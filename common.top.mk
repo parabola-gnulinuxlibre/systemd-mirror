@@ -29,8 +29,10 @@ endif
    objdir := $(call _noslash,$(dir $(lastword $(filter-out %.mk,$(MAKEFILE_LIST)))))
    srcdir := $(firstword $(call _relto,., $(topsrcdir)/$(call _relto,$(topobjdir),$(objdir)) ) .)
 
+included_makefiles := $(included_makefiles) $(abspath $(objdir)/Makefile)
+
 ## Set module name
-module := $(firstword $(subst /,_,$(if $(call _is_subdir,.,$(objdir)),$(call _relto,.,$(objdir)),dep-$(call _relto,$(topobjdir),$(objdir)))) all)
+module := $(subst /,_,$(if $(call _is_subdir,.,$(objdir)),$(firstword $(call _relto,.,$(objdir)) all),dep-$(firstword $(call _relto,$(topobjdir),$(objdir)) top)))
 
 ## Empty variables for use by the module
 subdirs =

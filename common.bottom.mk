@@ -39,9 +39,6 @@ $(parent)_clean_files := $($(parent)_clean_files) $($(module)_clean_files)
 $(parent)_slow_files  := $($(parent)_slow_files) $($(module)_slow_files)
 $(parent)_conf_files  := $($(parent)_conf_files) $($(module)_conf_files)
 $(parent)_dist_files  := $($(parent)_dist_files) $($(module)_dist_files)
-$(info added <$(module)> to <$(parent)>)
-$(info $(parent)_clean_files => $($(parent)_clean_files))
-$(info $(parent)_obj_files => $($(parent)_obj_files))
 endif
 
 modules := $(modules) $(module)
@@ -53,19 +50,36 @@ define _nl
 
 
 endef
+define _include_makefile
+ifeq ($(filter $(abspath $1),$(included_makefiles)),)
+include $(if $(call _is_subdir,.,$1),$(call _relto,.,$1),$(topobjdir)/$(call _relto,$(topobjdir),$1))
+endif
+endef
 $(eval \
   _COMMON_MK_NOONCE = n$(_nl)\
-  $(foreach dir,$(subdirs),parent=$(module)$(_nl)include $(objdir)/$(dir)/Makefile$(_nl)) \
-  $(foreach dir,$(depdirs),parent=dep      $(_nl)include $(objdir)/$(dir)/Makefile$(_nl)) \
+  $(foreach dir,$(subdirs),parent=$(module)$(_nl)$(call _include_makefile,$(objdir)/$(dir)/Makefile)$(_nl))\
+  parent=dep$(_nl)\
+  $(call _include_makefile,$(topobjdir)/$(dir)/Makefile)$(_nl)\
   _COMMON_MK_NOONCE = $(_COMMON_MK_NOONCE))
 
 
-# This only gets evaluated once, after all of the other Makefiles a read
+# This only gets evaluated once, after all of the other Makefiles are read
 ifeq ($(_COMMON_MK_NOONCE),)
-
-.phony = build install uninstall mostlyclean clean distclean maintainer-clean check
+# Empty module-level variables
+objdir = /bogus
+srcdir = /bogus
+subdirs =
+depdirs =
+src_files =
+obj_files =
+sys_files =
+clean_files =
+slow_files =
+conf_files =
+dist_files =
 
 # Declare phony targets
+.phony = build install uninstall mostlyclean clean distclean maintainer-clean check
 define module_rules
 .PHONY: $(addsuffix -%(module),$(.phony))
 # Constructive phony targets
@@ -93,11 +107,11 @@ $(topobjdir)/$(PACKAGE)-$(VERSION).tar.gz: $(topobjdir)/$(PACKAGE)-$(VERSION)
 	$(TAR) czf $@ -C $(<D) $(<F)
 _copyfile = $(MKDIRS) $(dir $2) && $(CP) $1 $2
 _addfile = $(call _copyfile,$3,$2/$(call _relto,$1,$3))
-$(topobjdir)/$(PACKAGE)-$(VERSION): $(all_src_files) $(all_dist_files)
+$(topobjdir)/$(PACKAGE)-$(VERSION): $(all_src_files) $(dep_src_files) $(all_dist_files) $(dep_dist_files)
 	$(RM) -r $@
 	$(MKDIR) $(@D)/tmp.$(@F).$$$$ && \
-	$(foreach f,$(all_src_files),$(call _addfile,$(topsrcdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
-	$(foreach f,$(all_dist_files),$(call _addfile,$(topobjdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
+	$(foreach f,$(all_src_files)  $(dep_src_files) ,$(call _addfile,$(topsrcdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
+	$(foreach f,$(all_dist_files) $(dep_dist_files),$(call _addfile,$(topobjdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
 	$(MV) $(@D)/tmp.$(@F).$$$$ $@ || $(RM) -r $(@D)/tmp.$(@F).$$$$
 
 include $(topsrcdir)/common.once.mk
