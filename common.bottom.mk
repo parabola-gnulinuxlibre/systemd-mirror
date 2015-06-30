@@ -28,7 +28,7 @@ $(module)_sys_files   := $(addprefix $(DESTDIR)/,$(sys_files))
 $(module)_clean_files := $(addprefix $(objdir)/,$(clean_files))
 $(module)_slow_files  := $(addprefix $(objdir)/,$(slow_files))
 $(module)_conf_files  := $(addprefix $(objdir)/,$(conf_files))
-$(module)_dist_files  := $(addprefix $(objdir)/,$(dist_files))
+$(module)_dist_files  := $(addprefix $(srcdir)/,$(dist_files))
 
 # And add them to the $(parent)_*_files variables (if applicable)
 ifneq ($(parent),)
@@ -110,8 +110,7 @@ _addfile = $(call _copyfile,$3,$2/$(call _relto,$1,$3))
 $(topobjdir)/$(PACKAGE)-$(VERSION): $(all_src_files) $(dep_src_files) $(all_dist_files) $(dep_dist_files)
 	$(RM) -r $@
 	$(MKDIR) $(@D)/tmp.$(@F).$$$$ && \
-	$(foreach f,$(all_src_files)  $(dep_src_files) ,$(call _addfile,$(topsrcdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
-	$(foreach f,$(all_dist_files) $(dep_dist_files),$(call _addfile,$(topobjdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
+	$(foreach f,$^,$(call _addfile,$(topsrcdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
 	$(MV) $(@D)/tmp.$(@F).$$$$ $@ || $(RM) -r $(@D)/tmp.$(@F).$$$$
 
 include $(topsrcdir)/common.once.mk
