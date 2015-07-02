@@ -19,98 +19,116 @@ include $(topsrcdir)/common.each.mk
 # Aggregate variables
 
 # Add some more defaults to the *_files variables
-clean_files += $(obj_files)
-conf_files += Makefile $(topobjdir)/config.mk
+clean_files += $(out_files)
+conf_files += Makefile $(topoutdir)/config.mk
 # Now namespace the *_files variables
-$(module)_src_files   := $(addprefix $(srcdir)/,$(src_files))
-$(module)_obj_files   := $(addprefix $(objdir)/,$(obj_files))
-$(module)_sys_files   := $(addprefix $(DESTDIR)/,$(sys_files))
-$(module)_clean_files := $(addprefix $(objdir)/,$(clean_files))
-$(module)_slow_files  := $(addprefix $(objdir)/,$(slow_files))
-$(module)_conf_files  := $(addprefix $(objdir)/,$(conf_files))
-$(module)_dist_files  := $(addprefix $(srcdir)/,$(dist_files))
+define _am_add_to_module
+_am_$(module)_src_files   = $(addprefix $(srcdir)/,$(src_files))
+_am_$(module)_out_files   = $(addprefix $(outdir)/,$(out_files))
+_am_$(module)_sys_files   = $(addprefix $(DESTDIR),$(sys_files))
+_am_$(module)_clean_files = $(addprefix $(outdir)/,$(clean_files))
+_am_$(module)_slow_files  = $(addprefix $(outdir)/,$(slow_files))
+_am_$(module)_conf_files  = $(addprefix $(outdir)/,$(conf_files))
+_am_$(module)_dist_files  = $(addprefix $(srcdir)/,$(dist_files))
+endef
+$(eval $(_am_add_to_module))
 
 # And add them to the $(parent)_*_files variables (if applicable)
+define _am_add_to_parent
+_am_%(parent)_src_files   += $(_am_%(module)_src_files)
+_am_%(parent)_out_files   += $(_am_%(module)_out_files)
+_am_%(parent)_sys_files   += $(_am_%(module)_sys_files)
+_am_%(parent)_clean_files += $(_am_%(module)_clean_files)
+_am_%(parent)_slow_files  += $(_am_%(module)_slow_files)
+_am_%(parent)_conf_files  += $(_am_%(module)_conf_files)
+_am_%(parent)_dist_files  += $(_am_%(module)_dist_files)
+endef
 ifneq ($(parent),)
-$(parent)_src_files   := $($(parent)_src_files) $($(module)_src_files)
-$(parent)_obj_files   := $($(parent)_obj_files) $($(module)_obj_files)
-$(parent)_sys_files   := $($(parent)_sys_files) $($(module)_sys_files)
-$(parent)_clean_files := $($(parent)_clean_files) $($(module)_clean_files)
-$(parent)_slow_files  := $($(parent)_slow_files) $($(module)_slow_files)
-$(parent)_conf_files  := $($(parent)_conf_files) $($(module)_conf_files)
-$(parent)_dist_files  := $($(parent)_dist_files) $($(module)_dist_files)
+$(eval $(subst %(parent),$(parent),$(subst %(module),$(module),$(value _am_add_to_parent))))
 endif
 
 modules := $(modules) $(module)
 
 
+# Do some per-module magic
+
+_am_phony = build install uninstall mostlyclean clean distclean maintainer-clean check
+
+.PHONY: $(addsuffix -%(module),$(_am_phony))
+
+$(addsuffix -$(module),uninstall mostlyclean clean distclean maintainer-clean) ::
+	$(RM) -- $(sort $(_am_$@))
+	$(RMDIRS) $(sort $(dir $(_am_$@))) 2>/dev/null || $(TRUE)
+
+
 # Include Makefiles from other directories
 
-define _nl
+define _am_nl
 
 
 endef
-define _include_makefile
+define _am_include_makefile
 ifeq ($(filter $(abspath $1),$(included_makefiles)),)
-include $(if $(call _is_subdir,.,$1),$(call _relto,.,$1),$(topobjdir)/$(call _relto,$(topobjdir),$1))
+include $(if $(call _am_is_subdir,.,$1),$(call _am_relto,.,$1),$(topoutdir)/$(call _am_relto,$(topoutdir),$1))
 endif
 endef
 $(eval \
-  _COMMON_MK_NOONCE = n$(_nl)\
-  $(foreach dir,$(subdirs),parent=$(module)$(_nl)$(call _include_makefile,$(objdir)/$(dir)/Makefile)$(_nl))\
-  parent=dep$(_nl)\
-  $(call _include_makefile,$(topobjdir)/$(dir)/Makefile)$(_nl)\
-  _COMMON_MK_NOONCE = $(_COMMON_MK_NOONCE))
+  _am_NO_ONCE = y$(_am_nl)\
+  $(foreach dir,$(subdirs),parent=$(module)$(_am_nl)$(call _am_include_makefile,$(outdir)/$(dir)/Makefile)$(_am_nl))\
+  parent=dep$(_am_nl)\
+  $(call _am_include_makefile,$(topoutdir)/$(dir)/Makefile)$(_am_nl)\
+  _am_NO_ONCE = $(_am_NO_ONCE))
 
 
 # This only gets evaluated once, after all of the other Makefiles are read
-ifeq ($(_COMMON_MK_NOONCE),)
+ifeq ($(_am_NO_ONCE),)
 # Empty module-level variables
-objdir = /bogus
+outdir = /bogus
 srcdir = /bogus
 subdirs =
 depdirs =
 src_files =
-obj_files =
+out_files =
 sys_files =
 clean_files =
 slow_files =
 conf_files =
 dist_files =
 
-# Declare phony targets
-.phony = build install uninstall mostlyclean clean distclean maintainer-clean check
-define module_rules
-.PHONY: $(addsuffix -%(module),$(.phony))
+ifeq ($(abspath .),$(abspath $(topoutdir)))
+_am_all_clean_files += $(topoutdir)/$(PACKAGE)-$(VERSION).tar.gz
+$(addsuffix -all,mostlyclean clean distclean maintainer-clean) ::
+	$(RM) -r -- $(topoutdir)/$(PACKAGE)-$(VERSION)
+endif
+
+define _am_module_rules
 # Constructive phony targets
-build-%(module): $(%(module)_obj_files)
-install-%(module): $(%(module)_sys_files)
+build-%(module): $(_am_%(module)_out_files)
+install-%(module): $(_am_%(module)_sys_files)
 # Destructive phony targets
-_%(module)_uninstall        = $(%(module)_sys_files))
-_%(module)_mostlyclean      = $(filter-out $(%(module)_slow_files) $(%(module)_conf_files) $(%(module)_dist_files),$(%(module)_clean_files))
-_%(module)_clean            = $(filter-out                         $(%(module)_conf_files) $(%(module)_dist_files),$(%(module)_clean_files))
-_%(module)_distclean        = $(filter-out                                                 $(%(module)_dist_files),$(%(module)_clean_files))
-_%(module)_maintainer-clean =                                                                                      $(%(module)_clean_files)
-uninstall-%(module) mostlyclean-%(module) clean-%(module) distclean-%(module) maintainer-clean-%(module): %-%(module):
-	$(RM) -- $(sort $(_%(module)_$*))
-	$(RMDIRS) $(sort $(dir $(_%(module)_$*))) 2>/dev/null || $(TRUE)
+_am_uninstall-%(module)        = $(_am_%(module)_sys_files))
+_am_mostlyclean-%(module)      = $(filter-out $(_am_%(module)_slow_files) $(_am_%(module)_conf_files) $(_am_%(module)_dist_files),$(_am_%(module)_clean_files))
+_am_clean-%(module)            = $(filter-out                             $(_am_%(module)_conf_files) $(_am_%(module)_dist_files),$(_am_%(module)_clean_files))
+_am_distclean-%(module)        = $(filter-out                                                         $(_am_%(module)_dist_files),$(_am_%(module)_clean_files))
+_am_maintainer-clean-%(module) =                                                                                                  $(_am_%(module)_clean_files)
 endef
-$(foreach module,$(modules),$(eval $(subst %(module),$(module),$(value module_rules))))
+$(foreach module,$(modules),$(eval $(subst %(module),$(module),$(value _am_module_rules))))
 
 # Alias each bare phony target to itself with the `-all` suffix
-$(foreach t,$(.phony),$(eval $t: $t-all))
+$(foreach t,$(_am_phony),$(eval $t: $t-all))
 
 # Add the `dist` target
 .PHONY: dist
-dist: $(topobjdir)/$(PACKAGE)-$(VERSION).tar.gz
-$(topobjdir)/$(PACKAGE)-$(VERSION).tar.gz: $(topobjdir)/$(PACKAGE)-$(VERSION)
+dist: $(topoutdir)/$(PACKAGE)-$(VERSION).tar.gz
+$(topoutdir)/$(PACKAGE)-$(VERSION).tar.gz: $(topoutdir)/$(PACKAGE)-$(VERSION)
 	$(TAR) czf $@ -C $(<D) $(<F)
-_copyfile = $(MKDIRS) $(dir $2) && $(CP) $1 $2
-_addfile = $(call _copyfile,$3,$2/$(call _relto,$1,$3))
-$(topobjdir)/$(PACKAGE)-$(VERSION): $(all_src_files) $(dep_src_files) $(all_dist_files) $(dep_dist_files)
+_am_copyfile = $(MKDIRS) $(dir $2) && $(CP) $1 $2
+_am_addfile = $(call _am_copyfile,$3,$2/$(call _am_relto,$1,$3))
+$(topoutdir)/$(PACKAGE)-$(VERSION): $(_am_all_src_files) $(_am_dep_src_files) $(_am_all_dist_files) $(_am_dep_dist_files)
 	$(RM) -r $@
+	@PS4='' && set -x && \
 	$(MKDIR) $(@D)/tmp.$(@F).$$$$ && \
-	$(foreach f,$^,$(call _addfile,$(topsrcdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
+	$(foreach f,$^,$(call _am_addfile,$(topsrcdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
 	$(MV) $(@D)/tmp.$(@F).$$$$ $@ || $(RM) -r $(@D)/tmp.$(@F).$$$$
 
 include $(topsrcdir)/common.once.mk

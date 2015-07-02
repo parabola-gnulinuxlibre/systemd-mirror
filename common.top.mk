@@ -14,32 +14,32 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Both of these have the argument order "parent,child"
-_noslash = $(patsubst %/,%,$1)
-_relto = $(call _noslash,$(patsubst $(abspath $1)/%,%,$(abspath $2)/))
-_is_subdir = $(filter $(abspath $1)/%,$(abspath $2)/)
+_am_noslash = $(patsubst %/,%,$1)
+_am_relto = $(call _am_noslash,$(patsubst $(abspath $1)/%,%,$(abspath $2)/))
+_am_is_subdir = $(filter $(abspath $1)/%,$(abspath $2)/)
 
 ## Declare the standard targets
 all: build
 .PHONY: all
 
-## Set topobjdir, objdir, and srcdir (assumes that topsrcdir is already set)
-ifeq ($(topobjdir),)
-topobjdir := $(call _noslash,$(dir $(lastword $(filter %/config.mk config.mk,$(MAKEFILE_LIST)))))
+## Set topoutdir, outdir, and srcdir (assumes that topsrcdir is already set)
+ifeq ($(topoutdir),)
+topoutdir := $(call _am_noslash,$(dir $(lastword $(filter %/config.mk config.mk,$(MAKEFILE_LIST)))))
 endif
-   objdir := $(call _noslash,$(dir $(lastword $(filter-out %.mk,$(MAKEFILE_LIST)))))
-   srcdir := $(firstword $(call _relto,., $(topsrcdir)/$(call _relto,$(topobjdir),$(objdir)) ) .)
+   outdir := $(call _am_noslash,$(dir $(lastword $(filter-out %.mk,$(MAKEFILE_LIST)))))
+   srcdir := $(firstword $(call _am_relto,., $(topsrcdir)/$(call _am_relto,$(topoutdir),$(outdir)) ) .)
 
-included_makefiles := $(included_makefiles) $(abspath $(objdir)/Makefile)
+included_makefiles := $(included_makefiles) $(abspath $(outdir)/Makefile)
 
 ## Set module name
-module := $(subst /,_,$(if $(call _is_subdir,.,$(objdir)),$(firstword $(call _relto,.,$(objdir)) all),dep-$(firstword $(call _relto,$(topobjdir),$(objdir)) top)))
+module := $(subst /,_,$(if $(call _am_is_subdir,.,$(outdir)),$(firstword $(call _am_relto,.,$(outdir)) all),dep-$(firstword $(call _am_relto,$(topoutdir),$(outdir)) top)))
 
 ## Empty variables for use by the module
 subdirs =
 depdirs =
 
 src_files =
-obj_files =
+out_files =
 sys_files =
 
 clean_files =
