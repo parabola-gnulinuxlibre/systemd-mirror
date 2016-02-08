@@ -1,0 +1,88 @@
+Luke's AutoMake
+===============
+
+Yo, this document is incomplete.  It describes the magical
+automake.{head,tail}.mk Makefiles and how to use them, kinda.
+
+I wrote a "clone" of automake.  I say clone, because it works
+differently.  Yeah, I need a new name for it.
+
+Anyway, how to use it:
+
+In each source directory, you write a `Makefile`, very similarly to if
+you were writing for plain GNU Make, with
+
+_am_phony = build install uninstall mostlyclean clean distclean maintainer-clean check
+
+
+    include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+    include $(topsrcdir)/automake.head.mk
+
+    # your makefile
+    
+    include $(topsrcdir)/automake.tail.mk
+
+Write your own `common.each.mk` that gets included after the body of
+your Makefile for each Makefile.
+
+Write your own `common.once.mk` that gets included once after
+everything else has been parsed.
+
+There are several commands that generate files; simply record what
+they the list of files in their output to the following variables:
+
+| Variable  | Command      | Description                       | Relative to |
+|-----------+--------------+-----------------------------------+-------------|
+| src_files | emacs        | Files that the developer writes   | srcdir      |
+| gen_files | ???          | Files the developer compiles      | srcdir      |
+| cfg_files | ./configure  | Users' compile-time configuration | outdir      |
+| out_files | make all     | Files the user compiles           | outdir      |
+| sys_files | make install | Files the user installs           | DESTDIR     |
+
+In addition, there are
+
+    subdirs   : A list of other directories containing Makefiles that
+                contain or generate files that are dependencies of
+                targets in this directory.  They are not necesarily
+                actually subdirectories of this directory in the
+                filesystem.
+    
+    clean_files : A list of things to `rm` in addition to
+                  `$(out_files)` when you run `make clean`. (Example:
+                  `*.o`).
+    
+    slow_files : A list of things in `$(out_files)` that (as an
+                 exception) should _not_ be deleted when you run `make
+                 mostlyclean`.
+
+Each directory containing a Makefile is a "module".  The module name
+is one of 4 things (with / replaced with _ in all cases):
+ - `all`
+ - $(realpath --relative-to=. $dir_name)
+ - dep-top
+ - dep-$(realpath --relative-to=$(topoutdir) $dir_name)
+
+The dep-* options are only used if that directory is not a child of
+the current directory.
+
+Here is a table of all of the .PHONY targets that automake takes care
+of for you:
+
+| this | and this         | are aliases for this | which is just a case of this |
+|------+------------------+----------------------+------------------------------|
+| all  | build            | build-all            | build-$(module)              |
+|      | install          | install-all          | install-$(module)            |
+|      | uninstall        | uninstall-all        | uninstall-$(module)          |
+|      | mostlyclean      | mostlyclean-all      | mostlyclean-$(module)        |
+|      | clean            | clean-all            | clean-$(module)              |
+|      | distclean        | distclean-all        | distclean-$(module)          |
+|      | maintainer-clean | maintainer-clean-all | maintainer-clean-$(module)   |
+|      | check            | check-all            | check-$(module)              |
+|      |                  |                      | dist                         |
+
+----
+Copyright (C) 2016  Luke Shumaker
+
+This documentation file is placed into the public domain.  If that is
+not possible in your legal system, I grant you permission to use it in
+absolutely every way that I can legally do so.
