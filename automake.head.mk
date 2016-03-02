@@ -39,7 +39,7 @@ endif
 
 _am_included_makefiles := $(_am_included_makefiles) $(call _am_path,$(outdir)/Makefile)
 
-## Empty variables for use by the module
+## Empty variables for use by each Makefile
 $(_am)subdirs =
 $(_am)depdirs =
 
