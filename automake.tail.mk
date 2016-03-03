@@ -19,8 +19,7 @@ include $(topsrcdir)/common.each.tail.mk
 # Aggregate variables
 
 # Add some more defaults to the *_files variables
-$(_am)clean_files += $($(_am)gen_files) $($(_am)out_files)
-$(_am)cfg_files += Makefile
+$(_am)clean_files += $($(_am)gen_files) $($(_am)cfg_files) $($(_am)out_files)
 
 # Now namespace the *_files variables
 define _am_save_variables
@@ -103,10 +102,10 @@ $(outdir)/build  : $(_am_out_files/%(outdir))
 $(outdir)/install: $(_am_sys_files/%(outdir))
 # Destructive phony targets
 _am_uninstall/%(outdir)        = $(_am_sys_files/%(outdir))
-_am_mostlyclean/%(outdir)      = $(filter-out $(_am_slow_files/%(outdir)) $(_am_cfg_files/%(outdir)) $(_am_gen_files/%(outdir)),$(_am_clean_files/%(outdir)))
-_am_clean/%(outdir)            = $(filter-out                             $(_am_cfg_files/%(outdir)) $(_am_gen_files/%(outdir)),$(_am_clean_files/%(outdir)))
-_am_distclean/%(outdir)        = $(filter-out                                                        $(_am_gen_files/%(outdir)),$(_am_clean_files/%(outdir)))
-_am_maintainer-clean/%(outdir) =                                                                                                $(_am_clean_files/%(outdir))
+_am_mostlyclean/%(outdir)      = $(filter-out $(_am_slow_files/%(outdir)) $(_am_cfg_files/%(outdir)) $(_am_gen_files/%(outdir)) $(_am_src_files/%(outdir)),$(_am_clean_files/%(outdir)))
+_am_clean/%(outdir)            = $(filter-out                             $(_am_cfg_files/%(outdir)) $(_am_gen_files/%(outdir)) $(_am_src_files/%(outdir)),$(_am_clean_files/%(outdir)))
+_am_distclean/%(outdir)        = $(filter-out                                                        $(_am_gen_files/%(outdir)) $(_am_src_files/%(outdir)),$(_am_clean_files/%(outdir)))
+_am_maintainer-clean/%(outdir) = $(filter-out                                                                                   $(_am_src_files/%(outdir)),$(_am_clean_files/%(outdir)))
 endef
 $(foreach outdir,$(_am_outdirs),$(eval $(subst %(outdir),$(outdir),$(value _am_directory_rules))))
 
