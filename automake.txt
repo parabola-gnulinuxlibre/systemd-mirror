@@ -82,7 +82,9 @@ recursive Makefile:
         specified twice, once for each case.
  2. if a prerequisite is in a directory "owned" by another Makefile,
     you must filter the pathname through `am_path`:
-    `$(call am_path,YOUR_PATH)`.
+    `$(call am_path,YOUR_PATH)`.  Further, that path must NOT contain
+    a `..` segment; if you need to refer to a sibling directory, do it
+    relative to `$(topoutdir)` or `$(topsrcdir)`.
 
 Telling automake about your program
 -----------------------------------
@@ -93,8 +95,8 @@ are all prefixed with `am_`; this prefix may be changed by editing the
 
 The exception to this is the `am_path` variable, which is a macro that
 is used to make a list of filenames relative to the appropriate
-directory, because unlike normal GNU (Auto)Make, $(outdir) isn't
-nescessarily equal to '.'.  See above.
+directory, because unlike normal GNU (Auto)Make, `$(outdir)` isn't
+nescessarily equal to `.`.  See above.
 
 There are several commands that generate files; simply record the list
 of files that each command generates as the following variable
@@ -147,15 +149,6 @@ If you have a `./configure` script, don't have it modify the
 `Makefile`s; have everything you need modified be in
 `$(topoutdir)/config.mk` and have it generate that; then have it copy
 (or (sym?)link?) every `$(srcdir)/Makefile` into `$(outdir)/Makefile`.
-
-If you're wondering, `am_path` is defined equivalently to:
-
-    am_path = $(if $1,$(shell realpath -sm -- $1))`
-
-though it is implemented purely in Make, instead of calling out to
-another program.  Besides that older versions of coreutils don't have
-`realpath`, calling to an external program like that can have a
-_substantial_ slowdown on the parse time.
 
 ----
 Copyright (C) 2016  Luke Shumaker
