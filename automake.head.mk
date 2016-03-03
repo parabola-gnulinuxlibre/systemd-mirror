@@ -17,13 +17,14 @@ _am = am_
 
 _am_noslash = $(patsubst %/.,%,$(patsubst %/,%,$1))
 # These are all $(call _am_func,parent,child)
-#_am_relto = $(if $2,$(shell realpath -s --relative-to='$1' $2))
+#_am_relto = $(if $2,$(shell realpath -sm --relative-to='$1' $2))
 _am_is_subdir = $(filter $(abspath $1)/%,$(abspath $2)/.)
 _am_relto_helper = $(if $(call _am_is_subdir,$1,$2),$(patsubst $1/%,%,$(addsuffix /.,$2)),$(addprefix ../,$(call _am_relto_helper,$(patsubst %/,%,$(dir $1)),$2)))
 _am_relto = $(call _am_noslash,$(call _am_relto_helper,$(call _am_noslash,$(abspath $1)),$(call _am_noslash,$(abspath $2))))
 # Note that _am_is_subdir says that a directory is a subdirectory of
 # itself.
 _am_path = $(call _am_relto,.,$1)
+am_path = $(foreach p,$1,$(call _am_relto,$p))
 
 ## Declare the default target
 all: build
