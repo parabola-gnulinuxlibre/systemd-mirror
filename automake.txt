@@ -41,24 +41,13 @@ What you have to do is:
 In each source directory, you write a `Makefile`, very similarly to if
 you were writing for plain GNU Make, with
 
-    # adjust the number of `../` segments as appropriate
-    include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+    topoutdir ?= ...
+    topsrcdir ?= ...
     include $(topsrcdir)/automake.head.mk
 
     # your makefile
     
     include $(topsrcdir)/automake.tail.mk
-
-And in the top-level output directory, you write a `config.mk` with:
-
-    ifeq ($(topsrcdir),)
-    # have your ./configure script adjust topsrcdir if doing an
-    # out-of-tree build
-    topsrcdir := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
-
-    # your configuration
-
-    endif
 
 And in the top-level source directory, Write your own helper makefiles
 that get included:
@@ -145,10 +134,27 @@ between directories:
 Tips, notes
 -----------
 
-If you have a `./configure` script, don't have it modify the
-`Makefile`s; have everything you need modified be in
-`$(topoutdir)/config.mk` and have it generate that; then have it copy
-(or (sym?)link?) every `$(srcdir)/Makefile` into `$(outdir)/Makefile`.
+I like to have the first (non-comment) line in a Makefile be:
+
+    include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+
+(adjusting the number of `../` sequences as nescessary).  Then, my
+(user-editable) `config.mk` is of the form:
+
+    ifeq ($(topsrcdir),)
+    topoutdir := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+    topsrcdir := $(topoutdir)
+
+    # your configuration
+
+    endif
+
+If the package has a `./configure` script, then I have it modifiy
+topsrcdir as necessary, as well as modifying whatever other parts of
+the configuration.  All of the configuration lives in `config.mk`;
+`./configure` doesn't modify any `Makefile`s, it just generates
+`config.mk`, and copies (or (sym?)link?) every `$(srcdir)/Makefile` to
+`$(outdir)/Makefile`.
 
 ----
 Copyright (C) 2016  Luke Shumaker

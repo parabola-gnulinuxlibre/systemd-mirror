@@ -30,13 +30,10 @@ am_path = $(foreach p,$1,$(call _am_relto,$p))
 all: build
 .PHONY: all
 
-## Set topoutdir, outdir, and srcdir (assumes that topsrcdir is
-## already set, and that $(topoutdir)/config.mk has been included)
-ifeq ($(topoutdir),)
-topoutdir := $(call _am_path,$(dir $(lastword $(filter %/config.mk config.mk,$(MAKEFILE_LIST)))))
-endif
-   outdir := $(call _am_path,$(dir $(lastword $(filter-out %.mk,$(MAKEFILE_LIST)))))
-   srcdir := $(call _am_path,$(topsrcdir)/$(call _am_relto,$(topoutdir),$(outdir)))
+## Set outdir and srcdir (assumes that topoutdir and topsrcdir are
+## already set)
+outdir := $(call _am_path,$(dir $(lastword $(filter-out %.mk,$(MAKEFILE_LIST)))))
+srcdir := $(call _am_path,$(topsrcdir)/$(call _am_relto,$(topoutdir),$(outdir)))
 
 _am_included_makefiles := $(_am_included_makefiles) $(call _am_path,$(outdir)/Makefile)
 
