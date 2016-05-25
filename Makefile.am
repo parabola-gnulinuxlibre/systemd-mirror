@@ -1,3 +1,4 @@
+#@all
 #  -*- Mode: makefile; indent-tabs-mode: t -*-
 #
 #  This file is part of systemd.
@@ -6,6 +7,7 @@
 #  Copyright 2010-2012 Kay Sievers
 #  Copyright 2013 Zbigniew Jędrzejewski-Szmek
 #  Copyright 2013 David Strauss
+#  Copyright 2016 Luke Shumaker
 #
 #  systemd is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License as published by
@@ -19,7 +21,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-
+#@common.once.head.mk
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 AM_MAKEFLAGS = --no-print-directory
 AUTOMAKE_OPTIONS = color-tests parallel-tests
@@ -38,14 +40,17 @@ SUBDIRS = . po
 # Keep the test-suite.log
 .PRECIOUS: $(TEST_SUITE_LOG) Makefile
 
+#@src/libudev/Makefile
 LIBUDEV_CURRENT=7
 LIBUDEV_REVISION=5
 LIBUDEV_AGE=6
 
+#@src/libsystemd/Makefile
 LIBSYSTEMD_CURRENT=17
 LIBSYSTEMD_REVISION=0
 LIBSYSTEMD_AGE=17
 
+#@config.mk
 # Dirs of external packages
 dbuspolicydir=@dbuspolicydir@
 dbussessionservicedir=@dbussessionservicedir@
@@ -97,6 +102,7 @@ rootprefix=@rootprefix@
 rootbindir=$(rootprefix)/bin
 rootlibexecdir=$(rootprefix)/lib/systemd
 
+#@discard.mk
 EXTRA_DIST =
 BUILT_SOURCES =
 INSTALL_EXEC_HOOKS =
@@ -379,6 +385,7 @@ bin_PROGRAMS = \
 	systemd-stdio-bridge \
 	systemd-path
 
+#@src/kernel-install/Makefile
 dist_bin_SCRIPTS = \
 	src/kernel-install/kernel-install
 
@@ -386,6 +393,7 @@ dist_kernelinstall_SCRIPTS = \
 	src/kernel-install/50-depmod.install \
 	src/kernel-install/90-loaderentry.install
 
+#@discard.mk
 rootlibexec_PROGRAMS = \
 	systemd \
 	systemd-cgroups-agent \
@@ -739,7 +747,7 @@ EXTRA_DIST += \
 	tools/xml_helper.py \
 	man/glib-event-glue.c
 
-# ------------------------------------------------------------------------------
+#@src/basic/Makefile -----------------------------------------------------------
 noinst_LTLIBRARIES += \
 	libbasic.la
 
@@ -956,7 +964,7 @@ libbasic_la_LIBADD = \
 	-lrt \
 	-lm
 
-# -----------------------------------------------------------------------------
+#@src/shared/Makefile ---------------------------------------------------------
 noinst_LTLIBRARIES += \
 	libshared.la
 
@@ -1134,7 +1142,7 @@ libfirewall_la_LIBADD = \
 	$(LIBIPTC_LIBS)
 endif # HAVE_LIBIPTC
 
-# -----------------------------------------------------------------------------
+#@discard.mk ------------------------------------------------------------------
 if ENABLE_LDCONFIG
 dist_systemunit_DATA += \
 	units/ldconfig.service
@@ -1143,7 +1151,7 @@ SYSINIT_TARGET_WANTS += \
 	ldconfig.service
 endif # ENABLE_LDCONFIG
 
-# ------------------------------------------------------------------------------
+#@src/core/Makefile ------------------------------------------------------------
 noinst_LTLIBRARIES += \
 	libcore.la
 
@@ -1290,6 +1298,7 @@ src/core/load-fragment-gperf-nulstr.c: src/core/load-fragment-gperf.gperf
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ keywords=0 ; FS="," ; print "extern const char load_fragment_gperf_nulstr[];" ; print "const char load_fragment_gperf_nulstr[] ="} ; keyword==1 { print "\"" $$1 "\\0\"" } ; /%%/ { keyword=1} ; END { print ";" }' < $< > $@
 
+#@discard.mk
 gperf_gperf_m4_sources = \
 	src/core/load-fragment-gperf.gperf.m4
 
@@ -1326,7 +1335,7 @@ CLEANFILES += \
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 
-
+#@src/basic/Makefile
 src/basic/errno-list.txt:
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM -include errno.h - </dev/null | $(AWK) '/^#define[ \t]+E[^ _]+[ \t]+/ { print $$2; }' >$@
@@ -1374,6 +1383,7 @@ src/basic/cap-from-name.h: src/basic/cap-from-name.gperf
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_capability -H hash_capability_name -p -C <$< >$@
 
+#@src/journal/Makefile
 audit_list_includes = -include linux/audit.h -include missing.h
 if HAVE_AUDIT
 audit_list_includes += -include libaudit.h
@@ -1400,7 +1410,7 @@ src/resolve/dns_type-from-name.gperf: src/resolve/dns_type-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct dns_type_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { s=$$1; sub(/_/, "-", s); printf "%s, ", $$s; printf "DNS_TYPE_%s\n", $$1 }' <$< >$@
 
-# ------------------------------------------------------------------------------
+#@src/core/Makefile ------------------------------------------------------------
 systemd_SOURCES = \
 	src/core/main.c
 
@@ -1439,7 +1449,7 @@ EXTRA_DIST += \
 	src/core/macros.systemd.in \
 	src/core/triggers.systemd.in
 
-# ------------------------------------------------------------------------------
+#@test/Makefile ----------------------------------------------------------------
 
 manual_tests += \
 	test-ns \
@@ -2390,7 +2400,7 @@ test_arphrd_list_SOURCES = \
 test_arphrd_list_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@discard.mk -------------------------------------------------------------------
 ## .PHONY so it always rebuilds it
 .PHONY: coverage lcov-run lcov-report coverage-sync
 
@@ -2429,7 +2439,7 @@ lcov-run lcov-report:
 	echo "Need to reconfigure with --enable-coverage"
 endif # ENABLE_COVERAGE
 
-# ------------------------------------------------------------------------------
+#@src/analyze/Makefile ---------------------------------------------------------
 systemd_analyze_SOURCES = \
 	src/analyze/analyze.c \
 	src/analyze/analyze-verify.c \
@@ -2443,14 +2453,14 @@ systemd_analyze_CFLAGS = \
 systemd_analyze_LDADD = \
 	libcore.la
 
-# ------------------------------------------------------------------------------
+#@src/initctl/Makefile ---------------------------------------------------------
 systemd_initctl_SOURCES = \
 	src/initctl/initctl.c
 
 systemd_initctl_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/update-utmp/Makefile -----------------------------------------------------
 systemd_update_utmp_SOURCES = \
 	src/update-utmp/update-utmp.c
 
@@ -2462,14 +2472,14 @@ systemd_update_utmp_LDADD = \
 	libsystemd-shared.la \
 	$(AUDIT_LIBS)
 
-# ------------------------------------------------------------------------------
+#@src/update-done/Makefile -----------------------------------------------------
 systemd_update_done_SOURCES = \
 	src/update-done/update-done.c
 
 systemd_update_done_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/core/Makefile ------------------------------------------------------------
 systemd_shutdown_SOURCES = \
 	src/core/umount.c \
 	src/core/umount.h \
@@ -2482,7 +2492,7 @@ systemd_shutdown_SOURCES = \
 systemd_shutdown_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/modules-load/Makefile ----------------------------------------------------
 if HAVE_KMOD
 systemd_modules_load_SOURCES = \
 	src/modules-load/modules-load.c
@@ -2517,7 +2527,7 @@ EXTRA_DIST += \
 	units/systemd-modules-load.service.in \
 	units/kmod-static-nodes.service.in
 
-# ------------------------------------------------------------------------------
+#@src/tmpfiles/Makefile --------------------------------------------------------
 if ENABLE_TMPFILES
 systemd_tmpfiles_SOURCES = \
 	src/tmpfiles/tmpfiles.c
@@ -2581,7 +2591,7 @@ EXTRA_DIST += \
 	units/systemd-tmpfiles-setup.service.in \
 	units/systemd-tmpfiles-clean.service.in
 
-# ------------------------------------------------------------------------------
+#@src/sysusers/Makefile --------------------------------------------------------
 if ENABLE_SYSUSERS
 systemd_sysusers_SOURCES = \
 	src/sysusers/sysusers.c
@@ -2617,7 +2627,7 @@ EXTRA_DIST += \
 	sysusers.d/systemd-remote.conf.m4 \
 	sysusers.d/basic.conf.in
 
-# ------------------------------------------------------------------------------
+#@discard.mk -------------------------------------------------------------------
 dist_factory_etc_DATA = \
 	factory/etc/nsswitch.conf
 
@@ -2627,7 +2637,7 @@ dist_factory_pam_DATA = \
 	factory/etc/pam.d/other
 endif # HAVE_PAM
 
-# ------------------------------------------------------------------------------
+#@src/firstboot/Makefile -------------------------------------------------------
 if ENABLE_FIRSTBOOT
 systemd_firstboot_SOURCES = \
 	src/firstboot/firstboot.c
@@ -2649,7 +2659,7 @@ endif # ENABLE_FIRSTBOOT
 EXTRA_DIST += \
 	units/systemd-firstboot.service.in
 
-# ------------------------------------------------------------------------------
+#@src/machine-id-setup/Makefile ------------------------------------------------
 systemd_machine_id_setup_SOURCES = \
 	src/machine-id-setup/machine-id-setup-main.c \
 	src/core/machine-id-setup.c \
@@ -2661,35 +2671,35 @@ systemd_machine_id_setup_LDADD = \
 SYSINIT_TARGET_WANTS += \
 	systemd-machine-id-commit.service
 
-# ------------------------------------------------------------------------------
+#@src/sysctl/Makefile ----------------------------------------------------------
 systemd_sysctl_SOURCES = \
 	src/sysctl/sysctl.c
 
 systemd_sysctl_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/sleep/Makefile -----------------------------------------------------------
 systemd_sleep_SOURCES = \
 	src/sleep/sleep.c
 
 systemd_sleep_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/fsck/Makefile ------------------------------------------------------------
 systemd_fsck_SOURCES = \
 	src/fsck/fsck.c
 
 systemd_fsck_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/ac-power/Makefile --------------------------------------------------------
 systemd_ac_power_SOURCES = \
 	src/ac-power/ac-power.c
 
 systemd_ac_power_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/detect-virt/Makefile -----------------------------------------------------
 systemd_detect_virt_SOURCES = \
 	src/detect-virt/detect-virt.c
 
@@ -2699,28 +2709,28 @@ systemd_detect_virt_LDADD = \
 INSTALL_EXEC_HOOKS += \
 	systemd-detect-virt-install-hook
 
-# ------------------------------------------------------------------------------
+#@src/delta/Makefile -----------------------------------------------------------
 systemd_delta_SOURCES = \
 	src/delta/delta.c
 
 systemd_delta_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/getty-generator/Makefile -------------------------------------------------
 systemd_getty_generator_SOURCES = \
 	src/getty-generator/getty-generator.c
 
 systemd_getty_generator_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/debug-generator/Makefile -------------------------------------------------
 systemd_debug_generator_SOURCES = \
 	src/debug-generator/debug-generator.c
 
 systemd_debug_generator_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/fstab-generator/Makefile -------------------------------------------------
 systemd_fstab_generator_SOURCES = \
 	src/fstab-generator/fstab-generator.c \
 	src/core/mount-setup.c
@@ -2728,14 +2738,14 @@ systemd_fstab_generator_SOURCES = \
 systemd_fstab_generator_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/system-update-generator/Makefile -----------------------------------------
 systemd_system_update_generator_SOURCES = \
 	src/system-update-generator/system-update-generator.c
 
 systemd_system_update_generator_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/hibernate-resume/Makefile ------------------------------------------------
 if ENABLE_HIBERNATE
 systemgenerator_PROGRAMS += \
 	systemd-hibernate-resume-generator
@@ -2770,7 +2780,7 @@ EXTRA_DIST += \
 	units/systemd-hibernate-resume@.service.in \
 	units/systemd-hybrid-sleep.service.in
 
-# ------------------------------------------------------------------------------
+#@src/boot/Makefile ------------------------------------------------------------
 if ENABLE_EFI
 if HAVE_BLKID
 bootctl_SOURCES = \
@@ -2799,7 +2809,7 @@ dist_zshcompletion_data += \
 	shell-completion/zsh/_bootctl
 endif # HAVE_BLKID
 
-# ------------------------------------------------------------------------------
+#@discard.mk -------------------------------------------------------------------
 if HAVE_GNUEFI
 efi_cppflags = \
 	$(EFI_CPPFLAGS) \
@@ -2860,7 +2870,7 @@ endif # ARCH_AARCH64
 endif # HAVE_GNUEFI
 endif # ENABLE_EFI
 
-# ------------------------------------------------------------------------------
+#@src/boot/efi/Makefile --------------------------------------------------------
 systemd_boot_headers = \
 	src/boot/efi/util.h \
 	src/boot/efi/console.h \
@@ -2967,7 +2977,7 @@ test-efi: test-efi-disk.img
 
 EXTRA_DIST += test/test-efi-create-disk.sh
 
-# ------------------------------------------------------------------------------
+#@src/gpt-auto-generator/Makefile ----------------------------------------------
 if HAVE_BLKID
 systemgenerator_PROGRAMS +=  \
 	systemd-gpt-auto-generator
@@ -2989,21 +2999,21 @@ endif # HAVE_BLKID
 dist_xinitrc_SCRIPTS = \
 	xorg/50-systemd-user.sh
 
-# ------------------------------------------------------------------------------
+#@src/sysv-generator/Makefile --------------------------------------------------
 systemd_sysv_generator_SOURCES = \
 	src/sysv-generator/sysv-generator.c
 
 systemd_sysv_generator_LDADD = \
 	libcore.la
 
-# ------------------------------------------------------------------------------
+#@src/rc-local-generator/Makefile ----------------------------------------------
 systemd_rc_local_generator_SOURCES = \
 	src/rc-local-generator/rc-local-generator.c
 
 systemd_rc_local_generator_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/remount-fs/Makefile ------------------------------------------------------
 systemd_remount_fs_SOURCES = \
 	src/remount-fs/remount-fs.c \
 	src/core/mount-setup.c \
@@ -3012,70 +3022,70 @@ systemd_remount_fs_SOURCES = \
 systemd_remount_fs_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/cgroups-agent/Makefile ---------------------------------------------------
 systemd_cgroups_agent_SOURCES = \
 	src/cgroups-agent/cgroups-agent.c
 
 systemd_cgroups_agent_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/escape/Makefile ----------------------------------------------------------
 systemd_escape_SOURCES = \
 	src/escape/escape.c
 
 systemd_escape_LDADD = \
 	libsystemd-shared.la
 
-# -----------------------------------------------------------------------------
+#@src/systemctl/Makefile ------------------------------------------------------
 systemctl_SOURCES = \
 	src/systemctl/systemctl.c
 
 systemctl_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/notify/Makefile ----------------------------------------------------------
 systemd_notify_SOURCES = \
 	src/notify/notify.c
 
 systemd_notify_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/path/Makefile ------------------------------------------------------------
 systemd_path_SOURCES = \
 	src/path/path.c
 
 systemd_path_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/ask-password/Makefile ----------------------------------------------------
 systemd_ask_password_SOURCES = \
 	src/ask-password/ask-password.c
 
 systemd_ask_password_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/reply-password/Makefile --------------------------------------------------
 systemd_reply_password_SOURCES = \
 	src/reply-password/reply-password.c
 
 systemd_reply_password_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/cgls/Makefile ------------------------------------------------------------
 systemd_cgls_SOURCES = \
 	src/cgls/cgls.c
 
 systemd_cgls_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/cgtop/Makefile -----------------------------------------------------------
 systemd_cgtop_SOURCES = \
 	src/cgtop/cgtop.c
 
 systemd_cgtop_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/nspawn/Makefile ----------------------------------------------------------
 systemd_nspawn_SOURCES = \
 	src/nspawn/nspawn.c \
 	src/nspawn/nspawn-settings.c \
@@ -3144,7 +3154,7 @@ test_patch_uid_LDADD = \
 manual_tests += \
 	test-patch-uid
 
-# ------------------------------------------------------------------------------
+#@src/run/Makefile -------------------------------------------------------------
 systemd_run_SOURCES = \
 	src/run/run.c
 
@@ -3165,14 +3175,14 @@ systemd_stdio_bridge_SOURCES = \
 systemd_stdio_bridge_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/tty-ask-password-agent/Makefile ------------------------------------------
 systemd_tty_ask_password_agent_SOURCES = \
 	src/tty-ask-password-agent/tty-ask-password-agent.c
 
 systemd_tty_ask_password_agent_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/libsystemd/Makefile ------------------------------------------------------
 libsystemd_internal_la_SOURCES = \
 	src/systemd/sd-bus.h \
 	src/systemd/sd-bus-protocol.h \
@@ -3477,7 +3487,7 @@ busctl_SOURCES = \
 busctl_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/libsystemd-network/Makefile ----------------------------------------------
 noinst_LTLIBRARIES += \
 	libsystemd-network.la
 
@@ -3628,7 +3638,7 @@ tests += \
 	test-dhcp6-client \
 	test-lldp
 
-# ------------------------------------------------------------------------------
+#@src/libudev/Makefile ---------------------------------------------------------
 include_HEADERS += \
 	src/libudev/libudev.h
 
@@ -3671,7 +3681,7 @@ noinst_LTLIBRARIES += \
 libudev_internal_la_SOURCES =\
 	$(libudev_la_SOURCES)
 
-# ------------------------------------------------------------------------------
+#@src/udev/Makefile ------------------------------------------------------------
 INSTALL_DIRS += \
 	$(sysconfdir)/udev/rules.d
 
@@ -3946,7 +3956,7 @@ EXTRA_DIST += \
 	test/mocks/fsck \
 	hwdb/parse_hwdb.py
 
-# ------------------------------------------------------------------------------
+#@src/udev/ata_id/Makefile -----------------------------------------------------
 ata_id_SOURCES = \
 	src/udev/ata_id/ata_id.c
 
@@ -3956,7 +3966,7 @@ ata_id_LDADD = \
 udevlibexec_PROGRAMS += \
 	ata_id
 
-# ------------------------------------------------------------------------------
+#@src/udev/cdrom_id/Makefile ---------------------------------------------------
 cdrom_id_SOURCES = \
 	src/udev/cdrom_id/cdrom_id.c
 
@@ -3969,7 +3979,7 @@ udevlibexec_PROGRAMS += \
 dist_udevrules_DATA += \
 	rules/60-cdrom_id.rules
 
-# ------------------------------------------------------------------------------
+#@src/udev/collect/Makefile ----------------------------------------------------
 collect_SOURCES = \
 	src/udev/collect/collect.c
 
@@ -3979,7 +3989,7 @@ collect_LDADD = \
 udevlibexec_PROGRAMS += \
 	collect
 
-# ------------------------------------------------------------------------------
+#@src/udev/scsi_id/Makefile ----------------------------------------------------
 scsi_id_SOURCES =\
 	src/udev/scsi_id/scsi_id.c \
 	src/udev/scsi_id/scsi_serial.c \
@@ -3995,7 +4005,7 @@ udevlibexec_PROGRAMS += \
 EXTRA_DIST += \
 	src/udev/scsi_id/README
 
-# ------------------------------------------------------------------------------
+#@src/udev/v4l_id/Makefile -----------------------------------------------------
 v4l_id_SOURCES = \
 	src/udev/v4l_id/v4l_id.c
 
@@ -4008,7 +4018,7 @@ udevlibexec_PROGRAMS += \
 dist_udevrules_DATA += \
 	rules/60-persistent-v4l.rules
 
-# ------------------------------------------------------------------------------
+#@src/udev/mtd_probe/Makefile --------------------------------------------------
 mtd_probe_SOURCES =  \
 	src/udev/mtd_probe/mtd_probe.c \
 	src/udev/mtd_probe/mtd_probe.h \
@@ -4020,7 +4030,7 @@ dist_udevrules_DATA += \
 udevlibexec_PROGRAMS += \
 	mtd_probe
 
-# ------------------------------------------------------------------------------
+#@src/test/Makefile ------------------------------------------------------------
 test_id128_SOURCES = \
 	src/test/test-id128.c
 
@@ -4030,7 +4040,7 @@ test_id128_LDADD = \
 tests += \
 	test-id128
 
-# ------------------------------------------------------------------------------
+#@src/activate/Makefile --------------------------------------------------------
 
 bin_PROGRAMS += \
 	systemd-socket-activate
@@ -4041,7 +4051,7 @@ systemd_socket_activate_SOURCES = \
 systemd_socket_activate_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/journal/Makefile ---------------------------------------------------------
 systemd_journald_SOURCES = \
 	src/journal/journald.c \
 	src/journal/journald-server.h
@@ -4084,6 +4094,7 @@ EXTRA_DIST += \
         units/systemd-journal-upload.service.in \
         src/journal-remote/journal-upload.conf.in
 
+#@src/journal-remote/Makefile
 if HAVE_MICROHTTPD
 rootlibexec_PROGRAMS += \
 	systemd-journal-remote
@@ -4143,6 +4154,7 @@ EXTRA_DIST += \
 	src/journal-remote/log-generator.py
 endif # HAVE_MICROHTTPD
 
+#@src/journal/Makefile
 # using _CFLAGS = in the conditional below would suppress AM_CFLAGS
 journalctl_CFLAGS = \
 	$(AM_CFLAGS)
@@ -4525,7 +4537,7 @@ endif # HAVE_MICROHTTPD
 EXTRA_DIST += \
 	units/systemd-journal-gatewayd.service.in
 
-# ------------------------------------------------------------------------------
+#@src/socket-proxy/Makefile ----------------------------------------------------
 
 systemd_socket_proxyd_SOURCES = \
 	src/socket-proxy/socket-proxyd.c
@@ -4533,7 +4545,7 @@ systemd_socket_proxyd_SOURCES = \
 systemd_socket_proxyd_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/coredump/Makefile --------------------------------------------------------
 if ENABLE_COREDUMP
 systemd_coredump_SOURCES = \
 	src/coredump/coredump.c \
@@ -4609,7 +4621,7 @@ EXTRA_DIST += \
 	sysctl.d/50-coredump.conf.in \
 	units/systemd-coredump@.service.in
 
-# ------------------------------------------------------------------------------
+#@src/binfmt/Makefile ----------------------------------------------------------
 if ENABLE_BINFMT
 systemd_binfmt_SOURCES = \
 	src/binfmt/binfmt.c
@@ -4640,7 +4652,7 @@ endif # ENABLE_BINFMT
 EXTRA_DIST += \
 	units/systemd-binfmt.service.in
 
-# ------------------------------------------------------------------------------
+#@src/vconsole/Makefile --------------------------------------------------------
 if ENABLE_VCONSOLE
 systemd_vconsole_setup_SOURCES = \
 	src/vconsole/vconsole-setup.c
@@ -4662,7 +4674,7 @@ EXTRA_DIST += \
 	src/vconsole/90-vconsole.rules.in \
 	units/systemd-vconsole-setup.service.in
 
-# ------------------------------------------------------------------------------
+#@src/quotacheck/Makefile ------------------------------------------------------
 if ENABLE_QUOTACHECK
 rootlibexec_PROGRAMS += \
 	systemd-quotacheck
@@ -4683,7 +4695,7 @@ EXTRA_DIST += \
 nodist_systemunit_DATA += \
 	units/quotaon.service
 
-# ------------------------------------------------------------------------------
+#@src/random-seed/Makefile -----------------------------------------------------
 if ENABLE_RANDOMSEED
 rootlibexec_PROGRAMS += \
 	systemd-random-seed
@@ -4705,7 +4717,7 @@ endif # ENABLE_RANDOMSEED
 EXTRA_DIST += \
 	units/systemd-random-seed.service.in
 
-# ------------------------------------------------------------------------------
+#@src/backlight/Makefile -------------------------------------------------------
 if ENABLE_BACKLIGHT
 rootlibexec_PROGRAMS += \
 	systemd-backlight
@@ -4723,7 +4735,7 @@ endif # ENABLE_BACKLIGHT
 EXTRA_DIST += \
 	units/systemd-backlight@.service.in
 
-# ------------------------------------------------------------------------------
+#@src/rfkill/Makefile ----------------------------------------------------------
 if ENABLE_RFKILL
 rootlibexec_PROGRAMS += \
 	systemd-rfkill
@@ -4744,7 +4756,7 @@ endif # ENABLE_RFKILL
 EXTRA_DIST += \
 	units/systemd-rfkill.service.in
 
-# ------------------------------------------------------------------------------
+#@src/cryptsetup/Makefile ------------------------------------------------------
 if HAVE_LIBCRYPTSETUP
 rootlibexec_PROGRAMS += \
 	systemd-cryptsetup
@@ -4778,7 +4790,7 @@ SYSINIT_TARGET_WANTS += \
 
 endif # HAVE_LIBCRYPTSETUP
 
-# ------------------------------------------------------------------------------
+#@src/hostname/Makefile --------------------------------------------------------
 if ENABLE_HOSTNAMED
 systemd_hostnamed_SOURCES = \
 	src/hostname/hostnamed.c
@@ -4832,14 +4844,14 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-hostnamed.service.in
 
-# ------------------------------------------------------------------------------
+#@src/core/Makefile.mk ---------------------------------------------------------
 dist_systemunit_DATA_busnames += \
 	units/org.freedesktop.systemd1.busname
 
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.systemd1.busname
 
-# ------------------------------------------------------------------------------
+#@src/locale/Makefile ----------------------------------------------------------
 if ENABLE_LOCALED
 systemd_localed_SOURCES = \
 	src/locale/localed.c \
@@ -4918,7 +4930,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-localed.service.in
 
-# ------------------------------------------------------------------------------
+#@src/timedate/Makefile --------------------------------------------------------
 if ENABLE_TIMEDATED
 systemd_timedated_SOURCES = \
 	src/timedate/timedated.c
@@ -4972,7 +4984,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-timedated.service.in
 
-# ------------------------------------------------------------------------------
+#@src/timesync/Makefile --------------------------------------------------------
 if ENABLE_TIMESYNCD
 systemd_timesyncd_SOURCES = \
 	src/timesync/timesyncd.c \
@@ -5045,7 +5057,7 @@ libnss_systemd_la_LIBADD = \
 rootlib_LTLIBRARIES += \
 	libnss_systemd.la
 
-# ------------------------------------------------------------------------------
+#@src/nss-myhostname/Makefile --------------------------------------------------
 if HAVE_MYHOSTNAME
 libnss_myhostname_la_SOURCES = \
 	src/nss-myhostname/nss-myhostname.sym \
@@ -5068,7 +5080,7 @@ rootlib_LTLIBRARIES += \
 	libnss_myhostname.la
 endif # HAVE_MYHOSTNAME
 
-# ------------------------------------------------------------------------------
+#@src/machine/Makefile ---------------------------------------------------------
 if ENABLE_MACHINED
 systemd_machined_SOURCES = \
 	src/machine/machined.c \
@@ -5174,7 +5186,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-machined.service.in
 
-# ------------------------------------------------------------------------------
+#@src/import/Makefile ----------------------------------------------------------
 if ENABLE_IMPORTD
 
 if HAVE_LIBCURL
@@ -5338,7 +5350,7 @@ EXTRA_DIST += \
 	units/systemd-importd.service.in
 
 
-# ------------------------------------------------------------------------------
+#@src/resolve/Makefile ---------------------------------------------------------
 if ENABLE_RESOLVED
 
 basic_dns_sources = \
@@ -5583,7 +5595,7 @@ EXTRA_DIST += \
 dist_rootlibexec_DATA += \
 	src/resolve/resolv.conf
 
-# ------------------------------------------------------------------------------
+#@src/network/Makefile ---------------------------------------------------------
 if ENABLE_NETWORKD
 rootlibexec_PROGRAMS += \
 	systemd-networkd
@@ -5778,7 +5790,7 @@ EXTRA_DIST += \
 	units/systemd-networkd-wait-online.service.in \
 	test/networkd-test.py
 
-# ------------------------------------------------------------------------------
+#@src/login/Makefile -----------------------------------------------------------
 if ENABLE_LOGIND
 systemd_logind_SOURCES = \
 	src/login/logind.c \
@@ -5999,7 +6011,7 @@ endif # HAVE_PAM
 EXTRA_DIST += \
 	units/systemd-user-sessions.service.in
 
-# ------------------------------------------------------------------------------
+#@discard.mk -------------------------------------------------------------------
 EXTRA_DIST += \
 	test/Makefile \
 	test/README.testsuite \
@@ -6050,7 +6062,7 @@ EXTRA_DIST += \
 	test/loopy.service.d \
 	test/loopy.service.d/compat.conf
 
-# ------------------------------------------------------------------------------
+#@discard.mk -------------------------------------------------------------------
 substitutions = \
        '|rootlibexecdir=$(rootlibexecdir)|' \
        '|rootbindir=$(rootbindir)|' \
@@ -6417,6 +6429,7 @@ dist-check-includes: $(public_headers)
 	    done;                                                               \
 	done; exit $$res
 
+#@hwdb/Makefile
 .PHONY: hwdb-update
 hwdb-update:
 	( cd $(top_srcdir)/hwdb && \
@@ -6431,6 +6444,7 @@ hwdb-update:
 	./acpi-update.py > 20-acpi-vendor.hwdb.base && \
 	patch -p0 -o- 20-acpi-vendor.hwdb.base < 20-acpi-vendor.hwdb.patch > 20-acpi-vendor.hwdb )
 
+#@Makefile
 .PHONY: built-sources
 built-sources: $(BUILT_SOURCES)
 
@@ -6454,6 +6468,7 @@ install-tree: all
 	$(MAKE) install DESTDIR=$(abs_srcdir)/install-tree
 	tree $(abs_srcdir)/install-tree
 
+#@common.once.tail.mk
 # Let's run all tests of the test suite, but under valgrind. Let's
 # exclude perl/python/shell scripts we have in there
 .PHONY: valgrind-tests
@@ -6506,6 +6521,7 @@ check-includes: $(top_srcdir)/tools/check-includes.pl
 EXTRA_DIST += \
 	$(top_srcdir)/tools/check-includes.pl
 
+#@common.once.head.mk
 # Stupid test that everything purported to be exported really is
 define generate-sym-test
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -6518,6 +6534,7 @@ define generate-sym-test
 	$(AM_V_at)printf 'return 0; }\n' >> $@
 endef
 
+#@src/libsystemd/Makefile
 test-libsystemd-sym.c: \
 		$(top_builddir)/src/libsystemd/libsystemd.sym \
 		src/systemd/sd-journal.h \
@@ -6530,16 +6547,19 @@ test-libsystemd-sym.c: \
 		src/systemd/sd-event.h
 	$(generate-sym-test)
 
+#@src/libudev/Makefile
 test-libudev-sym.c: \
 		src/libudev/libudev.sym \
 		src/udev/udev.h
 	$(generate-sym-test)
 
+#@src/libsystemd/Makefile
 nodist_test_libsystemd_sym_SOURCES = \
 	test-libsystemd-sym.c
 test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
+#@src/libudev/Makefile
 nodist_test_libudev_sym_SOURCES = \
 	test-libudev-sym.c
 test_libudev_sym_CFLAGS = \
@@ -6548,6 +6568,7 @@ test_libudev_sym_CFLAGS = \
 test_libudev_sym_LDADD = \
 	libudev.la
 
+#@discard.mk
 BUILT_SOURCES += \
 	test-libsystemd-sym.c \
 	test-libudev-sym.c
@@ -6560,6 +6581,7 @@ tests += \
 	test-libsystemd-sym \
 	test-libudev-sym
 
+#@common.once.tail.mk
 .PHONY: cppcheck
 cppcheck:
 	cppcheck --enable=all -q $(top_srcdir)

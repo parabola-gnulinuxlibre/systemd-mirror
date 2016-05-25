@@ -308,3 +308,4 @@ config.log
 config.status
 configure
 stamp-*
+.tmp*
