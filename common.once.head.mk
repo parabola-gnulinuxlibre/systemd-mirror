@@ -20,9 +20,33 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-systemd_debug_generator_SOURCES = \
-	src/debug-generator/debug-generator.c
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+AM_MAKEFLAGS = --no-print-directory
+AUTOMAKE_OPTIONS = color-tests parallel-tests
 
-systemd_debug_generator_LDADD = \
-	libshared.la
+GCC_COLORS ?= 'ooh, shiny!'
+export GCC_COLORS
+
+SUBDIRS = . po
+
+# remove targets if the command fails
+.DELETE_ON_ERROR:
+
+# keep intermediate files
+.SECONDARY:
+
+# Keep the test-suite.log
+.PRECIOUS: $(TEST_SUITE_LOG) Makefile
+
+# Stupid test that everything purported to be exported really is
+define generate-sym-test
+	$(AM_V_at)$(MKDIR_P) $(dir $@)
+	$(AM_V_at)printf '#include <stdio.h>\n' > $@
+	$(AM_V_at)printf '#include "%s"\n' $(notdir $(filter %.h, $^)) >> $@
+	$(AM_V_at)printf 'void* functions[] = {\n' >> $@
+	$(AM_V_GEN)sed -r -n 's/^ +([a-zA-Z0-9_]+);/\1,/p' $< >> $@
+	$(AM_V_at)printf '};\nint main(void) {\n' >> $@
+	$(AM_V_at)printf 'unsigned i; for (i=0;i<sizeof(functions)/sizeof(void*);i++) printf("%%p\\n", functions[i]);\n' >> $@
+	$(AM_V_at)printf 'return 0; }\n' >> $@
+endef
 
