@@ -20,14 +20,15 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
-include $(topsrcdir)/automake.head.mk
 
-dist_bin_SCRIPTS = \
-	src/kernel-install/kernel-install
+systemd_shutdown_SOURCES = \
+	src/core/umount.c \
+	src/core/umount.h \
+	src/core/shutdown.c \
+	src/core/mount-setup.c \
+	src/core/mount-setup.h \
+	src/core/killall.h \
+	src/core/killall.c
 
-dist_kernelinstall_SCRIPTS = \
-	src/kernel-install/50-depmod.install \
-	src/kernel-install/90-loaderentry.install
-
-include $(topsrcdir)/automake.tail.mk
+systemd_shutdown_LDADD = \
+	libshared.la

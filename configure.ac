@@ -25,7 +25,7 @@ AC_INIT([systemd],
         [systemd],
         [http://www.freedesktop.org/wiki/Software/systemd])
 
-AC_CONFIG_SRCDIR([src/core/main.c])
+AC_CONFIG_SRCDIR([src/systemd/main.c])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR([build-aux])
@@ -34,7 +34,6 @@ AC_USE_SYSTEM_EXTENSIONS
 AC_SYS_LARGEFILE
 AC_PREFIX_DEFAULT([/usr])
 AM_MAINTAINER_MODE([enable])
-AM_INIT_AUTOMAKE([foreign 1.11 -Wall -Wno-portability silent-rules tar-pax no-dist-gzip dist-xz subdir-objects parallel-tests])
 AM_SILENT_RULES([yes])
 AC_CANONICAL_HOST
 AC_DEFINE_UNQUOTED([CANONICAL_HOST], "$host", [Canonical host string.])
@@ -1503,7 +1502,7 @@ AC_SUBST([rootprefix], [$with_rootprefix])
 AC_SUBST([rootlibdir], [$with_rootlibdir])
 
 AC_CONFIG_FILES([
-        Makefile
+        config.mk
         po/Makefile.in
 ])
 

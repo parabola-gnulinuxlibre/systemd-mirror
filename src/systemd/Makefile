@@ -20,14 +20,44 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
-include $(topsrcdir)/automake.head.mk
 
-dist_bin_SCRIPTS = \
-	src/kernel-install/kernel-install
+systemd_SOURCES = \
+	src/core/main.c
 
-dist_kernelinstall_SCRIPTS = \
-	src/kernel-install/50-depmod.install \
-	src/kernel-install/90-loaderentry.install
+systemd_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(SECCOMP_CFLAGS) \
+	$(MOUNT_CFLAGS)
 
-include $(topsrcdir)/automake.tail.mk
+systemd_LDADD = \
+	libcore.la
+
+dist_pkgsysconf_DATA += \
+	src/core/system.conf \
+	src/core/user.conf
+
+dist_dbuspolicy_DATA += \
+	src/core/org.freedesktop.systemd1.conf
+
+dist_dbussystemservice_DATA += \
+	src/core/org.freedesktop.systemd1.service
+
+polkitpolicy_in_in_files += \
+	src/core/org.freedesktop.systemd1.policy.in.in
+
+pkgconfigdata_DATA += \
+	src/core/systemd.pc
+
+nodist_rpmmacros_DATA = \
+	src/core/macros.systemd
+
+EXTRA_DIST += \
+	src/core/systemd.pc.in \
+	src/core/macros.systemd.in \
+	src/core/triggers.systemd.in
+
+dist_systemunit_DATA_busnames += \
+	units/org.freedesktop.systemd1.busname
+
+BUSNAMES_TARGET_WANTS += \
+	org.freedesktop.systemd1.busname
