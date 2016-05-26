@@ -69,6 +69,7 @@
 #include "missing.h"
 #include "mkdir.h"
 #include "mount-util.h"
+#include "netlink-util.h"
 #include "nspawn-cgroup.h"
 #include "nspawn-expose-ports.h"
 #include "nspawn-mount.h"
