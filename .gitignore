@@ -296,3 +296,4 @@ config.status
 configure
 stamp-*
 .tmp*
+/config.mk
