@@ -20,44 +20,20 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-systemd_SOURCES = \
-	src/core/main.c
+test-libsystemd-sym.c: \
+		$(top_builddir)/src/libsystemd/libsystemd.sym \
+		src/systemd/sd-journal.h \
+		src/systemd/sd-daemon.h \
+		src/systemd/sd-login.h \
+		src/systemd/sd-bus.h \
+		src/systemd/sd-utf8.h \
+		src/systemd/sd-resolve.h \
+		src/systemd/sd-path.h \
+		src/systemd/sd-event.h
+	$(generate-sym-test)
 
-systemd_CFLAGS = \
-	$(AM_CFLAGS) \
-	$(SECCOMP_CFLAGS) \
-	$(MOUNT_CFLAGS)
-
-systemd_LDADD = \
-	libcore.la
-
-dist_pkgsysconf_DATA += \
-	src/core/system.conf \
-	src/core/user.conf
-
-dist_dbuspolicy_DATA += \
-	src/core/org.freedesktop.systemd1.conf
-
-dist_dbussystemservice_DATA += \
-	src/core/org.freedesktop.systemd1.service
-
-polkitpolicy_in_in_files += \
-	src/core/org.freedesktop.systemd1.policy.in.in
-
-pkgconfigdata_DATA += \
-	src/core/systemd.pc
-
-nodist_rpmmacros_DATA = \
-	src/core/macros.systemd
-
-EXTRA_DIST += \
-	src/core/systemd.pc.in \
-	src/core/macros.systemd.in \
-	src/core/triggers.systemd.in
-
-dist_systemunit_DATA_busnames += \
-	units/org.freedesktop.systemd1.busname
-
-BUSNAMES_TARGET_WANTS += \
-	org.freedesktop.systemd1.busname
+nodist_test_libsystemd_sym_SOURCES = \
+	test-libsystemd-sym.c
+test_libsystemd_sym_LDADD = \
+	libsystemd.la
 

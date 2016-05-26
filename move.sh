@@ -9,8 +9,95 @@ in_array() {
 	return 1 # Not Found
 }
 
+set -e
+
 (
-        set -e
+	for d in libsystemd libudev machine resolve; do
+		mkdir src/$d-new
+		mv -T src/$d src/$d-new/src
+		mv -T src/$d-new src/$d
+	done
+
+	for d in basic core shared; do
+		mv -T src/{,lib}$d
+	done
+
+	pfix=(
+		activate
+		analyze
+		ask-password
+		backlight
+		binfmt
+		bootchart
+		cgls
+		cgroups-agent
+		cgtop
+		cryptsetup
+		delta
+		escape
+		notify
+		nspawn
+		path
+		quotacheck
+		random-seed
+		remount-fs
+		reply-password
+		rfkill
+		run
+		timedate
+		timesync
+		tmpfiles
+		tty-ask-password-agent
+		update-done
+		update-utmp
+		user-sessions
+		vconsole
+	)
+	for d in "${pfix[@]}"; do
+		mv -T src/{,systemd-}$d
+	done
+
+
+	mv -T {,src/journal/}catalog
+
+	mv -T {shell-completion/bash/,src/kernel-install/bash-completion_}kernel-install
+	mv -T {shell-completion/zsh/_,src/kernel-install/zsh-completion_}kernel-install
+	mv -T {man,src/kernel-install}/kernel-install.xml
+
+	mv -T src/lib{shared,core}/linux
+
+	mv -T src/{,libsystemd/}/compat-libs
+	mkdir src/libsystemd/include
+	mv -T src/{,libsystemd/include}/systemd
+
+	mv -T src/{,machine}/nss-mymachines
+	mv -T src/{,resolve}/nss-resolve
+
+	mkdir src/system
+	mv -T src/{,system}/systemctl
+
+	mkdir src/libfirewall
+	mv -T src/lib{shared,firewall}/firewall-util.c
+	mv -T src/lib{shared,firewall}/firewall-util.h
+
+	mkdir src/system/systemd
+	mv -T src/{libcore,system/systemd}/main.c
+	mv -T src/{libcore,system/systemd}/macros.systemd.in
+	mv -T src/{libcore,system/systemd}/org.freedesktop.systemd1.conf
+	mv -T src/{libcore,system/systemd}/org.freedesktop.systemd1.policy.in.in
+	mv -T src/{libcore,system/systemd}/org.freedesktop.systemd1.service
+	mv -T src/{libcore,system/systemd}/system.conf
+	mv -T src/{libcore,system/systemd}/systemd.pc.in
+	mv -T src/{libcore,system/systemd}/triggers.systemd.in
+	mv -T src/{libcore,system/systemd}/user.conf
+
+	mkdir src/libudev/include
+	mv -T src/libudev/{src,include}/libudev.h
+
+	mv -T {man,src/systemd-activate}/systemd-activate.xml
+)
+
+(
         find . \( -name Makefile -o -name '*.mk' \) -delete
 
         touch .tmp.move.all
@@ -24,10 +111,10 @@ in_array() {
                 elif [[ $file = all ]]; then
                         printf '%s\n' "$line" | tee -a "${files[@]}" >/dev/null
                 else
-                        if ! in_array "$file" "${files[@]}"; then
-                                cat .tmp.move.all > "$file"
-                                files+=("$file")
-                        fi
+			if ! in_array "$file" "${files[@]}"; then
+				cat .tmp.move.all > "$file"
+				files+=("$file")
+			fi
                         printf '%s\n' "$line" >> "$file"
                 fi
         done < Makefile.am

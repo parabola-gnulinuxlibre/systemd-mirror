@@ -257,28 +257,6 @@ INSTALL_EXEC_HOOKS += \
 INSTALL_EXEC_HOOKS += \
 	install-busnames-target-wants-hook
 
-# ------------------------------------------------------------------------------
-AM_V_M4 = $(AM_V_M4_$(V))
-AM_V_M4_ = $(AM_V_M4_$(AM_DEFAULT_VERBOSITY))
-AM_V_M4_0 = @echo "  M4      " $@;
-
-AM_V_XSLT = $(AM_V_XSLT_$(V))
-AM_V_XSLT_ = $(AM_V_XSLT_$(AM_DEFAULT_VERBOSITY))
-AM_V_XSLT_0 = @echo "  XSLT    " $@;
-
-AM_V_GPERF = $(AM_V_GPERF_$(V))
-AM_V_GPERF_ = $(AM_V_GPERF_$(AM_DEFAULT_VERBOSITY))
-AM_V_GPERF_0 = @echo "  GPERF   " $@;
-
-AM_V_LN = $(AM_V_LN_$(V))
-AM_V_LN_ = $(AM_V_LN_$(AM_DEFAULT_VERBOSITY))
-AM_V_LN_0 = @echo "  LN      " $@;
-
-AM_V_RM = $(AM_V_RM_$(V))
-AM_V_RM_ = $(AM_V_RM_$(AM_DEFAULT_VERBOSITY))
-AM_V_RM_0 = @echo "  RM      " $@;
-
-# ------------------------------------------------------------------------------
 rootbin_PROGRAMS = \
 	systemctl \
 	systemd-notify \
@@ -686,14 +664,6 @@ EXTRA_DIST += \
 
 CLEANFILES += \
 	$(gperf_txt_sources)
-
-%-from-name.gperf: %-list.txt
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
-	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct $(notdir $*)_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { printf "%s, %s\n", $$1, $$1 }' <$< >$@
-
-%-from-name.h: %-from-name.gperf
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
-	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 
 ## .PHONY so it always rebuilds it
 .PHONY: coverage lcov-run lcov-report coverage-sync

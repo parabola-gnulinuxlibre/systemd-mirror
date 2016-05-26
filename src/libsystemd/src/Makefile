@@ -357,20 +357,3 @@ busctl_SOURCES = \
 busctl_LDADD = \
 	libshared.la
 
-test-libsystemd-sym.c: \
-		$(top_builddir)/src/libsystemd/libsystemd.sym \
-		src/systemd/sd-journal.h \
-		src/systemd/sd-daemon.h \
-		src/systemd/sd-login.h \
-		src/systemd/sd-bus.h \
-		src/systemd/sd-utf8.h \
-		src/systemd/sd-resolve.h \
-		src/systemd/sd-path.h \
-		src/systemd/sd-event.h
-	$(generate-sym-test)
-
-nodist_test_libsystemd_sym_SOURCES = \
-	test-libsystemd-sym.c
-test_libsystemd_sym_LDADD = \
-	libsystemd.la
-

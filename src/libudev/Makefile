@@ -20,44 +20,16 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-systemd_SOURCES = \
-	src/core/main.c
+test-libudev-sym.c: \
+		src/libudev/libudev.sym \
+		src/udev/udev.h
+	$(generate-sym-test)
 
-systemd_CFLAGS = \
+nodist_test_libudev_sym_SOURCES = \
+	test-libudev-sym.c
+test_libudev_sym_CFLAGS = \
 	$(AM_CFLAGS) \
-	$(SECCOMP_CFLAGS) \
-	$(MOUNT_CFLAGS)
-
-systemd_LDADD = \
-	libcore.la
-
-dist_pkgsysconf_DATA += \
-	src/core/system.conf \
-	src/core/user.conf
-
-dist_dbuspolicy_DATA += \
-	src/core/org.freedesktop.systemd1.conf
-
-dist_dbussystemservice_DATA += \
-	src/core/org.freedesktop.systemd1.service
-
-polkitpolicy_in_in_files += \
-	src/core/org.freedesktop.systemd1.policy.in.in
-
-pkgconfigdata_DATA += \
-	src/core/systemd.pc
-
-nodist_rpmmacros_DATA = \
-	src/core/macros.systemd
-
-EXTRA_DIST += \
-	src/core/systemd.pc.in \
-	src/core/macros.systemd.in \
-	src/core/triggers.systemd.in
-
-dist_systemunit_DATA_busnames += \
-	units/org.freedesktop.systemd1.busname
-
-BUSNAMES_TARGET_WANTS += \
-	org.freedesktop.systemd1.busname
+	-Wno-deprecated-declarations
+test_libudev_sym_LDADD = \
+	libudev.la
 
