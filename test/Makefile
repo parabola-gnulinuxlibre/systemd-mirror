@@ -36,12 +36,12 @@ manual_tests += \
 	test-ipv4ll-manual \
 	test-ask-password-api
 
-if HAVE_LIBIPTC
+ifneq ($(HAVE_LIBIPTC),)
 manual_tests += \
 	test-firewall-util
 endif
 
-if HAVE_KMOD
+ifneq ($(HAVE_KMOD),)
 manual_tests += \
 	test-netlink-manual
 endif
@@ -119,7 +119,7 @@ tests += \
 	test-rlimit-util \
 	test-signal-util
 
-if HAVE_ACL
+ifneq ($(HAVE_ACL),)
 tests += \
 	test-acl-util
 endif
@@ -290,7 +290,7 @@ test_resolve_tables_SOURCES = \
 test_resolve_tables_LDADD = \
 	libshared.la
 
-if ENABLE_EFI
+ifneq ($(ENABLE_EFI),)
 manual_tests += \
 	test-boot-timestamp
 
@@ -637,7 +637,7 @@ test_btrfs_SOURCES = \
 test_btrfs_LDADD = \
 	libshared.la
 
-if HAVE_LIBIPTC
+ifneq ($(HAVE_LIBIPTC),)
 test_firewall_util_SOURCES = \
 	src/test/test-firewall-util.c
 

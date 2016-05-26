@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if ENABLE_TIMESYNCD
+ifneq ($(ENABLE_TIMESYNCD),)
 systemd_timesyncd_SOURCES = \
 	src/timesync/timesyncd.c \
 	src/timesync/timesyncd-manager.c \

@@ -53,18 +53,18 @@ manual_tests =
 TEST_EXTENSIONS = .py
 PY_LOG_COMPILER = $(PYTHON)
 DISABLE_HARD_ERRORS = yes
-if ENABLE_TESTS
+ifneq ($(ENABLE_TESTS),)
 noinst_PROGRAMS = $(manual_tests) $(tests)
 TESTS = $(tests)
 else
 noinst_PROGRAMS =
 TESTS =
 endif
-if ENABLE_BASH_COMPLETION
+ifneq ($(ENABLE_BASH_COMPLETION),)
 dist_bashcompletion_DATA = $(dist_bashcompletion_data)
 nodist_bashcompletion_DATA = $(nodist_bashcompletion_data)
 endif
-if ENABLE_ZSH_COMPLETION
+ifneq ($(ENABLE_ZSH_COMPLETION),)
 dist_zshcompletion_DATA = $(dist_zshcompletion_data)
 nodist_zshcompletion_DATA = $(nodist_zshcompletion_data)
 endif
@@ -291,7 +291,7 @@ rootlibexec_PROGRAMS = \
 	systemd-socket-proxyd \
 	systemd-update-done
 
-if HAVE_UTMP
+ifneq ($(HAVE_UTMP),)
 rootlibexec_PROGRAMS += \
 	systemd-update-utmp
 endif
@@ -446,7 +446,7 @@ nodist_systemunit_DATA = \
 	units/systemd-nspawn@.service \
 	units/systemd-update-done.service
 
-if HAVE_UTMP
+ifneq ($(HAVE_UTMP),)
 nodist_systemunit_DATA += \
 	units/systemd-update-utmp.service \
 	units/systemd-update-utmp-runlevel.service
@@ -499,7 +499,7 @@ EXTRA_DIST += \
 	units/systemd-update-done.service.in \
     units/tmp.mount.m4
 
-if HAVE_SYSV_COMPAT
+ifneq ($(HAVE_SYSV_COMPAT),)
 nodist_systemunit_DATA += \
 	units/rc-local.service \
 	units/halt-local.service
@@ -565,7 +565,7 @@ HTML_FILES = \
 HTML_ALIAS = \
 	${patsubst %.1,%.html,${patsubst %.3,%.html,${patsubst %.5,%.html,${patsubst %.7,%.html,${patsubst %.8,%.html,$(MANPAGES_ALIAS)}}}}}
 
-if ENABLE_MANPAGES
+ifneq ($(ENABLE_MANPAGES),)
 man_MANS = \
 	$(MANPAGES) \
 	$(MANPAGES_ALIAS)
@@ -589,7 +589,7 @@ docs/html/man:
 man/index.html: man/systemd.index.html
 	$(AM_V_LN)$(LN_S) -f systemd.index.html $@
 
-if HAVE_PYTHON
+ifneq ($(HAVE_PYTHON),)
 noinst_DATA += \
 	man/index.html
 endif
@@ -629,7 +629,7 @@ EXTRA_DIST += \
 	tools/xml_helper.py \
 	man/glib-event-glue.c
 
-if ENABLE_LDCONFIG
+ifneq ($(ENABLE_LDCONFIG),)
 dist_systemunit_DATA += \
 	units/ldconfig.service
 
@@ -676,7 +676,7 @@ coverage: all
 coverage_dir = coverage
 coverage_opts = --base-directory $(srcdir) --directory $(builddir) --rc 'geninfo_adjust_src_path=$(abspath $(srcdir))=>$(abspath $(builddir))'
 
-if ENABLE_COVERAGE
+ifneq ($(ENABLE_COVERAGE),)
 # reset run coverage tests
 lcov-run:
 	@rm -rf $(coverage_dir)
@@ -706,13 +706,13 @@ endif
 dist_factory_etc_DATA = \
 	factory/etc/nsswitch.conf
 
-if HAVE_PAM
+ifneq ($(HAVE_PAM),)
 dist_factory_pam_DATA = \
 	factory/etc/pam.d/system-auth \
 	factory/etc/pam.d/other
 endif
 
-if HAVE_GNUEFI
+ifneq ($(HAVE_GNUEFI),)
 efi_cppflags = \
 	$(EFI_CPPFLAGS) \
 	-I$(top_builddir) -include config.h \
@@ -736,7 +736,7 @@ efi_cflags = \
 	-Wsign-compare \
 	-Wno-missing-field-initializers
 
-if ARCH_X86_64
+ifneq ($(ARCH_X86_64),)
 efi_cflags += \
 	-mno-red-zone \
 	-mno-sse \
@@ -745,7 +745,7 @@ efi_cflags += \
 	-DGNU_EFI_USE_MS_ABI
 endif
 
-if ARCH_IA32
+ifneq ($(ARCH_IA32),)
 efi_cflags += \
 	-mno-sse \
 	-mno-mmx
@@ -763,7 +763,7 @@ efi_ldflags = \
 
 # Aarch64 and ARM32 don't have an EFI capable objcopy. Use 'binary' instead,
 # and add required symbols manually.
-if ARCH_AARCH64
+ifneq ($(ARCH_AARCH64),)
 efi_ldflags += --defsym=EFI_SUBSYSTEM=0xa
 EFI_FORMAT = -O binary
 else
@@ -933,7 +933,7 @@ units/user/%: units/user/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) -DFOR_USER=1 < $< > $@
 
-if ENABLE_POLKIT
+ifneq ($(ENABLE_POLKIT),)
 nodist_polkitpolicy_DATA = \
 	$(polkitpolicy_files) \
 	$(polkitpolicy_in_in_files:.policy.in.in=.policy)
@@ -997,7 +997,7 @@ EXTRA_DIST += \
 	man/custom-man.xsl
 
 # ------------------------------------------------------------------------------
-if HAVE_SYSV_COMPAT
+ifneq ($(HAVE_SYSV_COMPAT),)
 sysvinit_DATA = \
 	docs/sysvinit/README
 
@@ -1022,8 +1022,8 @@ EXTRA_DIST += \
 SOCKETS_TARGET_WANTS += \
 	systemd-initctl.socket
 
-if HAVE_UTMP
-if HAVE_SYSV_COMPAT
+ifneq ($(HAVE_UTMP),)
+ifneq ($(HAVE_SYSV_COMPAT),)
 MULTI_USER_TARGET_WANTS += \
 	systemd-update-utmp-runlevel.service
 GRAPHICAL_TARGET_WANTS += \
@@ -1057,7 +1057,7 @@ SYSINIT_TARGET_WANTS += \
 	systemd-sysctl.service \
 	systemd-ask-password-console.path
 
-if HAVE_SYSV_COMPAT
+ifneq ($(HAVE_SYSV_COMPAT),)
 SYSTEM_UNIT_ALIASES += \
 	poweroff.target runlevel0.target \
 	rescue.target runlevel1.target \
@@ -1092,7 +1092,7 @@ GENERAL_ALIASES += \
 	$(pkgsysconfdir)/user $(sysconfdir)/xdg/systemd/user \
 	$(dbussystemservicedir)/org.freedesktop.systemd1.service $(dbussessionservicedir)/org.freedesktop.systemd1.service
 
-if HAVE_SYSV_COMPAT
+ifneq ($(HAVE_SYSV_COMPAT),)
 INSTALL_DIRS += \
 	$(systemunitdir)/runlevel1.target.wants \
 	$(systemunitdir)/runlevel2.target.wants \
@@ -1147,7 +1147,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-rootprefix=$$dc_install_base \
 	--enable-compat-libs
 
-if HAVE_SYSV_COMPAT
+ifneq ($(HAVE_SYSV_COMPAT),)
 DISTCHECK_CONFIGURE_FLAGS += \
 	--with-sysvinit-path=$$dc_install_base/$(sysvinitdir) \
 	--with-sysvrcnd-path=$$dc_install_base/$(sysvrcnddir)
@@ -1157,7 +1157,7 @@ DISTCHECK_CONFIGURE_FLAGS += \
 	--with-sysvrcnd-path=
 endif
 
-if ENABLE_SPLIT_USR
+ifneq ($(ENABLE_SPLIT_USR),)
 DISTCHECK_CONFIGURE_FLAGS += \
 	--enable-split-usr
 else

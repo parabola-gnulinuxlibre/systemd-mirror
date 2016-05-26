@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if ENABLE_BOOTCHART
+ifneq ($(ENABLE_BOOTCHART),)
 systemd_bootchart_SOURCES = \
 	src/bootchart/bootchart.c \
 	src/bootchart/bootchart.h \

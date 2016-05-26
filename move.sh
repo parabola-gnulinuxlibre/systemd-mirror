@@ -95,6 +95,8 @@ set -e
 	mv -T src/libudev/{src,include}/libudev.h
 
 	mv -T {man,src/systemd-activate}/systemd-activate.xml
+
+	mkdir src/systemd-shutdown
 )
 
 (
@@ -117,6 +119,6 @@ set -e
 			fi
                         printf '%s\n' "$line" >> "$file"
                 fi
-        done < Makefile.am
+        done < <(sed -r 's|^if (.*)|ifneq ($(\1),)|' <Makefile.am)
         rm .tmp.move.all
 )

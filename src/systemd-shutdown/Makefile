@@ -20,20 +20,15 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-test-libsystemd-sym.c: \
-		$(top_builddir)/src/libsystemd/libsystemd.sym \
-		src/systemd/sd-journal.h \
-		src/systemd/sd-daemon.h \
-		src/systemd/sd-login.h \
-		src/systemd/sd-bus.h \
-		src/systemd/sd-utf8.h \
-		src/systemd/sd-resolve.h \
-		src/systemd/sd-path.h \
-		src/systemd/sd-event.h
-	$(generate-sym-test)
+systemd_shutdown_SOURCES = \
+	src/core/umount.c \
+	src/core/umount.h \
+	src/core/shutdown.c \
+	src/core/mount-setup.c \
+	src/core/mount-setup.h \
+	src/core/killall.h \
+	src/core/killall.c
 
-nodist_test_libsystemd_sym_SOURCES = \
-	test-libsystemd-sym.c
-test_libsystemd_sym_LDADD = \
-	libsystemd.la
+systemd_shutdown_LDADD = \
+	libshared.la
 

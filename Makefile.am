@@ -2355,7 +2355,7 @@ systemd_update_done_SOURCES = \
 systemd_update_done_LDADD = \
 	libshared.la
 
-#@src/libcore/Makefile ---------------------------------------------------------
+#@src/systemd-shutdown/Makefile ------------------------------------------------
 systemd_shutdown_SOURCES = \
 	src/core/umount.c \
 	src/core/umount.h \
@@ -6424,7 +6424,7 @@ define generate-sym-test
 	$(AM_V_at)printf 'return 0; }\n' >> $@
 endef
 
-#@src/libsystemd/Makefile
+#@src/libsystemd/src/Makefile
 test-libsystemd-sym.c: \
 		$(top_builddir)/src/libsystemd/libsystemd.sym \
 		src/systemd/sd-journal.h \
@@ -6437,19 +6437,19 @@ test-libsystemd-sym.c: \
 		src/systemd/sd-event.h
 	$(generate-sym-test)
 
-#@src/libudev/Makefile
+#@src/libudev/src/Makefile
 test-libudev-sym.c: \
 		src/libudev/libudev.sym \
 		src/udev/udev.h
 	$(generate-sym-test)
 
-#@src/libsystemd/Makefile
+#@src/libsystemd/src/Makefile
 nodist_test_libsystemd_sym_SOURCES = \
 	test-libsystemd-sym.c
 test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
-#@src/libudev/Makefile
+#@src/libudev/src/Makefile
 nodist_test_libudev_sym_SOURCES = \
 	test-libudev-sym.c
 test_libudev_sym_CFLAGS = \

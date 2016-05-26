@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if ENABLE_NETWORKD
+ifneq ($(ENABLE_NETWORKD),)
 rootlibexec_PROGRAMS += \
 	systemd-networkd
 
@@ -30,7 +30,7 @@ systemd_networkd_SOURCES = \
 systemd_networkd_LDADD = \
 	libnetworkd-core.la
 
-if HAVE_LIBIPTC
+ifneq ($(HAVE_LIBIPTC),)
 systemd_networkd_LDADD += \
 	libfirewall.la
 endif
@@ -134,7 +134,7 @@ test_network_SOURCES = \
 test_network_LDADD = \
 	libnetworkd-core.la
 
-if HAVE_LIBIPTC
+ifneq ($(HAVE_LIBIPTC),)
 test_network_LDADD += \
 	libfirewall.la
 endif
@@ -147,7 +147,7 @@ test_network_tables_LDADD = \
 	libnetworkd-core.la \
 	libudev-core.la
 
-if HAVE_LIBIPTC
+ifneq ($(HAVE_LIBIPTC),)
 test_network_tables_LDADD += \
 	libfirewall.la
 endif

@@ -58,7 +58,7 @@ systemd_nspawn_LDADD = \
 	libshared.la \
 	$(BLKID_LIBS)
 
-if HAVE_LIBIPTC
+ifneq ($(HAVE_LIBIPTC),)
 systemd_nspawn_LDADD += \
 	libfirewall.la
 endif
