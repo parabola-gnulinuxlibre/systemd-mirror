@@ -21,7 +21,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 audit_list_includes = -include linux/audit.h -include missing.h
-if HAVE_AUDIT
+ifneq ($(HAVE_AUDIT),)
 audit_list_includes += -include libaudit.h
 endif
 
@@ -71,7 +71,7 @@ journalctl_LDADD = \
 	libshared.la \
 	libudev-core.la
 
-if HAVE_QRENCODE
+ifneq ($(HAVE_QRENCODE),)
 journalctl_SOURCES += \
 	src/journal/journal-qrcode.c \
 	src/journal/journal-qrcode.h
@@ -253,7 +253,7 @@ tests += \
 	test-catalog \
 	test-audit-type
 
-if HAVE_COMPRESSION
+ifneq ($(HAVE_COMPRESSION),)
 tests += \
 	test-compress \
 	test-compress-benchmark
@@ -299,7 +299,7 @@ libsystemd_journal_internal_la_CFLAGS = \
 
 libsystemd_journal_internal_la_LIBADD =
 
-if HAVE_XZ
+ifneq ($(HAVE_XZ),)
 libsystemd_journal_internal_la_CFLAGS += \
 	$(XZ_CFLAGS)
 
@@ -307,12 +307,12 @@ libsystemd_journal_internal_la_LIBADD += \
 	$(XZ_LIBS)
 endif
 
-if HAVE_LZ4
+ifneq ($(HAVE_LZ4),)
 libsystemd_journal_internal_la_LIBADD += \
 	-llz4
 endif
 
-if HAVE_GCRYPT
+ifneq ($(HAVE_GCRYPT),)
 libsystemd_journal_internal_la_SOURCES += \
 	src/journal/journal-authenticate.c \
 	src/journal/journal-authenticate.h \
@@ -384,7 +384,7 @@ gperf_gperf_sources += \
 	src/journal/journald-gperf.gperf
 
 # ------------------------------------------------------------------------------
-if HAVE_MICROHTTPD
+ifneq ($(HAVE_MICROHTTPD),)
 gatewayddocumentrootdir=$(pkgdatadir)/gatewayd
 
 rootlibexec_PROGRAMS += \
@@ -399,7 +399,7 @@ systemd_journal_gatewayd_LDADD = \
 	libshared.la \
 	$(MICROHTTPD_LIBS)
 
-if HAVE_GNUTLS
+ifneq ($(HAVE_GNUTLS),)
 systemd_journal_gatewayd_LDADD += \
 	$(GNUTLS_LIBS)
 endif

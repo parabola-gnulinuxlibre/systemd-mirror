@@ -20,7 +20,6 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-
 systemd_shutdown_SOURCES = \
 	src/core/umount.c \
 	src/core/umount.h \
@@ -32,3 +31,4 @@ systemd_shutdown_SOURCES = \
 
 systemd_shutdown_LDADD = \
 	libshared.la
+

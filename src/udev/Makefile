@@ -132,7 +132,7 @@ libudev_core_la_LIBADD = \
 	$(BLKID_LIBS) \
 	$(KMOD_LIBS)
 
-if HAVE_KMOD
+ifneq ($(HAVE_KMOD),)
 libudev_core_la_SOURCES += \
 	src/udev/udev-builtin-kmod.c
 
@@ -140,12 +140,12 @@ dist_udevrules_DATA += \
 	rules/80-drivers.rules
 endif
 
-if HAVE_BLKID
+ifneq ($(HAVE_BLKID),)
 libudev_core_la_SOURCES += \
 	src/udev/udev-builtin-blkid.c
 endif
 
-if HAVE_ACL
+ifneq ($(HAVE_ACL),)
 libudev_core_la_SOURCES += \
 	src/udev/udev-builtin-uaccess.c \
 	src/login/logind-acl.c \
@@ -176,7 +176,7 @@ udevadm_LDADD = \
 	libudev-core.la
 
 # ------------------------------------------------------------------------------
-if ENABLE_HWDB
+ifneq ($(ENABLE_HWDB),)
 INSTALL_DIRS += \
 	$(sysconfdir)/udev/hwdb.d
 
@@ -227,15 +227,15 @@ EXTRA_DIST += \
 	hwdb/sdio.ids
 
 # ------------------------------------------------------------------------------
-if ENABLE_TESTS
+ifneq ($(ENABLE_TESTS),)
 TESTS += \
 	test/udev-test.pl
 
-if HAVE_PYTHON
+ifneq ($(HAVE_PYTHON),)
 TESTS += \
 	test/rule-syntax-check.py
 
-if HAVE_SYSV_COMPAT
+ifneq ($(HAVE_SYSV_COMPAT),)
 TESTS += \
 	test/sysv-generator-test.py
 endif
@@ -260,7 +260,7 @@ test_udev_LDADD = \
 	$(BLKID_LIBS) \
 	$(KMOD_LIBS)
 
-if ENABLE_TESTS
+ifneq ($(ENABLE_TESTS),)
 check_DATA += \
 	test/sys
 endif

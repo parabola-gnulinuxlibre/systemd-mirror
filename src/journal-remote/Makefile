@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if HAVE_MICROHTTPD
+ifneq ($(HAVE_MICROHTTPD),)
 rootlibexec_PROGRAMS += \
 	systemd-journal-remote
 
@@ -46,12 +46,12 @@ systemd_journal_remote_CFLAGS = \
 systemd_journal_remote_LDADD += \
 	$(MICROHTTPD_LIBS)
 
-if ENABLE_TMPFILES
+ifneq ($(ENABLE_TMPFILES),)
 dist_tmpfiles_DATA += \
 	tmpfiles.d/systemd-remote.conf
 endif
 
-if HAVE_GNUTLS
+ifneq ($(HAVE_GNUTLS),)
 systemd_journal_remote_LDADD += \
 	$(GNUTLS_LIBS)
 endif
@@ -79,7 +79,7 @@ EXTRA_DIST += \
 	src/journal-remote/log-generator.py
 endif
 
-if HAVE_LIBCURL
+ifneq ($(HAVE_LIBCURL),)
 rootlibexec_PROGRAMS += \
 	systemd-journal-upload
 

@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if HAVE_KMOD
+ifneq ($(HAVE_KMOD),)
 systemd_modules_load_SOURCES = \
 	src/modules-load/modules-load.c
 
@@ -41,7 +41,7 @@ nodist_systemunit_DATA += \
 SYSINIT_TARGET_WANTS += \
 	systemd-modules-load.service
 
-if ENABLE_TMPFILES
+ifneq ($(ENABLE_TMPFILES),)
 nodist_systemunit_DATA += \
 	units/kmod-static-nodes.service
 

@@ -106,7 +106,6 @@ libshared_la_SOURCES = \
 	src/shared/resolve-util.c \
 	src/shared/resolve-util.h
 
-
 ifneq ($(HAVE_UTMP),)
 libshared_la_SOURCES += \
 	src/shared/utmp-wtmp.c

@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if ENABLE_RESOLVED
+ifneq ($(ENABLE_RESOLVED),)
 
 systemd_resolved_SOURCES = \
 	src/resolve/resolved.c \

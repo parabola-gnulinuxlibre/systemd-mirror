@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if ENABLE_COMPAT_LIBS
+ifneq ($(ENABLE_COMPAT_LIBS),)
 libsystemd-%.c: src/compat-libs/libsystemd-%.sym
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)sed -r -n 's/^ +(sd_.*);/obsolete_lib(\1,$(notdir $(basename $<)));/p' <$< >$@

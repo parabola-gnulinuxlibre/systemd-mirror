@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if ENABLE_TMPFILES
+ifneq ($(ENABLE_TMPFILES),)
 systemd_tmpfiles_SOURCES = \
 	src/tmpfiles/tmpfiles.c
 
@@ -51,7 +51,7 @@ dist_tmpfiles_DATA = \
 	tmpfiles.d/systemd-nspawn.conf \
 	tmpfiles.d/journal-nocow.conf
 
-if HAVE_SYSV_COMPAT
+ifneq ($(HAVE_SYSV_COMPAT),)
 dist_tmpfiles_DATA += \
 	tmpfiles.d/legacy.conf
 endif

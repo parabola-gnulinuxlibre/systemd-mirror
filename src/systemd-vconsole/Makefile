@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if ENABLE_VCONSOLE
+ifneq ($(ENABLE_VCONSOLE),)
 systemd_vconsole_setup_SOURCES = \
 	src/vconsole/vconsole-setup.c
 

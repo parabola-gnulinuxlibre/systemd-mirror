@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if ENABLE_HOSTNAMED
+ifneq ($(ENABLE_HOSTNAMED),)
 systemd_hostnamed_SOURCES = \
 	src/hostname/hostnamed.c
 

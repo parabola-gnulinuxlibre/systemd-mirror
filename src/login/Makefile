@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if ENABLE_LOGIND
+ifneq ($(ENABLE_LOGIND),)
 systemd_logind_SOURCES = \
 	src/login/logind.c \
 	src/login/logind.h
@@ -59,7 +59,7 @@ liblogind_core_la_SOURCES = \
 liblogind_core_la_LIBADD = \
 	libshared.la
 
-if HAVE_ACL
+ifneq ($(HAVE_ACL),)
 liblogind_core_la_SOURCES += \
 	src/login/logind-acl.c
 endif
@@ -129,7 +129,7 @@ tests += \
 	test-login-tables \
 	test-login-shared
 
-if HAVE_PAM
+ifneq ($(HAVE_PAM),)
 pam_systemd_la_SOURCES = \
 	src/login/pam_systemd.sym \
 	src/login/pam_systemd.c
@@ -215,7 +215,7 @@ EXTRA_DIST += \
 	units/systemd-logind.service.in
 
 # ------------------------------------------------------------------------------
-if HAVE_PAM
+ifneq ($(HAVE_PAM),)
 
 systemd_user_sessions_SOURCES = \
 	src/user-sessions/user-sessions.c

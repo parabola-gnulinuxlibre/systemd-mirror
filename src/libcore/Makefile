@@ -166,15 +166,3 @@ src/core/load-fragment-gperf-nulstr.c: src/core/load-fragment-gperf.gperf
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ keywords=0 ; FS="," ; print "extern const char load_fragment_gperf_nulstr[];" ; print "const char load_fragment_gperf_nulstr[] ="} ; keyword==1 { print "\"" $$1 "\\0\"" } ; /%%/ { keyword=1} ; END { print ";" }' < $< > $@
 
-systemd_shutdown_SOURCES = \
-	src/core/umount.c \
-	src/core/umount.h \
-	src/core/shutdown.c \
-	src/core/mount-setup.c \
-	src/core/mount-setup.h \
-	src/core/killall.h \
-	src/core/killall.c
-
-systemd_shutdown_LDADD = \
-	libshared.la
-

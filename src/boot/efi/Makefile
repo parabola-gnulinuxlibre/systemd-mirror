@@ -41,8 +41,8 @@ systemd_boot_objects = $(addprefix $(top_builddir)/,$(systemd_boot_sources:.c=.o
 systemd_boot_solib = $(top_builddir)/src/boot/efi/systemd_boot.so
 systemd_boot = systemd-boot$(EFI_MACHINE_TYPE_NAME).efi
 
-if ENABLE_EFI
-if HAVE_GNUEFI
+ifneq ($(ENABLE_EFI),)
+ifneq ($(HAVE_GNUEFI),)
 bootlib_DATA = $(systemd_boot)
 
 $(top_builddir)/src/boot/efi/%.o: $(top_srcdir)/src/boot/efi/%.c $(addprefix $(top_srcdir)/,$(systemd_boot_headers))
@@ -89,8 +89,8 @@ stub_objects = $(addprefix $(top_builddir)/,$(stub_sources:.c=.o))
 stub_solib = $(top_builddir)/src/boot/efi/stub.so
 stub = linux$(EFI_MACHINE_TYPE_NAME).efi.stub
 
-if ENABLE_EFI
-if HAVE_GNUEFI
+ifneq ($(ENABLE_EFI),)
+ifneq ($(HAVE_GNUEFI),)
 bootlib_DATA += $(stub)
 
 $(top_builddir)/src/boot/efi/%.o: $(top_srcdir)/src/boot/efi/%.c $(addprefix $(top_srcdir)/,$(stub_headers))

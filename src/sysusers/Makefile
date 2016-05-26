@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if ENABLE_SYSUSERS
+ifneq ($(ENABLE_SYSUSERS),)
 systemd_sysusers_SOURCES = \
 	src/sysusers/sysusers.c
 
@@ -40,7 +40,7 @@ nodist_sysusers_DATA = \
 	sysusers.d/systemd.conf \
 	sysusers.d/basic.conf
 
-if HAVE_REMOTE
+ifneq ($(HAVE_REMOTE),)
 nodist_sysusers_DATA += \
 	sysusers.d/systemd-remote.conf
 endif

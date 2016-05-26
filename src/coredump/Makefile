@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-if ENABLE_COREDUMP
+ifneq ($(ENABLE_COREDUMP),)
 systemd_coredump_SOURCES = \
 	src/coredump/coredump.c \
 	src/coredump/coredump-vacuum.c \
@@ -29,7 +29,7 @@ systemd_coredump_SOURCES = \
 systemd_coredump_LDADD = \
 	libshared.la
 
-if HAVE_ELFUTILS
+ifneq ($(HAVE_ELFUTILS),)
 systemd_coredump_SOURCES += \
 	src/coredump/stacktrace.c \
 	src/coredump/stacktrace.h
