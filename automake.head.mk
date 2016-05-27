@@ -24,7 +24,7 @@ _am_relto = $(call _am_noslash,$(call _am_relto_helper,$(call _am_noslash,$(absp
 # Note that _am_is_subdir says that a directory is a subdirectory of
 # itself.
 _am_path = $(call _am_relto,.,$1)
-am_path = $(foreach p,$1,$(call _am_relto,$p))
+am_path = $(foreach p,$1,$(call _am_relto,.,$p))
 
 ## Declare the default target
 all: build
