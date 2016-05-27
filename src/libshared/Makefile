@@ -147,4 +147,6 @@ CPPFLAGS += -DPOLKIT_AGENT_BINARY_PATH=\"$(bindir)/pkttyagent\" \
 $(outdir)/libshared.la: \
 	$(patsubst src/shared/%.c,$(outdir)/%.lo,$(filter %.c,$(libshared_la_SOURCES)))
 
+$(call amtarget2dir,src/shared,libshared.la)
+
 include $(topsrcdir)/automake.tail.mk

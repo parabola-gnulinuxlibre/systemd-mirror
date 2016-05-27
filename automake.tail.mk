@@ -56,8 +56,9 @@ _am_phony = build install uninstall mostlyclean clean distclean maintainer-clean
 .PHONY: $(addprefix $(outdir)/,$(_am_phony))
 
 $(addprefix $(outdir)/,uninstall mostlyclean clean distclean maintainer-clean)::
-	$(RM) -- $(sort $(_am_$(@F)/$(@D)))
-	$(RMDIRS) $(sort $(dir $(_am_$(@F)/$(@D)))) 2>/dev/null || $(TRUE)
+	$(RM)    -- $(filter-out %/,$(sort $(_am_$(@F)/$(@D))))
+	$(RM) -r -- $(filter     %/,$(sort $(_am_$(@F)/$(@D))))
+	$(RMDIRS) $(sort $(dir $(patsubst %/,%,$(_am_$(@F)/$(@D))))) 2>/dev/null || $(TRUE)
 
 # 'build' and 'install' must be defined later, because the
 # am_*_files/* variables might not be complete yet.

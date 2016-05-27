@@ -23,9 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/automake.head.mk
 
-noinst_LTLIBRARIES += \
-	libbasic.la
-
 libbasic_la_SOURCES = \
 	src/basic/missing.h \
 	src/basic/capability-util.c \
@@ -219,34 +216,14 @@ libbasic_la_SOURCES = \
 	src/basic/formats-util.h \
 	src/basic/nss-util.h
 
-nodist_libbasic_la_SOURCES = \
-	src/basic/errno-from-name.h \
-	src/basic/errno-to-name.h \
-	src/basic/af-from-name.h \
-	src/basic/af-to-name.h \
-	src/basic/arphrd-from-name.h \
-	src/basic/arphrd-to-name.h \
-	src/basic/cap-from-name.h \
-	src/basic/cap-to-name.h
-
-libbasic_la_CFLAGS = \
-	$(AM_CFLAGS) \
-	$(SELINUX_CFLAGS) \
-	$(CAP_CFLAGS) \
-	-pthread
-
-libbasic_la_LIBADD = \
-	$(SELINUX_LIBS) \
-	$(CAP_LIBS) \
-	-lrt \
-	-lm
-
 am_out_files = libbasic.la
-CFLAGS += $(libbasic_la_CFLAGS)
-CPPFLAGS += -I$(topsrcdir)/src/libsystemd/include
-CPPFLAGS += -I$(topoutdir)/src/libsystemd/include
-CPPFLAGS += -include $(topoutdir)/config.h
-$(outdir)/libbasic.la: $(patsubst src/basic/%.c,$(outdir)/%.lo,$(filter %.c,$(libbasic_la_SOURCES))) $(libbasic_la_LIBADD)
+CFLAGS += -pthread
+CPPFLAGS += $(libsystemd.CPPFLAGS) $(libselinux.CPPFLAGS) $(libcap.CPPFLAGS)
+$(outdir)/libbasic.la: \
+	$(patsubst src/basic/%.c,$(outdir)/%.lo,$(filter %.c,$(libbasic_la_SOURCES))) \
+	$(libselinux.DEPENDS) $(libcap.DEPENDS) -lrt -lm
+
+am_clean_files += *-to-name.h *-from-name.h *-from-name.gperf *-list.txt
 
 $(outdir)/af-list.lo: $(outdir)/af-from-name.h $(outdir)/af-to-name.h
 $(outdir)/arphrd-list.lo: $(outdir)/arphrd-from-name.h $(outdir)/arphrd-to-name.h
@@ -254,21 +231,21 @@ $(outdir)/cap-list.lo: $(outdir)/cap-from-name.h $(outdir)/cap-to-name.h
 $(outdir)/errno-list.lo: $(outdir)/errno-from-name.h $(outdir)/errno-to-name.h
 
 $(outdir)/errno-list.txt:
-	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM -include errno.h - </dev/null | $(AWK) '/^#define[ \t]+E[^ _]+[ \t]+/ { print $$2; }' >$@
+	$(AM_V_GEN)$(CPP) $(CFLAGS) $(CPPFLAGS) -dM -include errno.h - </dev/null | $(AWK) '/^#define[ \t]+E[^ _]+[ \t]+/ { print $$2; }' >$@
 
 $(outdir)/errno-to-name.h: $(outdir)/errno-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "static const char* const errno_names[] = { "} !/EDEADLOCK/ && !/EWOULDBLOCK/ && !/ENOTSUP/ { printf "[%s] = \"%s\",\n", $$1, $$1 } END{print "};"}' <$< >$@
 
 
 $(outdir)/af-list.txt:
-	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM -include sys/socket.h - </dev/null | grep -v AF_UNSPEC | grep -v AF_MAX | $(AWK) '/^#define[ \t]+AF_[^ \t]+[ \t]+PF_[^ \t]/ { print $$2; }' >$@
+	$(AM_V_GEN)$(CPP) $(CFLAGS) $(CPPFLAGS) -dM -include sys/socket.h - </dev/null | grep -v AF_UNSPEC | grep -v AF_MAX | $(AWK) '/^#define[ \t]+AF_[^ \t]+[ \t]+PF_[^ \t]/ { print $$2; }' >$@
 
 $(outdir)/af-to-name.h: $(outdir)/af-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "static const char* const af_names[] = { "} !/AF_FILE/ && !/AF_ROUTE/ && !/AF_LOCAL/ { printf "[%s] = \"%s\",\n", $$1, $$1 } END{print "};"}' <$< >$@
 
 
 $(outdir)/arphrd-list.txt:
-	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM -include net/if_arp.h - </dev/null | $(AWK) '/^#define[ \t]+ARPHRD_[^ \t]+[ \t]+[^ \t]/ { print $$2; }' | sed -e 's/ARPHRD_//' >$@
+	$(AM_V_GEN)$(CPP) $(CFLAGS) $(CPPFLAGS) -dM -include net/if_arp.h - </dev/null | $(AWK) '/^#define[ \t]+ARPHRD_[^ \t]+[ \t]+[^ \t]/ { print $$2; }' | sed -e 's/ARPHRD_//' >$@
 
 $(outdir)/arphrd-to-name.h: $(outdir)/arphrd-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -279,7 +256,7 @@ $(outdir)/arphrd-from-name.gperf: $(outdir)/arphrd-list.txt
 
 
 $(outdir)/cap-list.txt:
-	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM -include linux/capability.h -include missing.h - </dev/null | $(AWK) '/^#define[ \t]+CAP_[A-Z_]+[ \t]+/ { print $$2; }' | grep -v CAP_LAST_CAP >$@
+	$(AM_V_GEN)$(CPP) $(CFLAGS) $(CPPFLAGS) -dM -include linux/capability.h -include missing.h - </dev/null | $(AWK) '/^#define[ \t]+CAP_[A-Z_]+[ \t]+/ { print $$2; }' | grep -v CAP_LAST_CAP >$@
 
 $(outdir)/cap-to-name.h: $(outdir)/cap-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "static const char* const capability_names[] = { "} { printf "[%s] = \"%s\",\n", $$1, tolower($$1) } END{print "};"}' <$< >$@

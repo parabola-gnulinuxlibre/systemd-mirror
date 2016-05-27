@@ -20,16 +20,20 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
-AM_MAKEFLAGS = --no-print-directory
-AUTOMAKE_OPTIONS = color-tests parallel-tests
+AM_CPPFLAGS     = @OUR_CPPFLAGS@
+AM_CFLAGS       = @OUR_CFLAGS@
+AM_LDFLAGS      = @OUR_LDFLAGS@
+AM_LIBTOOLFLAGS = 
+
+ALL_CPPFLAGS     = $(CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS/$(@D))
+ALL_CFLAGS       = $(CFLAGS) $(AM_CFLAGS) $(CFLAGS/$(@D))
+ALL_LDFLAGS      = $(LDFLAGS) $(AM_LDFLAGS) $(LDFLAGS/$(@D))
+ALL_LIBTOOLFLAGS = $(LIBTOOLFLAGS) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS/$(@D))
+
+AM_CPPFLAGS += -include $(topoutdir)/config.h
 
 GCC_COLORS ?= 'ooh, shiny!'
 export GCC_COLORS
-
-SUBDIRS = . po
-
-CPPFLAGS += -include $(topoutdir)/config.h
 
 # remove targets if the command fails
 .DELETE_ON_ERROR:
@@ -60,14 +64,25 @@ define generate-sym-test
 	$(AM_V_at)printf 'return 0; }\n' >> $@
 endef
 
-# from GNU automake
 
-DEFAULT_INCLUDES = -I.
-depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
-am__depfiles_maybe = depfiles
-DEPDIR = .deps
+lib_LTLIBRARIES
+pkginclude_HEADERS
 
-am__mv = mv -f
+o = $(if $(filter lib%,$(notdir $2)),lo,o)
+m = $(subst -,_,$(subst .,_,$2))
+define amtarget2dir
+am_out_files += $(notdir $2)
+LDFLAGS/$(outdir) += $($m_LDFLAGS)
+CFLAGS/$(outdir) += $($m_CFLAGS)
+LDFLAGS/$(outdir) += $($m_LDFLAGS)
+$(outdir)/$(notdir $2): $(filter %.$o,$(patsubst $(addsuffix /%.c,$1),%.$o,$($m_SOURCES))) $($m_LIBADD)
+
+am_out_files += $(lib_LTLIBRARIES) $(noinst_LTLIBRARIES)
+am_sys_files += $(addprefix $(libdir)/,$(lib_LTLIBRARIES))
+endef
+
+$(topoutdir)/config.mk: $(topoutdir)/config.status $(topsrcdir)/config.mk.in
+	cd $(topoutdir) && ./config.status
 
 include $(topsrcdir)/am-pretty.mk
 include $(topsrcdir)/am-tools.mk

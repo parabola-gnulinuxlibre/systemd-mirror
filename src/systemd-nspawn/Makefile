@@ -46,15 +46,19 @@ systemd_nspawn_SOURCES = \
 	src/core/loopback-setup.c \
 	src/core/loopback-setup.h
 
+nodist_systemd_nspawn_SOURCES = \
+	src/nspawn/nspawn-gperf.c
+
+gperf_gperf_sources += \
+	src/nspawn/nspawn-gperf.gperf
+
 am_out_files = systemd-nspawn
-CPPFLAGS += -I$(topsrcdir)/src/libbasic
-CPPFLAGS += -I$(topoutdir)/src/libbasic
-CPPFLAGS += -I$(topsrcdir)/src/libshared
-CPPFLAGS += -I$(topoutdir)/src/libshared
-CPPFLAGS += -I$(topsrcdir)/src/libsystemd/include
-CPPFLAGS += -I$(topoutdir)/src/libsystemd/include
-CPPFLAGS += -I$(topsrcdir)/src/libudev/include
-CPPFLAGS += -I$(topoutdir)/src/libudev/include
+CPPFLAGS += $(libbasic.CPPFLAGS) $(libshared.CPPFLAGS) $(libsystemd.CPPFLAGS) $(libudev.CPPFLAGS) $(libblkid.CPPFLAGS)
+CPPFLAGS += -I$(topsrcdir)/src/libsystemd/src/sd-netlink -I$(topsrcdir)/src/libsystemd/src/sd-bus -I$(topsrcdir)/src/udev -I$(topsrcdir)/src/libudev/src
+CPPFLAGS += $(libblkid.CPPFLAGS) $(libseccomp.CPPFLAGS)
+ifneq ($(HAVE_LIBIPTC),)
+CPPFLAGS += $(libfirewall.CPPFLAGS)
+endif
 $(outdir)/systemd-nspawn: \
 	$(outdir)/nspawn.o \
 	$(outdir)/nspawn-settings.o \
@@ -67,7 +71,10 @@ $(outdir)/systemd-nspawn: \
 	$(outdir)/nspawn-stub-pid1.o \
 	$(outdir)/mount-setup.o \
 	$(outdir)/loopback-setup.o \
-	$(topsrcdir)/libshared/libshared.la $(BLKID_LIBS)
+	$(libshared.DEPENDS) $(libblkid.DEPENDS)
+ifneq ($(HAVE_LIBIPTC),)
+$(outdir)/systemd-nspawn: $(libfirewall.DEPENDS)
+endif
 
 $(outdir)/mount-setup.c: $(topsrcdir)/src/libcore/mount-setup.c; $(CP) $< $@
 $(outdir)/mount-setup.h: $(topsrcdir)/src/libcore/mount-setup.h; $(CP) $< $@
@@ -75,25 +82,5 @@ $(outdir)/loopback-setup.c: $(topsrcdir)/src/libcore/loopback-setup.c; $(CP) $< 
 $(outdir)/loopback-setup.h: $(topsrcdir)/src/libcore/loopback-setup.h; $(CP) $< $@
 
 $(outdir)/nspawn.o: $(outdir)/loopback-setup.h
-
-nodist_systemd_nspawn_SOURCES = \
-	src/nspawn/nspawn-gperf.c
-
-gperf_gperf_sources += \
-	src/nspawn/nspawn-gperf.gperf
-
-systemd_nspawn_CFLAGS = \
-	$(AM_CFLAGS) \
-	$(BLKID_CFLAGS) \
-	$(SECCOMP_CFLAGS)
-
-systemd_nspawn_LDADD = \
-	libshared.la \
-	$(BLKID_LIBS)
-
-ifneq ($(HAVE_LIBIPTC),)
-systemd_nspawn_LDADD += \
-	libfirewall.la
-endif
 
 include $(topsrcdir)/automake.tail.mk

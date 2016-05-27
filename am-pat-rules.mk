@@ -1,15 +1,11 @@
 $(outdir)/%.o: $(srcdir)/%.c | $(outdir)/.deps
-	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
-	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-	$(am__mv) $$depbase.Tpo $$depbase.Po
+	$(AM_V_CC)$(COMPILE)   -c -o $@ $<
 
 $(outdir)/%.lo: $(srcdir)/%.c | $(outdir)/.deps
-	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
-	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-	$(am__mv) $$depbase.Tpo $$depbase.Plo
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 $(outdir)/.deps:
 	$(AM_V_at)$(MKDIR_P) $@
 
 $(outdir)/%.la:
-	$(AM_V_CCLD)$(LINK) $^
+	$(AM_V_CCLD)$(LINK) $(filter-out .var%,$^)
