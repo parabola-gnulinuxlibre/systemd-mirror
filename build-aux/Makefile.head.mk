@@ -12,6 +12,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# This bit only gets evaluated once, at the very beginning
+ifeq ($(_am_NO_ONCE),)
 
 _am = am_
 
@@ -23,34 +26,24 @@ _am_relto_helper = $(if $(call _am_is_subdir,$1,$2),$(patsubst $1/%,%,$(addsuffi
 _am_relto = $(call _am_noslash,$(call _am_relto_helper,$(call _am_noslash,$(abspath $1)),$(call _am_noslash,$(abspath $2))))
 # Note that _am_is_subdir says that a directory is a subdirectory of
 # itself.
-_am_path = $(call _am_relto,.,$1)
 am_path = $(foreach p,$1,$(call _am_relto,.,$p))
 
-## Declare the default target
-all: build
-.PHONY: all
+$(_am)dirlocal += $(_am)subdirs
+$(_am)dirlocal += $(_am)depdirs
+
+include $(topsrcdir)/common.once.head.mk
+
+endif # _am_NO_ONCE
+
+# This bit gets evaluated for each Makefile
 
 ## Set outdir and srcdir (assumes that topoutdir and topsrcdir are
 ## already set)
-outdir := $(call _am_path,$(dir $(lastword $(filter-out %.mk,$(MAKEFILE_LIST)))))
-srcdir := $(call _am_path,$(topsrcdir)/$(call _am_relto,$(topoutdir),$(outdir)))
+outdir := $(call am_path,$(dir $(lastword $(filter-out %.mk,$(MAKEFILE_LIST)))))
+srcdir := $(call am_path,$(topsrcdir)/$(call _am_relto,$(topoutdir),$(outdir)))
 
-_am_included_makefiles := $(_am_included_makefiles) $(call _am_path,$(outdir)/Makefile)
+_am_included_makefiles := $(_am_included_makefiles) $(call am_path,$(outdir)/Makefile)
 
-## Empty variables for use by each Makefile
-$(_am)subdirs =
-$(_am)depdirs =
+$(foreach v,$($(_am)dirlocal),$(eval $v=))
 
-$(_am)src_files =
-$(_am)gen_files =
-$(_am)cfg_files =
-$(_am)out_files =
-$(_am)sys_files =
-
-$(_am)clean_files =
-$(_am)slow_files =
-
-ifeq ($(_am_NO_ONCE),)
-include $(topsrcdir)/common.once.head.mk
-endif
 include $(topsrcdir)/common.each.head.mk
