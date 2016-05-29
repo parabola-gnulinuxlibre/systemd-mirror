@@ -14,5 +14,5 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ifeq ($(outdir),$(topoutdir))
-$(_am)clean_files += $(addprefix $(PACKAGE)-*,$($(_am)distexts) /)
+std.clean_files += $(addprefix $(PACKAGE)-*,$(dist.exts) /)
 endif
