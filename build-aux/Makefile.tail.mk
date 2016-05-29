@@ -18,35 +18,30 @@
 include $(wildcard $(topsrcdir)/build-aux/Makefile.each.tail/*.mk)
 
 # Make the namespaced versions of all of the dirlocal variables
-$(foreach v,$($(_am)dirlocal),$(eval $v/$(outdir) = $($v)))
+$(foreach v,$(at.dirlocal),$(eval $v/$(outdir) = $($v)))
 
 # Remember that this is a directory that we've visited
-_am_outdirs := $(_am_outdirs) $(outdir)
+_at.outdirs := $(_at.outdirs) $(outdir)
 
 # Generic phony target declarations:
 # mark them phony
-.PHONY: $(addprefix $(outdir)/,$($(_am)phony))
+.PHONY: $(addprefix $(outdir)/,$(at.phony))
 # have them depend on subdirs
-$(foreach t,$($(_am)phony),$(eval $(outdir)/$t: $(addsuffix /$t,$(subdirs))))
+$(foreach t,$(at.phony),$(eval $(outdir)/$t: $(addsuffix /$t,$(subdirs))))
 
 # Include Makefiles from other directories
-
-define _am_nl
-
-
-endef
-$(foreach _am_NO_ONCE,y,\
-	$(foreach makefile,$(call am_path,$(addsuffix /Makefile,$($(_am)subdirs) $($(_am)depdirs))),\
-		$(eval include $(filter-out $(_am_included_makefiles),$(makefile)))))
+$(foreach _at.NO_ONCE,y,\
+	$(foreach makefile,$(call am_path,$(addsuffix /Makefile,$(at.subdirs) $(at.depdirs))),\
+		$(eval include $(filter-out $(_at.included_makefiles),$(makefile)))))
 
 # This bit only gets evaluated once, after all of the other Makefiles are read
-ifeq ($(_am_NO_ONCE),)
+ifeq ($(_at.NO_ONCE),)
 
 outdir = /bogus
 srcdir = /bogus
 
-$(foreach v,$($(_am)dirlocal),$(eval $v=))
+$(foreach v,$(at.dirlocal),$(eval $v=))
 
 include $(wildcard $(topsrcdir)/build-aux/Makefile.once.tail/*.mk)
 
-endif # _am_NO_ONCE
+endif # _at.NO_ONCE

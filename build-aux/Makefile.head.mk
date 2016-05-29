@@ -14,36 +14,39 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # This bit only gets evaluated once, at the very beginning
-ifeq ($(_am_NO_ONCE),)
+ifeq ($(_at.NO_ONCE),)
 
-_am = am_
-
-_am_noslash = $(patsubst %/.,%,$(patsubst %/,%,$1))
-# These are all $(call _am_func,parent,child)
-#_am_relto = $(if $2,$(shell realpath -sm --relative-to='$1' $2))
-_am_is_subdir = $(filter $(abspath $1)/%,$(abspath $2)/.)
-_am_relto_helper = $(if $(call _am_is_subdir,$1,$2),$(patsubst $1/%,%,$(addsuffix /.,$2)),$(addprefix ../,$(call _am_relto_helper,$(patsubst %/,%,$(dir $1)),$2)))
-_am_relto = $(call _am_noslash,$(call _am_relto_helper,$(call _am_noslash,$(abspath $1)),$(call _am_noslash,$(abspath $2))))
-# Note that _am_is_subdir says that a directory is a subdirectory of
+_at.noslash = $(patsubst %/.,%,$(patsubst %/,%,$1))
+# These are all $(call _at.func,parent,child)
+#_at.relto = $(if $2,$(shell realpath -sm --relative-to='$1' $2))
+_at.is_subdir = $(filter $(abspath $1)/%,$(abspath $2)/.)
+_at.relto_helper = $(if $(call _at.is_subdir,$1,$2),$(patsubst $1/%,%,$(addsuffix /.,$2)),$(addprefix ../,$(call _at.relto_helper,$(patsubst %/,%,$(dir $1)),$2)))
+_at.relto = $(call _at.noslash,$(call _at.relto_helper,$(call _at.noslash,$(abspath $1)),$(call _at.noslash,$(abspath $2))))
+# Note that _at.is_subdir says that a directory is a subdirectory of
 # itself.
-am_path = $(foreach p,$1,$(call _am_relto,.,$p))
+at.path = $(foreach p,$1,$(call _at.relto,.,$p))
 
-$(_am)dirlocal += $(_am)subdirs
-$(_am)dirlocal += $(_am)depdirs
+define at.nl
+
+
+endef
+
+at.dirlocal += at.subdirs
+at.dirlocal += at.depdirs
 
 include $(topsrcdir)/common.once.head.mk
 
-endif # _am_NO_ONCE
+endif # _at.NO_ONCE
 
 # This bit gets evaluated for each Makefile
 
 ## Set outdir and srcdir (assumes that topoutdir and topsrcdir are
 ## already set)
-outdir := $(call am_path,$(dir $(lastword $(filter-out %.mk,$(MAKEFILE_LIST)))))
-srcdir := $(call am_path,$(topsrcdir)/$(call _am_relto,$(topoutdir),$(outdir)))
+outdir := $(call at.path,$(dir $(lastword $(filter-out %.mk,$(MAKEFILE_LIST)))))
+srcdir := $(call at.path,$(topsrcdir)/$(call _at.relto,$(topoutdir),$(outdir)))
 
-_am_included_makefiles := $(_am_included_makefiles) $(call am_path,$(outdir)/Makefile)
+_at.included_makefiles := $(_at.included_makefiles) $(call at.path,$(outdir)/Makefile)
 
-$(foreach v,$($(_am)dirlocal),$(eval $v=))
+$(foreach v,$(at.dirlocal),$(eval $v=))
 
 include $(topsrcdir)/common.each.head.mk
