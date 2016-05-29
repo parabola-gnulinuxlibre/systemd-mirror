@@ -23,7 +23,7 @@ ifeq ($(dist.name),)
 $(error dist.name must be set)
 endif
 ifeq ($(dist.version),)
-$(error dist.name must be set)
+$(error dist.version must be set)
 endif
 
 # User configuration
