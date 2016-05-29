@@ -1,14 +1,17 @@
-# This file is based on §7.2 "Makefile Conventions" of the release of
-# the GNU Coding Standards dated April 13, 2016.
-
-# 7.2.1: General Conventions for Makefiles
-# ----------------------------------------
-
-# The standards claim that every Makefile should contain
+# Copyright (C) 2016  Luke Shumaker
 #
-#    SHELL = /bin/sh`
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-# but note that this is unnescesary with GNU Make.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # 7.2.2: Utilities in Makefiles
 # -----------------------------
@@ -43,8 +46,6 @@ TOUCH ?= touch
 TR ?= tr
 TRUE ?= true
 
-# Beyond those, define them yourself.
-
 # 7.2.3 Variables for Specifying Commands
 # ---------------------------------------
 
@@ -52,10 +53,14 @@ INSTALL ?= install
 INSTALL_PROGRAM ?= $(INSTALL)
 INSTALL_DATA ?= ${INSTALL} -m 644
 
-# 7.2.4 DESTDIR: Support for Staged Installs
-# ------------------------------------------
-
-# This is done for us by the std module.
+# These aren't specified in the standards, but we use them
+STRIP ?= strip
+MAKEINFO ?= makeinfo
+TEXI2DVI ?= texi2dvi
+TEXI2HTML ?= makeinfo --html
+TEXI2PDF ?= texi2pdf
+TEXI2PS ?= makeinfo --ps
+MKDIR_P ?= mkdir -p
 
 # 7.2.5 Variables for Installation Directories
 # --------------------------------------------
@@ -113,6 +118,10 @@ man8ext ?= .8
 
 # srcdir is handled for us by the core
 
+# Other initialization
+gnu.info_docs ?=
+std.dirlocal += gnu.info_docs
+
 define _gnu.install_program
 $$($1)/%: $$(outdir)/$$($1)
 	$$(NORMAL_INSTALL)
@@ -121,7 +130,6 @@ $$($1)/%: $$(srcdir)/$$($1)
 	$$(NORMAL_INSTALL)
 	$$(INSTALL_PROGRAM)
 endef
-$(foreach d,$(gnu.program_dirs),$(eval $(call _gnu.install_program,$d)))
 
 define _gnu.install_data
 $$($1)/%: $$(outdir)/$$($1)
@@ -131,51 +139,5 @@ $$($1)/%: $$(srcdir)/$$($1)
 	$$(NORMAL_INSTALL)
 	$$(INSTALL_DATA)
 endef
-$(foreach d,$(gnu.data_dirs),$(eval $(call _gnu.install_data,$d)))
 
 gnu.dirs += $(gnu.program_dirs) $(gnu.data_dirs)
-$(gnu.dirs):
-	$(MKDIR_P) $@
-
-# 7.2.6: Standard Targets for Users
-# ---------------------------------
-
-gnu.info_docs ?=
-std.sys_files += $(foreach f,$(gnu.info_docs), $(infodir)/$f.info )
-
-#all: std
-#install: std
-$(outdir)/install-html: $(foreach f,$(gnu.info_docs), $(DESTDIR)$(htmldir)/$f.html )
-$(outdir)/install-dvi : $(foreach f,$(gnu.info_docs), $(DESTDIR)$(dvidir)/$f.dvi  )
-$(outdir)/install-pdf : $(foreach f,$(gnu.info_docs), $(DESTDIR)$(pdfdir)/$f.pdf  )
-$(outdir)/install-ps  : $(foreach f,$(gnu.info_docs), $(DESTDIR)$(psdir)/$f.ps   )
-#uninstall: std
-$(outdir)/install-strip: install
-	$(STRIP $(filter $(bindir)/% $(sbindir)/% $(libexecdir)/%,$(std.sys_files/$(@D)))
-#clean: std
-#distclean: std
-#mostlyclean: std
-#maintainer-clean: std
-TAGS: TODO
-$(outdir)/info: $(addsuffix .info,$(gnu.info_docs))
-$(outdir)/dvi : $(addsuffix .dvi ,$(gnu.info_docs))
-$(outdir)/html: $(addsuffix .html,$(gnu.info_docs))
-$(outdir)/pdf : $(addsuffix .pdf ,$(gnu.info_docs))
-$(outdir)/ps  : $(addsuffix .ps  ,$(gnu.info_docs))
-#dist:dist
-check: TODO
-installcheck: TODO
-#installdirs: std
-
-$(outdir)/%.info: $(srcdir)/%.texi; $(MAKEINFO)  -o $(@D) $<
-$(outdir)/%.dvi : $(srcdir)/%.texi; $(TEXI2DVI)  -o $(@D) $<
-$(outdir)/%.html: $(srcdir)/%.texi; $(TEXI2HTML) -o $(@D) $<
-$(outdir)/%.pdf : $(srcdir)/%.texi; $(TEXI2PDF)  -o $(@D) $<
-$(outdir)/%.ps  : $(srcdir)/%.texi; $(TEXI2PS)   -o $(@D) $<
-
-
-
-#installdirs: std
-
-# 7.2.7: Standard Targets for Users
-# ---------------------------------
