@@ -13,32 +13,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Add the `dist` target
-.PHONY: dist
-dist: $(addprefix $(topoutdir)/$(PACKAGE)-$(VERSION),$($(_am)distexts)
-
-_am_copyfile = $(MKDIR_P) $(dir $2) && $(CP) -T $1 $2
-_am_addfile = $(call _am_copyfile,$3,$2/$(call _am_relto,$1,$3))
-$(topoutdir)/$(PACKAGE)-$(VERSION): $(_am_src_files/$(topoutdir)) $(_am_gen_files/$(topoutdir))
+_dist.copyfile = $(MKDIR_P) $(dir $2) && $(CP) -T $1 $2
+_dist.addfile = $(call _dist.copyfile,$3,$2/$(call at.relto,$1,$3))
+$(topoutdir)/$(PACKAGE)-$(VERSION): $(std.src_files/$(topoutdir)) $(std.gen_files/$(topoutdir))
 	$(RM) -r $@
 	@PS4='' && set -x && \
 	$(MKDIR) $(@D)/tmp.$(@F).$$$$ && \
-	$(foreach f,$^,$(call _am_addfile,$(topsrcdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
+	$(foreach f,$^,$(call _dist.addfile,$(topsrcdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
 	$(MV) $(@D)/tmp.$(@F).$$$$ $@ || $(RM) -r $(@D)/tmp.$(@F).$$$$
 
 $(topoutdir)/$(PACKAGE)-$(VERSION).tar: $(topoutdir)/$(PACKAGE)-$(VERSION)
 	$(TAR) cf $@ -C $(<D) $(<F)
 $(topoutdir)/$(PACKAGE)-$(VERSION).tar.gz: $(topoutdir)/$(PACKAGE)-$(VERSION).tar
-	$(GZIP) $(GZIP_ENV) < $< > $@
-
-CP      ?= cp
-GZIP    ?= gzip
-MKDIR   ?= mkdir
-MKDIR_P ?= mkdir -p
-MV      ?= mv
-RM      ?= rm -f
-RMDIR_P ?= rmdir -p
-TAR     ?= tar
-TRUE    ?= true
-
-GZIP_ENV ?= --best
+	$(GZIP) $(GZIPFLAGS) < $< > $@
