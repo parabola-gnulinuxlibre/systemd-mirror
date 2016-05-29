@@ -15,9 +15,7 @@
 
 # Declare the default target
 all: build
-.PHONY: all
-
-DESTDIR ?=
+.PHONY: all noop
 
 # Standard creative PHONY targets
 at.phony += build install installdirs
@@ -31,3 +29,11 @@ at.dirlocal += std.out_files
 at.dirlocal += std.sys_files
 at.dirlocal += std.clean_files
 at.dirlocal += std.slow_files
+
+# User configuration
+
+DESTDIR ?=
+
+RM      ?= rm -f
+RMDIR_P ?= rmdir -p
+TRUE    ?= true
