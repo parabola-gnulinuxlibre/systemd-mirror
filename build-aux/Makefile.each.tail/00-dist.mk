@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ifeq ($(outdir),$(topoutdir))
-std.clean_files += $(addprefix $(PACKAGE)-*,$(dist.exts) .tar /)
+std.clean_files += $(addprefix $(dist.name)-*,$(dist.exts) .tar /)
 endif
 
-$(outdir)/dist: $(addprefix $(topoutdir)/$(PACKAGE)-$(VERSION),$(dist.exts))
+$(outdir)/dist: $(addprefix $(topoutdir)/$(dist.name)-$(dist.version),$(dist.exts))
