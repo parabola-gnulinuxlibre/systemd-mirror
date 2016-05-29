@@ -16,8 +16,15 @@
 # Developer configuration
 
 dist.exts ?= .tar.gz
-PACKAGE ?= YOUR_PACKAGE_NAME
-VERSION ?= 0.0.1
+dist.name ?= $(PACKAGE)
+dist.version ?= $(VERSION)
+
+ifeq ($(dist.name),)
+$(error dist.name must be set)
+endif
+ifeq ($(dist.version),)
+$(error dist.name must be set)
+endif
 
 # User configuration
 
