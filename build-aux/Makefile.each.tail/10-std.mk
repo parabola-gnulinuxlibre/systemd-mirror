@@ -36,6 +36,6 @@ _std.mostlyclean/$(outdir)      := $(filter-out $(_std.slow_files) $(_std.cfg_fi
 _std.clean/$(outdir)            := $(filter-out                    $(_std.cfg_files) $(_std.gen_files) $(_std.src_files),$(_std.clean_files))
 _std.distclean/$(outdir)        := $(filter-out                                      $(_std.gen_files) $(_std.src_files),$(_std.clean_files))
 _std.maintainer-clean/$(outdir) := $(filter-out                                                        $(_std.src_files),$(_std.clean_files))
-$(addprefix $(outdir)/,uninstall mostlyclean clean distclean maintainer-clean):
+$(addprefix $(outdir)/,uninstall mostlyclean clean distclean maintainer-clean)::
 	$(RM) -- $(sort $(_std.$(@F)/$(@D)))
 	$(RMDIR_P) $(sort $(dir $(_std.$(@F)/$(@D)))) 2>/dev/null || $(TRUE)
