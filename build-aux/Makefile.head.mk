@@ -16,6 +16,13 @@
 # This bit only gets evaluated once, at the very beginning
 ifeq ($(_at.NO_ONCE),)
 
+ifeq ($(topsrcdir),)
+$(error topsrcdir must be set before including Makefile.head.mk)
+endif
+ifeq ($(topoutdir),)
+$(error topoutdir must be set before including Makefile.head.mk)
+endif
+
 _at.noslash = $(patsubst %/.,%,$(patsubst %/,%,$1))
 # These are all $(call _at.func,parent,child)
 #_at.relto = $(if $2,$(shell realpath -sm --relative-to='$1' $2))
