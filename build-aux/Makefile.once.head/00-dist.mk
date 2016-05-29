@@ -16,11 +16,11 @@
 # Developer configuration
 
 dist.exts ?= .tar.gz
-dist.name ?= $(PACKAGE)
+dist.pkgname ?= $(PACKAGE)
 dist.version ?= $(VERSION)
 
-ifeq ($(dist.name),)
-$(error dist.name must be set)
+ifeq ($(dist.pkgname),)
+$(error dist.pkgname must be set)
 endif
 ifeq ($(dist.version),)
 $(error dist.version must be set)
