@@ -17,15 +17,17 @@
 all: build
 .PHONY: all
 
-# Standard creative PHONY targets
-$(_am)phony += build install installdirs
-# Standard destructive PHONY targets
-$(_am)phony += uninstall mostlyclean clean distclean maintainer-clean
+DESTDIR ?=
 
-$(_am)dirlocal += $(_am)src_files
-$(_am)dirlocal += $(_am)gen_files
-$(_am)dirlocal += $(_am)cfg_files
-$(_am)dirlocal += $(_am)out_files
-$(_am)dirlocal += $(_am)sys_files
-$(_am)dirlocal += $(_am)clean_files
-$(_am)dirlocal += $(_am)slow_files
+# Standard creative PHONY targets
+at.phony += build install installdirs
+# Standard destructive PHONY targets
+at.phony += uninstall mostlyclean clean distclean maintainer-clean
+
+at.dirlocal += std.src_files
+at.dirlocal += std.gen_files
+at.dirlocal += std.cfg_files
+at.dirlocal += std.out_files
+at.dirlocal += std.sys_files
+at.dirlocal += std.clean_files
+at.dirlocal += std.slow_files

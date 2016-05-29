@@ -12,31 +12,30 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 # Add some more defaults to the *_files variables
-$(_am)clean_files += $($(_am)gen_files) $($(_am)cfg_files) $($(_am)out_files)
+std.clean_files += $(std.gen_files) $(std.cfg_files) $(std.out_files)
 
 # Make each of the standard variables relative to the correct directory 
-$(_am)src_files   := $(addprefix $(srcdir)/,$($(_am)src_files))
-$(_am)gen_files   := $(addprefix $(srcdir)/,$($(_am)gen_files))
-$(_am)cfg_files   := $(addprefix $(outdir)/,$($(_am)cfg_files))
-$(_am)out_files   := $(addprefix $(outdir)/,$($(_am)out_files))
-$(_am)sys_files   := $(addprefix $(DESTDIR),$($(_am)sys_files))
-$(_am)clean_files := $(addprefix $(outdir)/,$($(_am)clean_files))
-$(_am)slow_files  := $(addprefix $(outdir)/,$($(_am)slow_files))
-$(_am)subdirs     := $(addprefix $(outdir)/,$($(_am)subdirs))
+std.src_files   := $(addprefix $(srcdir)/,$(std.src_files))
+std.gen_files   := $(addprefix $(srcdir)/,$(std.gen_files))
+std.cfg_files   := $(addprefix $(outdir)/,$(std.cfg_files))
+std.out_files   := $(addprefix $(outdir)/,$(std.out_files))
+std.sys_files   := $(addprefix $(DESTDIR),$(std.sys_files))
+std.clean_files := $(addprefix $(outdir)/,$(std.clean_files))
+std.slow_files  := $(addprefix $(outdir)/,$(std.slow_files))
+std.subdirs     := $(addprefix $(outdir)/,$(std.subdirs))
 
 # Creative targets
-$(outdir)/build      :       $($(_am)out_files/$(outdir))
-$(outdir)/install    :       $($(_am)sys_files/$(outdir))
-$(outdir)/installdirs: $(dir $($(_am)sys_files/$(outdir)))
+$(outdir)/build      :       $(std.out_files)
+$(outdir)/install    :       $(std.sys_files)
+$(outdir)/installdirs: $(dir $(std.sys_files))
 
 # Destructive targets
-_am_uninstall/$(outdir)        = $(_am_sys_files/$(outdir))
-_am_mostlyclean/$(outdir)      = $(filter-out $(_am_slow_files/$(outdir)) $(_am_cfg_files/$(outdir)) $(_am_gen_files/$(outdir)) $(_am_src_files/$(outdir)),$(_am_clean_files/$(outdir)))
-_am_clean/$(outdir)            = $(filter-out                             $(_am_cfg_files/$(outdir)) $(_am_gen_files/$(outdir)) $(_am_src_files/$(outdir)),$(_am_clean_files/$(outdir)))
-_am_distclean/$(outdir)        = $(filter-out                                                        $(_am_gen_files/$(outdir)) $(_am_src_files/$(outdir)),$(_am_clean_files/$(outdir)))
-_am_maintainer-clean/$(outdir) = $(filter-out                                                                                   $(_am_src_files/$(outdir)),$(_am_clean_files/$(outdir)))
+_std.uninstall/$(outdir)        := $(_std.sys_files)
+_std.mostlyclean/$(outdir)      := $(filter-out $(_std.slow_files) $(_std.cfg_files) $(_std.gen_files) $(_std.src_files),$(_std.clean_files))
+_std.clean/$(outdir)            := $(filter-out                    $(_std.cfg_files) $(_std.gen_files) $(_std.src_files),$(_std.clean_files))
+_std.distclean/$(outdir)        := $(filter-out                                      $(_std.gen_files) $(_std.src_files),$(_std.clean_files))
+_std.maintainer-clean/$(outdir) := $(filter-out                                                        $(_std.src_files),$(_std.clean_files))
 $(addprefix $(outdir)/,uninstall mostlyclean clean distclean maintainer-clean):
-	$(RM) -- $(sort $(_am_$(@F)/$(@D)))
-	$(RMDIRS) $(sort $(dir $(_am_$(@F)/$(@D)))) 2>/dev/null || $(TRUE)
+	$(RM) -- $(sort $(_std.$(@F)/$(@D)))
+	$(RMDIRS) $(sort $(dir $(_std.$(@F)/$(@D)))) 2>/dev/null || $(TRUE)
