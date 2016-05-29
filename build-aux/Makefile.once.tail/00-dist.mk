@@ -17,10 +17,7 @@
 .PHONY: dist
 dist: $(addprefix $(topoutdir)/$(PACKAGE)-$(VERSION),$($(_am)distexts)
 
-$(topoutdir)/$(PACKAGE)-$(VERSION).tar: $(topoutdir)/$(PACKAGE)-$(VERSION)
-	$(TAR) cf $@ -C $(<D) $(<F)
-
-_am_copyfile = $(MKDIRS) $(dir $2) && $(CP) -T $1 $2
+_am_copyfile = $(MKDIR_P) $(dir $2) && $(CP) -T $1 $2
 _am_addfile = $(call _am_copyfile,$3,$2/$(call _am_relto,$1,$3))
 $(topoutdir)/$(PACKAGE)-$(VERSION): $(_am_src_files/$(topoutdir)) $(_am_gen_files/$(topoutdir))
 	$(RM) -r $@
@@ -29,12 +26,19 @@ $(topoutdir)/$(PACKAGE)-$(VERSION): $(_am_src_files/$(topoutdir)) $(_am_gen_file
 	$(foreach f,$^,$(call _am_addfile,$(topsrcdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
 	$(MV) $(@D)/tmp.$(@F).$$$$ $@ || $(RM) -r $(@D)/tmp.$(@F).$$$$
 
-# For some reason I can't explain, RM doesn't really get set with ?=
-CP     ?= cp
-MKDIR  ?= mkdir
-MKDIRS ?= mkdir -p
-MV     ?= mv
-RM      = rm -f
-RMDIRS ?= rmdir -p
-TAR    ?= tar
-TRUE   ?= true
+$(topoutdir)/$(PACKAGE)-$(VERSION).tar: $(topoutdir)/$(PACKAGE)-$(VERSION)
+	$(TAR) cf $@ -C $(<D) $(<F)
+$(topoutdir)/$(PACKAGE)-$(VERSION).tar.gz: $(topoutdir)/$(PACKAGE)-$(VERSION).tar
+	$(GZIP) $(GZIP_ENV) < $< > $@
+
+CP      ?= cp
+GZIP    ?= gzip
+MKDIR   ?= mkdir
+MKDIR_P ?= mkdir -p
+MV      ?= mv
+RM      ?= rm -f
+RMDIR_P ?= rmdir -p
+TAR     ?= tar
+TRUE    ?= true
+
+GZIP_ENV ?= --best
