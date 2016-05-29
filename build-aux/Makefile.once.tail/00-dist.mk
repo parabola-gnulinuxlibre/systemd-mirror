@@ -15,14 +15,14 @@
 
 _dist.copyfile = $(MKDIR_P) $(dir $2) && $(CP) -T $1 $2
 _dist.addfile = $(call _dist.copyfile,$3,$2/$(call at.relto,$1,$3))
-$(topoutdir)/$(dist.name)-$(dist.version): $(std.src_files/$(topoutdir)) $(std.gen_files/$(topoutdir))
+$(topoutdir)/$(dist.pkgname)-$(dist.version): $(std.src_files/$(topoutdir)) $(std.gen_files/$(topoutdir))
 	$(RM) -r $@
 	@PS4='' && set -x && \
 	$(MKDIR) $(@D)/tmp.$(@F).$$$$ && \
 	$(foreach f,$^,$(call _dist.addfile,$(topsrcdir),$(@D)/tmp.$(@F).$$$$,$f) &&) \
 	$(MV) $(@D)/tmp.$(@F).$$$$ $@ || $(RM) -r $(@D)/tmp.$(@F).$$$$
 
-$(topoutdir)/$(dist.name)-$(dist.version).tar: $(topoutdir)/$(dist.name)-$(dist.version)
+$(topoutdir)/$(dist.pkgname)-$(dist.version).tar: $(topoutdir)/$(dist.pkgname)-$(dist.version)
 	$(TAR) cf $@ -C $(<D) $(<F)
-$(topoutdir)/$(dist.name)-$(dist.version).tar.gz: $(topoutdir)/$(dist.name)-$(dist.version).tar
+$(topoutdir)/$(dist.pkgname)-$(dist.version).tar.gz: $(topoutdir)/$(dist.pkgname)-$(dist.version).tar
 	$(GZIP) $(GZIPFLAGS) < $< > $@
