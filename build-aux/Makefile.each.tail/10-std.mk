@@ -38,4 +38,4 @@ _std.distclean/$(outdir)        := $(filter-out                                 
 _std.maintainer-clean/$(outdir) := $(filter-out                                                        $(_std.src_files),$(_std.clean_files))
 $(addprefix $(outdir)/,uninstall mostlyclean clean distclean maintainer-clean):
 	$(RM) -- $(sort $(_std.$(@F)/$(@D)))
-	$(RMDIRS) $(sort $(dir $(_std.$(@F)/$(@D)))) 2>/dev/null || $(TRUE)
+	$(RMDIR_P) $(sort $(dir $(_std.$(@F)/$(@D)))) 2>/dev/null || $(TRUE)
