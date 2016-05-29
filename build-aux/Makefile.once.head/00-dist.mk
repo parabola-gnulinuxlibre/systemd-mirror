@@ -1,1 +1,0 @@
-dist.exts ?= .tar.gz
