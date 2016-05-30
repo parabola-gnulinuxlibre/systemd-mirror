@@ -13,6 +13,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# This file is based on §7.2 "Makefile Conventions" of the release of
+# the GNU Coding Standards dated April 13, 2016.
+
+gnuconf.pkgname ?= $(PACKAGE)
+ifeq ($(gnuconf.pkgname),)
+$(error gnuconf.pkgname must be set)
+endif
+
 # 7.2.2: Utilities in Makefiles
 # -----------------------------
 
@@ -46,21 +54,49 @@ TOUCH ?= touch
 TR ?= tr
 TRUE ?= true
 
+# These must be user-configurable
+AR ?= ar
+ARFLAGS ?=
+BISON ?= bison
+BISONFLAGS ?=
+CC ?= cc
+CCFLAGS ?= $(CFLAGS)
+FLEX ?= flex
+FLEXFLAGS ?=
+INSTALL ?= install
+INSTALLFLAGS ?=
+LD ?= ld
+LDFLAGS ?=
+LDCONFIG ?= ldconfig #TODO
+LDCONFIGFLAGS ?=
+LEX ?= lex
+LEXFLAGS ?= $(LFLAGS)
+#MAKE
+MAKEINFO ?= makeinfo
+MAKEINFOFLAGS ?=
+RANLIB ?= ranlib #TODO
+RANLIBFLAGS ?=
+TEXI2DVI ?= texi2dvi
+TEXI2DVIFLAGS ?=
+YACC ?= yacc
+YACCFLAGS ?= $(YFLAGS)
+
+CFLAGS ?=
+LFLAGS ?=
+YFLAGS ?=
+
+LN_S ?= ln -s #TODO
+
+CHGRP ?= chgrp
+CHMOD ?= chmod
+CHOWN ?= chown
+MKNOD ?= mknod
+
 # 7.2.3 Variables for Specifying Commands
 # ---------------------------------------
 
-INSTALL ?= install
 INSTALL_PROGRAM ?= $(INSTALL)
 INSTALL_DATA ?= ${INSTALL} -m 644
-
-# These aren't specified in the standards, but we use them
-STRIP ?= strip
-MAKEINFO ?= makeinfo
-TEXI2DVI ?= texi2dvi
-TEXI2HTML ?= makeinfo --html
-TEXI2PDF ?= texi2pdf
-TEXI2PS ?= makeinfo --ps
-MKDIR_P ?= mkdir -p
 
 # 7.2.5 Variables for Installation Directories
 # --------------------------------------------
@@ -72,7 +108,6 @@ exec_prefix ?= $(prefix)
 bindir     ?= $(exec_prefix)/bin
 sbindir    ?= $(exec_prefix)/sbin
 libexecdir ?= $(exec_prefix)/libexec
-gnu.program_dirs += $(bindir) $(sbindir) $(libexecdir)
 # Data files
 datarootdir    ?= $(prefix)/share
 datadir        ?= $(datarootdir)
@@ -80,20 +115,18 @@ sysconfdir     ?= $(prefix)/etc
 sharedstatedir ?= $(prefix)/com
 localstatedir  ?= $(prefix)/var
 runstatedir    ?= $(localstatedir)/run
-gnu.data_dirs += $(datarootdir) $(datadir) $(sysconfdir) $(sharedstatedir) $(localstatedir) $(runstatedir)
 # Specific types of files
 includedir ?= $(prefix)/include
 oldincludedir ?= /usr/include
-docdir ?= $(datarootdir)/doc/$(PACKAGE)
+docdir ?= $(datarootdir)/doc/$(gnuconf.pkgname)
 infodir ?= $(datarootdir)/info
 htmldir ?= $(docdir)
-dvidir ?= $(docdir)
-pdfdir ?= $(docdir)
-psdir ?= $(docdir)
+dvidir  ?= $(docdir)
+pdfdir  ?= $(docdir)
+psdir   ?= $(docdir)
 libdir ?= $(exec_prefix)/lib
 lispdir ?= $(datarootdir)/emacs/site-lisp
 localedir ?= $(datarootdir)/locale
-gnu.data_dirs += $(includedir) $(oldincludedir) $(docdir) $(infodir) $(htmldir) $(dvidir) $(pdfdir) $(psdir) $(libdir) $(lispdir) $(localedir)
 
 mandir ?= $(datarootdir)/man
 man1dir ?= $(mandir)/man1
@@ -104,7 +137,6 @@ man5dir ?= $(mandir)/man5
 man6dir ?= $(mandir)/man6
 man7dir ?= $(mandir)/man7
 man8dir ?= $(mandir)/man8
-gnu.data_dirs += $(mandir) $(man1dir) $(man2dir) $(man3dir) $(man4dir) $(man5dir) $(man6dir) $(man7dir) $(man8dir)
 
 manext ?= .1
 man1ext ?= .1
@@ -115,29 +147,3 @@ man5ext ?= .5
 man6ext ?= .6
 man7ext ?= .7
 man8ext ?= .8
-
-# srcdir is handled for us by the core
-
-# Other initialization
-gnu.info_docs ?=
-std.dirlocal += gnu.info_docs
-
-define _gnu.install_program
-$$($1)/%: $$(outdir)/$$($1)
-	$$(NORMAL_INSTALL)
-	$$(INSTALL_PROGRAM)
-$$($1)/%: $$(srcdir)/$$($1)
-	$$(NORMAL_INSTALL)
-	$$(INSTALL_PROGRAM)
-endef
-
-define _gnu.install_data
-$$($1)/%: $$(outdir)/$$($1)
-	$$(NORMAL_INSTALL)
-	$$(INSTALL_DATA)
-$$($1)/%: $$(srcdir)/$$($1)
-	$$(NORMAL_INSTALL)
-	$$(INSTALL_DATA)
-endef
-
-gnu.dirs += $(gnu.program_dirs) $(gnu.data_dirs)
