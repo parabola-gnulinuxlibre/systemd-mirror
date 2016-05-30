@@ -1,45 +1,67 @@
 # This file is based on §7.2 "Makefile Conventions" of the release of
 # the GNU Coding Standards dated April 13, 2016.
 
+dist.pkgname = @PACKAGE_TARNAME@
+gnu.pkgname = @PACKAGE_NAME@
+
+# AC_PROG_{AWK,GREP,EGREP,FGREP,INSTALL,MKDIR_P,SED}
 # 7.2.2: Utilities in Makefiles
 # ----------------------------- 
 
 # It's ok to hard-code these commands in rules, but who wants to
 # memorize the list of what's ok?
 AWK = @AWK@
-CAT = @CAT@
-CMP = @CMP@
-CP = @CP@
-DIFF = @DIFF@
-ECHO = @ECHO@
+CAT = cat
+CMP = cmp
+CP = cp
+DIFF = diff
+ECHO = echo
 EGREP = @EGREP@
-EXPR = @EXPR@
-FALSE = @FALSE@
+EXPR = expr
+FALSE = false
 GREP = @GREP@
-INSTALL_INFO = @INSTALL_INFO@
-LN = @LN@
-LS = @LS@
-MKDIR = @MKDIR@
-MV = @MV@
-PRINTF = @PRINTF@
-PWD = @PWD@
-RM = @RM@
-RMDIR = @RMDIR@
+INSTALL_INFO = install-info
+LN = ln
+LS = ls
+MKDIR = mkdir
+MV = mv
+PRINTF = printf
+PWD = pwd
+RM = rm
+RMDIR = rmdir
 SED = @SED@
-SLEEP = @SLEEP@
-SORT = @SORT@
-TAR = @TAR@
-TEST = @TEST@
-TOUCH = @TOUCH@
-TR = @TR@
-TRUE = @TRUE@
+SLEEP = sleep
+SORT = sort
+TAR = tar
+TEST = test
+TOUCH = touch
+TR = tr
+TRUE = true
+
+AR = @AR@
+BISON = bison
+CC = @CC@
+FLEX = flex
+INSTALL = @INSTALL@
+LD = ld
+LDCONFIG = ldconfig
+LEX = @LEX@
+MAKEINFO = makeinfo
+RANLIB = @RANLIB@
+TEXI2DVI = texi2dvi
+YACC = @YACC@
 
 # 7.2.3 Variables for Specifying Commands
 # ---------------------------------------
 
-INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
+
+STRIP = strip
+TEXI2HTML = $(MAKEINFO) --html
+TEXI2PDF = $(TEXI2DVI) --pdf
+TEXI2PS = $(TEXI2DVI) --ps
+MKDIR_P = @MKDIR_P@
 
 # 7.2.5 Variables for Installation Directories
 # --------------------------------------------
