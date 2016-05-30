@@ -16,31 +16,31 @@
 # 7.2.6: Standard Targets for Users
 # ---------------------------------
 
-std.gen_files += $(foreach f,$(gnu.info_docs),            $f.info )
-std.sys_files += $(foreach f,$(gnu.info_docs), $(infodir)/$f.info )
+std.gen_files += $(foreach f,$(gnustuff.info_docs),            $f.info )
+std.sys_files += $(foreach f,$(gnustuff.info_docs), $(infodir)/$f.info )
 
-$(foreach d,$(gnu.program_dirs),$(eval $(call _gnu.install_program,$d)))
-$(foreach d,$(gnu.data_dirs)   ,$(eval $(call _gnu.install_data,$d)))
+$(foreach d,$(gnustuff.program_dirs),$(eval $(call _gnustuff.install_program,$d)))
+$(foreach d,$(gnustuff.data_dirs)   ,$(eval $(call _gnustuff.install_data,$d)))
 
 #all: std
 #install: std
-$(outdir)/install-html: $(foreach f,$(gnu.info_docs), $(DESTDIR)$(htmldir)/$f.html )
-$(outdir)/install-dvi : $(foreach f,$(gnu.info_docs), $(DESTDIR)$(dvidir)/$f.dvi  )
-$(outdir)/install-pdf : $(foreach f,$(gnu.info_docs), $(DESTDIR)$(pdfdir)/$f.pdf  )
-$(outdir)/install-ps  : $(foreach f,$(gnu.info_docs), $(DESTDIR)$(psdir)/$f.ps   )
+$(outdir)/install-html: $(foreach f,$(gnustuff.info_docs), $(DESTDIR)$(htmldir)/$f.html )
+$(outdir)/install-dvi : $(foreach f,$(gnustuff.info_docs), $(DESTDIR)$(dvidir)/$f.dvi  )
+$(outdir)/install-pdf : $(foreach f,$(gnustuff.info_docs), $(DESTDIR)$(pdfdir)/$f.pdf  )
+$(outdir)/install-ps  : $(foreach f,$(gnustuff.info_docs), $(DESTDIR)$(psdir)/$f.ps   )
 #uninstall: std
 $(outdir)/install-strip: install
-	$(STRIP) $(filter $(addsuffix /%,$(gnu.program_dirs)),$(std.sys_files/$(@D)))
+	$(STRIP) $(filter $(addsuffix /%,$(gnustuff.program_dirs)),$(std.sys_files/$(@D)))
 #clean: std
 #distclean: std
 #mostlyclean: std
 #maintainer-clean: std
 TAGS: TODO
-$(outdir)/info: $(addsuffix .info,$(gnu.info_docs))
-$(outdir)/dvi : $(addsuffix .dvi ,$(gnu.info_docs))
-$(outdir)/html: $(addsuffix .html,$(gnu.info_docs))
-$(outdir)/pdf : $(addsuffix .pdf ,$(gnu.info_docs))
-$(outdir)/ps  : $(addsuffix .ps  ,$(gnu.info_docs))
+$(outdir)/info: $(addsuffix .info,$(gnustuff.info_docs))
+$(outdir)/dvi : $(addsuffix .dvi ,$(gnustuff.info_docs))
+$(outdir)/html: $(addsuffix .html,$(gnustuff.info_docs))
+$(outdir)/pdf : $(addsuffix .pdf ,$(gnustuff.info_docs))
+$(outdir)/ps  : $(addsuffix .ps  ,$(gnustuff.info_docs))
 #dist:dist
 check: TODO
 installcheck: TODO
