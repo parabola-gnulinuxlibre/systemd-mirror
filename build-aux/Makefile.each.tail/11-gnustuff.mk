@@ -23,7 +23,8 @@ $(foreach d,$(gnustuff.program_dirs),$(eval $(call _gnustuff.install_program,$d)
 $(foreach d,$(gnustuff.data_dirs)   ,$(eval $(call _gnustuff.install_data,$d)))
 
 #all: std
-#install: std
+install:
+	$(foreach f,$(gnustuff.info_docs),$(INSTALL_INFO) $(DESTDIR)$(infodir)/$f.info $(DESTDIR)$(infodir)/dir$(at.nl))
 $(outdir)/install-html: $(foreach f,$(gnustuff.info_docs), $(DESTDIR)$(htmldir)/$f.html )
 $(outdir)/install-dvi : $(foreach f,$(gnustuff.info_docs), $(DESTDIR)$(dvidir)/$f.dvi  )
 $(outdir)/install-pdf : $(foreach f,$(gnustuff.info_docs), $(DESTDIR)$(pdfdir)/$f.pdf  )

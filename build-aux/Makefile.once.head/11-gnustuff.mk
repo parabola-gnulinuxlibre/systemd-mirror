@@ -28,3 +28,7 @@ gnustuff.info_docs ?=
 std.dirlocal += gnustuff.info_docs
 
 gnustuff.dirs += $(gnu.program_dirs) $(gnu.data_dirs)
+
+at.phony += install-html install-dvi install-pdf install-ps
+at.phony += info html dvi pdf ps
+at.phony += install-strip
