@@ -15,10 +15,14 @@
 
 # This bit gets evaluated for each Makefile processed
 
-include $(wildcard $(topsrcdir)/build-aux/Makefile.each.tail/*.mk)
+include $(call _at.reverse,$(sort $(wildcard $(topsrcdir)/build-aux/Makefile.each.tail/*.mk)))
 
-# Make the namespaced versions of all of the dirlocal variables
-$(foreach v,$(at.dirlocal),$(eval $v/$(outdir) = $($v)))
+at.subdirs := $(addprefix $(outdir)/,$(at.subdirs))
+at.depdirs := $(addprefix $(outdir)/,$(at.depdirs))
+
+# Move all of the dirlocal variables to their namespaced version
+$(foreach v,$(at.dirlocal),$(eval $v/$(outdir) := $$($v)))
+$(foreach v,$(at.dirlocal),$(eval undefine $v))
 
 # Remember that this is a directory that we've visited
 _at.outdirs := $(_at.outdirs) $(outdir)
@@ -27,11 +31,11 @@ _at.outdirs := $(_at.outdirs) $(outdir)
 # mark them phony
 .PHONY: $(addprefix $(outdir)/,$(at.phony))
 # have them depend on subdirs
-$(foreach t,$(at.phony),$(eval $(outdir)/$t: $(addsuffix /$t,$(subdirs))))
+$(foreach t,$(at.phony),$(eval $(outdir)/$t: $(addsuffix /$t,$(at.subdirs/$(outdir)))))
 
 # Include Makefiles from other directories
 $(foreach _at.NO_ONCE,y,\
-	$(foreach makefile,$(call am_path,$(addsuffix /Makefile,$(at.subdirs) $(at.depdirs))),\
+	$(foreach makefile,$(call at.path,$(addsuffix /Makefile,$(at.subdirs/$(outdir)) $(at.depdirs/$(outdir)))),\
 		$(eval include $(filter-out $(_at.included_makefiles),$(makefile)))))
 
 # This bit only gets evaluated once, after all of the other Makefiles are read
@@ -42,6 +46,6 @@ srcdir = /bogus
 
 $(foreach v,$(at.dirlocal),$(eval $v=))
 
-include $(wildcard $(topsrcdir)/build-aux/Makefile.once.tail/*.mk)
+include $(call _at.reverse,$(sort $(wildcard $(topsrcdir)/build-aux/Makefile.once.tail/*.mk)))
 
 endif # _at.NO_ONCE
