@@ -15,7 +15,7 @@
 
 _dist.copyfile = $(MKDIR_P) $(dir $2) && $(CP) -T $1 $2
 _dist.addfile = $(call _dist.copyfile,$3,$2/$(call at.relto,$1,$3))
-$(topoutdir)/$(dist.pkgname)-$(dist.version): $(std.src_files/$(topoutdir)) $(std.gen_files/$(topoutdir))
+$(topoutdir)/$(dist.pkgname)-$(dist.version): $(foreach v,$(filter std.src_files/% std.gen_files/%,$(.VARIABLES)),$($v))
 	$(RM) -r $@
 	@PS4='' && set -x && \
 	$(MKDIR) $(@D)/tmp.$(@F).$$$$ && \
