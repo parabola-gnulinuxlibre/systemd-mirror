@@ -17,8 +17,8 @@
 
 include $(call _at.reverse,$(sort $(wildcard $(topsrcdir)/build-aux/Makefile.each.tail/*.mk)))
 
-at.subdirs := $(addprefix $(outdir)/,$(at.subdirs))
-at.depdirs := $(addprefix $(outdir)/,$(at.depdirs))
+at.subdirs := $(patsubst ./%,%,$(addprefix $(outdir)/,$(at.subdirs)))
+at.depdirs := $(patsubst ./%,%,$(addprefix $(outdir)/,$(at.depdirs)))
 
 # Move all of the dirlocal variables to their namespaced version
 $(foreach v,$(at.dirlocal),$(eval $v/$(outdir) := $$($v)))
