@@ -297,3 +297,6 @@ configure
 stamp-*
 .tmp*
 /config.mk
+/automake.mk.in
+/automake.mk
+/gnustandards.mk

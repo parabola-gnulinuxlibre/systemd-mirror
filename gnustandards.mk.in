@@ -1,0 +1,107 @@
+# Programs that it's OK to hard-code, but you don't want to have to memorize
+# this list.
+AWK = awk
+CAT = cat
+CMP = cmp
+CP = cp
+DIFF = diff
+ECHO = echo
+EGREP = egrep
+EXPR = expr
+FALSE = false
+GREP = grep
+INSTALL_INFO = install-info
+LN = ln
+LS = ls
+MKDIR = mkdir
+MV = mv
+PRINTF = printf
+PWD = pwd
+RM = rm
+RMDIR = rmdir
+SED = sed
+SLEEP = sleep
+SORT = sort
+TAR = tar
+TEST = test
+TOUCH = touch
+TR = tr
+TRUE = true
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+# Root for the installation
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+# Executable programs
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+# Data files
+datarootdir = @datarootdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+runstatedir = $(localstatedir)/run
+# Specific types of files
+includedir = @includedir@
+oldincludedir = @oldincludedir@
+docdir = @docdir@
+infodir = @infodir@
+htmldir = @htmldir@
+dvidir = @dvidir@
+pdfdir = @pdfdir@
+psdir = @psdir@
+libdir = @libdir@
+lispdir = $(datarootdir)/emacs/site-lisp
+localedir = @localedir@
+
+mandir = @mandir@
+man1dir = $(mandir)/man1
+man2dir = $(mandir)/man2
+man3dir = $(mandir)/man3
+man4dir = $(mandir)/man4
+man5dir = $(mandir)/man5
+man6dir = $(mandir)/man6
+man7dir = $(mandir)/man7
+man8dir = $(mandir)/man8
+
+manext = .1
+man1ext = .1
+man2ext = .2
+man3ext = .3
+man4ext = .4
+man5ext = .5
+man6ext = .6
+man7ext = .7
+man8ext = .8
+
+#all
+#install
+#install-html
+#install-dvi
+#install-pdf
+#install-ps
+#uninstall
+#install-strip
+#clean
+#distclean
+#mostlyclean
+#maintainer-clean
+#TAGS
+#info
+#dvi
+#html
+#pdf
+#ps
+#dist
+#check
+#installcheck
+#installdirs
+
+PRE_INSTALL ?=
+POST_INSTALL ?=
+NORMAL_INSTALL ?= 
