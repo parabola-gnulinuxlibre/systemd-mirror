@@ -1,62 +1,108 @@
-# Programs that it's OK to hard-code, but you don't want to have to memorize
-# this list.
-AWK = awk
-CAT = cat
-CMP = cmp
-CP = cp
-DIFF = diff
-ECHO = echo
-EGREP = egrep
-EXPR = expr
-FALSE = false
-GREP = grep
-INSTALL_INFO = install-info
-LN = ln
-LS = ls
-MKDIR = mkdir
-MV = mv
-PRINTF = printf
-PWD = pwd
-RM = rm
-RMDIR = rmdir
-SED = sed
-SLEEP = sleep
-SORT = sort
-TAR = tar
-TEST = test
-TOUCH = touch
-TR = tr
-TRUE = true
+# 7.2.2: Utilities in Makefiles
+# -----------------------------
 
+# It's ok to hard-code these commands in rules, but who wants to
+# memorize the list of what's ok?
+AWK = @AWK@
+CAT = @CAT@
+CMP = @CMP@
+CP = @CP@
+DIFF = @DIFF@
+ECHO = @ECHO@
+EGREP = @EGREP@
+EXPR = @EXPR@
+FALSE = @FALSE@
+GREP = @GREP@
+INSTALL_INFO = @INSTALL_INFO@
+LN = @LN@
+LS = @LS@
+MKDIR = @MKDIR@
+MV = @MV@
+PRINTF = @PRINTF@
+PWD = @PWD@
+RM = @RM@
+RMDIR = @RMDIR@
+SED = @SED@
+SLEEP = @SLEEP@
+SORT = @SORT@
+TAR = @TAR@
+TEST = @TEST@
+TOUCH = @TOUCH@
+TR = @TR@
+TRUE = @TRUE@
+
+# These must be user-configurable
+AR = @AR@
+ARFLAGS = @ARFLAGS@
+BISON = @BISON@
+BISONFLAGS = @BISONFLAGS@
+CC = @CC@
+CCFLAGS = $(CFLAGS)
+FLEX = @FLEX@
+FLEXFLAGS = @FLEXFLAGS@
 INSTALL = @INSTALL@
+#INSTALLFLAGS = @INSTALLFLAGS@
+LD = @LD@
+LDFLAGS = @LDFLAGS@
+LDCONFIG = @LDCONFIG@
+LDCONFIGFLAGS = @LDCONFIGFLAGS@
+LEX = @LEX@
+LEXFLAGS = $(LFLAGS)
+#MAKE
+MAKEINFO = @MAKEINFO@
+MAKEINFOFLAGS = @MAKEINFOFLAGS@
+RANLIB = @RANLIB@
+RANLIBFLAGS = @RANLIBFLAGS@
+TEXI2DVI = @TEXI2DVI@
+TEXI2DVIFLAGS = @TEXI2DVIFLAGS@
+YACC = @YACC@
+YACCFLAGS = $(YFLAGS)
+
+CFLAGS = @CFLAGS@
+LFLAGS = @LFLAGS@
+YFLAGS = @YFLAGS@
+
+LN_S = @LN_S@
+
+CHGRP = @CHGRP@
+CHMOD = @CHMOD@
+CHOWN = @CHOWN@
+MKNOD = @MKNOD@
+
+# 7.2.3 Variables for Specifying Commands
+# ---------------------------------------
+
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
+
+# 7.2.5 Variables for Installation Directories
+# --------------------------------------------
 
 # Root for the installation
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 # Executable programs
-bindir = @bindir@
-sbindir = @sbindir@
+bindir     = @bindir@
+sbindir    = @sbindir@
 libexecdir = @libexecdir@
 # Data files
-datarootdir = @datarootdir@
-datadir = @datadir@
-sysconfdir = @sysconfdir@
+datarootdir    = @datarootdir@
+datadir        = @datadir@
+sysconfdir     = @sysconfdir@
 sharedstatedir = @sharedstatedir@
-localstatedir = @localstatedir@
-runstatedir = $(localstatedir)/run
+localstatedir  = @localstatedir@
+runstatedir    = $(localstatedir)/run
 # Specific types of files
 includedir = @includedir@
 oldincludedir = @oldincludedir@
 docdir = @docdir@
 infodir = @infodir@
 htmldir = @htmldir@
-dvidir = @dvidir@
-pdfdir = @pdfdir@
-psdir = @psdir@
-libdir = @libdir@
-lispdir = $(datarootdir)/emacs/site-lisp
+dvidir  = @dvidir@
+pdfdir  = @pdfdir@
+psdir   = @psdir@
+libdir  = @libdir@
+lispdir = $(datarootdir)/emacs/site-lisp# Autoconf 2.70+
 localedir = @localedir@
 
 mandir = @mandir@
@@ -79,29 +125,13 @@ man6ext = .6
 man7ext = .7
 man8ext = .8
 
-#all
-#install
-#install-html
-#install-dvi
-#install-pdf
-#install-ps
-#uninstall
-#install-strip
-#clean
-#distclean
-#mostlyclean
-#maintainer-clean
-#TAGS
-#info
-#dvi
-#html
-#pdf
-#ps
-#dist
-#check
-#installcheck
-#installdirs
+# 7.2.7: Install Command Categories
+# ---------------------------------
 
-PRE_INSTALL ?=
-POST_INSTALL ?=
-NORMAL_INSTALL ?= 
+PRE_INSTALL =
+POST_INSTALL =
+NORMAL_INSTALL =
+
+PRE_UNINSTALL =
+POST_UNINSTALL =
+NORMAL_UNINSTALL =

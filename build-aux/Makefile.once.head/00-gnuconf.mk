@@ -64,7 +64,7 @@ CCFLAGS ?= $(CFLAGS)
 FLEX ?= flex
 FLEXFLAGS ?=
 INSTALL ?= install
-INSTALLFLAGS ?=
+#INSTALLFLAGS ?=
 LD ?= ld
 LDFLAGS ?=
 LDCONFIG ?= ldconfig #TODO
@@ -92,14 +92,14 @@ CHMOD ?= chmod
 CHOWN ?= chown
 MKNOD ?= mknod
 
-# 7.2.3 Variables for Specifying Commands
-# ---------------------------------------
+# 7.2.3: Variables for Specifying Commands
+# ----------------------------------------
 
 INSTALL_PROGRAM ?= $(INSTALL)
 INSTALL_DATA ?= ${INSTALL} -m 644
 
-# 7.2.5 Variables for Installation Directories
-# --------------------------------------------
+# 7.2.5: Variables for Installation Directories
+# ---------------------------------------------
 
 # Root for the installation
 prefix ?= /usr/local
@@ -147,3 +147,14 @@ man5ext ?= .5
 man6ext ?= .6
 man7ext ?= .7
 man8ext ?= .8
+
+# 7.2.7: Install Command Categories
+# ---------------------------------
+
+PRE_INSTALL ?=
+POST_INSTALL ?=
+NORMAL_INSTALL ?=
+
+PRE_UNINSTALL ?=
+POST_UNINSTALL ?=
+NORMAL_UNINSTALL ?=
