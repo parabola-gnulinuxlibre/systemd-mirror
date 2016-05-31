@@ -43,11 +43,11 @@ you were writing for plain GNU Make, with
 
     topoutdir ?= ...
     topsrcdir ?= ...
-    include $(topsrcdir)/automake.head.mk
+    include $(topsrcdir)/build-aux/Makefile.head.mk
 
     # your makefile
     
-    include $(topsrcdir)/automake.tail.mk
+    include $(topsrcdir)/build-aux/Makefile.tail.mk
 
 And in the top-level source directory, Write your own helper makefiles
 that get included:
