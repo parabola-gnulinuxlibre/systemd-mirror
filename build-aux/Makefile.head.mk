@@ -25,23 +25,27 @@ endif
 
 _at.noslash = $(patsubst %/.,%,$(patsubst %/,%,$1))
 # These are all $(call _at.func,parent,child)
-#_at.relto = $(if $2,$(shell realpath -sm --relative-to='$1' $2))
+#at.relto = $(if $2,$(shell realpath -sm --relative-to='$1' $2))
 _at.is_subdir = $(filter $(abspath $1)/%,$(abspath $2)/.)
 _at.relto_helper = $(if $(call _at.is_subdir,$1,$2),$(patsubst $1/%,%,$(addsuffix /.,$2)),$(addprefix ../,$(call _at.relto_helper,$(patsubst %/,%,$(dir $1)),$2)))
 _at.relto = $(call _at.noslash,$(call _at.relto_helper,$(call _at.noslash,$(abspath $1)),$(call _at.noslash,$(abspath $2))))
+at.relto = $(foreach p,$2,$(call _at.relto,$1,$p))
 # Note that _at.is_subdir says that a directory is a subdirectory of
 # itself.
-at.path = $(foreach p,$1,$(call _at.relto,.,$p))
+at.path = $(call at.relto,.,$1)
 
 define at.nl
 
 
 endef
 
+_at.rest = $(wordlist 2,$(words $1),$1)
+_at.reverse = $(if $1,$(call _at.reverse,$(_at.rest))) $(firstword $1)
+
 at.dirlocal += at.subdirs
 at.dirlocal += at.depdirs
 
-include $(topsrcdir)/common.once.head.mk
+include $(sort $(wildcard $(topsrcdir)/build-aux/Makefile.once.head/*.mk))
 
 endif # _at.NO_ONCE
 
@@ -56,4 +60,4 @@ _at.included_makefiles := $(_at.included_makefiles) $(call at.path,$(outdir)/Mak
 
 $(foreach v,$(at.dirlocal),$(eval $v=))
 
-include $(topsrcdir)/common.each.head.mk
+include $(sort $(wildcard $(topsrcdir)/build-aux/Makefile.each.head/*.mk))
