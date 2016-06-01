@@ -23,8 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sd-bus.h"
-#include "sd-id128.h"
+#include <systemd/sd-bus.h>
+#include <systemd/sd-id128.h>
 
 #include "alloc-util.h"
 #include "architecture.h"

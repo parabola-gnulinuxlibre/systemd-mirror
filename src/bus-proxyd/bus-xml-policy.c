@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-login.h"
+#include <systemd/sd-login.h>
 
 #include "alloc-util.h"
 #include "bus-internal.h"
