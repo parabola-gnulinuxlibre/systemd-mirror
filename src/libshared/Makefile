@@ -138,14 +138,26 @@ libshared_la_LIBADD = \
 	$(SECCOMP_LIBS)
 
 $(eval $(value automake2autothing))
-std.out_files += libshared.la
-CPPFLAGS += -I$(topsrcdir)/src/libsystemd/include
-CPPFLAGS += -I$(topoutdir)/src/libsystemd/include
-CPPFLAGS += -I$(topsrcdir)/src/libbasic
-CPPFLAGS += -I$(topoutdir)/src/libbasic
-CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
-CPPFLAGS += -DPOLKIT_AGENT_BINARY_PATH=\"$(bindir)/pkttyagent\" \
-$(outdir)/libshared.la: \
-	$(patsubst src/shared/%.c,$(outdir)/%.lo,$(filter %.c,$(libshared_la_SOURCES)))
+at.depdirs +=
+AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
+AM_CPPFLAGS += -I$(topsrcdir)/src/journal
+
+AM_CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
+AM_CPPFLAGS += -DSYSTEM_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/system\"
+AM_CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
+AM_CPPFLAGS += -DSYSTEM_SYSVINIT_PATH=\"$(SYSTEM_SYSVINIT_PATH)\"
+AM_CPPFLAGS += -DSYSTEM_SYSVRCND_PATH=\"$(SYSTEM_SYSVRCND_PATH)\"
+AM_CPPFLAGS += -DUSER_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/user\"
+AM_CPPFLAGS += -DUSER_DATA_UNIT_PATH=\"$(userunitdir)\"
+
+AM_CPPFLAGS += -DSYSTEMD_FSCK_PATH=\"$(rootlibexecdir)/systemd-fsck\"
+
+AM_CPPFLAGS += -DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(rootbindir)/systemd-tty-ask-password-agent\"
+
+AM_CPPFLAGS += -DSYSTEM_GENERATOR_PATH=\"$(systemgeneratordir)\"
+AM_CPPFLAGS += -DUSER_GENERATOR_PATH=\"$(usergeneratordir)\"
+
+AM_CPPFLAGS += -DPOLKIT_AGENT_BINARY_PATH=\"$(bindir)/pkttyagent\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
