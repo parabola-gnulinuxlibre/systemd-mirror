@@ -9,11 +9,7 @@ in_array() {
 	return 1 # Not Found
 }
 
-set -e
-
-git checkout -b postmove
-
-(
+move_files() (
 	for d in libsystemd libudev machine resolve; do
 		mkdir src/$d-new
 		mv -T src/$d src/$d-new/src
@@ -112,7 +108,7 @@ git checkout -b postmove
 	mkdir src/libsystemd/libsystemd-journal-internal
 )
 
-(
+breakup_makefile() (
         find . \( -name Makefile -o -name '*.mk' \) -delete
 
         touch .tmp.move.all
@@ -136,15 +132,32 @@ git checkout -b postmove
         rm .tmp.move.all
 )
 
-(
+fixup_includes() (
 	find src \( -name '*.h' -o -name '*.c' \) \
 	     -exec grep '#include "sd-' -l -- {} + |
 	    xargs -d $'\n' sed -ri 's|#include "(sd-[^"]*)"|#include <systemd/\1>|'
 )
 
-git add .
-git commit -m './move.sh'
-git merge -s ours lukeshu/postmove
-git checkout lukeshu/postmove
-git merge postmove
-git branch -d postmove
+main() {
+	set -e
+
+	if [[ -n "$(git status -s)" ]] || [[ -n "$(git clean -xdn)" ]]; then
+		echo 'There are changes in the current directory.' >&2
+		exit 1
+	fi
+
+	git checkout -b postmove
+
+	move_files
+	breakup_makefile
+	fixup_includes
+
+	git add .
+	git commit -m './move.sh'
+	git merge -s ours lukeshu/postmove
+	git checkout lukeshu/postmove
+	git merge postmove
+	git branch -d postmove
+}
+
+main "$@"
