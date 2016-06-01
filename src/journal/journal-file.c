@@ -37,7 +37,7 @@
 #include "lookup3.h"
 #include "parse-util.h"
 #include "random-util.h"
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 #include "string-util.h"
 #include "xattr-util.h"
 

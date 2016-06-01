@@ -27,9 +27,9 @@
 #include <linux/sockios.h>
 
 #include "libudev.h"
-#include "sd-daemon.h"
-#include "sd-journal.h"
-#include "sd-messages.h"
+#include <systemd/sd-daemon.h>
+#include <systemd/sd-journal.h>
+#include <systemd/sd-messages.h>
 
 #include "acl-util.h"
 #include "alloc-util.h"

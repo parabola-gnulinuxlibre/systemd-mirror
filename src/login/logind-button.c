@@ -24,7 +24,7 @@
 #include <unistd.h>
 #include <linux/input.h>
 
-#include "sd-messages.h"
+#include <systemd/sd-messages.h>
 
 #include "alloc-util.h"
 #include "fd-util.h"

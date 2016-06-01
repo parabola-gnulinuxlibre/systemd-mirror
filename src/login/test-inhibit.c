@@ -19,7 +19,7 @@
 
 #include <unistd.h>
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 #include "bus-util.h"
 #include "fd-util.h"

@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "sd-event.h"
-#include "sd-netlink.h"
-#include "sd-network.h"
+#include <systemd/sd-event.h>
+#include <systemd/sd-netlink.h>
+#include <systemd/sd-network.h>
 
 #include "hashmap.h"
 
