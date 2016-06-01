@@ -188,4 +188,5 @@ EXTRA_DIST += \
 	units/systemd-importd.service.in
 
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

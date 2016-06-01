@@ -38,4 +38,5 @@ udevlibexec_PROGRAMS += \
 EXTRA_DIST += \
 	src/udev/scsi_id/README
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

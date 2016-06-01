@@ -120,6 +120,7 @@ libsystemd_internal_la_LIBADD = \
 noinst_LTLIBRARIES += \
 	libsystemd-internal.la
 
+$(eval $(value automake2autothing))
 std.out_files += libsystemd-internal.la
 CPPFLAGS += $(libsystemd.CPPFLAGS) $(libbasic.CPPFLAGS) $(libshared.CPPFLAGS)
 CPPFLAGS += -DLIBDIR=\"$(libdir)\" -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"

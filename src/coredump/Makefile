@@ -93,4 +93,5 @@ EXTRA_DIST += \
 	sysctl.d/50-coredump.conf.in \
 	units/systemd-coredump@.service.in
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

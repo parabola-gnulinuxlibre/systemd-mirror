@@ -29,4 +29,5 @@ systemd_fsck_SOURCES = \
 systemd_fsck_LDADD = \
 	libshared.la
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

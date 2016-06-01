@@ -29,4 +29,5 @@ systemd_sysv_generator_SOURCES = \
 systemd_sysv_generator_LDADD = \
 	libcore.la
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -29,4 +29,5 @@ systemd_notify_SOURCES = \
 systemd_notify_LDADD = \
 	libshared.la
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

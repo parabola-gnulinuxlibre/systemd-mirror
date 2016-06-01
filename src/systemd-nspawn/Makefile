@@ -78,4 +78,5 @@ endif
 
 $(outdir)/nspawn.o: $(outdir)/loopback-setup.h
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

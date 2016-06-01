@@ -57,4 +57,5 @@ EXTRA_DIST += \
 	units/systemd-hibernate-resume@.service.in \
 	units/systemd-hybrid-sleep.service.in
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

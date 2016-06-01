@@ -36,4 +36,5 @@ systemd_analyze_CFLAGS = \
 systemd_analyze_LDADD = \
 	libcore.la
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

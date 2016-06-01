@@ -34,4 +34,5 @@ systemd_update_utmp_LDADD = \
 	libshared.la \
 	$(AUDIT_LIBS)
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

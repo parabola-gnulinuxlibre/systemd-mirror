@@ -57,4 +57,5 @@ EXTRA_DIST += \
 	units/systemd-modules-load.service.in \
 	units/kmod-static-nodes.service.in
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

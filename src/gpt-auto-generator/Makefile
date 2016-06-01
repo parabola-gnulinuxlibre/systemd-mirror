@@ -40,4 +40,5 @@ systemd_gpt_auto_generator_CFLAGS = \
 	$(BLKID_CFLAGS)
 endif
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

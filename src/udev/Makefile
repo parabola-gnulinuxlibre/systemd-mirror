@@ -284,4 +284,5 @@ EXTRA_DIST += \
 	test/sysv-generator-test.py \
 	test/mocks/fsck
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

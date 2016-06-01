@@ -44,4 +44,5 @@ endif
 EXTRA_DIST += \
 	units/systemd-firstboot.service.in
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -29,4 +29,5 @@ systemd_delta_SOURCES = \
 systemd_delta_LDADD = \
 	libshared.la
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

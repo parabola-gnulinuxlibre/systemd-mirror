@@ -32,4 +32,5 @@ collect_LDADD = \
 udevlibexec_PROGRAMS += \
 	collect
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

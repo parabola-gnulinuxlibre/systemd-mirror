@@ -29,4 +29,5 @@ systemd_ac_power_SOURCES = \
 systemd_ac_power_LDADD = \
 	libshared.la
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -32,4 +32,5 @@ ata_id_LDADD = \
 udevlibexec_PROGRAMS += \
 	ata_id
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

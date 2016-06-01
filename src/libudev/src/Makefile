@@ -78,4 +78,5 @@ noinst_LTLIBRARIES += \
 libudev_internal_la_SOURCES =\
 	$(libudev_la_SOURCES)
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

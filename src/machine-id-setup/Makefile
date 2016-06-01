@@ -34,4 +34,5 @@ systemd_machine_id_setup_LDADD = \
 SYSINIT_TARGET_WANTS += \
 	systemd-machine-id-commit.service
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

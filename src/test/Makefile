@@ -32,4 +32,5 @@ test_id128_LDADD = \
 tests += \
 	test-id128
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

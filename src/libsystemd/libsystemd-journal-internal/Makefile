@@ -94,4 +94,5 @@ endif
 
 noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

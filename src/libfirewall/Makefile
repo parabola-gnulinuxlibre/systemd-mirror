@@ -33,4 +33,5 @@ $(outdir)/libfirewall.la: $(outdir)/firewall-util.lo $(libiptc.DEPENDS)
 
 endif
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

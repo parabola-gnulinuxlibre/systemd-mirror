@@ -51,4 +51,5 @@ dist_zshcompletion_data += \
 	shell-completion/zsh/_bootctl
 endif
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

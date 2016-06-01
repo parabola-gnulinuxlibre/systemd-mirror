@@ -137,6 +137,7 @@ libshared_la_LIBADD = \
 	$(LIBIDN_LIBS) \
 	$(SECCOMP_LIBS)
 
+$(eval $(value automake2autothing))
 std.out_files += libshared.la
 CPPFLAGS += -I$(topsrcdir)/src/libsystemd/include
 CPPFLAGS += -I$(topoutdir)/src/libsystemd/include
@@ -146,7 +147,5 @@ CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 CPPFLAGS += -DPOLKIT_AGENT_BINARY_PATH=\"$(bindir)/pkttyagent\" \
 $(outdir)/libshared.la: \
 	$(patsubst src/shared/%.c,$(outdir)/%.lo,$(filter %.c,$(libshared_la_SOURCES)))
-
-$(call amtarget2dir,src/shared,libshared.la)
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

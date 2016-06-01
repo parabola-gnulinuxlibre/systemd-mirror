@@ -32,4 +32,5 @@ systemd_detect_virt_LDADD = \
 INSTALL_EXEC_HOOKS += \
 	systemd-detect-virt-install-hook
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

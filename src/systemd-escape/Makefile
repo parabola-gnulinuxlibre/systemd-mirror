@@ -29,4 +29,5 @@ systemd_escape_SOURCES = \
 systemd_escape_LDADD = \
 	libshared.la
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

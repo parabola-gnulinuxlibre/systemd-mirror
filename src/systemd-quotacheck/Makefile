@@ -43,4 +43,5 @@ EXTRA_DIST += \
 nodist_systemunit_DATA += \
 	units/quotaon.service
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

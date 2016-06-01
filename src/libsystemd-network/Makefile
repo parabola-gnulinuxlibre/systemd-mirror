@@ -177,4 +177,5 @@ tests += \
 	test-dhcp6-client \
 	test-lldp
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

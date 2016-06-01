@@ -35,4 +35,5 @@ udevlibexec_PROGRAMS += \
 dist_udevrules_DATA += \
 	rules/60-persistent-v4l.rules
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

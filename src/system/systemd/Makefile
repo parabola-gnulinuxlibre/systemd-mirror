@@ -64,4 +64,5 @@ dist_systemunit_DATA_busnames += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.systemd1.busname
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -282,4 +282,5 @@ nodist_test_libsystemd_sym_SOURCES = \
 test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

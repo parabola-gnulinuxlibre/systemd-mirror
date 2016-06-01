@@ -1190,4 +1190,5 @@ tests += \
 	test-libsystemd-sym \
 	test-libudev-sym
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

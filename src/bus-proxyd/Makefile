@@ -76,4 +76,5 @@ bus-proxyd-set-cap-hook:
 INSTALL_EXEC_HOOKS += bus-proxyd-set-cap-hook
 endif
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

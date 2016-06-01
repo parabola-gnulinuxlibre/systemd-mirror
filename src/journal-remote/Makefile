@@ -110,4 +110,5 @@ EXTRA_DIST += \
 	units/systemd-journal-upload.service.in \
 	src/journal-remote/journal-upload.conf.in
 
+$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk
