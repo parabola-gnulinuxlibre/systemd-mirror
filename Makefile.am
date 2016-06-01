@@ -3193,6 +3193,7 @@ libsystemd_internal_la_LIBADD = \
 noinst_LTLIBRARIES += \
 	libsystemd-internal.la
 
+#@src/libsystemd/Makefile
 EXTRA_DIST += \
 	src/libsystemd/libsystemd.pc.in \
 	src/libsystemd/sd-bus/DIFFERENCES \
@@ -4347,6 +4348,7 @@ libsystemd_journal_internal_la_CFLAGS += \
 	$(GCRYPT_CFLAGS) \
 	-Wno-pointer-arith
 endif
+#@src/journal/Makefile
 
 noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la
