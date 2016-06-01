@@ -22,7 +22,7 @@
 #include <sys/types.h>
 
 #include "libudev.h"
-#include "sd-netlink.h"
+#include <systemd/sd-netlink.h>
 
 #include "label.h"
 #include "libudev-private.h"
