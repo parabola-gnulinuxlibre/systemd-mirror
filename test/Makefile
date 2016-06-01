@@ -521,7 +521,7 @@ test_signal_util_LDADD = \
 BUILT_SOURCES += \
 	src/test/test-hashmap-ordered.c
 
-src/test/test-hashmap-ordered.c: src/test/test-hashmap-plain.c
+$(outdir)/test-hashmap-ordered.c: src/test/test-hashmap-plain.c
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN { print "/* GENERATED FILE */\n#define ORDERED" } \
 	                   { if (!match($$0, "^#include"))          \

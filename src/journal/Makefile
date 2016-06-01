@@ -28,24 +28,24 @@ ifneq ($(HAVE_AUDIT),)
 audit_list_includes += -include libaudit.h
 endif
 
-src/journal/audit_type-list.txt:
+$(outdir)/audit_type-list.txt:
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM $(audit_list_includes) - </dev/null | grep -vE 'AUDIT_.*(FIRST|LAST)_' | $(SED) -r -n 's/^#define\s+AUDIT_(\w+)\s+([0-9]{4})\s*$$/\1\t\2/p' | sort -k2 >$@
 
-src/journal/audit_type-to-name.h: src/journal/audit_type-list.txt
+$(outdir)/audit_type-to-name.h: src/journal/audit_type-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
 
 
-src/resolve/dns_type-list.txt: src/resolve/dns-type.h
+$(outdir)/dns_type-list.txt: src/resolve/dns-type.h
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(SED) -n -r 's/.* DNS_TYPE_(\w+).*/\1/p' <$< >$@
 
-src/resolve/dns_type-to-name.h: src/resolve/dns_type-list.txt
+$(outdir)/dns_type-to-name.h: src/resolve/dns_type-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *dns_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case DNS_TYPE_%s: return ", $$1; sub(/_/, "-"); printf "\"%s\";\n", $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
 
-src/resolve/dns_type-from-name.gperf: src/resolve/dns_type-list.txt
+$(outdir)/dns_type-from-name.gperf: src/resolve/dns_type-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct dns_type_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { s=$$1; sub(/_/, "-", s); printf "%s, ", $$s; printf "DNS_TYPE_%s\n", $$1 }' <$< >$@
 
@@ -261,6 +261,7 @@ tests += \
 	test-compress \
 	test-compress-benchmark
 endif
+
 
 rootlibexec_PROGRAMS += \
 	systemd-journald

@@ -9,9 +9,7 @@ in_array() {
 	return 1 # Not Found
 }
 
-set -e
-
-(
+move_files() (
 	for d in libsystemd libudev machine resolve; do
 		mkdir src/$d-new
 		mv -T src/$d src/$d-new/src
@@ -110,7 +108,7 @@ set -e
 	mkdir src/libsystemd/libsystemd-journal-internal
 )
 
-(
+breakup_makefile() (
         find . \( -name Makefile -o -name '*.mk' \) -delete
 
         touch .tmp.move.all
@@ -130,12 +128,60 @@ set -e
 			fi
                         printf '%s\n' "$line" >> "$file"
                 fi
-        done < <(sed -r 's|^if (.*)|ifneq ($(\1),)|' <Makefile.am)
+        done < <(fixup_makefile <Makefile.am)
         rm .tmp.move.all
 )
 
-(
+fixup_includes() (
 	find src \( -name '*.h' -o -name '*.c' \) \
 	     -exec grep '#include "sd-' -l -- {} + |
 	    xargs -d $'\n' sed -ri 's|#include "(sd-[^"]*)"|#include <systemd/\1>|'
 )
+
+fixup_makefile() {
+	sed -r \
+	    -e '/^[^#	]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' \
+	    -e 's|^if (.*)|ifneq ($(\1),)|'
+}
+
+fixup_makefiles() (
+	sed -ri \
+	    -e '/^	\$\(AM_V_at\)\$\(MKDIR_P\) \$\(dir \$@\)/d' \
+	    -e 's/ \$\(CFLAGS\) / /g' \
+	    -e 's/ \$\(CPPFLAGS\) / /g' \
+	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
+	    src/libbasic/Makefile
+)
+
+move() (
+	>&2 echo ' => move_files'
+	move_files
+	>&2 echo ' => breakup_makefile'
+	breakup_makefile
+	>&2 echo ' => fixup_includes'
+	fixup_includes
+	>&2 echo ' => fixup_makefiles'
+	fixup_makefiles
+)
+
+main() {
+	set -e
+
+	if [[ -n "$(git status -s)" ]] || [[ -n "$(git clean -xdn)" ]]; then
+		echo 'There are changes in the current directory.' >&2
+		exit 1
+	fi
+
+	git checkout -b postmove
+
+	move
+
+	git add .
+	git commit -m './move.sh'
+	git merge -s ours lukeshu/postmove
+	git checkout lukeshu/postmove
+	git merge postmove
+	git branch -d postmove
+}
+
+main "$@"

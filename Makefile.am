@@ -3193,6 +3193,7 @@ libsystemd_internal_la_LIBADD = \
 noinst_LTLIBRARIES += \
 	libsystemd-internal.la
 
+#@src/libsystemd/Makefile
 EXTRA_DIST += \
 	src/libsystemd/libsystemd.pc.in \
 	src/libsystemd/sd-bus/DIFFERENCES \
@@ -4350,6 +4351,7 @@ endif
 
 noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la
+#@src/journal/Makefile
 
 rootlibexec_PROGRAMS += \
 	systemd-journald

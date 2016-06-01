@@ -48,7 +48,7 @@ ifneq ($(ENABLE_EFI),)
 ifneq ($(HAVE_GNUEFI),)
 bootlib_DATA = $(systemd_boot)
 
-$(top_builddir)/src/boot/efi/%.o: $(top_srcdir)/src/boot/efi/%.c $(addprefix $(top_srcdir)/,$(systemd_boot_headers))
+$(outdir)/%.o: $(top_srcdir)/src/boot/efi/%.c $(addprefix $(top_srcdir)/,$(systemd_boot_headers))
 	@$(MKDIR_P) $(top_builddir)/src/boot/efi/
 	$(AM_V_CC)$(EFI_CC) $(efi_cppflags) $(efi_cflags) -c $< -o $@
 
@@ -96,7 +96,7 @@ ifneq ($(ENABLE_EFI),)
 ifneq ($(HAVE_GNUEFI),)
 bootlib_DATA += $(stub)
 
-$(top_builddir)/src/boot/efi/%.o: $(top_srcdir)/src/boot/efi/%.c $(addprefix $(top_srcdir)/,$(stub_headers))
+$(outdir)/%.o: $(top_srcdir)/src/boot/efi/%.c $(addprefix $(top_srcdir)/,$(stub_headers))
 	@$(MKDIR_P) $(top_builddir)/src/boot/efi/
 	$(AM_V_CC)$(EFI_CC) $(efi_cppflags) $(efi_cflags) -c $< -o $@
 

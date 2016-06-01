@@ -585,11 +585,11 @@ CLEANFILES += \
 	$(HTML_ALIAS) \
 	docs/html/man
 
-docs/html/man:
+$(outdir)/man:
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_LN)$(LN_S) -f ../../man $@
 
-man/index.html: man/systemd.index.html
+$(outdir)/index.html: man/systemd.index.html
 	$(AM_V_LN)$(LN_S) -f systemd.index.html $@
 
 ifneq ($(HAVE_PYTHON),)
@@ -612,11 +612,11 @@ update-man-list: $(top_srcdir)/tools/make-man-rules.py $(XML_GLOB) man/custom-en
 	$(AM_V_at)mv $(top_srcdir)/Makefile-man.tmp $(top_srcdir)/Makefile-man.am
 	@echo "Makefile-man.am has been regenerated"
 
-man/systemd.index.xml: $(top_srcdir)/tools/make-man-index.py $(NON_INDEX_XML_FILES)
+$(outdir)/systemd.index.xml: $(top_srcdir)/tools/make-man-index.py $(NON_INDEX_XML_FILES)
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(PYTHON) $< $@ $(filter-out $<,$^)
 
-man/systemd.directives.xml: $(top_srcdir)/tools/make-directive-index.py man/custom-entities.ent $(SOURCE_XML_FILES)
+$(outdir)/systemd.directives.xml: $(top_srcdir)/tools/make-directive-index.py man/custom-entities.ent $(SOURCE_XML_FILES)
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(PYTHON) $< $@ $(SOURCE_XML_FILES)
 
@@ -877,13 +877,13 @@ SED_PROCESS = \
 	$(SED) $(subst '|,-e 's|@,$(subst =,\@|,$(subst |',|g',$(substitutions)))) \
 		< $< > $@
 
-units/%: units/%.in
+$(outdir)/%: units/%.in
 	$(SED_PROCESS)
 
-man/%: man/%.in
+$(outdir)/%: man/%.in
 	$(SED_PROCESS)
 
-sysctl.d/%: sysctl.d/%.in
+$(outdir)/%: sysctl.d/%.in
 	$(SED_PROCESS)
 
 %.pc: %.pc.in
@@ -892,13 +892,13 @@ sysctl.d/%: sysctl.d/%.in
 %.conf: %.conf.in
 	$(SED_PROCESS)
 
-src/core/%.systemd: src/core/%.systemd.in
+$(outdir)/%.systemd: src/core/%.systemd.in
 	$(SED_PROCESS)
 
-src/%.policy.in: src/%.policy.in.in
+$(outdir)/%.policy.in: src/%.policy.in.in
 	$(SED_PROCESS)
 
-shell-completion/%: shell-completion/%.in
+$(outdir)/%: shell-completion/%.in
 	$(SED_PROCESS)
 
 %.rules: %.rules.in
@@ -911,28 +911,28 @@ shell-completion/%: shell-completion/%.in
 	$(SED_PROCESS)
 	$(AM_V_GEN)chmod +x $@
 
-src/%.c: src/%.gperf
+$(outdir)/%.c: src/%.gperf
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) < $< > $@
 
-src/%: src/%.m4 $(top_builddir)/config.status
+$(outdir)/%: src/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
 
-sysusers.d/%: sysusers.d/%.m4 $(top_builddir)/config.status
+$(outdir)/%: sysusers.d/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
 
-tmpfiles.d/%: tmpfiles.d/%.m4 $(top_builddir)/config.status
+$(outdir)/%: tmpfiles.d/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
 
 
-units/%: units/%.m4 $(top_builddir)/config.status
+$(outdir)/%: units/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) -DFOR_SYSTEM=1 < $< > $@
 
-units/user/%: units/user/%.m4 $(top_builddir)/config.status
+$(outdir)/%: units/user/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) -DFOR_USER=1 < $< > $@
 
@@ -947,7 +947,7 @@ EXTRA_DIST += \
 	$(polkitpolicy_in_in_files)
 
 # ------------------------------------------------------------------------------
-man/custom-entities.ent: configure.ac
+$(outdir)/custom-entities.ent: configure.ac
 	$(AM_V_GEN)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)(echo '<?xml version="1.0" encoding="utf-8" ?>' && \
 	 printf '$(subst '|,<!ENTITY ,$(subst =, ",$(subst |',">\n,$(substitutions))))') \
@@ -973,22 +973,22 @@ XSLTPROC_PROCESS_MAN = \
 XSLTPROC_PROCESS_HTML = \
 	$(AM_V_XSLT)$(XSLT) -o $@ $(XSLTPROC_FLAGS) $(srcdir)/man/custom-html.xsl $<
 
-man/%.1: man/%.xml man/custom-man.xsl man/custom-entities.ent
+$(outdir)/%.1: man/%.xml man/custom-man.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_MAN)
 
-man/%.3: man/%.xml man/custom-man.xsl man/custom-entities.ent
+$(outdir)/%.3: man/%.xml man/custom-man.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_MAN)
 
-man/%.5: man/%.xml man/custom-man.xsl man/custom-entities.ent
+$(outdir)/%.5: man/%.xml man/custom-man.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_MAN)
 
-man/%.7: man/%.xml man/custom-man.xsl man/custom-entities.ent
+$(outdir)/%.7: man/%.xml man/custom-man.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_MAN)
 
-man/%.8: man/%.xml man/custom-man.xsl man/custom-entities.ent
+$(outdir)/%.8: man/%.xml man/custom-man.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_MAN)
 
-man/%.html: man/%.xml man/custom-html.xsl man/custom-entities.ent
+$(outdir)/%.html: man/%.xml man/custom-html.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_HTML)
 
 define html-alias
@@ -1007,10 +1007,10 @@ sysvinit_DATA = \
 varlog_DATA = \
 	docs/var-log/README
 
-docs/sysvinit/README: docs/sysvinit/README.in
+$(outdir)/README: docs/sysvinit/README.in
 	$(SED_PROCESS)
 
-docs/var-log/README: docs/var-log/README.in
+$(outdir)/README: docs/var-log/README.in
 	$(SED_PROCESS)
 
 CLEANFILES += \
