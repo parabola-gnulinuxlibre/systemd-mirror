@@ -64,20 +64,11 @@ libsystemd_la_CFLAGS = \
 libsystemd_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
 	-version-info $(LIBSYSTEMD_CURRENT):$(LIBSYSTEMD_REVISION):$(LIBSYSTEMD_AGE) \
-	-Wl,--version-script=$(top_srcdir)/src/libsystemd/libsystemd.sym
+	-Wl,--version-script=$(@D)/libsystemd.sym
 
 libsystemd_la_LIBADD = \
 	$(libsystemd_internal_la_LIBADD) \
 	$(libsystemd_journal_internal_la_LIBADD)
-
-libsystemd-install-hook:
-	libname=libsystemd.so && $(move-to-rootlibdir)
-
-libsystemd-uninstall-hook:
-	rm -f $(DESTDIR)$(rootlibdir)/libsystemd.so*
-
-INSTALL_EXEC_HOOKS += libsystemd-install-hook
-UNINSTALL_EXEC_HOOKS += libsystemd-uninstall-hook
 
 pkgconfiglib_DATA += \
 	src/libsystemd/libsystemd.pc

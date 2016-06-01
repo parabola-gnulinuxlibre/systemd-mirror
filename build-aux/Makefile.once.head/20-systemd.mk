@@ -34,6 +34,11 @@ COMPILE   = $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(ALL_LIBTOOLFLAGS) --mode=compile $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
 LINK      = $(LIBTOOL) $(AM_V_lt) --tag=CC $(ALL_LIBTOOLFLAGS) --mode=link $(CCLD) $(ALL_CFLAGS) $(ALL_LDFLAGS) -o $@
 
+SED_PROCESS = \
+	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
+	$(SED) $(subst '|,-e 's|@,$(subst =,\@|,$(subst |',|g',$(substitutions)))) \
+		< $< > $@
+
 # remove targets if the command fails
 .DELETE_ON_ERROR:
 
@@ -126,7 +131,7 @@ define generate-sym-test
 	$(AM_V_at)printf 'return 0; }\n' >> $@
 endef
 
-at.dirlocal += noinst_LTLIBRARIES
+at.dirlocal += noinst_LTLIBRARIES lib_LTLIBRARIES
 automake_name = $(subst -,_,$(subst .,_,$1))
 automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
 automake_lo = $(patsubst %.c,%.lo,$(filter %.c,$(automake_sources)))
@@ -134,7 +139,9 @@ automake_o = $(patsubst %.c,%.o,$(filter %.c,$(automake_sources)))
 automake_libs = $($(automake_name)_LIBADD)
 
 define automake2autothing
-std.out_files += $(noinst_LTLIBRARIES)
+std.out_files += $(noinst_LTLIBRARIES) $(lib_LTLIBRARIES) $(notdir $(pkgconfiglib_DATA))
+std.sys_files += $(addprefix $(libdir)/,$(lib_LTLIBRARIES))
+std.sys_files += $(addprefix $(pkgconfiglibdir)/,$(notdir $(lib_pkgconfiglib_DATA)))
 $(foreach n,$(call automake_name,$(std.out_files)),\
   $(eval $n_SOURCES ?=)\
   $(eval nodist_$n_SOURCES ?=)\

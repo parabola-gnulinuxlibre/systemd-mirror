@@ -37,4 +37,6 @@ test_libudev_sym_LDADD = \
 	libudev.la
 
 $(eval $(value automake2autothing))
+at.subdirs += src
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

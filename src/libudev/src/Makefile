@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 LIBUDEV_CURRENT=7
@@ -68,15 +68,8 @@ libudev-install-hook:
 libudev-uninstall-hook:
 	rm -f $(DESTDIR)$(rootlibdir)/libudev.so*
 
-INSTALL_EXEC_HOOKS += libudev-install-hook
-UNINSTALL_EXEC_HOOKS += libudev-uninstall-hook
-
-# ------------------------------------------------------------------------------
-noinst_LTLIBRARIES += \
-	libudev-internal.la
-
-libudev_internal_la_SOURCES =\
-	$(libudev_la_SOURCES)
-
 $(eval $(value automake2autothing))
+AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

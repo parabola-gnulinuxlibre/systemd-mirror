@@ -1,7 +1,10 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
-include $(topsrcdir)/automake.head.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
 
-#CPPFLAGS += $(libsystemd.CPPFLAGS) $(libbasic.CPPFLAGS) $(libshared.CPPFLAGS)
-#CPPFLAGS += -DLIBDIR=\"$(libdir)\" -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
+AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
+AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+AM_CPPFLAGS += $(libshared.CPPFLAGS)
+AM_CPPFLAGS += -DLIBDIR=\"$(libdir)\"
+AM_CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
-include $(topsrcdir)/automake.tail.mk
+include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -114,19 +114,23 @@ libsystemd_internal_la_SOURCES = \
 	src/libsystemd/sd-resolve/sd-resolve.c
 
 libsystemd_internal_la_LIBADD = \
-	libbasic.la \
+	$(topoutdir)/src/libbasic/libbasic.la \
 	-lresolv
 
 noinst_LTLIBRARIES += \
 	libsystemd-internal.la
 
+automake_sources = $(patsubst src/libsystemd/%,$(outdir)/%,$(filter %.c,$($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
 $(eval $(value automake2autothing))
-std.out_files += libsystemd-internal.la
-CPPFLAGS += $(libsystemd.CPPFLAGS) $(libbasic.CPPFLAGS) $(libshared.CPPFLAGS)
-CPPFLAGS += -DLIBDIR=\"$(libdir)\" -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
-am.subdirs += $(dir $(patsubst src/libsystemd/%.c,$(outdir)/%.lo,$(filter %.c,$(libsystemd_internal_la_SOURCES))))
-$(outdir)/libsystemd-internal.la: \
-	$(patsubst src/libsystemd/%.c,$(outdir)/%.lo,$(filter %.c,$(libsystemd_internal_la_SOURCES))) \
-	$(libbasic.DEPENDS) -lresolv
+_subdirs := $(patsubst %/,%,$(dir $(call automake_sources,libsystemd-internal.la)))
+automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
+
+at.subdirs += $(_subdirs)
+
+AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
+AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+AM_CPPFLAGS += $(libshared.CPPFLAGS)
+AM_CPPFLAGS += -DLIBDIR=\"$(libdir)\"
+AM_CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

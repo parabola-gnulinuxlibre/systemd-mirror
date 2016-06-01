@@ -13,3 +13,6 @@ $(outdir)/.deps:
 
 $(outdir)/%.la:
 	$(AM_V_CCLD)$(LINK) $(filter-out .var%,$^)
+
+$(DESTDIR)$(libdir)/%.so: $(outdir)/%.la
+	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $< $(@D)
