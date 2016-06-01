@@ -4348,10 +4348,10 @@ libsystemd_journal_internal_la_CFLAGS += \
 	$(GCRYPT_CFLAGS) \
 	-Wno-pointer-arith
 endif
-#@src/journal/Makefile
 
 noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la
+#@src/journal/Makefile
 
 rootlibexec_PROGRAMS += \
 	systemd-journald
