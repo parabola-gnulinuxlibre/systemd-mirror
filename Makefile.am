@@ -45,7 +45,7 @@ LIBUDEV_CURRENT=7
 LIBUDEV_REVISION=4
 LIBUDEV_AGE=6
 
-#@src/libsystemd/src/Makefile
+#@src/libsystemd/libsystemd-internal/Makefile
 LIBSYSTEMD_CURRENT=14
 LIBSYSTEMD_REVISION=0
 LIBSYSTEMD_AGE=14
@@ -3084,7 +3084,7 @@ systemd_tty_ask_password_agent_SOURCES = \
 systemd_tty_ask_password_agent_LDADD = \
 	libshared.la
 
-#@src/libsystemd/src/Makefile --------------------------------------------------
+#@src/libsystemd/libsystemd-internal/Makefile ----------------------------------
 libsystemd_internal_la_SOURCES = \
 	src/systemd/sd-bus.h \
 	src/systemd/sd-bus-protocol.h \
@@ -6424,7 +6424,7 @@ define generate-sym-test
 	$(AM_V_at)printf 'return 0; }\n' >> $@
 endef
 
-#@src/libsystemd/src/Makefile
+#@src/libsystemd/Makefile
 test-libsystemd-sym.c: \
 		$(top_builddir)/src/libsystemd/libsystemd.sym \
 		src/systemd/sd-journal.h \
@@ -6437,19 +6437,19 @@ test-libsystemd-sym.c: \
 		src/systemd/sd-event.h
 	$(generate-sym-test)
 
-#@src/libudev/src/Makefile
+#@src/libudev/Makefile
 test-libudev-sym.c: \
 		src/libudev/libudev.sym \
 		src/udev/udev.h
 	$(generate-sym-test)
 
-#@src/libsystemd/src/Makefile
+#@src/libsystemd/Makefile
 nodist_test_libsystemd_sym_SOURCES = \
 	test-libsystemd-sym.c
 test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
-#@src/libudev/src/Makefile
+#@src/libudev/Makefile
 nodist_test_libudev_sym_SOURCES = \
 	test-libudev-sym.c
 test_libudev_sym_CFLAGS = \

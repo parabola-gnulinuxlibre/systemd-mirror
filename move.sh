@@ -96,6 +96,10 @@ set -e
 
 	mv -T {man,src/systemd-activate}/systemd-activate.xml
 
+	mv -T src/libsystemd/{src,}/libsystemd.pc.in
+	mv -T src/libsystemd/{src,}/libsystemd.sym
+	mv -T src/libsystemd/{src,libsystemd-internal}
+
 	mkdir src/systemd-shutdown
 )
 
