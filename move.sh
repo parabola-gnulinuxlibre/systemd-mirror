@@ -128,7 +128,7 @@ breakup_makefile() (
 			fi
                         printf '%s\n' "$line" >> "$file"
                 fi
-        done < <(sed -r 's|^if (.*)|ifneq ($(\1),)|' <Makefile.am)
+        done < <(fixup_makefile <Makefile.am)
         rm .tmp.move.all
 )
 
@@ -138,23 +138,31 @@ fixup_includes() (
 	    xargs -d $'\n' sed -ri 's|#include "(sd-[^"]*)"|#include <systemd/\1>|'
 )
 
+fixup_makefile() {
+	sed -r \
+	    -e '/^[^#	]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' \
+	    -e 's|^if (.*)|ifneq ($(\1),)|'
+}
+
 fixup_makefiles() (
-	find src -type f -name Makefile \
-	     -exec sed -ri '/^[^#]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' -- {} +
 	sed -ri \
 	    -e '/^	\$\(AM_V_at\)\$\(MKDIR_P\) \$\(dir \$@\)/d' \
-	    -e '/ \$\(CFLAGS\) / /g' \
-	    -e '/ \$\(CPPFLAGS\) / /g' \
-	    -e '/^[^#]*:/ { s|\S+/|$(outdir)/| }'
+	    -e 's/ \$\(CFLAGS\) / /g' \
+	    -e 's/ \$\(CPPFLAGS\) / /g' \
+	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
 	    src/libbasic/Makefile
 )
 
-move() {
+move() (
+	>&2 echo ' => move_files'
 	move_files
+	>&2 echo ' => breakup_makefile'
 	breakup_makefile
+	>&2 echo ' => fixup_includes'
 	fixup_includes
+	>&2 echo ' => fixup_makefiles'
 	fixup_makefiles
-}
+)
 
 main() {
 	set -e
