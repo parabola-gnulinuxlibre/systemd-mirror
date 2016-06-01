@@ -23,7 +23,7 @@
 #include <unistd.h>
 
 #include "libudev.h"
-#include "sd-id128.h"
+#include <systemd/sd-id128.h>
 
 #include "alloc-util.h"
 #include "blkid-util.h"

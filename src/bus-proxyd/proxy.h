@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 #include "bus-xml-policy.h"
 
