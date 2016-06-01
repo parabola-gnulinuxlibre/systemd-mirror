@@ -20,7 +20,7 @@
 
 #include <arpa/inet.h>
 
-#include "sd-lldp.h"
+#include <systemd/sd-lldp.h>
 
 #include "alloc-util.h"
 #include "fd-util.h"
