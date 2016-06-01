@@ -61,13 +61,6 @@ pkgconfiglib_DATA += \
 EXTRA_DIST += \
 	src/libudev/libudev.pc.in
 
-# move lib from $(libdir) to $(rootlibdir) and update devel link, if needed
-libudev-install-hook:
-	libname=libudev.so && $(move-to-rootlibdir)
-
-libudev-uninstall-hook:
-	rm -f $(DESTDIR)$(rootlibdir)/libudev.so*
-
 $(eval $(value automake2autothing))
 AM_CPPFLAGS += $(libbasic.CPPFLAGS)
 AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
