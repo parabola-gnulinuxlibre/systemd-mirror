@@ -27,11 +27,19 @@ ifneq ($(HAVE_LIBIPTC),)
 noinst_LTLIBRARIES += \
 	libfirewall.la
 
-std.out_files = libfirewall.la
-CPPFLAGS += $(libbasic.CPPFLAGS) $(libiptc.CPPFLAGS)
-$(outdir)/libfirewall.la: $(outdir)/firewall-util.lo $(libiptc.DEPENDS)
+libfirewall_la_SOURCES = \
+	src/shared/firewall-util.h \
+	src/shared/firewall-util.c
 
+libfirewall_la_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(LIBIPTC_CFLAGS)
+
+libfirewall_la_LIBADD = \
+	$(LIBIPTC_LIBS)
 endif
 
 $(eval $(value automake2autothing))
+AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk
