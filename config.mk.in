@@ -33,6 +33,8 @@ topsrcdir = $(if $(value am_path),$(call am_path,$(abs_topsrcdir)),$(abs_topsrcd
 include $(topsrcdir)/gnustandards.mk
 include $(topsrcdir)/autoconf.mk
 
+CCLD = $(CC)
+
 OUR_CPPFLAGS = @OUR_CPPFLAGS@
 OUR_CFLAGS = @OUR_CFLAGS@
 OUR_LDFLAGS = @OUR_LDFLAGS@

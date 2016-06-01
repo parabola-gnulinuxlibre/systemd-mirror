@@ -30,6 +30,16 @@ export GCC_COLORS
 
 SUBDIRS = . po
 
+OUR_CPPFLAGS += -MT $@ -MD -MP -MF $(@D)/$(DEPDIR)/$(basename $(@F)).P$(patsubst .%,%,$(suffix $(@F)))
+
+ALL_CFLAGS = $(OUR_CFLAGS) $(AM_CFLAGS/$(@D)) $(CFLAGS)
+ALL_CPPFLAGS = $(OUR_CPPFLAGS) $(AM_CPPFLAGS/$(@D)) $(CPPFLAGS)
+ALL_LDFLAGS = $(OUR_LDFLAGS) $(AM_LDFLAGS/$(@D)) $(LDFLAGS)
+
+COMPILE   = $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(ALL_LIBTOOLFLAGS) --mode=compile $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
+LINK      = $(LIBTOOL) $(AM_V_lt) --tag=CC $(ALL_LIBTOOLFLAGS) --mode=link $(CCLD) $(ALL_CFLAGS) $(ALL_LDFLAGS) -o $@
+
 # remove targets if the command fails
 .DELETE_ON_ERROR:
 
