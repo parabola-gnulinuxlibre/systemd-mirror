@@ -131,3 +131,9 @@ set -e
         done < <(sed -r 's|^if (.*)|ifneq ($(\1),)|' <Makefile.am)
         rm .tmp.move.all
 )
+
+(
+	find src \( -name '*.h' -o -name '*.c' \) \
+	     -exec grep '#include "sd-' -l -- {} + |
+	    xargs -d $'\n' sed -ri 's|#include "(sd-[^"]*)"|#include <systemd/\1>|'
+)
