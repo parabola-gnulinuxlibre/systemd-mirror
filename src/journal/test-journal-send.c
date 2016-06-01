@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "sd-journal.h"
+#include <systemd/sd-journal.h>
 
 #include "macro.h"
 
