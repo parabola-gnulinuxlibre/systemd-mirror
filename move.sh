@@ -138,6 +138,18 @@ fixup_includes() (
 	    xargs -d $'\n' sed -ri 's|#include "(sd-[^"]*)"|#include <systemd/\1>|'
 )
 
+fixup_makefiles() (
+	find src -type f -name Makefile \
+	     -exec sed -ri '/^[^#]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' -- {} +
+)
+
+move() {
+	move_files
+	breakup_makefile
+	fixup_includes
+	fixup_makefiles
+}
+
 main() {
 	set -e
 
@@ -148,9 +160,7 @@ main() {
 
 	git checkout -b postmove
 
-	move_files
-	breakup_makefile
-	fixup_includes
+	move
 
 	git add .
 	git commit -m './move.sh'
