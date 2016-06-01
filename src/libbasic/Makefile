@@ -277,16 +277,7 @@ $(outdir)/cap-from-name.gperf: $(outdir)/cap-list.txt
 $(outdir)/cap-from-name.h: $(outdir)/cap-from-name.gperf
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_capability -H hash_capability_name -p -C <$< >$@
 
-
-std.out_files = libbasic.la
-CFLAGS += -pthread
-CPPFLAGS += $(libsystemd.CPPFLAGS) $(libselinux.CPPFLAGS) $(libcap.CPPFLAGS)
-$(outdir)/libbasic.la: \
-	$(patsubst src/basic/%.c,$(outdir)/%.lo,$(filter %.c,$(libbasic_la_SOURCES))) \
-	$(libselinux.DEPENDS) $(libcap.DEPENDS) -lrt -lm
-
-std.gen_files += *-to-name.h *-from-name.h *-from-name.gperf *-list.txt
-
+$(eval $(value automake2autothing))
 $(outdir)/af-list.lo: $(outdir)/af-from-name.h $(outdir)/af-to-name.h
 $(outdir)/arphrd-list.lo: $(outdir)/arphrd-from-name.h $(outdir)/arphrd-to-name.h
 $(outdir)/cap-list.lo: $(outdir)/cap-from-name.h $(outdir)/cap-to-name.h

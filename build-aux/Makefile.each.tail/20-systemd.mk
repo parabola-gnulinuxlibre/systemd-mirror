@@ -2,10 +2,10 @@
 
 std.clean_files += *.o *.lo .deps/ .libs/
 
-$(outdir)/%.o: $(srcdir)/%.c | $(outdir)/.deps
+$(outdir)/%.o: $(srcdir)/%.c $(topoutdir)/config.h | $(outdir)/.deps
 	$(AM_V_CC)$(COMPILE)   -c -o $@ $<
 
-$(outdir)/%.lo: $(srcdir)/%.c | $(outdir)/.deps
+$(outdir)/%.lo: $(srcdir)/%.c $(topoutdir)/config.h | $(outdir)/.deps
 	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 $(outdir)/.deps:

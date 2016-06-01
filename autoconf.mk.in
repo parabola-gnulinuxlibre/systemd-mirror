@@ -1,3 +1,5 @@
+top_builddir = $(topoutdir)
+
 PACKAGE = @PACKAGE@
 VERSION = @VERSION@
 PACKAGE_NAME = @PACKAGE_NAME@

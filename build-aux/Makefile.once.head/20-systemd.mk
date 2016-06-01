@@ -21,20 +21,14 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
-ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
-AM_MAKEFLAGS = --no-print-directory
-AUTOMAKE_OPTIONS = color-tests parallel-tests
-
-GCC_COLORS ?= 'ooh, shiny!'
-export GCC_COLORS
-
-SUBDIRS = . po
-
 OUR_CPPFLAGS += -MT $@ -MD -MP -MF $(@D)/$(DEPDIR)/$(basename $(@F)).P$(patsubst .%,%,$(suffix $(@F)))
+OUR_CPPFLAGS += -include $(topoutdir)/config.h
 
+at.dirlocal += AM_CFLAGS AM_CPPFLAGS AM_LDFLAGS AM_LIBTOOLFLAGS
 ALL_CFLAGS = $(OUR_CFLAGS) $(AM_CFLAGS/$(@D)) $(CFLAGS)
 ALL_CPPFLAGS = $(OUR_CPPFLAGS) $(AM_CPPFLAGS/$(@D)) $(CPPFLAGS)
 ALL_LDFLAGS = $(OUR_LDFLAGS) $(AM_LDFLAGS/$(@D)) $(LDFLAGS)
+ALL_LIBTOOLFLAGS = $(OUR_LIBTOOLFLAGS) $(AM_LIBTOOLFLAGS/$(@D)) $(LIBTOOLFLAGS)
 
 COMPILE   = $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(ALL_LIBTOOLFLAGS) --mode=compile $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
@@ -130,4 +124,27 @@ define generate-sym-test
 	$(AM_V_at)printf '};\nint main(void) {\n' >> $@
 	$(AM_V_at)printf 'unsigned i; for (i=0;i<sizeof(functions)/sizeof(void*);i++) printf("%%p\\n", functions[i]);\n' >> $@
 	$(AM_V_at)printf 'return 0; }\n' >> $@
+endef
+
+at.dirlocal += noinst_LTLIBRARIES
+automake_name = $(subst -,_,$(subst .,_,$1))
+automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
+automake_lo = $(patsubst %.c,%.lo,$(filter %.c,$(automake_sources)))
+automake_o = $(patsubst %.c,%.o,$(filter %.c,$(automake_sources)))
+automake_libs = $($(automake_name)_LIBADD)
+
+define automake2autothing
+std.out_files += $(noinst_LTLIBRARIES)
+$(foreach n,$(call automake_name,$(std.out_files)),\
+  $(eval $n_SOURCES ?=)\
+  $(eval nodist_$n_SOURCES ?=)\
+  $(eval $n_CFLAGS ?=)\
+  $(eval $n_CPPFLAGS ?=)\
+  $(eval $n_LDFLAGS ?=)\
+  $(eval $n_LIBADD ?=))
+$(foreach t,$(filter %.la,$(std.out_files)),\
+	$(eval $(outdir)/$t: $(call automake_lo,$t) $(call automake_libs,$t) )\
+	$(eval AM_CFLAGS += $($(call automake_name,$t)_CFLAGS)               )\
+	$(eval AM_CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS)           )\
+	$(eval AM_LDFLAGS += $($(call automake_name,$t)_LDFLAGS)             ))
 endef
