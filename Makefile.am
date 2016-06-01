@@ -1343,7 +1343,7 @@ EXTRA_DIST += \
 CLEANFILES += \
 	$(gperf_txt_sources)
 
-#@build-aux/Makefile.once.head/20-systemd.mk
+#@build-aux/Makefile.each.tail/20-systemd.mk
 %-from-name.gperf: %-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct $(notdir $*)_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { printf "%s, %s\n", $$1, $$1 }' <$< >$@
