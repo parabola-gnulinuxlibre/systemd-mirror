@@ -16,7 +16,7 @@
 # This file is based on §7.2 "Makefile Conventions" of the release of
 # the GNU Coding Standards dated April 13, 2016.
 
-gnuconf.pkgname ?= $(PACKAGE)
+gnuconf.pkgname ?= $(firstword $(PACKAGE_TARNAME) $(PACKAGE) $(PACKAGE_NAME))
 ifeq ($(gnuconf.pkgname),)
 $(error gnuconf.pkgname must be set)
 endif

@@ -16,8 +16,8 @@
 # Developer configuration
 
 dist.exts ?= .tar.gz
-dist.pkgname ?= $(PACKAGE)
-dist.version ?= $(VERSION)
+dist.pkgname ?= $(firstword $(PACKAGE_TARNAME) $(PACKAGE) $(PACKAGE_NAME))
+dist.version ?= $(firstword $(PACKAGE_VERSION) $(VERSION))
 
 ifeq ($(dist.pkgname),)
 $(error dist.pkgname must be set)
