@@ -20,6 +20,6 @@
 
 #pragma once
 
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 
 int lldp_network_bind_raw_socket(int ifindex);

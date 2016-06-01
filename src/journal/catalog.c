@@ -25,7 +25,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "sd-id128.h"
+#include <systemd/sd-id128.h>
 
 #include "alloc-util.h"
 #include "catalog.h"

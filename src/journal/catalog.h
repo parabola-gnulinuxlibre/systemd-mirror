@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-#include "sd-id128.h"
+#include <systemd/sd-id128.h>
 
 #include "hashmap.h"
 #include "strbuf.h"
