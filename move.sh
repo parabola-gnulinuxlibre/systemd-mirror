@@ -11,6 +11,8 @@ in_array() {
 
 set -e
 
+git checkout -b postmove
+
 (
 	for d in libsystemd libudev machine resolve; do
 		mkdir src/$d-new
@@ -139,3 +141,10 @@ set -e
 	     -exec grep '#include "sd-' -l -- {} + |
 	    xargs -d $'\n' sed -ri 's|#include "(sd-[^"]*)"|#include <systemd/\1>|'
 )
+
+git add .
+git commit -m './move.sh'
+git merge -s ours lukeshu/postmove
+git checkout lukeshu/postmove
+git merge postmove
+git branch -d postmove
