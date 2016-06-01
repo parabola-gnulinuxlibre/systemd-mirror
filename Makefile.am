@@ -3219,6 +3219,7 @@ libsystemd_la_LIBADD = \
 	$(libsystemd_internal_la_LIBADD) \
 	$(libsystemd_journal_internal_la_LIBADD)
 
+#@discard.mk
 libsystemd-install-hook:
 	libname=libsystemd.so && $(move-to-rootlibdir)
 
@@ -3228,6 +3229,7 @@ libsystemd-uninstall-hook:
 INSTALL_EXEC_HOOKS += libsystemd-install-hook
 UNINSTALL_EXEC_HOOKS += libsystemd-uninstall-hook
 
+#@src/libsystemd/Makefile
 pkgconfiglib_DATA += \
 	src/libsystemd/libsystemd.pc
 
@@ -3242,6 +3244,8 @@ pkginclude_HEADERS += \
 
 lib_LTLIBRARIES += \
 	libsystemd.la
+
+# ------------------------------------------------------------------------------
 
 tests += \
 	test-bus-marshal \
@@ -3602,6 +3606,7 @@ pkgconfiglib_DATA += \
 EXTRA_DIST += \
 	src/libudev/libudev.pc.in
 
+#@discard.mk
 # move lib from $(libdir) to $(rootlibdir) and update devel link, if needed
 libudev-install-hook:
 	libname=libudev.so && $(move-to-rootlibdir)
@@ -6031,11 +6036,13 @@ substitutions = \
        '|binfmtdir=$(binfmtdir)|' \
        '|modulesloaddir=$(modulesloaddir)|'
 
+#@build-aux/Makefile.once.head/20-systemd.mk
 SED_PROCESS = \
 	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
 	$(SED) $(subst '|,-e 's|@,$(subst =,\@|,$(subst |',|g',$(substitutions)))) \
 		< $< > $@
 
+#@build-aux/Makefile.each.tail/20-systemd.mk
 units/%: units/%.in
 	$(SED_PROCESS)
 
@@ -6095,6 +6102,7 @@ units/user/%: units/user/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) -DFOR_USER=1 < $< > $@
 
+#@discard.mk
 if ENABLE_POLKIT
 nodist_polkitpolicy_DATA = \
 	$(polkitpolicy_files) \
