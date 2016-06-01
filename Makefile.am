@@ -346,7 +346,7 @@ INSTALL_EXEC_HOOKS += \
 INSTALL_EXEC_HOOKS += \
 	install-busnames-target-wants-hook
 
-#@am-pretty.mk -----------------------------------------------------------------
+#@build-aux/Makefile.once.head/20-systemd.mk -----------------------------------
 V ?=
 
 AM_V_M4 = $(AM_V_M4_$(V))
