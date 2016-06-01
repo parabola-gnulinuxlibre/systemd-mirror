@@ -147,18 +147,22 @@ fixup_makefile() {
 fixup_makefiles() (
 	sed -ri \
 	    -e '/^	\$\(AM_V_at\)\$\(MKDIR_P\) \$\(dir \$@\)/d' \
-	    -e '/ \$\(CFLAGS\) / /g' \
-	    -e '/ \$\(CPPFLAGS\) / /g' \
-	    -e '/^[^#]*:/ { s|\S+/|$(outdir)/| }'
+	    -e 's/ \$\(CFLAGS\) / /g' \
+	    -e 's/ \$\(CPPFLAGS\) / /g' \
+	    -e '/^[^#]*:/ { s|\S+/|$(outdir)/| }' \
 	    src/libbasic/Makefile
 )
 
-move() {
+move() (
+	>&2 echo ' => move_files'
 	move_files
+	>&2 echo ' => breakup_makefile'
 	breakup_makefile
+	>&2 echo ' => fixup_includes'
 	fixup_includes
+	>&2 echo ' => fixup_makefiles'
 	fixup_makefiles
-}
+)
 
 main() {
 	set -e
