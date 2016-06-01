@@ -23,7 +23,8 @@
 
 ifeq ($(topsrcdir),)
 
-MAKEFLAGS += --no-builtin-rules --no-builtin-variables --warn-undefined-variables
+MAKEFLAGS += --warn-undefined-variables
+include $(topsrcdir)/build-aux/no-builtin-variables.mk
 .LIBPATTERNS = lib%.so lib%.a
 
 topoutdir := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
