@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/automake.head.mk
 
-am_out_files = libfirewall.la
+std.out_files = libfirewall.la
 CPPFLAGS += $(libbasic.CPPFLAGS) $(libiptc.CPPFLAGS)
 $(outdir)/libfirewall.la: $(outdir)/firewall-util.lo $(libiptc.DEPENDS)
 

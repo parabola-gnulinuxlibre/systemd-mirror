@@ -52,7 +52,7 @@ nodist_systemd_nspawn_SOURCES = \
 gperf_gperf_sources += \
 	src/nspawn/nspawn-gperf.gperf
 
-am_out_files = systemd-nspawn
+std.out_files = systemd-nspawn
 CPPFLAGS += $(libbasic.CPPFLAGS) $(libshared.CPPFLAGS) $(libsystemd.CPPFLAGS) $(libudev.CPPFLAGS) $(libblkid.CPPFLAGS)
 CPPFLAGS += -I$(topsrcdir)/src/libsystemd/src/sd-netlink -I$(topsrcdir)/src/libsystemd/src/sd-bus -I$(topsrcdir)/src/udev -I$(topsrcdir)/src/libudev/src
 CPPFLAGS += $(libblkid.CPPFLAGS) $(libseccomp.CPPFLAGS)

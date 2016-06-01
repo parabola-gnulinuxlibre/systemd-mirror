@@ -21,7 +21,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
-include $(topsrcdir)/automake.head.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
 
 libbasic_la_SOURCES = \
 	src/basic/missing.h \
@@ -216,14 +216,14 @@ libbasic_la_SOURCES = \
 	src/basic/formats-util.h \
 	src/basic/nss-util.h
 
-am_out_files = libbasic.la
+std.out_files = libbasic.la
 CFLAGS += -pthread
 CPPFLAGS += $(libsystemd.CPPFLAGS) $(libselinux.CPPFLAGS) $(libcap.CPPFLAGS)
 $(outdir)/libbasic.la: \
 	$(patsubst src/basic/%.c,$(outdir)/%.lo,$(filter %.c,$(libbasic_la_SOURCES))) \
 	$(libselinux.DEPENDS) $(libcap.DEPENDS) -lrt -lm
 
-am_clean_files += *-to-name.h *-from-name.h *-from-name.gperf *-list.txt
+std.gen_files += *-to-name.h *-from-name.h *-from-name.gperf *-list.txt
 
 $(outdir)/af-list.lo: $(outdir)/af-from-name.h $(outdir)/af-to-name.h
 $(outdir)/arphrd-list.lo: $(outdir)/arphrd-from-name.h $(outdir)/arphrd-to-name.h
@@ -267,4 +267,4 @@ $(outdir)/cap-from-name.gperf: $(outdir)/cap-list.txt
 $(outdir)/cap-from-name.h: $(outdir)/cap-from-name.gperf
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_capability -H hash_capability_name -p -C <$< >$@
 
-include $(topsrcdir)/automake.tail.mk
+include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -30,26 +30,12 @@ topoutdir := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 abs_topsrcdir := @abs_top_srcdir@
 topsrcdir = $(if $(value am_path),$(call am_path,$(abs_topsrcdir)),$(abs_topsrcdir))
 
-# Standard package directories
-prefix = @prefix@
-exec_prefix = @exec_prefix@
+include $(topsrcdir)/gnustandards.mk
+include $(topsrcdir)/autoconf.mk
 
-bindir = @bindir@
-sbindir = @sbindir@
-libexecdir = @libexecdir@
-
-datarootdir = @datarootdir@
-datadir = @datadir@
-sysconfdir = @sysconfdir@
-sharedstatedir = @sharedstatedir@
-localstatedir = @localstatedir@
-runstatedir = @runstatedir@
-
-includedir = @includedir@
-docdir = @docdir@
-libdir = @libdir@
-localedir = @localedir@
-mandir = @mandir@
+OUR_CPPFLAGS = @OUR_CPPFLAGS@
+OUR_CFLAGS = @OUR_CFLAGS@
+OUR_LDFLAGS = @OUR_LDFLAGS@
 
 # Dirs of external packages
 dbuspolicydir=@dbuspolicydir@
@@ -234,27 +220,10 @@ HAVE_ZLIB = @HAVE_ZLIB_TRUE@1
 
 LIBTOOLFLAGS = 
 
-AR = @AR@
-ACLOCAL = @ACLOCAL@
-AUTOCONF = @AUTOCONF@
-AUTOHEADER = @AUTOHEADER@
-AUTOMAKE = @AUTOMAKE@
-AWK = @AWK@
-CC = @CC@
-CPP = @CPP@
-EGREP = @EGREP@
-FGREP = @FGREP@
-GREP = @GREP@
-INSTALL = @INSTALL@
-INSTALL_DATA = @INSTALL_DATA@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 INTLTOOL_EXTRACT = @INTLTOOL_EXTRACT@
 INTLTOOL_MERGE = @INTLTOOL_MERGE@
 INTLTOOL_PERL = @INTLTOOL_PERL@
 INTLTOOL_UPDATE = @INTLTOOL_UPDATE@
-GPERF = @GPERF@
 GMSGFMT = @GMSGFMT@
 KBD_LOADKEYS = @KBD_LOADKEYS@
 KBD_SETFONT = @KBD_SETFONT@
@@ -262,35 +231,17 @@ KEXEC = @KEXEC@
 KILL = @KILL@
 KMOD = @KMOD@
 LD = @LD@
-LIBTOOL = @LIBTOOL@
-M4 = @M4@
-MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
-MKDIR_P = @MKDIR_P@
-MSGFMT = @MSGFMT@
-MSGMERGE = @MSGMERGE@
-NM = @NM@
-OBJCOPY = @OBJCOPY@
-OBJDUMP = @OBJDUMP@
 PKG_CONFIG = @PKG_CONFIG@
 PYTHON = @PYTHON@
 QEMU = @QEMU@
 QUOTACHECK = @QUOTACHECK@
 QUOTAON = @QUOTAON@
-RANLIB = @RANLIB@
-SED = @SED@
 SETCAP = @SETCAP@
-SHELL = @SHELL@
-STRINGS = @STRINGS@
-STRIP = @STRIP@
 SULOGIN = @SULOGIN@
 SUSHELL = @SUSHELL@
 UMOUNT_PATH = @UMOUNT_PATH@
 XSLTPROC = @XSLTPROC@
-
-CFLAGS = @CFLAGS@
-CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
 
 AMTAR = @AMTAR@
 CCDEPMODE = @CCDEPMODE@
@@ -301,9 +252,6 @@ DEPDIR = @DEPDIR@
 DNS_SERVERS = @DNS_SERVERS@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
-ECHO_C = @ECHO_C@
-ECHO_N = @ECHO_N@
-ECHO_T = @ECHO_T@
 EFI_ARCH = @EFI_ARCH@
 EFI_CC = @EFI_CC@
 EFI_INC_DIR = @EFI_INC_DIR@
@@ -318,20 +266,12 @@ LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
-M4_DEFINES = @M4_DEFINES@
 MAINT = @MAINT@
 NMEDIT = @NMEDIT@
 NTP_SERVERS = @NTP_SERVERS@
 OBJEXT = @OBJEXT@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
-PACKAGE = systemd
-PACKAGE_BUGREPORT = http://github.com/systemd/systemd/issues
-PACKAGE_NAME = systemd
-PACKAGE_STRING = systemd 229
-PACKAGE_TARNAME = systemd
-PACKAGE_URL = http://www.freedesktop.org/wiki/Software/systemd
-PACKAGE_VERSION = 229
 PATH_SEPARATOR = :
 PKG_CONFIG_LIBDIR = 
 PKG_CONFIG_PATH = /home/luke/.prefix/lib/pkgconfig
@@ -350,19 +290,6 @@ SYSTEM_UID_MAX = 999
 TELINIT = /lib/sysvinit/telinit
 TTY_GID = 5
 USE_NLS = yes
-VERSION = 229
-XGETTEXT = /usr/bin/xgettext
-
-ac_ct_AR = gcc-ar
-ac_ct_CC = gcc
-ac_ct_DUMPBIN = 
-ac_ct_NM = gcc-nm
-ac_ct_RANLIB = gcc-ranlib
-am__include = include
-am__leading_dot = .
-am__quote = 
-am__tar = tar --format=posix -chf - "$$tardir"
-am__untar = tar -xf -
 
 build = x86_64-unknown-linux-gnu
 build_alias = 

@@ -120,10 +120,10 @@ libsystemd_internal_la_LIBADD = \
 noinst_LTLIBRARIES += \
 	libsystemd-internal.la
 
-am_out_files += libsystemd-internal.la
+std.out_files += libsystemd-internal.la
 CPPFLAGS += $(libsystemd.CPPFLAGS) $(libbasic.CPPFLAGS) $(libshared.CPPFLAGS)
 CPPFLAGS += -DLIBDIR=\"$(libdir)\" -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
-am_subdirs += $(dir $(patsubst src/libsystemd/%.c,$(outdir)/%.lo,$(filter %.c,$(libsystemd_internal_la_SOURCES))))
+am.subdirs += $(dir $(patsubst src/libsystemd/%.c,$(outdir)/%.lo,$(filter %.c,$(libsystemd_internal_la_SOURCES))))
 $(outdir)/libsystemd-internal.la: \
 	$(patsubst src/libsystemd/%.c,$(outdir)/%.lo,$(filter %.c,$(libsystemd_internal_la_SOURCES))) \
 	$(libbasic.DEPENDS) -lresolv

@@ -3,77 +3,78 @@
 
 # It's ok to hard-code these commands in rules, but who wants to
 # memorize the list of what's ok?
-AWK = @AWK@
-CAT = @CAT@
-CMP = @CMP@
-CP = @CP@
-DIFF = @DIFF@
-ECHO = @ECHO@
-EGREP = @EGREP@
-EXPR = @EXPR@
-FALSE = @FALSE@
-GREP = @GREP@
-INSTALL_INFO = @INSTALL_INFO@
-LN = @LN@
-LS = @LS@
-MKDIR = @MKDIR@
-MV = @MV@
-PRINTF = @PRINTF@
-PWD = @PWD@
-RM = @RM@
-RMDIR = @RMDIR@
-SED = @SED@
-SLEEP = @SLEEP@
-SORT = @SORT@
-TAR = @TAR@
-TEST = @TEST@
-TOUCH = @TOUCH@
-TR = @TR@
-TRUE = @TRUE@
+AWK = @AWK@# Requires AC_PROG_AWK
+CAT = cat
+CMP = cmp
+CP = cp
+DIFF = diff
+ECHO = echo
+EGREP = @EGREP@# Requires AC_PROG_EGREP
+EXPR = expr
+FALSE = false
+GREP = @GREP@# Requires AC_PROG_GREP
+INSTALL_INFO = install-info
+LN = ln
+LS = ls
+MKDIR = mkdir
+MV = mv
+PRINTF = printf
+PWD = pwd
+RM = rm -f
+RMDIR = rmdir
+SED = sed
+SLEEP = sleep
+SORT = sort
+TAR = tar
+TEST = test
+TOUCH = touch
+TR = tr
+TRUE = true
 
 # These must be user-configurable
 AR = @AR@
-ARFLAGS = @ARFLAGS@
-BISON = @BISON@
-BISONFLAGS = @BISONFLAGS@
+ARFLAGS =
+BISON = bison
+BISONFLAGS =
 CC = @CC@
 CCFLAGS = $(CFLAGS)
-FLEX = @FLEX@
-FLEXFLAGS = @FLEXFLAGS@
-INSTALL = @INSTALL@
-#INSTALLFLAGS = @INSTALLFLAGS@
+FLEX = flex
+FLEXFLAGS =
+INSTALL = @INSTALL@# Requires AC_PROG_INSTALL
+#INSTALLFLAGS =
 LD = @LD@
 LDFLAGS = @LDFLAGS@
-LDCONFIG = @LDCONFIG@
-LDCONFIGFLAGS = @LDCONFIGFLAGS@
+LDCONFIG = ldconfig
+LDCONFIGFLAGS =
 LEX = @LEX@
+LEXLIB = @LEXLIB@
 LEXFLAGS = $(LFLAGS)
 #MAKE
 MAKEINFO = @MAKEINFO@
-MAKEINFOFLAGS = @MAKEINFOFLAGS@
+MAKEINFOFLAGS =
 RANLIB = @RANLIB@
-RANLIBFLAGS = @RANLIBFLAGS@
-TEXI2DVI = @TEXI2DVI@
-TEXI2DVIFLAGS = @TEXI2DVIFLAGS@
+RANLIBFLAGS =
+TEXI2DVI = texi2dvi
+TEXI2DVIFLAGS =
 YACC = @YACC@
 YACCFLAGS = $(YFLAGS)
 
 CFLAGS = @CFLAGS@
-LFLAGS = @LFLAGS@
+LFLAGS =
 YFLAGS = @YFLAGS@
 
 LN_S = @LN_S@
 
-CHGRP = @CHGRP@
-CHMOD = @CHMOD@
-CHOWN = @CHOWN@
-MKNOD = @MKNOD@
+CHGRP = chgrp
+CHMOD = chmod
+CHOWN = chown
+MKNOD = mknod
 
 # 7.2.3 Variables for Specifying Commands
 # ---------------------------------------
 
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@# Requires AC_PROG_INSTALL
+INSTALL_DATA = @INSTALL_DATA@# Requires AC_PROG_INSTALL
 
 # 7.2.5 Variables for Installation Directories
 # --------------------------------------------
@@ -91,7 +92,7 @@ datadir        = @datadir@
 sysconfdir     = @sysconfdir@
 sharedstatedir = @sharedstatedir@
 localstatedir  = @localstatedir@
-runstatedir    = $(localstatedir)/run
+runstatedir    = $(localstatedir)/run# Requires Autoconf 2.70+
 # Specific types of files
 includedir = @includedir@
 oldincludedir = @oldincludedir@
@@ -102,7 +103,7 @@ dvidir  = @dvidir@
 pdfdir  = @pdfdir@
 psdir   = @psdir@
 libdir  = @libdir@
-lispdir = $(datarootdir)/emacs/site-lisp# Autoconf 2.70+
+lispdir = $(datarootdir)/emacs/site-lisp# Requires manual configure.ac support
 localedir = @localedir@
 
 mandir = @mandir@

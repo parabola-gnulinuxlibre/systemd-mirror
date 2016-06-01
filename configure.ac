@@ -86,11 +86,17 @@ GETTEXT_PACKAGE=systemd
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [systemd])
 
-AC_PROG_MKDIR_P
-AC_PROG_LN_S
-AC_PROG_SED
-AC_PROG_GREP
 AC_PROG_AWK
+AC_PROG_GREP
+AC_PROG_EGREP
+AC_PROG_FGREP
+AC_PROG_INSTALL
+AC_PROG_MKDIR_P
+AC_PROG_LEX
+AC_PROG_LN_S
+AC_PROG_RANLIB
+AC_PROG_SED
+AC_PROG_YACC
 
 AC_PATH_PROG([M4], [m4])
 
@@ -1505,6 +1511,7 @@ AC_SUBST([rootlibdir], [$with_rootlibdir])
 AC_CONFIG_FILES([
         config.mk
         automake.mk
+        autoconf.mk
         gnustandards.mk
         po/Makefile.in
 ])

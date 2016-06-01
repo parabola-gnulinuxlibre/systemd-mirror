@@ -137,7 +137,7 @@ libshared_la_LIBADD = \
 	$(LIBIDN_LIBS) \
 	$(SECCOMP_LIBS)
 
-am_out_files += libshared.la
+std.out_files += libshared.la
 CPPFLAGS += -I$(topsrcdir)/src/libsystemd/include
 CPPFLAGS += -I$(topoutdir)/src/libsystemd/include
 CPPFLAGS += -I$(topsrcdir)/src/libbasic
