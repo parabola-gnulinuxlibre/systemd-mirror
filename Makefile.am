@@ -4278,7 +4278,7 @@ tests += \
 	test-compress-benchmark
 endif
 
-#@src/libsystemd/Makefile
+#@src/libsystemd/libsystemd-journal-internal/Makefile
 pkginclude_HEADERS += \
 	src/systemd/sd-journal.h \
 	src/systemd/sd-messages.h \
