@@ -52,6 +52,21 @@ nodist_systemd_nspawn_SOURCES = \
 gperf_gperf_sources += \
 	src/nspawn/nspawn-gperf.gperf
 
+systemd_nspawn_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(BLKID_CFLAGS) \
+	$(SECCOMP_CFLAGS)
+
+systemd_nspawn_LDADD = \
+	libshared.la \
+	$(BLKID_LIBS)
+
+ifneq ($(HAVE_LIBIPTC),)
+systemd_nspawn_LDADD += \
+	libfirewall.la
+endif
+
+$(eval $(value automake2autothing))
 std.out_files = systemd-nspawn
 CPPFLAGS += $(libbasic.CPPFLAGS) $(libshared.CPPFLAGS) $(libsystemd.CPPFLAGS) $(libudev.CPPFLAGS) $(libblkid.CPPFLAGS)
 CPPFLAGS += -I$(topsrcdir)/src/libsystemd/src/sd-netlink -I$(topsrcdir)/src/libsystemd/src/sd-bus -I$(topsrcdir)/src/udev -I$(topsrcdir)/src/libudev/src
@@ -78,5 +93,4 @@ endif
 
 $(outdir)/nspawn.o: $(outdir)/loopback-setup.h
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk
