@@ -141,6 +141,12 @@ fixup_includes() (
 fixup_makefiles() (
 	find src -type f -name Makefile \
 	     -exec sed -ri '/^[^#]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' -- {} +
+	sed -ri \
+	    -e '/^	\$\(AM_V_at\)\$\(MKDIR_P\) \$\(dir \$@\)/d' \
+	    -e '/ \$\(CFLAGS\) / /g' \
+	    -e '/ \$\(CPPFLAGS\) / /g' \
+	    -e '/^[^#]*:/ { s|\S+/|$(outdir)/| }'
+	    src/libbasic/Makefile
 )
 
 move() {
