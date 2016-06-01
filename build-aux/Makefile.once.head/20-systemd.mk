@@ -119,6 +119,71 @@ INTLTOOL_V_MERGE_1 =
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 
+substitutions = \
+       '|libexecdir=$(libexecdir)|' \
+       '|bindir=$(bindir)|' \
+       '|bindir=$(bindir)|' \
+       '|SYSTEMCTL=$(bindir)/systemctl|' \
+       '|SYSTEMD_NOTIFY=$(bindir)/systemd-notify|' \
+       '|pkgsysconfdir=$(pkgsysconfdir)|' \
+       '|SYSTEM_CONFIG_UNIT_PATH=$(pkgsysconfdir)/system|' \
+       '|USER_CONFIG_UNIT_PATH=$(pkgsysconfdir)/user|' \
+       '|pkgdatadir=$(pkgdatadir)|' \
+       '|systemunitdir=$(systemunitdir)|' \
+       '|userunitdir=$(userunitdir)|' \
+       '|systempresetdir=$(systempresetdir)|' \
+       '|userpresetdir=$(userpresetdir)|' \
+       '|udevhwdbdir=$(udevhwdbdir)|' \
+       '|udevrulesdir=$(udevrulesdir)|' \
+       '|catalogdir=$(catalogdir)|' \
+       '|tmpfilesdir=$(tmpfilesdir)|' \
+       '|sysusersdir=$(sysusersdir)|' \
+       '|sysctldir=$(sysctldir)|' \
+       '|systemgeneratordir=$(systemgeneratordir)|' \
+       '|usergeneratordir=$(usergeneratordir)|' \
+       '|CERTIFICATEROOT=$(CERTIFICATEROOT)|' \
+       '|PACKAGE_VERSION=$(PACKAGE_VERSION)|' \
+       '|PACKAGE_NAME=$(PACKAGE_NAME)|' \
+       '|PACKAGE_URL=$(PACKAGE_URL)|' \
+       '|RANDOM_SEED_DIR=$(localstatedir)/lib/systemd/|' \
+       '|RANDOM_SEED=$(localstatedir)/lib/systemd/random-seed|' \
+       '|prefix=$(prefix)|' \
+       '|exec_prefix=$(exec_prefix)|' \
+       '|libdir=$(libdir)|' \
+       '|includedir=$(includedir)|' \
+       '|VERSION=$(VERSION)|' \
+       '|prefix=$(prefix)|' \
+       '|udevlibexecdir=$(udevlibexecdir)|' \
+       '|SUSHELL=$(SUSHELL)|' \
+       '|SULOGIN=$(SULOGIN)|' \
+       '|DEBUGTTY=$(DEBUGTTY)|' \
+       '|KILL=$(KILL)|' \
+       '|KMOD=$(KMOD)|' \
+       '|MOUNT_PATH=$(MOUNT_PATH)|' \
+       '|UMOUNT_PATH=$(UMOUNT_PATH)|' \
+       '|MKDIR_P=$(MKDIR_P)|' \
+       '|QUOTAON=$(QUOTAON)|' \
+       '|QUOTACHECK=$(QUOTACHECK)|' \
+       '|SYSTEM_SYSVINIT_PATH=$(sysvinitdir)|' \
+       '|VARLOGDIR=$(varlogdir)|' \
+       '|RC_LOCAL_SCRIPT_PATH_START=$(RC_LOCAL_SCRIPT_PATH_START)|' \
+       '|RC_LOCAL_SCRIPT_PATH_STOP=$(RC_LOCAL_SCRIPT_PATH_STOP)|' \
+       '|PYTHON=$(PYTHON)|' \
+       '|NTP_SERVERS=$(NTP_SERVERS)|' \
+       '|DNS_SERVERS=$(DNS_SERVERS)|' \
+       '|systemuidmax=$(SYSTEM_UID_MAX)|' \
+       '|systemgidmax=$(SYSTEM_GID_MAX)|' \
+       '|TTY_GID=$(TTY_GID)|' \
+       '|systemsleepdir=$(systemsleepdir)|' \
+       '|systemshutdowndir=$(systemshutdowndir)|' \
+       '|binfmtdir=$(binfmtdir)|' \
+       '|modulesloaddir=$(modulesloaddir)|'
+
+SED_PROCESS = \
+	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
+	$(SED) $(subst '|,-e 's|@,$(subst =,\@|,$(subst |',|g',$(substitutions)))) \
+		< $< > $@
+
 # Stupid test that everything purported to be exported really is
 define generate-sym-test
 	$(AM_V_at)$(MKDIR_P) $(dir $@)

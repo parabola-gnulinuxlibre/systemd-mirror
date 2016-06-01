@@ -31,7 +31,7 @@ ifneq ($(HAVE_ZLIB),)
 ifneq ($(HAVE_BZIP2),)
 ifneq ($(HAVE_GCRYPT),)
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-importd \
 	systemd-pull \
 	systemd-import \
@@ -42,9 +42,9 @@ systemd_importd_SOURCES = \
 
 systemd_importd_CFLAGS = \
 	$(AM_CFLAGS) \
-	-D SYSTEMD_PULL_PATH=\"$(rootlibexecdir)/systemd-pull\" \
-	-D SYSTEMD_IMPORT_PATH=\"$(rootlibexecdir)/systemd-import\" \
-	-D SYSTEMD_EXPORT_PATH=\"$(rootlibexecdir)/systemd-export\"
+	-D SYSTEMD_PULL_PATH=\"$(libexecdir)/systemd-pull\" \
+	-D SYSTEMD_IMPORT_PATH=\"$(libexecdir)/systemd-import\" \
+	-D SYSTEMD_EXPORT_PATH=\"$(libexecdir)/systemd-export\"
 
 systemd_importd_LDADD = \
 	libshared.la
@@ -76,7 +76,7 @@ systemd_pull_CFLAGS = \
 	$(XZ_CFLAGS) \
 	$(ZLIB_CFLAGS) \
 	$(GCRYPT_CFLAGS) \
-	-D VENDOR_KEYRING_PATH=\"$(rootlibexecdir)/import-pubring.gpg\" \
+	-D VENDOR_KEYRING_PATH=\"$(libexecdir)/import-pubring.gpg\" \
 	-D USER_KEYRING_PATH=\"$(pkgsysconfdir)/import-pubring.gpg\"
 
 systemd_pull_LDADD = \
@@ -133,7 +133,7 @@ systemd_export_LDADD = \
 	$(ZLIB_LIBS) \
 	-lbz2
 
-dist_rootlibexec_DATA = \
+dist_libexec_DATA = \
 	src/import/import-pubring.gpg
 
 nodist_systemunit_DATA += \

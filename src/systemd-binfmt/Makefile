@@ -30,7 +30,7 @@ systemd_binfmt_SOURCES = \
 systemd_binfmt_LDADD = \
 	libshared.la
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-binfmt
 
 dist_systemunit_DATA += \

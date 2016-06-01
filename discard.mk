@@ -101,18 +101,18 @@ AM_CPPFLAGS = \
 	-DUSER_DATA_UNIT_PATH=\"$(userunitdir)\" \
 	-DCERTIFICATE_ROOT=\"$(CERTIFICATEROOT)\" \
 	-DCATALOG_DATABASE=\"$(catalogstatedir)/database\" \
-	-DSYSTEMD_CGROUP_AGENT_PATH=\"$(rootlibexecdir)/systemd-cgroups-agent\" \
-	-DSYSTEMD_BINARY_PATH=\"$(rootlibexecdir)/systemd\" \
-	-DSYSTEMD_FSCK_PATH=\"$(rootlibexecdir)/systemd-fsck\" \
-	-DSYSTEMD_SHUTDOWN_BINARY_PATH=\"$(rootlibexecdir)/systemd-shutdown\" \
-	-DSYSTEMD_SLEEP_BINARY_PATH=\"$(rootlibexecdir)/systemd-sleep\" \
-	-DSYSTEMCTL_BINARY_PATH=\"$(rootbindir)/systemctl\" \
-	-DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(rootbindir)/systemd-tty-ask-password-agent\" \
+	-DSYSTEMD_CGROUP_AGENT_PATH=\"$(libexecdir)/systemd-cgroups-agent\" \
+	-DSYSTEMD_BINARY_PATH=\"$(libexecdir)/systemd\" \
+	-DSYSTEMD_FSCK_PATH=\"$(libexecdir)/systemd-fsck\" \
+	-DSYSTEMD_SHUTDOWN_BINARY_PATH=\"$(libexecdir)/systemd-shutdown\" \
+	-DSYSTEMD_SLEEP_BINARY_PATH=\"$(libexecdir)/systemd-sleep\" \
+	-DSYSTEMCTL_BINARY_PATH=\"$(bindir)/systemctl\" \
+	-DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(bindir)/systemd-tty-ask-password-agent\" \
 	-DSYSTEMD_STDIO_BRIDGE_BINARY_PATH=\"$(bindir)/systemd-stdio-bridge\" \
-	-DROOTPREFIX=\"$(rootprefix)\" \
+	-DROOTPREFIX=\"$(prefix)\" \
 	-DRANDOM_SEED_DIR=\"$(localstatedir)/lib/systemd/\" \
 	-DRANDOM_SEED=\"$(localstatedir)/lib/systemd/random-seed\" \
-	-DSYSTEMD_CRYPTSETUP_PATH=\"$(rootlibexecdir)/systemd-cryptsetup\" \
+	-DSYSTEMD_CRYPTSETUP_PATH=\"$(libexecdir)/systemd-cryptsetup\" \
 	-DSYSTEM_GENERATOR_PATH=\"$(systemgeneratordir)\" \
 	-DUSER_GENERATOR_PATH=\"$(usergeneratordir)\" \
 	-DSYSTEM_SHUTDOWN_PATH=\"$(systemshutdowndir)\" \
@@ -126,8 +126,8 @@ AM_CPPFLAGS = \
 	-DMOUNT_PATH=\"$(MOUNT_PATH)\" \
 	-DUMOUNT_PATH=\"$(UMOUNT_PATH)\" \
 	-DLIBDIR=\"$(libdir)\" \
-	-DROOTLIBDIR=\"$(rootlibdir)\" \
-	-DROOTLIBEXECDIR=\"$(rootlibexecdir)\" \
+	-DROOTLIBDIR=\"$(libdir)\" \
+	-DROOTLIBEXECDIR=\"$(libexecdir)\" \
 	-DTEST_DIR=\"$(abs_top_srcdir)/test\" \
 	-I $(top_srcdir)/src \
 	-I $(top_builddir)/src/basic \
@@ -164,13 +164,13 @@ AM_CFLAGS = $(OUR_CFLAGS)
 AM_LDFLAGS = $(OUR_LDFLAGS)
 
 # ------------------------------------------------------------------------------
-define move-to-rootlibdir
-	if test "$(libdir)" != "$(rootlibdir)"; then \
-		$(MKDIR_P) $(DESTDIR)$(rootlibdir) && \
+define move-to-libdir
+	if test "$(libdir)" != "$(libdir)"; then \
+		$(MKDIR_P) $(DESTDIR)$(libdir) && \
 		so_img_name=$$(readlink $(DESTDIR)$(libdir)/$$libname) && \
 		rm -f $(DESTDIR)$(libdir)/$$libname && \
-		$(LN_S) --relative -f $(DESTDIR)$(rootlibdir)/$$so_img_name $(DESTDIR)$(libdir)/$$libname && \
-		mv $(DESTDIR)$(libdir)/$$libname.* $(DESTDIR)$(rootlibdir); \
+		$(LN_S) --relative -f $(DESTDIR)$(libdir)/$$so_img_name $(DESTDIR)$(libdir)/$$libname && \
+		mv $(DESTDIR)$(libdir)/$$libname.* $(DESTDIR)$(libdir); \
 	fi
 endef
 
@@ -260,7 +260,7 @@ INSTALL_EXEC_HOOKS += \
 INSTALL_EXEC_HOOKS += \
 	install-busnames-target-wants-hook
 
-rootbin_PROGRAMS = \
+bin_PROGRAMS = \
 	systemctl \
 	systemd-notify \
 	systemd-ask-password \
@@ -279,7 +279,7 @@ bin_PROGRAMS = \
 	systemd-stdio-bridge \
 	systemd-path
 
-rootlibexec_PROGRAMS = \
+libexec_PROGRAMS = \
 	systemd \
 	systemd-cgroups-agent \
 	systemd-initctl \
@@ -295,7 +295,7 @@ rootlibexec_PROGRAMS = \
 	systemd-update-done
 
 ifneq ($(HAVE_UTMP),)
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-update-utmp
 endif
 
@@ -775,6 +775,32 @@ endif
 endif
 endif
 
+libsystemd-install-hook:
+	libname=libsystemd.so && $(move-to-libdir)
+
+libsystemd-uninstall-hook:
+	rm -f $(DESTDIR)$(libdir)/libsystemd.so*
+
+INSTALL_EXEC_HOOKS += libsystemd-install-hook
+UNINSTALL_EXEC_HOOKS += libsystemd-uninstall-hook
+
+# move lib from $(libdir) to $(libdir) and update devel link, if needed
+libudev-install-hook:
+	libname=libudev.so && $(move-to-libdir)
+
+libudev-uninstall-hook:
+	rm -f $(DESTDIR)$(libdir)/libudev.so*
+
+INSTALL_EXEC_HOOKS += libudev-install-hook
+UNINSTALL_EXEC_HOOKS += libudev-uninstall-hook
+
+# ------------------------------------------------------------------------------
+noinst_LTLIBRARIES += \
+	libudev-internal.la
+
+libudev_internal_la_SOURCES =\
+	$(libudev_la_SOURCES)
+
 EXTRA_DIST += \
 	test/Makefile \
 	test/README.testsuite \
@@ -812,78 +838,10 @@ EXTRA_DIST += \
 	test/loopy.service.d \
 	test/loopy.service.d/compat.conf
 
-substitutions = \
-       '|rootlibexecdir=$(rootlibexecdir)|' \
-       '|rootbindir=$(rootbindir)|' \
-       '|bindir=$(bindir)|' \
-       '|SYSTEMCTL=$(rootbindir)/systemctl|' \
-       '|SYSTEMD_NOTIFY=$(rootbindir)/systemd-notify|' \
-       '|pkgsysconfdir=$(pkgsysconfdir)|' \
-       '|SYSTEM_CONFIG_UNIT_PATH=$(pkgsysconfdir)/system|' \
-       '|USER_CONFIG_UNIT_PATH=$(pkgsysconfdir)/user|' \
-       '|pkgdatadir=$(pkgdatadir)|' \
-       '|systemunitdir=$(systemunitdir)|' \
-       '|userunitdir=$(userunitdir)|' \
-       '|systempresetdir=$(systempresetdir)|' \
-       '|userpresetdir=$(userpresetdir)|' \
-       '|udevhwdbdir=$(udevhwdbdir)|' \
-       '|udevrulesdir=$(udevrulesdir)|' \
-       '|catalogdir=$(catalogdir)|' \
-       '|tmpfilesdir=$(tmpfilesdir)|' \
-       '|sysusersdir=$(sysusersdir)|' \
-       '|sysctldir=$(sysctldir)|' \
-       '|systemgeneratordir=$(systemgeneratordir)|' \
-       '|usergeneratordir=$(usergeneratordir)|' \
-       '|CERTIFICATEROOT=$(CERTIFICATEROOT)|' \
-       '|PACKAGE_VERSION=$(PACKAGE_VERSION)|' \
-       '|PACKAGE_NAME=$(PACKAGE_NAME)|' \
-       '|PACKAGE_URL=$(PACKAGE_URL)|' \
-       '|RANDOM_SEED_DIR=$(localstatedir)/lib/systemd/|' \
-       '|RANDOM_SEED=$(localstatedir)/lib/systemd/random-seed|' \
-       '|prefix=$(prefix)|' \
-       '|exec_prefix=$(exec_prefix)|' \
-       '|libdir=$(libdir)|' \
-       '|includedir=$(includedir)|' \
-       '|VERSION=$(VERSION)|' \
-       '|rootprefix=$(rootprefix)|' \
-       '|udevlibexecdir=$(udevlibexecdir)|' \
-       '|SUSHELL=$(SUSHELL)|' \
-       '|SULOGIN=$(SULOGIN)|' \
-       '|DEBUGTTY=$(DEBUGTTY)|' \
-       '|KILL=$(KILL)|' \
-       '|KMOD=$(KMOD)|' \
-       '|MOUNT_PATH=$(MOUNT_PATH)|' \
-       '|UMOUNT_PATH=$(UMOUNT_PATH)|' \
-       '|MKDIR_P=$(MKDIR_P)|' \
-       '|QUOTAON=$(QUOTAON)|' \
-       '|QUOTACHECK=$(QUOTACHECK)|' \
-       '|SYSTEM_SYSVINIT_PATH=$(sysvinitdir)|' \
-       '|VARLOGDIR=$(varlogdir)|' \
-       '|RC_LOCAL_SCRIPT_PATH_START=$(RC_LOCAL_SCRIPT_PATH_START)|' \
-       '|RC_LOCAL_SCRIPT_PATH_STOP=$(RC_LOCAL_SCRIPT_PATH_STOP)|' \
-       '|PYTHON=$(PYTHON)|' \
-       '|NTP_SERVERS=$(NTP_SERVERS)|' \
-       '|DNS_SERVERS=$(DNS_SERVERS)|' \
-       '|systemuidmax=$(SYSTEM_UID_MAX)|' \
-       '|systemgidmax=$(SYSTEM_GID_MAX)|' \
-       '|TTY_GID=$(TTY_GID)|' \
-       '|systemsleepdir=$(systemsleepdir)|' \
-       '|systemshutdowndir=$(systemshutdowndir)|' \
-       '|binfmtdir=$(binfmtdir)|' \
-       '|modulesloaddir=$(modulesloaddir)|'
-
-SED_PROCESS = \
-	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
-	$(SED) $(subst '|,-e 's|@,$(subst =,\@|,$(subst |',|g',$(substitutions)))) \
-		< $< > $@
-
 $(outdir)/%: units/%.in
 	$(SED_PROCESS)
 
 $(outdir)/%: man/%.in
-	$(SED_PROCESS)
-
-$(outdir)/%: sysctl.d/%.in
 	$(SED_PROCESS)
 
 %.pc: %.pc.in
@@ -906,18 +864,6 @@ $(outdir)/%: shell-completion/%.in
 
 %.conf: %.conf.in
 	$(SED_PROCESS)
-
-%.sh: %.sh.in
-	$(SED_PROCESS)
-	$(AM_V_GEN)chmod +x $@
-
-$(outdir)/%.c: src/%.gperf
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
-	$(AM_V_GPERF)$(GPERF) < $< > $@
-
-$(outdir)/%: src/%.m4 $(top_builddir)/config.status
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
-	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
 
 $(outdir)/%: sysusers.d/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -1147,7 +1093,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-zshcompletiondir=$$dc_install_base/$(zshcompletiondir) \
 	--with-pamlibdir=$$dc_install_base/$(pamlibdir) \
 	--with-pamconfdir=$$dc_install_base/$(pamconfdir) \
-	--with-rootprefix=$$dc_install_base \
+	--with-prefix=$$dc_install_base \
 	--enable-compat-libs
 
 ifneq ($(HAVE_SYSV_COMPAT),)
@@ -1170,7 +1116,7 @@ endif
 
 .PHONY: dist-check-help
 
-dist-check-help: $(rootbin_PROGRAMS) $(bin_PROGRAMS)
+dist-check-help: $(bin_PROGRAMS) $(bin_PROGRAMS)
 	for i in $(abspath $^); do                                             \
             if $$i  --help | grep -v 'default:' | grep -E -q '.{80}.' ; then   \
 		echo "$(basename $$i) --help output is too wide:";             \

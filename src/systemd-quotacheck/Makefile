@@ -24,7 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(ENABLE_QUOTACHECK),)
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-quotacheck
 
 nodist_systemunit_DATA += \

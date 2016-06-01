@@ -30,7 +30,7 @@ systemd_vconsole_setup_SOURCES = \
 systemd_vconsole_setup_LDADD = \
 	libshared.la
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-vconsole-setup
 
 nodist_udevrules_DATA += \

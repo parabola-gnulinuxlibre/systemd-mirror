@@ -35,7 +35,7 @@ systemd_modules_load_LDADD = \
 	libshared.la \
 	$(KMOD_LIBS)
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-modules-load
 
 nodist_systemunit_DATA += \

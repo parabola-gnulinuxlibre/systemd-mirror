@@ -74,10 +74,10 @@ SYSINIT_TARGET_WANTS += \
 	systemd-udevd.service \
 	systemd-udev-trigger.service
 
-rootbin_PROGRAMS += \
+bin_PROGRAMS += \
 	udevadm
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-udevd
 
 noinst_LTLIBRARIES += \
@@ -190,7 +190,7 @@ systemd_hwdb_SOURCES = \
 systemd_hwdb_LDADD = \
 	libshared.la
 
-rootbin_PROGRAMS += \
+bin_PROGRAMS += \
 	systemd-hwdb
 
 dist_udevhwdb_DATA = \
@@ -215,7 +215,7 @@ SYSINIT_TARGET_WANTS += \
 # Update hwdb on installation. Do not bother if installing
 # in DESTDIR, since this is likely for packaging purposes.
 hwdb-update-hook:
-	-test -n "$(DESTDIR)" || $(rootbindir)/systemd-hwdb update
+	-test -n "$(DESTDIR)" || $(bindir)/systemd-hwdb update
 
 INSTALL_DATA_HOOKS += \
 	hwdb-update-hook

@@ -41,7 +41,7 @@ nodist_systemunit_DATA += \
 dist_systemunit_DATA_busnames += \
 	units/org.freedesktop.locale1.busname
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-localed
 
 dist_dbuspolicy_DATA += \

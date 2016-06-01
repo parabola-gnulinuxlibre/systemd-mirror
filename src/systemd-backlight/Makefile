@@ -24,7 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(ENABLE_BACKLIGHT),)
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-backlight
 
 nodist_systemunit_DATA += \

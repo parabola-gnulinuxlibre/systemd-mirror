@@ -141,7 +141,10 @@ fixup_includes() (
 fixup_makefile() {
 	sed -r \
 	    -e '/^[^#	]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' \
-	    -e 's|^if (.*)|ifneq ($(\1),)|'
+	    -e 's|^if (.*)|ifneq ($(\1),)|' \
+	    -e 's|rootprefix|prefix|g' \
+	    -e 's|rootbin|bin|g' \
+	    -e 's|rootlib|lib|g'
 }
 
 fixup_makefiles() (

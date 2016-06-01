@@ -24,7 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(HAVE_LIBCRYPTSETUP),)
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-cryptsetup
 
 systemgenerator_PROGRAMS += \

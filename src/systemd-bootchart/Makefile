@@ -35,7 +35,7 @@ systemd_bootchart_SOURCES = \
 systemd_bootchart_LDADD = \
 	libshared.la
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-bootchart
 
 dist_pkgsysconf_DATA += \

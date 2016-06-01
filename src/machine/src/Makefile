@@ -31,7 +31,7 @@ systemd_machined_SOURCES = \
 systemd_machined_LDADD = \
 	libmachine-core.la
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-machined
 
 libmachine_core_la_SOURCES = \
@@ -55,7 +55,7 @@ machinectl_SOURCES = \
 machinectl_LDADD = \
 	libshared.la
 
-rootbin_PROGRAMS += \
+bin_PROGRAMS += \
 	machinectl
 
 test_machine_tables_SOURCES = \

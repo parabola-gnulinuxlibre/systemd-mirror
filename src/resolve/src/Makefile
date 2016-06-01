@@ -88,7 +88,7 @@ systemd_resolved_LDADD = \
 	libsystemd-network.la \
 	libshared.la
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-resolved
 
 nodist_systemunit_DATA += \

@@ -70,7 +70,7 @@ endif
 noinst_LTLIBRARIES += \
 	liblogind-core.la
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-logind
 
 loginctl_SOURCES = \
@@ -81,7 +81,7 @@ loginctl_SOURCES = \
 loginctl_LDADD = \
 	libshared.la
 
-rootbin_PROGRAMS += \
+bin_PROGRAMS += \
 	loginctl
 
 dist_bashcompletion_data += \
@@ -97,7 +97,7 @@ systemd_inhibit_SOURCES = \
 systemd_inhibit_LDADD = \
 	libshared.la
 
-rootbin_PROGRAMS += \
+bin_PROGRAMS += \
 	systemd-inhibit
 
 test_login_SOURCES = \
@@ -226,7 +226,7 @@ systemd_user_sessions_SOURCES = \
 systemd_user_sessions_LDADD = \
 	libshared.la
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-user-sessions
 
 nodist_systemunit_DATA += \

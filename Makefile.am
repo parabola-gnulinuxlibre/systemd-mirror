@@ -3219,6 +3219,7 @@ libsystemd_la_LIBADD = \
 	$(libsystemd_internal_la_LIBADD) \
 	$(libsystemd_journal_internal_la_LIBADD)
 
+#@discard.mk
 libsystemd-install-hook:
 	libname=libsystemd.so && $(move-to-rootlibdir)
 
@@ -3228,6 +3229,7 @@ libsystemd-uninstall-hook:
 INSTALL_EXEC_HOOKS += libsystemd-install-hook
 UNINSTALL_EXEC_HOOKS += libsystemd-uninstall-hook
 
+#@src/libsystemd/Makefile
 pkgconfiglib_DATA += \
 	src/libsystemd/libsystemd.pc
 
@@ -3242,6 +3244,8 @@ pkginclude_HEADERS += \
 
 lib_LTLIBRARIES += \
 	libsystemd.la
+
+# ------------------------------------------------------------------------------
 
 tests += \
 	test-bus-marshal \
@@ -3602,6 +3606,7 @@ pkgconfiglib_DATA += \
 EXTRA_DIST += \
 	src/libudev/libudev.pc.in
 
+#@discard.mk
 # move lib from $(libdir) to $(rootlibdir) and update devel link, if needed
 libudev-install-hook:
 	libname=libudev.so && $(move-to-rootlibdir)
@@ -5970,7 +5975,7 @@ EXTRA_DIST += \
 	src/compat-libs/libsystemd-id128.pc.in \
 	src/compat-libs/libsystemd-daemon.pc.in
 
-#@discard.mk -------------------------------------------------------------------
+#@build-aux/Makefile.once.head/20-systemd.mk -----------------------------------
 substitutions = \
        '|rootlibexecdir=$(rootlibexecdir)|' \
        '|rootbindir=$(rootbindir)|' \
@@ -6036,15 +6041,18 @@ SED_PROCESS = \
 	$(SED) $(subst '|,-e 's|@,$(subst =,\@|,$(subst |',|g',$(substitutions)))) \
 		< $< > $@
 
+#@discard.mk
 units/%: units/%.in
 	$(SED_PROCESS)
 
 man/%: man/%.in
 	$(SED_PROCESS)
 
+#@build-aux/Makefile.each.tail/20-systemd.mk
 sysctl.d/%: sysctl.d/%.in
 	$(SED_PROCESS)
 
+#@discard.mk
 %.pc: %.pc.in
 	$(SED_PROCESS)
 
@@ -6066,6 +6074,7 @@ shell-completion/%: shell-completion/%.in
 %.conf: %.conf.in
 	$(SED_PROCESS)
 
+#@build-aux/Makefile.each.tail/20-systemd.mk
 %.sh: %.sh.in
 	$(SED_PROCESS)
 	$(AM_V_GEN)chmod +x $@
@@ -6078,6 +6087,7 @@ src/%: src/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
 
+#@discard.mk
 sysusers.d/%: sysusers.d/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@

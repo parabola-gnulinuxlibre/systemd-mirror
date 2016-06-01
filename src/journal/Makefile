@@ -228,7 +228,7 @@ UNINSTALL_EXEC_HOOKS += journal-uninstall-hook
 # Update catalog on installation. Do not bother if installing
 # in DESTDIR, since this is likely for packaging purposes.
 catalog-update-hook:
-	-test -n "$(DESTDIR)" || $(rootbindir)/journalctl --update-catalog
+	-test -n "$(DESTDIR)" || $(bindir)/journalctl --update-catalog
 
 INSTALL_DATA_HOOKS += \
 	catalog-update-hook
@@ -263,10 +263,10 @@ tests += \
 endif
 
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-journald
 
-rootbin_PROGRAMS += \
+bin_PROGRAMS += \
 	journalctl
 
 bin_PROGRAMS += \
@@ -319,7 +319,7 @@ gperf_gperf_sources += \
 ifneq ($(HAVE_MICROHTTPD),)
 gatewayddocumentrootdir=$(pkgdatadir)/gatewayd
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-journal-gatewayd
 
 systemd_journal_gatewayd_SOURCES = \

@@ -24,7 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(ENABLE_NETWORKD),)
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-networkd
 
 systemd_networkd_SOURCES = \
@@ -100,7 +100,7 @@ libnetworkd_core_la_LIBADD = \
 	libsystemd-network.la \
 	libshared.la
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-networkd-wait-online
 
 systemd_networkd_wait_online_CFLAGS = \
@@ -118,7 +118,7 @@ systemd_networkd_wait_online_LDADD = \
 	libsystemd-network.la \
 	libshared.la
 
-rootbin_PROGRAMS += \
+bin_PROGRAMS += \
 	networkctl
 
 networkctl_SOURCES = \

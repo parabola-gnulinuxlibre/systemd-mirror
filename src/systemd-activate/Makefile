@@ -24,7 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 
-rootlibexec_PROGRAMS += \
+libexec_PROGRAMS += \
 	systemd-activate
 
 systemd_activate_SOURCES = \

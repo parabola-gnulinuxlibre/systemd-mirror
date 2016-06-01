@@ -69,15 +69,15 @@ sysusersdir=$(prefix)/lib/sysusers.d
 sysctldir=$(prefix)/lib/sysctl.d
 binfmtdir=$(prefix)/lib/binfmt.d
 modulesloaddir=$(prefix)/lib/modules-load.d
-networkdir=$(rootprefix)/lib/systemd/network
+networkdir=$(prefix)/lib/systemd/network
 pkgincludedir=$(includedir)/systemd
-systemgeneratordir=$(rootlibexecdir)/system-generators
+systemgeneratordir=$(libexecdir)/system-generators
 usergeneratordir=$(prefix)/lib/systemd/user-generators
-systemshutdowndir=$(rootlibexecdir)/system-shutdown
-systemsleepdir=$(rootlibexecdir)/system-sleep
-systemunitdir=$(rootprefix)/lib/systemd/system
-systempresetdir=$(rootprefix)/lib/systemd/system-preset
-udevlibexecdir=$(rootprefix)/lib/udev
+systemshutdowndir=$(libexecdir)/system-shutdown
+systemsleepdir=$(libexecdir)/system-sleep
+systemunitdir=$(prefix)/lib/systemd/system
+systempresetdir=$(prefix)/lib/systemd/system-preset
+udevlibexecdir=$(prefix)/lib/udev
 udevhomedir=$(udevlibexecdir)
 udevrulesdir=$(udevlibexecdir)/rules.d
 udevhwdbdir=$(udevlibexecdir)/hwdb.d
@@ -88,9 +88,9 @@ factory_pamdir = $(datadir)/factory/etc/pam.d
 bootlibdir = $(prefix)/lib/systemd/boot/efi
 
 # And these are the special ones for /
-rootprefix=@rootprefix@
-rootbindir=$(rootprefix)/bin
-rootlibexecdir=$(rootprefix)/lib/systemd
+prefix=@prefix@
+bindir=$(prefix)/bin
+libexecdir=$(prefix)/lib/systemd
 
 # Libraries we depend on
 libbasic.CPPFLAGS      = -I$(topsrcdir)/src/libbasic -I$(topoutdir)/src/libbasic

@@ -119,18 +119,18 @@ pkgconfiglib_DATA += \
 	src/compat-libs/libsystemd-id128.pc \
 	src/compat-libs/libsystemd-daemon.pc
 
-# move lib from $(libdir) to $(rootlibdir) and update devel link, if needed
+# move lib from $(libdir) to $(libdir) and update devel link, if needed
 compat-lib-install-hook:
-	libname=libsystemd-login.so && $(move-to-rootlibdir)
-	libname=libsystemd-journal.so && $(move-to-rootlibdir)
-	libname=libsystemd-id128.so && $(move-to-rootlibdir)
-	libname=libsystemd-daemon.so && $(move-to-rootlibdir)
+	libname=libsystemd-login.so && $(move-to-libdir)
+	libname=libsystemd-journal.so && $(move-to-libdir)
+	libname=libsystemd-id128.so && $(move-to-libdir)
+	libname=libsystemd-daemon.so && $(move-to-libdir)
 
 compat-lib-uninstall-hook:
-	rm -f $(DESTDIR)$(rootlibdir)/libsystemd-login.so*
-	rm -f $(DESTDIR)$(rootlibdir)/libsystemd-journal.so*
-	rm -f $(DESTDIR)$(rootlibdir)/libsystemd-id128.so*
-	rm -f $(DESTDIR)$(rootlibdir)/libsystemd-daemon.so*
+	rm -f $(DESTDIR)$(libdir)/libsystemd-login.so*
+	rm -f $(DESTDIR)$(libdir)/libsystemd-journal.so*
+	rm -f $(DESTDIR)$(libdir)/libsystemd-id128.so*
+	rm -f $(DESTDIR)$(libdir)/libsystemd-daemon.so*
 
 INSTALL_EXEC_HOOKS += compat-lib-install-hook
 UNINSTALL_EXEC_HOOKS += compat-lib-uninstall-hook
