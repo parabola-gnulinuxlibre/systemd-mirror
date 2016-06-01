@@ -98,9 +98,14 @@ set -e
 
 	mv -T src/libsystemd/{src,}/libsystemd.pc.in
 	mv -T src/libsystemd/{src,}/libsystemd.sym
+	mv -T src/libsystemd/{src,}/.gitignore
 	mv -T src/libsystemd/{src,libsystemd-internal}
 
 	mkdir src/systemd-shutdown
+
+	mkdir build-aux
+	mkdir build-aux/Makefile.{once,each}.{head,tail}
+	touch build-aux/Makefile.{once,each}.{head,tail}/.gitignore
 )
 
 (

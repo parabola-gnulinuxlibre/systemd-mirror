@@ -21,7 +21,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-#@common.once.head.mk
+#@build-aux/Makefile.once.head/20-systemd.mk
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 AM_MAKEFLAGS = --no-print-directory
 AUTOMAKE_OPTIONS = color-tests parallel-tests
@@ -1332,7 +1332,7 @@ EXTRA_DIST += \
 CLEANFILES += \
 	$(gperf_txt_sources)
 
-#@common.once.head.mk
+#@build-aux/Makefile.once.head/20-systemd.mk
 %-from-name.gperf: %-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct $(notdir $*)_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { printf "%s, %s\n", $$1, $$1 }' <$< >$@
@@ -6358,7 +6358,7 @@ install-tree: all
 	$(MAKE) install DESTDIR=$(abs_srcdir)/install-tree
 	tree $(abs_srcdir)/install-tree
 
-#@common.once.tail.mk
+#@build-aux/Makefile.once.tail/20-systemd.mk
 # Let's run all tests of the test suite, but under valgrind. Let's
 # exclude perl/python/shell scripts we have in there
 .PHONY: valgrind-tests
@@ -6411,7 +6411,7 @@ check-includes: $(top_srcdir)/tools/check-includes.pl
 EXTRA_DIST += \
 	$(top_srcdir)/tools/check-includes.pl
 
-#@common.once.head.mk
+#@build-aux/Makefile.once.head/20-systemd.mk
 # Stupid test that everything purported to be exported really is
 define generate-sym-test
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -6471,7 +6471,7 @@ tests += \
 	test-libsystemd-sym \
 	test-libudev-sym
 
-#@common.once.tail.mk
+#@build-aux/Makefile.once.tail/20-systemd.mk
 .PHONY: cppcheck
 cppcheck:
 	cppcheck --enable=all -q $(top_srcdir)
