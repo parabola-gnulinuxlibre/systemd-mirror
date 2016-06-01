@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "sd-hwdb.h"
+#include <systemd/sd-hwdb.h>
 
 #include "alloc-util.h"
 #include "hwdb-util.h"

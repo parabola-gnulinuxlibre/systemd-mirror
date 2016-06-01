@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 
 #include "journal-remote-write.h"
 

@@ -18,7 +18,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-network.h"
+#include <systemd/sd-network.h>
 
 #include "alloc-util.h"
 #include "networkd-wait-online-link.h"
