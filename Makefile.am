@@ -5975,7 +5975,7 @@ EXTRA_DIST += \
 	src/compat-libs/libsystemd-id128.pc.in \
 	src/compat-libs/libsystemd-daemon.pc.in
 
-#@discard.mk -------------------------------------------------------------------
+#@build-aux/Makefile.once.head/20-systemd.mk -----------------------------------
 substitutions = \
        '|rootlibexecdir=$(rootlibexecdir)|' \
        '|rootbindir=$(rootbindir)|' \
@@ -6036,22 +6036,23 @@ substitutions = \
        '|binfmtdir=$(binfmtdir)|' \
        '|modulesloaddir=$(modulesloaddir)|'
 
-#@build-aux/Makefile.once.head/20-systemd.mk
 SED_PROCESS = \
 	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
 	$(SED) $(subst '|,-e 's|@,$(subst =,\@|,$(subst |',|g',$(substitutions)))) \
 		< $< > $@
 
-#@build-aux/Makefile.each.tail/20-systemd.mk
+#@discard.mk
 units/%: units/%.in
 	$(SED_PROCESS)
 
 man/%: man/%.in
 	$(SED_PROCESS)
 
+#@build-aux/Makefile.each.tail/20-systemd.mk
 sysctl.d/%: sysctl.d/%.in
 	$(SED_PROCESS)
 
+#@discard.mk
 %.pc: %.pc.in
 	$(SED_PROCESS)
 
@@ -6073,6 +6074,7 @@ shell-completion/%: shell-completion/%.in
 %.conf: %.conf.in
 	$(SED_PROCESS)
 
+#@build-aux/Makefile.each.tail/20-systemd.mk
 %.sh: %.sh.in
 	$(SED_PROCESS)
 	$(AM_V_GEN)chmod +x $@
@@ -6085,6 +6087,7 @@ src/%: src/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
 
+#@discard.mk
 sysusers.d/%: sysusers.d/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
@@ -6102,7 +6105,6 @@ units/user/%: units/user/%.m4 $(top_builddir)/config.status
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) -DFOR_USER=1 < $< > $@
 
-#@discard.mk
 if ENABLE_POLKIT
 nodist_polkitpolicy_DATA = \
 	$(polkitpolicy_files) \
