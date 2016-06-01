@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 
 #include "import-compress.h"
 #include "macro.h"

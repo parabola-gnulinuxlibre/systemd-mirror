@@ -27,7 +27,7 @@
 
 #define SD_JOURNAL_SUPPRESS_LOCATION
 
-#include "sd-journal.h"
+#include <systemd/sd-journal.h>
 
 #include "alloc-util.h"
 #include "fd-util.h"

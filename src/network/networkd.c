@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-daemon.h"
+#include <systemd/sd-daemon.h>
 
 #include "capability-util.h"
 #include "networkd.h"
