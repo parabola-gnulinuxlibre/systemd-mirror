@@ -96,7 +96,18 @@ set -e
 
 	mv -T {man,src/systemd-activate}/systemd-activate.xml
 
+	mv -T src/libsystemd/{src,}/libsystemd.pc.in
+	mv -T src/libsystemd/{src,}/libsystemd.sym
+	mv -T src/libsystemd/{src,}/.gitignore
+	mv -T src/libsystemd/{src,libsystemd-internal}
+
 	mkdir src/systemd-shutdown
+
+	mkdir build-aux
+	mkdir build-aux/Makefile.{once,each}.{head,tail}
+	touch build-aux/Makefile.{once,each}.{head,tail}/.gitignore
+
+	mkdir src/libsystemd/libsystemd-journal-internal
 )
 
 (
@@ -121,4 +132,10 @@ set -e
                 fi
         done < <(sed -r 's|^if (.*)|ifneq ($(\1),)|' <Makefile.am)
         rm .tmp.move.all
+)
+
+(
+	find src \( -name '*.h' -o -name '*.c' \) \
+	     -exec grep '#include "sd-' -l -- {} + |
+	    xargs -d $'\n' sed -ri 's|#include "(sd-[^"]*)"|#include <systemd/\1>|'
 )

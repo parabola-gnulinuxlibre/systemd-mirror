@@ -20,9 +20,13 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 systemd_reply_password_SOURCES = \
 	src/reply-password/reply-password.c
 
 systemd_reply_password_LDADD = \
 	libshared.la
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

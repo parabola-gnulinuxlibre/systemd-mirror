@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 noinst_LTLIBRARIES += \
 	libbus-proxy-core.la
 
@@ -73,3 +76,4 @@ bus-proxyd-set-cap-hook:
 INSTALL_EXEC_HOOKS += bus-proxyd-set-cap-hook
 endif
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

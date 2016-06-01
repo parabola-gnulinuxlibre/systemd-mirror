@@ -24,7 +24,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "sd-daemon.h"
+#include <systemd/sd-daemon.h>
 
 #include "alloc-util.h"
 #include "fd-util.h"

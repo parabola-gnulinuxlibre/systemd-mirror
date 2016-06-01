@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 ifneq ($(ENABLE_LOCALED),)
 systemd_localed_SOURCES = \
 	src/locale/localed.c
@@ -84,3 +87,4 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-localed.service.in
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

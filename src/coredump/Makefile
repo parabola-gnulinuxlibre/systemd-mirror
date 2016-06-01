@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 ifneq ($(ENABLE_COREDUMP),)
 systemd_coredump_SOURCES = \
 	src/coredump/coredump.c \
@@ -90,3 +93,4 @@ EXTRA_DIST += \
 	sysctl.d/50-coredump.conf.in \
 	units/systemd-coredump@.service.in
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 
 rootlibexec_PROGRAMS += \
 	systemd-activate
@@ -30,3 +33,4 @@ systemd_activate_SOURCES = \
 systemd_activate_LDADD = \
 	libshared.la
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

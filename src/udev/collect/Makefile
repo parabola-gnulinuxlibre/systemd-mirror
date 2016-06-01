@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 collect_SOURCES = \
 	src/udev/collect/collect.c
 
@@ -29,3 +32,4 @@ collect_LDADD = \
 udevlibexec_PROGRAMS += \
 	collect
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 #include "alloc-util.h"
 #include "dbus-job.h"

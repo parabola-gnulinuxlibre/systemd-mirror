@@ -32,8 +32,8 @@
 #include <sys/statvfs.h>
 #include <unistd.h>
 
-#include "sd-bus-protocol.h"
-#include "sd-bus.h"
+#include <systemd/sd-bus-protocol.h>
+#include <systemd/sd-bus.h>
 
 #include "alloc-util.h"
 #include "btrfs-util.h"

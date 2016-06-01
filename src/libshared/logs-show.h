@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#include "sd-journal.h"
+#include <systemd/sd-journal.h>
 
 #include "macro.h"
 #include "output-mode.h"

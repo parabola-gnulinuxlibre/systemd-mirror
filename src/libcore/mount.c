@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <sys/epoll.h>
 
-#include "sd-messages.h"
+#include <systemd/sd-messages.h>
 
 #include "alloc-util.h"
 #include "dbus-mount.h"

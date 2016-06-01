@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 ifneq ($(ENABLE_BINFMT),)
 systemd_binfmt_SOURCES = \
 	src/binfmt/binfmt.c
@@ -50,3 +53,4 @@ endif
 EXTRA_DIST += \
 	units/systemd-binfmt.service.in
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

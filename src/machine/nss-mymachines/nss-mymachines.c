@@ -20,8 +20,8 @@
 #include <netdb.h>
 #include <nss.h>
 
-#include "sd-bus.h"
-#include "sd-login.h"
+#include <systemd/sd-bus.h>
+#include <systemd/sd-login.h>
 
 #include "alloc-util.h"
 #include "bus-common-errors.h"

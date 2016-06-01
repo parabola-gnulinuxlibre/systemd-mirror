@@ -23,7 +23,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 #include "bus-error.h"
 #include "bus-util.h"

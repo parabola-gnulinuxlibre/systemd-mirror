@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 ifneq ($(ENABLE_RESOLVED),)
 
 systemd_resolved_SOURCES = \
@@ -202,3 +205,4 @@ EXTRA_DIST += \
 	units/systemd-resolved.service.m4.in \
 	src/resolve/resolved.conf.in
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

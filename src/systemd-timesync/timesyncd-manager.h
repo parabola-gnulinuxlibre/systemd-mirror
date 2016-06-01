@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-event.h"
-#include "sd-network.h"
-#include "sd-resolve.h"
+#include <systemd/sd-event.h>
+#include <systemd/sd-network.h>
+#include <systemd/sd-resolve.h>
 
 #include "list.h"
 #include "ratelimit.h"

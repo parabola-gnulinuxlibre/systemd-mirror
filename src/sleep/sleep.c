@@ -22,7 +22,7 @@
 #include <getopt.h>
 #include <stdio.h>
 
-#include "sd-messages.h"
+#include <systemd/sd-messages.h>
 
 #include "def.h"
 #include "fd-util.h"

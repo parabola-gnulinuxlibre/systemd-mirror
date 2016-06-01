@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 systemd_remount_fs_SOURCES = \
 	src/remount-fs/remount-fs.c \
 	src/core/mount-setup.c \
@@ -28,3 +31,4 @@ systemd_remount_fs_SOURCES = \
 systemd_remount_fs_LDADD = \
 	libshared.la
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

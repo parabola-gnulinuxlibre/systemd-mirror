@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <time.h>
 
-#include "sd-daemon.h"
+#include <systemd/sd-daemon.h>
 
 #include "alloc-util.h"
 #include "fd-util.h"

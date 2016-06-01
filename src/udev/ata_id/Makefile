@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 ata_id_SOURCES = \
 	src/udev/ata_id/ata_id.c
 
@@ -29,3 +32,4 @@ ata_id_LDADD = \
 udevlibexec_PROGRAMS += \
 	ata_id
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

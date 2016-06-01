@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 systemd_analyze_SOURCES = \
 	src/analyze/analyze.c \
 	src/analyze/analyze-verify.c \
@@ -33,3 +36,4 @@ systemd_analyze_CFLAGS = \
 systemd_analyze_LDADD = \
 	libcore.la
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -23,6 +23,9 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+noinst_LTLIBRARIES += \
+	libbasic.la
+
 libbasic_la_SOURCES = \
 	src/basic/missing.h \
 	src/basic/capability-util.c \

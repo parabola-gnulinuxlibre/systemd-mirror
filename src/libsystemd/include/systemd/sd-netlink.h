@@ -26,7 +26,7 @@
 #include <linux/rtnetlink.h>
 #include <linux/neighbour.h>
 
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 
 #include "_sd-common.h"
 

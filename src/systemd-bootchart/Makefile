@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 ifneq ($(ENABLE_BOOTCHART),)
 systemd_bootchart_SOURCES = \
 	src/bootchart/bootchart.c \
@@ -45,3 +48,4 @@ endif
 EXTRA_DIST += \
 	units/systemd-bootchart.service.in
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

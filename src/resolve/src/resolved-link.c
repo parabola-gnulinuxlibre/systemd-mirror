@@ -19,7 +19,7 @@
 
 #include <net/if.h>
 
-#include "sd-network.h"
+#include <systemd/sd-network.h>
 
 #include "alloc-util.h"
 #include "missing.h"

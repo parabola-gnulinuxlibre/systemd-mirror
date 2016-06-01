@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-daemon.h"
-#include "sd-event.h"
+#include <systemd/sd-daemon.h>
+#include <systemd/sd-event.h>
 
 #include "capability-util.h"
 #include "mkdir.h"

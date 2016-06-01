@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 #include "bus-util.h"
 #include "log.h"

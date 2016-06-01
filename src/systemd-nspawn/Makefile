@@ -21,7 +21,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
-include $(topsrcdir)/automake.head.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
 
 systemd_nspawn_SOURCES = \
 	src/nspawn/nspawn.c \
@@ -83,4 +83,4 @@ $(outdir)/loopback-setup.h: $(topsrcdir)/src/libcore/loopback-setup.h; $(CP) $< 
 
 $(outdir)/nspawn.o: $(outdir)/loopback-setup.h
 
-include $(topsrcdir)/automake.tail.mk
+include $(topsrcdir)/build-aux/Makefile.tail.mk

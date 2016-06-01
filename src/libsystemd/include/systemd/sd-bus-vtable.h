@@ -26,7 +26,7 @@ _SD_BEGIN_DECLARATIONS;
 
 typedef struct sd_bus_vtable sd_bus_vtable;
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 enum {
         _SD_BUS_VTABLE_START             = '<',

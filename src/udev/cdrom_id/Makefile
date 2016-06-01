@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 cdrom_id_SOURCES = \
 	src/udev/cdrom_id/cdrom_id.c
 
@@ -32,3 +35,4 @@ udevlibexec_PROGRAMS += \
 dist_udevrules_DATA += \
 	rules/60-cdrom_id.rules
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

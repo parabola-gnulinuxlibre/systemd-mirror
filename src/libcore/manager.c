@@ -35,8 +35,8 @@
 #include <libaudit.h>
 #endif
 
-#include "sd-daemon.h"
-#include "sd-messages.h"
+#include <systemd/sd-daemon.h>
+#include <systemd/sd-messages.h>
 
 #include "alloc-util.h"
 #include "audit-fd.h"

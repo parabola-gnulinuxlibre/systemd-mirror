@@ -20,7 +20,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-id128.h"
+#include <systemd/sd-id128.h>
 
 #include "_sd-common.h"
 

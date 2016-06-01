@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 mtd_probe_SOURCES =  \
 	src/udev/mtd_probe/mtd_probe.c \
 	src/udev/mtd_probe/mtd_probe.h \
@@ -31,3 +34,4 @@ dist_udevrules_DATA += \
 udevlibexec_PROGRAMS += \
 	mtd_probe
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

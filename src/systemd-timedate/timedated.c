@@ -21,9 +21,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "sd-bus.h"
-#include "sd-event.h"
-#include "sd-messages.h"
+#include <systemd/sd-bus.h>
+#include <systemd/sd-event.h>
+#include <systemd/sd-messages.h>
 
 #include "alloc-util.h"
 #include "bus-common-errors.h"

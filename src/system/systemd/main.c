@@ -35,8 +35,8 @@
 #include <valgrind/valgrind.h>
 #endif
 
-#include "sd-bus.h"
-#include "sd-daemon.h"
+#include <systemd/sd-bus.h>
+#include <systemd/sd-daemon.h>
 
 #include "alloc-util.h"
 #include "architecture.h"

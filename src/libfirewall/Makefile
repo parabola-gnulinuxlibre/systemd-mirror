@@ -21,10 +21,16 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
-include $(topsrcdir)/automake.head.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
+ifneq ($(HAVE_LIBIPTC),)
+noinst_LTLIBRARIES += \
+	libfirewall.la
 
 std.out_files = libfirewall.la
 CPPFLAGS += $(libbasic.CPPFLAGS) $(libiptc.CPPFLAGS)
 $(outdir)/libfirewall.la: $(outdir)/firewall-util.lo $(libiptc.DEPENDS)
 
-include $(topsrcdir)/automake.tail.mk
+endif
+
+include $(topsrcdir)/build-aux/Makefile.tail.mk

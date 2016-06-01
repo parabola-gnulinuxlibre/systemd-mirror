@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 systemd_boot_headers = \
 	src/boot/efi/util.h \
 	src/boot/efi/console.h \
@@ -122,3 +125,4 @@ test-efi: test-efi-disk.img
 
 EXTRA_DIST += test/test-efi-create-disk.sh
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

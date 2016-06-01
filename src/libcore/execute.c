@@ -48,7 +48,7 @@
 #include <sys/apparmor.h>
 #endif
 
-#include "sd-messages.h"
+#include <systemd/sd-messages.h>
 
 #include "af-list.h"
 #include "alloc-util.h"

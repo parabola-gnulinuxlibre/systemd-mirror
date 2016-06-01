@@ -21,7 +21,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
-include $(topsrcdir)/automake.head.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
 
 dist_bin_SCRIPTS = \
 	src/kernel-install/kernel-install
@@ -30,4 +30,4 @@ dist_kernelinstall_SCRIPTS = \
 	src/kernel-install/50-depmod.install \
 	src/kernel-install/90-loaderentry.install
 
-include $(topsrcdir)/automake.tail.mk
+include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 systemd_machine_id_setup_SOURCES = \
 	src/machine-id-setup/machine-id-setup-main.c \
 	src/core/machine-id-setup.c \
@@ -31,3 +34,4 @@ systemd_machine_id_setup_LDADD = \
 SYSINIT_TARGET_WANTS += \
 	systemd-machine-id-commit.service
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

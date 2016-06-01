@@ -28,7 +28,7 @@
 #include <unistd.h>
 #include <linux/sctp.h>
 
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 #include "alloc-util.h"
 #include "bus-error.h"
 #include "bus-util.h"

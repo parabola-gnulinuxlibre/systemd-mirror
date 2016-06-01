@@ -19,8 +19,8 @@
 
 #include <errno.h>
 
-#include "sd-id128.h"
-#include "sd-messages.h"
+#include <systemd/sd-id128.h>
+#include <systemd/sd-messages.h>
 
 #include "alloc-util.h"
 #include "async.h"

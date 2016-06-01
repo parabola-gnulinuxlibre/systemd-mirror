@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 scsi_id_SOURCES =\
 	src/udev/scsi_id/scsi_id.c \
 	src/udev/scsi_id/scsi_serial.c \
@@ -35,3 +38,4 @@ udevlibexec_PROGRAMS += \
 EXTRA_DIST += \
 	src/udev/scsi_id/README
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -23,16 +23,17 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-systemd_shutdown_SOURCES = \
-	src/core/umount.c \
-	src/core/umount.h \
-	src/core/shutdown.c \
-	src/core/mount-setup.c \
-	src/core/mount-setup.h \
-	src/core/killall.h \
-	src/core/killall.c
+test-libudev-sym.c: \
+		src/libudev/libudev.sym \
+		src/udev/udev.h
+	$(generate-sym-test)
 
-systemd_shutdown_LDADD = \
-	libshared.la
+nodist_test_libudev_sym_SOURCES = \
+	test-libudev-sym.c
+test_libudev_sym_CFLAGS = \
+	$(AM_CFLAGS) \
+	-Wno-deprecated-declarations
+test_libudev_sym_LDADD = \
+	libudev.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

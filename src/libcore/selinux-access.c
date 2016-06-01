@@ -29,7 +29,7 @@
 #include <libaudit.h>
 #endif
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 #include "alloc-util.h"
 #include "audit-fd.h"

@@ -44,7 +44,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "sd-journal.h"
+#include <systemd/sd-journal.h>
 
 #include "alloc-util.h"
 #include "bootchart.h"

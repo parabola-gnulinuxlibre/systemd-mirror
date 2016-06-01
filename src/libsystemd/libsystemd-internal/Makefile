@@ -21,7 +21,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
-include $(topsrcdir)/automake.head.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
 
 libsystemd_internal_la_SOURCES = \
 	src/systemd/sd-bus.h \
@@ -128,4 +128,4 @@ $(outdir)/libsystemd-internal.la: \
 	$(patsubst src/libsystemd/%.c,$(outdir)/%.lo,$(filter %.c,$(libsystemd_internal_la_SOURCES))) \
 	$(libbasic.DEPENDS) -lresolv
 
-include $(topsrcdir)/automake.tail.mk
+include $(topsrcdir)/build-aux/Makefile.tail.mk

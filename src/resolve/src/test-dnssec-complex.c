@@ -19,7 +19,7 @@
 
 #include <netinet/ip.h>
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 #include "af-list.h"
 #include "alloc-util.h"

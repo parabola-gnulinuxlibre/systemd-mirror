@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 
 typedef struct Server Server;
 

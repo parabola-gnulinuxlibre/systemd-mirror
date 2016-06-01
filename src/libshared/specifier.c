@@ -24,7 +24,7 @@
 #include <string.h>
 #include <sys/utsname.h>
 
-#include "sd-id128.h"
+#include <systemd/sd-id128.h>
 
 #include "alloc-util.h"
 #include "hostname-util.h"

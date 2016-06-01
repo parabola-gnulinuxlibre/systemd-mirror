@@ -21,7 +21,7 @@
 #include <poll.h>
 
 #include "libudev.h"
-#include "sd-daemon.h"
+#include <systemd/sd-daemon.h>
 
 #include "alloc-util.h"
 #include "escape.h"

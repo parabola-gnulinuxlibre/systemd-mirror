@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 v4l_id_SOURCES = \
 	src/udev/v4l_id/v4l_id.c
 
@@ -32,3 +35,4 @@ udevlibexec_PROGRAMS += \
 dist_udevrules_DATA += \
 	rules/60-persistent-v4l.rules
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk

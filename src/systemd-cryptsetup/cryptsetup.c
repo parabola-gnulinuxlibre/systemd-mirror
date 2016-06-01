@@ -23,7 +23,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#include "sd-device.h"
+#include <systemd/sd-device.h>
 
 #include "alloc-util.h"
 #include "ask-password-api.h"

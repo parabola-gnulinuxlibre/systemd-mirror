@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 
 #include "list.h"
 #include "unit-name.h"

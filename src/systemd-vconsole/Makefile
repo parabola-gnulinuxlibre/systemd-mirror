@@ -20,6 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
+
 ifneq ($(ENABLE_VCONSOLE),)
 systemd_vconsole_setup_SOURCES = \
 	src/vconsole/vconsole-setup.c
@@ -44,3 +47,4 @@ EXTRA_DIST += \
 	src/vconsole/90-vconsole.rules.in \
 	units/systemd-vconsole-setup.service.in
 
+include $(topsrcdir)/build-aux/Makefile.tail.mk
