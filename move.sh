@@ -140,7 +140,7 @@ fixup_includes() (
 
 fixup_makefile() {
 	sed -r \
-	    -e '/^[^#]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' \
+	    -e '/^[^#	]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' \
 	    -e 's|^if (.*)|ifneq ($(\1),)|'
 }
 
@@ -149,7 +149,7 @@ fixup_makefiles() (
 	    -e '/^	\$\(AM_V_at\)\$\(MKDIR_P\) \$\(dir \$@\)/d' \
 	    -e 's/ \$\(CFLAGS\) / /g' \
 	    -e 's/ \$\(CPPFLAGS\) / /g' \
-	    -e '/^[^#]*:/ { s|\S+/|$(outdir)/| }' \
+	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
 	    src/libbasic/Makefile
 )
 
