@@ -66,31 +66,16 @@ systemd_nspawn_LDADD += \
 	libfirewall.la
 endif
 
+bin_PROGRAMS += systemd-nspawn
 $(eval $(value automake2autothing))
-std.out_files = systemd-nspawn
-CPPFLAGS += $(libbasic.CPPFLAGS) $(libshared.CPPFLAGS) $(libsystemd.CPPFLAGS) $(libudev.CPPFLAGS) $(libblkid.CPPFLAGS)
-CPPFLAGS += -I$(topsrcdir)/src/libsystemd/src/sd-netlink -I$(topsrcdir)/src/libsystemd/src/sd-bus -I$(topsrcdir)/src/udev -I$(topsrcdir)/src/libudev/src
-CPPFLAGS += $(libblkid.CPPFLAGS) $(libseccomp.CPPFLAGS)
-ifneq ($(HAVE_LIBIPTC),)
-CPPFLAGS += $(libfirewall.CPPFLAGS)
-endif
-$(outdir)/systemd-nspawn: \
-	$(outdir)/nspawn.o \
-	$(outdir)/nspawn-settings.o \
-	$(outdir)/nspawn-mount.o \
-	$(outdir)/nspawn-network.o \
-	$(outdir)/nspawn-expose-ports.o \
-	$(outdir)/nspawn-cgroup.o \
-	$(outdir)/nspawn-register.o \
-	$(outdir)/nspawn-setuid.o \
-	$(outdir)/nspawn-stub-pid1.o \
-	$(outdir)/mount-setup.o \
-	$(outdir)/loopback-setup.o \
-	$(libshared.DEPENDS) $(libblkid.DEPENDS)
-ifneq ($(HAVE_LIBIPTC),)
-$(outdir)/systemd-nspawn: $(libfirewall.DEPENDS)
-endif
 
-$(outdir)/nspawn.o: $(outdir)/loopback-setup.h
+CPPFLAGS += $(libbasic.CPPFLAGS)
+CPPFLAGS += $(libshared.CPPFLAGS)
+CPPFLAGS += $(libsystemd.CPPFLAGS)
+CPPFLAGS += $(libudev.CPPFLAGS)
+CPPFLAGS += -I$(topsrcdir)/src/libsystemd/src/sd-netlink
+CPPFLAGS += -I$(topsrcdir)/src/libsystemd/src/sd-bus
+CPPFLAGS += -I$(topsrcdir)/src
+CPPFLAGS += /udev -I$(topsrcdir)/src/libudev/src
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
