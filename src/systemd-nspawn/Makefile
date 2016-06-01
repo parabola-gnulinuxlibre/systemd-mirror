@@ -76,11 +76,6 @@ ifneq ($(HAVE_LIBIPTC),)
 $(outdir)/systemd-nspawn: $(libfirewall.DEPENDS)
 endif
 
-$(outdir)/mount-setup.c: $(topsrcdir)/src/libcore/mount-setup.c; $(CP) $< $@
-$(outdir)/mount-setup.h: $(topsrcdir)/src/libcore/mount-setup.h; $(CP) $< $@
-$(outdir)/loopback-setup.c: $(topsrcdir)/src/libcore/loopback-setup.c; $(CP) $< $@
-$(outdir)/loopback-setup.h: $(topsrcdir)/src/libcore/loopback-setup.h; $(CP) $< $@
-
 $(outdir)/nspawn.o: $(outdir)/loopback-setup.h
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
