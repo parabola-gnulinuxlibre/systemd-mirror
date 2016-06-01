@@ -23,8 +23,8 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "sd-id128.h"
-#include "sd-journal.h"
+#include <systemd/sd-id128.h>
+#include <systemd/sd-journal.h>
 
 #include "hashmap.h"
 #include "journal-def.h"

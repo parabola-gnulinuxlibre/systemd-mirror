@@ -22,7 +22,7 @@
 
 #include <net/ethernet.h>
 
-#include "sd-lldp.h"
+#include <systemd/sd-lldp.h>
 
 #include "list.h"
 #include "lldp.h"

@@ -25,13 +25,13 @@
 #include <gcrypt.h>
 #endif
 
-#include "sd-id128.h"
+#include <systemd/sd-id128.h>
 
 #include "hashmap.h"
 #include "journal-def.h"
 #include "macro.h"
 #include "mmap-cache.h"
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 #include "sparse-endian.h"
 
 typedef struct JournalMetrics {

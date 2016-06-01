@@ -106,6 +106,8 @@ set -e
 	mkdir build-aux
 	mkdir build-aux/Makefile.{once,each}.{head,tail}
 	touch build-aux/Makefile.{once,each}.{head,tail}/.gitignore
+
+	mkdir src/libsystemd/libsystemd-journal-internal
 )
 
 (

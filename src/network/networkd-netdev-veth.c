@@ -20,7 +20,7 @@
 #include <net/if.h>
 #include <linux/veth.h>
 
-#include "sd-netlink.h"
+#include <systemd/sd-netlink.h>
 
 #include "networkd-netdev-veth.h"
 
