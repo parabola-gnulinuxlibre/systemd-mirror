@@ -23,20 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-audit_list_includes = -include linux/audit.h -include missing.h
-ifneq ($(HAVE_AUDIT),)
-audit_list_includes += -include libaudit.h
-endif
-
-$(outdir)/audit_type-list.txt:
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
-	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM $(audit_list_includes) - </dev/null | grep -vE 'AUDIT_.*(FIRST|LAST)_' | $(SED) -r -n 's/^#define\s+AUDIT_(\w+)\s+([0-9]{4})\s*$$/\1\t\2/p' | sort -k2 >$@
-
-$(outdir)/audit_type-to-name.h: src/journal/audit_type-list.txt
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
-	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
-
-
 $(outdir)/dns_type-list.txt: src/resolve/dns-type.h
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(SED) -n -r 's/.* DNS_TYPE_(\w+).*/\1/p' <$< >$@

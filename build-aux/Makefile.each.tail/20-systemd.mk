@@ -24,6 +24,10 @@
 -include $(outdir)/$(DEPDIR)/*.P*
 
 std.clean_files += *.o *.lo .deps/ .libs/
+std.clean_files += *-list.txt
+std.clean_files += *-from-name.gperf
+std.clean_files += *-from-name.h
+std.clean_files += *-to-name.h
 
 $(outdir)/%.o: $(srcdir)/%.c $(topoutdir)/config.h | $(outdir)/.deps
 	$(AM_V_CC)$(COMPILE)   -c -o $@ $<

@@ -99,7 +99,7 @@ libshared.CPPFLAGS     = -I$(topsrcdir)/src/libshared -I$(topoutdir)/src/libshar
 libshared.DEPENDS      =   $(topoutdir)/src/libshared/libshared.la
 libfirewall.CPPFLAGS   = -I$(topsrcdir)/src/libfirewall -I$(topoutdir)/src/libfirewall
 libfirewall.DEPENDS    =   $(topoutdir)/src/libfirewall/libfirewall.la
-libsystemd.CPPFLAGS    = -I$(topsrcdir)/src/libsystemd/include -I$(topoutdir)/src/libsystemd/include
+libsystemd.CPPFLAGS    = -I$(topsrcdir)/src/libsystemd/include
 libsystemd.DEPENDS     =   $(topoutdir)/src/libsystemd/libsystemd/libsystemd.la
 libsystemd-internal.CPPFLAGS = -I$(topsrcdir)/src/libsystemd/libsystemd-internal/include
 libsystemd-internal.DEPENDS  =   $(topoutdir)/src/libsystemd/libsystemd-internal/libsystemd-internal.la
@@ -221,6 +221,13 @@ HAVE_XZ = @HAVE_XZ_TRUE@1
 HAVE_ZLIB = @HAVE_ZLIB_TRUE@1
 
 LIBTOOLFLAGS = 
+
+pkgdatadir = $(datadir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkglibexecdir = $(libexecdir)/@PACKAGE@
+pkgpyexecdir = @pkgpyexecdir@
+pkgpythondir = @pkgpythondir@
 
 INTLTOOL_EXTRACT = @INTLTOOL_EXTRACT@
 INTLTOOL_MERGE = @INTLTOOL_MERGE@

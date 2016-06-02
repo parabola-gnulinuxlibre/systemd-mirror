@@ -21,6 +21,8 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
+SHELL = bash -o pipefail
+
 OUR_CPPFLAGS += -MT $@ -MD -MP -MF $(@D)/$(DEPDIR)/$(basename $(@F)).P$(patsubst .%,%,$(suffix $(@F)))
 OUR_CPPFLAGS += -include $(topoutdir)/config.h
 OUR_CPPFLAGS += $(if $(<D),-I$(<D)) -I$(@D)
