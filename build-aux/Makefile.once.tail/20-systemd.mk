@@ -22,13 +22,13 @@
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
 $(topsrcdir)/configure: $(topsrcdir)/configure.ac
-	cd $(@D) && autoreconf
+	cd $(topsrcdir) && ./autogen.sh
 $(topoutdir)/config.status: $(topsrcdir)/configure
-	cd $(@D) && $(abspath $<)
+	cd $(topoutdir) && ./config.status --recheck
 $(addprefix $(topoutdir)/,config.mk automake.mk autoconf.mk gnustandards.mk po/Makefile.in): $(topoutdir)/%: $(topoutdir)/config.status $(topsrcdir)/%.in
 	cd $(topoutdir) && ./config.status --file=$*
 $(addprefix $(topoutdir)/,config.h): $(topoutdir)/%: $(topoutdir)/config.status $(topsrcdir)/%.in
-	cd $(topoutdir) && ./config.status --file=$*
+	cd $(topoutdir) && ./config.status --header=$*
 
 # Let's run all tests of the test suite, but under valgrind. Let's
 # exclude perl/python/shell scripts we have in there
