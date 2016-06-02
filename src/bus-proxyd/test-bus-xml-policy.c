@@ -21,7 +21,7 @@
 #include <stddef.h>
 #include <unistd.h>
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 #include "alloc-util.h"
 #include "bus-xml-policy.h"
