@@ -3387,6 +3387,7 @@ tests += \
 	test-local-addresses \
 	test-resolve
 
+#@src/busctl/Makefile
 bin_PROGRAMS += \
 	busctl
 

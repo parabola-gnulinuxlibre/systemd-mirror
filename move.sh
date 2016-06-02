@@ -136,6 +136,8 @@ move_files() (
 	for file in "${libsystemd_journal_files[@]}"; do
 		mv -T src/{journal,libsystemd/libsystemd-journal-internal}/$file
 	done
+
+	mkdir src/busctl
 )
 
 breakup_makefile() (
