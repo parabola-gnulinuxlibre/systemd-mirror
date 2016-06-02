@@ -29,7 +29,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "sd-daemon.h"
+#include <systemd/sd-daemon.h>
 
 #include "alloc-util.h"
 #include "bus-internal.h"

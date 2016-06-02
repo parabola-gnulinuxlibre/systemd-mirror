@@ -28,9 +28,9 @@
 #include <elfutils/libdwfl.h>
 #endif
 
-#include "sd-journal.h"
-#include "sd-login.h"
-#include "sd-daemon.h"
+#include <systemd/sd-journal.h>
+#include <systemd/sd-login.h>
+#include <systemd/sd-daemon.h>
 
 #include "acl-util.h"
 #include "alloc-util.h"

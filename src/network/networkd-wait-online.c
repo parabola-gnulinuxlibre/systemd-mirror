@@ -20,7 +20,7 @@
 
 #include <getopt.h>
 
-#include "sd-daemon.h"
+#include <systemd/sd-daemon.h>
 
 #include "networkd-wait-online.h"
 #include "signal-util.h"
