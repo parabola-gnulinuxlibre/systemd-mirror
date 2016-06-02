@@ -4336,8 +4336,11 @@ libsystemd_journal_internal_la_LIBADD += \
 endif
 
 if HAVE_LZ4
+libsystemd_journal_internal_la_CFLAGS += \
+	$(LZ4_CFLAGS)
+
 libsystemd_journal_internal_la_LIBADD += \
-	-llz4
+	$(LZ4_LIBS)
 endif
 
 if HAVE_GCRYPT
@@ -5129,6 +5132,7 @@ systemd_pull_CFLAGS = \
 	$(LIBCURL_CFLAGS) \
 	$(XZ_CFLAGS) \
 	$(ZLIB_CFLAGS) \
+	$(BZIP2_CFLAGS) \
 	$(GCRYPT_CFLAGS) \
 	-D VENDOR_KEYRING_PATH=\"$(rootlibexecdir)/import-pubring.gpg\" \
 	-D USER_KEYRING_PATH=\"$(pkgsysconfdir)/import-pubring.gpg\"
@@ -5138,7 +5142,7 @@ systemd_pull_LDADD = \
 	$(LIBCURL_LIBS) \
 	$(XZ_LIBS) \
 	$(ZLIB_LIBS) \
-	-lbz2 \
+	$(BZIP2_LIBS) \
 	$(GCRYPT_LIBS)
 
 systemd_import_SOURCES = \
@@ -5157,13 +5161,14 @@ systemd_import_SOURCES = \
 systemd_import_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(XZ_CFLAGS) \
-	$(ZLIB_CFLAGS)
+	$(ZLIB_CFLAGS) \
+	$(BZIP2_CFLAGS)
 
 systemd_import_LDADD = \
 	libshared.la \
 	$(XZ_LIBS) \
 	$(ZLIB_LIBS) \
-	-lbz2
+	$(BZIP2_LIBS)
 
 systemd_export_SOURCES = \
 	src/import/export.c \
@@ -5179,13 +5184,14 @@ systemd_export_SOURCES = \
 systemd_export_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(XZ_CFLAGS) \
-	$(ZLIB_CFLAGS)
+	$(ZLIB_CFLAGS) \
+	$(BZIP2_CFLAGS)
 
 systemd_export_LDADD = \
 	libshared.la \
 	$(XZ_LIBS) \
 	$(ZLIB_LIBS) \
-	-lbz2
+	$(BZIP2_LIBS)
 
 dist_rootlibexec_DATA = \
 	src/import/import-pubring.gpg

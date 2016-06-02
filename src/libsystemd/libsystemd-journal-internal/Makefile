@@ -83,8 +83,11 @@ libsystemd_journal_internal_la_LIBADD += \
 endif
 
 ifneq ($(HAVE_LZ4),)
+libsystemd_journal_internal_la_CFLAGS += \
+	$(LZ4_CFLAGS)
+
 libsystemd_journal_internal_la_LIBADD += \
-	-llz4
+	$(LZ4_LIBS)
 endif
 
 ifneq ($(HAVE_GCRYPT),)
