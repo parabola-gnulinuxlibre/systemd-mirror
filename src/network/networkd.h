@@ -21,9 +21,9 @@
 
 #include <arpa/inet.h>
 
-#include "sd-bus.h"
-#include "sd-event.h"
-#include "sd-netlink.h"
+#include <systemd/sd-bus.h>
+#include <systemd/sd-event.h>
+#include <systemd/sd-netlink.h>
 
 #include "hashmap.h"
 #include "list.h"
