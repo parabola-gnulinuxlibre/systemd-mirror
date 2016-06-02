@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+
 $(outdir)/dns_type-list.txt: src/resolve/dns-type.h
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(SED) -n -r 's/.* DNS_TYPE_(\w+).*/\1/p' <$< >$@

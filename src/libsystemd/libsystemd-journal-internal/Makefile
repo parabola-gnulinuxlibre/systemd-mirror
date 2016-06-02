@@ -23,6 +23,17 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+audit_list_includes = -include linux/audit.h -include $(call at.path,$(topsrcdir)/src/libbasic/missing.h)
+ifneq ($(HAVE_AUDIT),)
+audit_list_includes += -include libaudit.h
+endif
+
+$(outdir)/audit_type-list.txt: $(call at.path,$(topsrcdir)/src/libbasic/missing.h)
+	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM $(audit_list_includes) - </dev/null | grep -vE 'AUDIT_.*(FIRST|LAST)_' | $(SED) -r -n 's/^#define\s+AUDIT_(\w+)\s+([0-9]{4})\s*$$/\1\t\2/p' | sort -k2 >$@
+
+$(outdir)/audit_type-to-name.h: $(outdir)/audit_type-list.txt
+	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
+
 pkginclude_HEADERS += \
 	src/systemd/sd-journal.h \
 	src/systemd/sd-messages.h \
@@ -94,17 +105,6 @@ endif
 
 noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la
-
-audit_list_includes = -include linux/audit.h -include $(call at.path,$(topsrcdir)/src/libbasic/missing.h)
-ifneq ($(HAVE_AUDIT),)
-audit_list_includes += -include libaudit.h
-endif
-
-$(outdir)/audit_type-list.txt: $(call at.path,$(topsrcdir)/src/libbasic/missing.h)
-	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM $(audit_list_includes) - </dev/null | grep -vE 'AUDIT_.*(FIRST|LAST)_' | $(SED) -r -n 's/^#define\s+AUDIT_(\w+)\s+([0-9]{4})\s*$$/\1\t\2/p' | sort -k2 >$@
-
-$(outdir)/audit_type-to-name.h: $(outdir)/audit_type-list.txt
-	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
 
 $(eval $(value automake2autothing))
 AM_CPPFLAGS += $(libbasic.CPPFLAGS)
