@@ -38,10 +38,13 @@ $(outdir)/%.lo: $(srcdir)/%.c $(topoutdir)/config.h | $(outdir)/.deps
 $(outdir)/.deps:
 	$(AM_V_at)$(MKDIR_P) $@
 
+_systemd.rpath = $(dir $(patsubst $(DESTDIR)%,%,$(filter %/$(@F),$(std.sys_files/$(@D)))))
+_systemd.patsubst-all = $(if $1,$(call _systemd.patsubst-all,$(wordlist 2,$(words $1),$1),$2,$(patsubst $(firstword $1),$2,$3)),$3)
+_systemd.link_files = $(filter %.o %.lo %.la,$^) $(call _systemd.patsubst-all,$(.LIBPATTERNS),-l%,$(filter $(.LIBPATTERNS),$(notdir $^)))
 $(outdir)/%.la:
-	$(AM_V_CCLD)$(LINK) $(filter-out .var%,$^)
+	$(AM_V_CCLD)$(LINK) $(if $(_systemd.rpath),-rpath $(_systemd.rpath)) $(_systemd.link_files)
 
-$(DESTDIR)$(libdir)/%.so: $(outdir)/%.la
+$(DESTDIR)$(libdir)/%.la: $(outdir)/%.la
 	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $< $(@D)
 
 $(outdir)/%-from-name.gperf: $(outdir)/%-list.txt

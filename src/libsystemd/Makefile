@@ -64,7 +64,7 @@ libsystemd_la_CFLAGS = \
 libsystemd_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
 	-version-info $(LIBSYSTEMD_CURRENT):$(LIBSYSTEMD_REVISION):$(LIBSYSTEMD_AGE) \
-	-Wl,--version-script=$(@D)/libsystemd.sym
+	-Wl,--version-script=$(srcdir)/libsystemd.sym
 
 libsystemd_la_LIBADD = \
 	$(libsystemd_internal_la_LIBADD) \
@@ -127,6 +127,9 @@ test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
 $(eval $(value automake2autothing))
+$(outdir)/libsystemd.la: $(srcdir)/libsystemd.sym
+$(outdir)/libsystemd.la: $(outdir)/libsystemd-internal/libsystemd-internal.la
+$(outdir)/libsystemd.la: $(outdir)/libsystemd-journal-internal/libsystemd-journal-internal.la
 at.subdirs += libsystemd-internal libsystemd-journal-internal
 #at.subdirs += compat-libs
 include $(topsrcdir)/build-aux/Makefile.tail.mk
