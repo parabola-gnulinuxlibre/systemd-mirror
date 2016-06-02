@@ -122,7 +122,7 @@ noinst_LTLIBRARIES += \
 
 automake_sources = $(patsubst src/libsystemd/%,$(outdir)/%,$(filter %.c,$($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
 $(eval $(value automake2autothing))
-_subdirs := $(patsubst %/,%,$(dir $(call automake_sources,libsystemd-internal.la)))
+_subdirs := $(notdir $(patsubst %/,%,$(dir $(call automake_sources,libsystemd-internal.la))))
 automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
 
 at.subdirs += $(_subdirs)

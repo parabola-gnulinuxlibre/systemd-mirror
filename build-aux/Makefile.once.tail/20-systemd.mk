@@ -23,12 +23,20 @@
 
 $(topsrcdir)/configure: $(topsrcdir)/configure.ac
 	cd $(topsrcdir) && ./autogen.sh
+	test -f $@
+	touch $@
 $(topoutdir)/config.status: $(topsrcdir)/configure
 	cd $(topoutdir) && ./config.status --recheck
+	test -f $@
+	touch $@
 $(addprefix $(topoutdir)/,config.mk automake.mk autoconf.mk gnustandards.mk po/Makefile.in): $(topoutdir)/%: $(topoutdir)/config.status $(topsrcdir)/%.in
 	cd $(topoutdir) && ./config.status --file=$*
+	test -f $@
+	touch $@
 $(addprefix $(topoutdir)/,config.h): $(topoutdir)/%: $(topoutdir)/config.status $(topsrcdir)/%.in
-	cd $(topoutdir) && ./config.status --header=$*
+	cd $(topoutdir) && ./config.status --header=$* || touch
+	test -f $@
+	touch $@
 
 # Let's run all tests of the test suite, but under valgrind. Let's
 # exclude perl/python/shell scripts we have in there

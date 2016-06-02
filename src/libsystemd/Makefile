@@ -274,5 +274,6 @@ test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
 $(eval $(value automake2autothing))
-at.subdirs += compat-libs libsystemd-internal libsystem-journal-internal
+at.subdirs += libsystemd-internal libsystemd-journal-internal
+#at.subdirs += compat-libs
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -191,7 +191,9 @@ define generate-sym-test
 	$(AM_V_at)printf 'return 0; }\n' >> $@
 endef
 
-at.dirlocal += noinst_LTLIBRARIES lib_LTLIBRARIES bin_PROGRAMS
+at.dirlocal += noinst_LTLIBRARIES lib_LTLIBRARIES
+at.dirlocal += bin_PROGRAMS
+at.dirlocal += pkgconfiglib_DATA
 automake_name = $(subst -,_,$(subst .,_,$1))
 automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
 automake_lo = $(patsubst %.c,%.lo,$(filter %.c,$(automake_sources)))
@@ -199,10 +201,15 @@ automake_o = $(patsubst %.c,%.o,$(filter %.c,$(automake_sources)))
 automake_libs = $($(automake_name)_LIBADD)
 
 define automake2autothing
-std.out_files += $(noinst_LTLIBRARIES) $(lib_LTLIBRARIES) $(notdir $(pkgconfiglib_DATA)) $(bin_PROGRAMS)
+std.out_files += $(noinst_LTLIBRARIES) $(lib_LTLIBRARIES)
 std.sys_files += $(addprefix $(libdir)/,$(lib_LTLIBRARIES))
+
+std.out_files += $(bin_PROGRAMS)
 std.sys_files += $(addprefix $(bindir)/,$(bin_PROGRAMS))
+
+std.out_files += $(notdir $(pkgconfiglib_DATA))
 std.sys_files += $(addprefix $(pkgconfiglibdir)/,$(notdir $(lib_pkgconfiglib_DATA)))
+
 $(foreach n,$(call automake_name,$(std.out_files)),\
   $(eval $n_SOURCES ?=)\
   $(eval nodist_$n_SOURCES ?=)\
