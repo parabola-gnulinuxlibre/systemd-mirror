@@ -106,6 +106,36 @@ move_files() (
 	touch build-aux/Makefile.{once,each}.{head,tail}/.gitignore
 
 	mkdir src/libsystemd/libsystemd-journal-internal
+
+	libsystemd_journal_files=(
+		audit-type.c
+		audit-type.h
+		catalog.c
+		catalog.h
+		compress.c
+		compress.h
+		fsprg.c
+		fsprg.h
+		journal-authenticate.c
+		journal-authenticate.h
+		journal-def.h
+		journal-file.c
+		journal-file.h
+		journal-internal.h
+		journal-send.c
+		journal-vacuum.c
+		journal-vacuum.h
+		journal-verify.c
+		journal-verify.h
+		lookup3.c
+		lookup3.h
+		mmap-cache.c
+		mmap-cache.h
+		sd-journal.c
+	)
+	for file in "${libsystemd_journal_files[@]}"; do
+		mv -T src/{journal,libsystemd/libsystemd-journal-internal}/$file
+	done
 )
 
 breakup_makefile() (
