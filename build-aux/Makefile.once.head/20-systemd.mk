@@ -23,6 +23,7 @@
 
 OUR_CPPFLAGS += -MT $@ -MD -MP -MF $(@D)/$(DEPDIR)/$(basename $(@F)).P$(patsubst .%,%,$(suffix $(@F)))
 OUR_CPPFLAGS += -include $(topoutdir)/config.h
+OUR_CPPFLAGS += $(if $(<D),-I$(<D)) -I$(@D)
 
 at.dirlocal += AM_CFLAGS AM_CPPFLAGS AM_LDFLAGS AM_LIBTOOLFLAGS
 ALL_CFLAGS = $(OUR_CFLAGS) $(AM_CFLAGS/$(@D)) $(CFLAGS)

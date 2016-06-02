@@ -265,8 +265,8 @@ $(outdir)/arphrd-from-name.gperf: $(outdir)/arphrd-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct arphrd_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { printf "%s, ARPHRD_%s\n", $$1, $$1 }' <$< >$@
 
 
-$(outdir)/cap-list.txt:
-	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM -include linux/capability.h -include missing.h - </dev/null | $(AWK) '/^#define[ \t]+CAP_[A-Z_]+[ \t]+/ { print $$2; }' | grep -v CAP_LAST_CAP >$@
+$(outdir)/cap-list.txt: $(srcdir)/missing.h
+	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM -include linux/capability.h -include $< - </dev/null | $(AWK) '/^#define[ \t]+CAP_[A-Z_]+[ \t]+/ { print $$2; }' | grep -v CAP_LAST_CAP >$@
 
 $(outdir)/cap-to-name.h: $(outdir)/cap-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "static const char* const capability_names[] = { "} { printf "[%s] = \"%s\",\n", $$1, tolower($$1) } END{print "};"}' <$< >$@

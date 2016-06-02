@@ -40,11 +40,11 @@ $(outdir)/%.la:
 $(DESTDIR)$(libdir)/%.so: $(outdir)/%.la
 	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $< $(@D)
 
-$(outdir)/%-from-name.gperf: $(srcdir)/%-list.txt
+$(outdir)/%-from-name.gperf: $(outdir)/%-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct $(notdir $*)_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { printf "%s, %s\n", $$1, $$1 }' <$< >$@
 
-$(outdir)/%-from-name.h: $(srcdir)/%-from-name.gperf
+$(outdir)/%-from-name.h: $(outdir)/%-from-name.gperf
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 

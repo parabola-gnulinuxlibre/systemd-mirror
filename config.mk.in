@@ -31,8 +31,8 @@ MAKEFLAGS += --warn-undefined-variables
 include $(topsrcdir)/build-aux/no-builtin-variables.mk
 .LIBPATTERNS = lib%.so lib%.a
 
-include $(topsrcdir)/gnustandards.mk
-include $(topsrcdir)/autoconf.mk
+include $(topoutdir)/gnustandards.mk
+include $(topoutdir)/autoconf.mk
 
 CCLD = $(CC)
 
