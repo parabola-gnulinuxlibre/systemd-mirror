@@ -1430,7 +1430,7 @@ src/basic/cap-from-name.h: src/basic/cap-from-name.gperf
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_capability -H hash_capability_name -p -C <$< >$@
 
-#@src/journal/Makefile
+#@src/libsystemd/libsystemd-journal-internal/Makefile
 audit_list_includes = -include linux/audit.h -include missing.h
 if HAVE_AUDIT
 audit_list_includes += -include libaudit.h
@@ -1444,6 +1444,7 @@ src/journal/audit_type-to-name.h: src/journal/audit_type-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
 
+#@src/journal/Makefile
 
 src/resolve/dns_type-list.txt: src/resolve/dns-type.h
 	$(AM_V_at)$(MKDIR_P) $(dir $@)

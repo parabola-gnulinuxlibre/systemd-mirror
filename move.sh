@@ -184,7 +184,8 @@ fixup_makefiles() (
 	    -e 's/ \$\(CPPFLAGS\) / /g' \
 	    -e 's/ \$\(AM_CPPFLAGS\) / $(ALL_CPPFLAGS) /g' \
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
-	    src/libbasic/Makefile
+	    src/libbasic/Makefile \
+	    src/libsystemd/libsystemd-journal-internal/Makefile
 )
 
 move() (
