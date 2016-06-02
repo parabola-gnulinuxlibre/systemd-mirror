@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 #include "bus-error.h"
 #include "bus-util.h"

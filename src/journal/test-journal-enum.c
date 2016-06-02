@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 
-#include "sd-journal.h"
+#include <systemd/sd-journal.h>
 
 #include "journal-internal.h"
 #include "log.h"
