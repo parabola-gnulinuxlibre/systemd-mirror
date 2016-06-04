@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-audit_list_includes = -include linux/audit.h -include $(call at.path,$(topsrcdir)/src/libbasic/missing.h)
+audit_list_includes = -include linux/audit.h -include $(topsrcdir)/src/libbasic/missing.h
 ifneq ($(HAVE_AUDIT),)
 audit_list_includes += -include libaudit.h
 endif

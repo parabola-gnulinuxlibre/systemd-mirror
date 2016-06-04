@@ -198,7 +198,7 @@ automake_name = $(subst -,_,$(subst .,_,$1))
 automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
 automake_lo = $(patsubst %.c,%.lo,$(filter %.c,$(automake_sources)))
 automake_o = $(patsubst %.c,%.o,$(filter %.c,$(automake_sources)))
-automake_libs = $($(automake_name)_LIBADD)
+automake_libs = $($(automake_name)_LIBADD) $($(automake_name)_LDADD)
 
 define automake2autothing
 std.out_files += $(noinst_LTLIBRARIES) $(lib_LTLIBRARIES)
@@ -218,8 +218,13 @@ $(foreach n,$(call automake_name,$(std.out_files)),\
   $(eval $n_LDFLAGS ?=)\
   $(eval $n_LIBADD ?=))
 $(foreach t,$(filter %.la,$(std.out_files)),\
-	$(eval $(outdir)/$t: $(call automake_lo,$t) $(call automake_libs,$t) )\
-	$(eval AM_CFLAGS += $($(call automake_name,$t)_CFLAGS)               )\
-	$(eval AM_CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS)           )\
-	$(eval AM_LDFLAGS += $($(call automake_name,$t)_LDFLAGS)             ))
+	$(eval $(outdir)/$t: $(call at.path,$(call automake_lo,$t) $(call automake_libs,$t)) )\
+	$(eval AM_CFLAGS += $($(call automake_name,$t)_CFLAGS)                               )\
+	$(eval AM_CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS)                           )\
+	$(eval AM_LDFLAGS += $($(call automake_name,$t)_LDFLAGS)                             ))
+$(foreach t,$(bin_PROGRAMS),\
+	$(eval $(outdir)/$t: $(call at.path,$(call automake_o,$t) $(call automake_libs,$t))  )\
+	$(eval AM_CFLAGS += $($(call automake_name,$t)_CFLAGS)                               )\
+	$(eval AM_CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS)                           )\
+	$(eval AM_LDFLAGS += $($(call automake_name,$t)_LDFLAGS)                             ))
 endef

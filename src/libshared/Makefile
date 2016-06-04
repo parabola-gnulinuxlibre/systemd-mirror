@@ -130,18 +130,19 @@ libshared_la_CFLAGS = \
 	$(SECCOMP_CFLAGS)
 
 libshared_la_LIBADD = \
-	libsystemd-internal.la \
-	libsystemd-journal-internal.la \
+	$(topoutdir)/src/libsystemd/libsystemd-internal/libsystemd-internal.la \
+	$(topoutdir)/src/libsystemd/libsystemd-journal-internal/libsystemd-journal-internal.la \
 	libudev-internal.la \
 	$(ACL_LIBS) \
 	$(LIBIDN_LIBS) \
 	$(SECCOMP_LIBS)
 
 $(eval $(value automake2autothing))
-at.depdirs +=
+at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-internal
+at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-journal-internal
 AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
 AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
-AM_CPPFLAGS += -I$(topsrcdir)/src/journal
 
 AM_CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 AM_CPPFLAGS += -DSYSTEM_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/system\"
