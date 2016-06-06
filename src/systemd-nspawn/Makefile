@@ -58,24 +58,23 @@ systemd_nspawn_CFLAGS = \
 	$(SECCOMP_CFLAGS)
 
 systemd_nspawn_LDADD = \
-	$(topoutdir)/libshared/libshared.la \
+	$(topoutdir)/src/libshared/libshared.la \
 	$(BLKID_LIBS)
 
 ifneq ($(HAVE_LIBIPTC),)
 systemd_nspawn_LDADD += \
-	$(topoutdir)/libfirewall/libfirewall.la
+	$(topoutdir)/src/libfirewall/libfirewall.la
 endif
 
 bin_PROGRAMS += systemd-nspawn
 $(eval $(value automake2autothing))
 at.depdirs += $(topoutdir)/src/libshared $(if $(HAVE_LIBIPTC),$(topoutdir)/src/libfirewall)
-CPPFLAGS += $(libbasic.CPPFLAGS)
-CPPFLAGS += $(libshared.CPPFLAGS)
-CPPFLAGS += $(libsystemd.CPPFLAGS)
-CPPFLAGS += $(libfirewall.CPPFLAGS)
-CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-netlink
-CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
-CPPFLAGS += -I$(topsrcdir)/src/udev
-CPPFLAGS += -I$(topsrcdir)/src/libudev/src
+AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+AM_CPPFLAGS += $(libshared.CPPFLAGS)
+AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
+AM_CPPFLAGS += $(libfirewall.CPPFLAGS)
+AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-netlink
+AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
+AM_CPPFLAGS += -I$(topsrcdir)/src/libudev/src
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

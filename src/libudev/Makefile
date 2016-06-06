@@ -23,20 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-test-libudev-sym.c: \
-		src/libudev/libudev.sym \
-		src/udev/udev.h
-	$(generate-sym-test)
-
-nodist_test_libudev_sym_SOURCES = \
-	test-libudev-sym.c
-test_libudev_sym_CFLAGS = \
-	$(AM_CFLAGS) \
-	-Wno-deprecated-declarations
-test_libudev_sym_LDADD = \
-	libudev.la
-
-$(eval $(value automake2autothing))
 at.subdirs += src
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
