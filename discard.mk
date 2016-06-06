@@ -1124,6 +1124,29 @@ dist-check-help: $(bin_PROGRAMS) $(bin_PROGRAMS)
 	        exit 1;                                                        \
             fi; done
 
+.PHONY: built-sources
+built-sources: $(BUILT_SOURCES)
+
+.PHONY: git-tag
+git-tag:
+	git tag -s "v$(VERSION)" -m "systemd $(VERSION)"
+
+.PHONY: git-tar
+git-tar:
+	git archive --format=tar --prefix=systemd-$(VERSION)/ HEAD | gzip > systemd-$(VERSION).tar.gz
+
+www_target = www.freedesktop.org:/srv/www.freedesktop.org/www/software/systemd
+
+.PHONY: doc-sync
+doc-sync: all
+	rsync -rlv --delete-excluded --include="*.html" --exclude="*" --omit-dir-times man/ $(www_target)/man/
+
+.PHONY: install-tree
+install-tree: all
+	rm -rf $(abs_srcdir)/install-tree
+	$(MAKE) install DESTDIR=$(abs_srcdir)/install-tree
+	tree $(abs_srcdir)/install-tree
+
 BUILT_SOURCES += \
 	test-libsystemd-sym.c \
 	test-libudev-sym.c
