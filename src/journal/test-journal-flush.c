@@ -19,7 +19,7 @@
 
 #include <fcntl.h>
 
-#include "sd-journal.h"
+#include <systemd/sd-journal.h>
 
 #include "alloc-util.h"
 #include "journal-file.h"
