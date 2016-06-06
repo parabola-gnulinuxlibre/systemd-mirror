@@ -6366,7 +6366,7 @@ hwdb-update:
 	wget -O ma-small.txt 'http://standards.ieee.org/develop/regauth/oui36/oui36.txt' && \
 	./ids-update.pl )
 
-#@Makefile
+#@discard.mk
 .PHONY: built-sources
 built-sources: $(BUILT_SOURCES)
 
@@ -6469,7 +6469,7 @@ test-libsystemd-sym.c: \
 		src/systemd/sd-event.h
 	$(generate-sym-test)
 
-#@src/libudev/Makefile
+#@src/libudev/src/Makefile
 test-libudev-sym.c: \
 		src/libudev/libudev.sym \
 		src/udev/udev.h
@@ -6481,7 +6481,7 @@ nodist_test_libsystemd_sym_SOURCES = \
 test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
-#@src/libudev/Makefile
+#@src/libudev/src/Makefile
 nodist_test_libudev_sym_SOURCES = \
 	test-libudev-sym.c
 test_libudev_sym_CFLAGS = \
