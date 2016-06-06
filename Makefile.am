@@ -6510,7 +6510,7 @@ hwdb-update:
 	./acpi-update.py > 20-acpi-vendor.hwdb.base && \
 	patch -p0 -o- 20-acpi-vendor.hwdb.base < 20-acpi-vendor.hwdb.patch > 20-acpi-vendor.hwdb )
 
-#@Makefile
+#@discard.mk
 .PHONY: built-sources
 built-sources: $(BUILT_SOURCES)
 
@@ -6613,7 +6613,7 @@ test-libsystemd-sym.c: \
 		src/systemd/sd-event.h
 	$(generate-sym-test)
 
-#@src/libudev/Makefile
+#@src/libudev/src/Makefile
 test-libudev-sym.c: \
 		src/libudev/libudev.sym \
 		src/udev/udev.h
@@ -6625,7 +6625,7 @@ nodist_test_libsystemd_sym_SOURCES = \
 test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
-#@src/libudev/Makefile
+#@src/libudev/src/Makefile
 nodist_test_libudev_sym_SOURCES = \
 	test-libudev-sym.c
 test_libudev_sym_CFLAGS = \
