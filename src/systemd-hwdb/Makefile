@@ -66,7 +66,7 @@ INSTALL_DATA_HOOKS += \
 
 hwdb-remove-hook:
 	-test -n "$(DESTDIR)" || rm -f /etc/udev/hwdb.bin
-endif
+endif # ENABLE_HWDB
 
 EXTRA_DIST += \
 	units/systemd-hwdb-update.service.in \

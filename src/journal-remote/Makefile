@@ -52,12 +52,12 @@ systemd_journal_remote_LDADD += \
 ifneq ($(ENABLE_TMPFILES),)
 dist_tmpfiles_DATA += \
 	tmpfiles.d/systemd-remote.conf
-endif
+endif # ENABLE_TMPFILES
 
 ifneq ($(HAVE_GNUTLS),)
 systemd_journal_remote_LDADD += \
 	$(GNUTLS_LIBS)
-endif
+endif # HAVE_GNUTLS
 
 # systemd-journal-remote make sense mostly with full crypto stack
 dist_systemunit_DATA += \
@@ -80,7 +80,7 @@ EXTRA_DIST += \
 	units/systemd-journal-remote.service.in \
 	src/journal-remote/journal-remote.conf.in \
 	src/journal-remote/log-generator.py
-endif
+endif # HAVE_MICROHTTPD
 
 ifneq ($(HAVE_LIBCURL),)
 libexec_PROGRAMS += \
@@ -104,7 +104,7 @@ nodist_systemunit_DATA += \
 
 nodist_pkgsysconf_DATA += \
 	src/journal-remote/journal-upload.conf
-endif
+endif # HAVE_LIBCURL
 
 EXTRA_DIST += \
 	units/systemd-journal-upload.service.in \

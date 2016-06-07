@@ -26,7 +26,7 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 audit_list_includes = -include linux/audit.h -include $(topsrcdir)/src/libbasic/missing.h
 ifneq ($(HAVE_AUDIT),)
 audit_list_includes += -include libaudit.h
-endif
+endif # HAVE_AUDIT
 
 $(outdir)/audit_type-list.txt: $(call at.path,$(topsrcdir)/src/libbasic/missing.h)
 	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM $(audit_list_includes) - </dev/null | grep -vE 'AUDIT_.*(FIRST|LAST)_' | $(SED) -r -n 's/^#define\s+AUDIT_(\w+)\s+([0-9]{4})\s*$$/\1\t\2/p' | sort -k2 >$@
@@ -80,7 +80,7 @@ libsystemd_journal_internal_la_CFLAGS += \
 
 libsystemd_journal_internal_la_LIBADD += \
 	$(XZ_LIBS)
-endif
+endif # HAVE_XZ
 
 ifneq ($(HAVE_LZ4),)
 libsystemd_journal_internal_la_CFLAGS += \
@@ -88,7 +88,7 @@ libsystemd_journal_internal_la_CFLAGS += \
 
 libsystemd_journal_internal_la_LIBADD += \
 	$(LZ4_LIBS)
-endif
+endif # HAVE_LZ4
 
 ifneq ($(HAVE_GCRYPT),)
 libsystemd_journal_internal_la_SOURCES += \
@@ -104,7 +104,7 @@ libsystemd_journal_internal_la_LIBADD += \
 libsystemd_journal_internal_la_CFLAGS += \
 	$(GCRYPT_CFLAGS) \
 	-Wno-pointer-arith
-endif
+endif # HAVE_GCRYPT
 
 noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la

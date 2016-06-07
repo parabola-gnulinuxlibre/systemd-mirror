@@ -65,7 +65,7 @@ liblogind_core_la_LIBADD = \
 ifneq ($(HAVE_ACL),)
 liblogind_core_la_SOURCES += \
 	src/login/logind-acl.c
-endif
+endif # HAVE_ACL
 
 noinst_LTLIBRARIES += \
 	liblogind-core.la
@@ -161,7 +161,7 @@ dist_pamconf_DATA = \
 
 EXTRA_DIST += \
 	src/login/systemd-user.m4
-endif
+endif # HAVE_PAM
 
 nodist_systemunit_DATA += \
 	units/systemd-logind.service
@@ -204,7 +204,7 @@ nodist_udevrules_DATA += \
 	src/login/71-seat.rules \
 	src/login/73-seat-late.rules
 
-endif
+endif # ENABLE_LOGIND
 
 polkitpolicy_in_files += \
 	src/login/org.freedesktop.login1.policy.in
@@ -235,7 +235,7 @@ nodist_systemunit_DATA += \
 MULTI_USER_TARGET_WANTS += \
 	systemd-user-sessions.service
 
-endif
+endif # HAVE_PAM
 
 EXTRA_DIST += \
 	units/systemd-user-sessions.service.in

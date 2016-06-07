@@ -58,7 +58,6 @@ move_files() (
 		reply-password
 		rfkill
 		run
-		timedate
 		timesync
 		tmpfiles
 		tty-ask-password-agent
@@ -177,6 +176,11 @@ move_files() (
 	mv  src/{libbus-proxy-core,systemd-bus-proxyd}/bus-proxyd.c
 	mkdir src/systemd-stdio-bridge
 	mv  src/{libbus-proxy-core,systemd-stdio-bridge}/stdio-bridge.c
+
+	mkdir src/grp-timedate
+	mv -T src/timedate src/grp-timedate/systemd-timedated
+	mkdir src/grp-timedate/timedatectl
+	mv -T src/grp-timedate/{systemd-timedated,timedatectl}/timedatectl.c
 )
 
 breakup_makefile() (

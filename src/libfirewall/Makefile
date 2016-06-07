@@ -37,7 +37,7 @@ libfirewall_la_CFLAGS = \
 
 libfirewall_la_LIBADD = \
 	$(LIBIPTC_LIBS)
-endif
+endif # HAVE_LIBIPTC
 
 $(eval $(value automake2autothing))
 AM_CPPFLAGS += $(libbasic.CPPFLAGS)

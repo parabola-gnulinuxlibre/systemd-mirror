@@ -141,12 +141,12 @@ libudev_core_la_SOURCES += \
 
 dist_udevrules_DATA += \
 	rules/80-drivers.rules
-endif
+endif # HAVE_KMOD
 
 ifneq ($(HAVE_BLKID),)
 libudev_core_la_SOURCES += \
 	src/udev/udev-builtin-blkid.c
-endif
+endif # HAVE_BLKID
 
 ifneq ($(HAVE_ACL),)
 libudev_core_la_SOURCES += \
@@ -154,7 +154,7 @@ libudev_core_la_SOURCES += \
 	src/login/logind-acl.c \
 	src/libsystemd/sd-login/sd-login.c \
 	src/systemd/sd-login.h
-endif
+endif # HAVE_ACL
 
 systemd_udevd_SOURCES = \
 	src/udev/udevd.c

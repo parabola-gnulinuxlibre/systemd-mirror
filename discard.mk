@@ -62,15 +62,15 @@ TESTS = $(tests)
 else
 noinst_PROGRAMS =
 TESTS =
-endif
+endif # ENABLE_TESTS
 ifneq ($(ENABLE_BASH_COMPLETION),)
 dist_bashcompletion_DATA = $(dist_bashcompletion_data)
 nodist_bashcompletion_DATA = $(nodist_bashcompletion_data)
-endif
+endif # ENABLE_BASH_COMPLETION
 ifneq ($(ENABLE_ZSH_COMPLETION),)
 dist_zshcompletion_DATA = $(dist_zshcompletion_data)
 nodist_zshcompletion_DATA = $(nodist_zshcompletion_data)
-endif
+endif # ENABLE_ZSH_COMPLETION
 udevlibexec_PROGRAMS =
 gperf_gperf_sources =
 
@@ -297,7 +297,7 @@ libexec_PROGRAMS = \
 ifneq ($(HAVE_UTMP),)
 libexec_PROGRAMS += \
 	systemd-update-utmp
-endif
+endif # HAVE_UTMP
 
 systemgenerator_PROGRAMS = \
 	systemd-getty-generator \
@@ -453,7 +453,7 @@ ifneq ($(HAVE_UTMP),)
 nodist_systemunit_DATA += \
 	units/systemd-update-utmp.service \
 	units/systemd-update-utmp-runlevel.service
-endif
+endif # HAVE_UTMP
 
 dist_userunit_DATA = \
 	units/user/basic.target \
@@ -510,7 +510,7 @@ nodist_systemunit_DATA += \
 systemgenerator_PROGRAMS += \
 	systemd-sysv-generator \
 	systemd-rc-local-generator
-endif
+endif # HAVE_SYSV_COMPAT
 
 EXTRA_DIST += \
 	src/systemctl/systemd-sysv-install.SKELETON \
@@ -577,7 +577,7 @@ noinst_DATA += \
 	$(HTML_FILES) \
 	$(HTML_ALIAS) \
 	docs/html/man
-endif
+endif # ENABLE_MANPAGES
 
 CLEANFILES += \
 	$(man_MANS) \
@@ -595,7 +595,7 @@ $(outdir)/index.html: man/systemd.index.html
 ifneq ($(HAVE_PYTHON),)
 noinst_DATA += \
 	man/index.html
-endif
+endif # HAVE_PYTHON
 
 CLEANFILES += \
 	man/index.html
@@ -638,7 +638,7 @@ dist_systemunit_DATA += \
 
 SYSINIT_TARGET_WANTS += \
 	ldconfig.service
-endif
+endif # ENABLE_LDCONFIG
 
 gperf_gperf_m4_sources = \
 	src/core/load-fragment-gperf.gperf.m4
@@ -704,7 +704,7 @@ coverage-sync: coverage
 else
 lcov-run lcov-report:
 	echo "Need to reconfigure with --enable-coverage"
-endif
+endif # ENABLE_COVERAGE
 
 dist_factory_etc_DATA = \
 	factory/etc/nsswitch.conf
@@ -713,7 +713,7 @@ ifneq ($(HAVE_PAM),)
 dist_factory_pam_DATA = \
 	factory/etc/pam.d/system-auth \
 	factory/etc/pam.d/other
-endif
+endif # HAVE_PAM
 
 libsystemd-install-hook:
 	libname=libsystemd.so && $(move-to-libdir)
@@ -752,9 +752,9 @@ TESTS += \
 ifneq ($(HAVE_SYSV_COMPAT),)
 TESTS += \
 	test/sysv-generator-test.py
-endif
-endif
-endif
+endif # HAVE_SYSV_COMPAT
+endif # HAVE_PYTHON
+endif # ENABLE_TESTS
 
 manual_tests += \
 	test-libudev \
@@ -777,7 +777,7 @@ test_udev_LDADD = \
 ifneq ($(ENABLE_TESTS),)
 check_DATA += \
 	test/sys
-endif
+endif # ENABLE_TESTS
 
 # packed sysfs test tree
 $(outdir)/sys:
@@ -880,7 +880,7 @@ ifneq ($(ENABLE_POLKIT),)
 nodist_polkitpolicy_DATA = \
 	$(polkitpolicy_files) \
 	$(polkitpolicy_in_in_files:.policy.in.in=.policy)
-endif
+endif # ENABLE_POLKIT
 
 EXTRA_DIST += \
 	$(polkitpolicy_in_files) \
@@ -956,7 +956,7 @@ $(outdir)/README: docs/var-log/README.in
 CLEANFILES += \
 	docs/sysvinit/README \
 	docs/var-log/README
-endif
+endif # HAVE_SYSV_COMPAT
 
 EXTRA_DIST += \
 	docs/sysvinit/README.in \
@@ -973,11 +973,11 @@ GRAPHICAL_TARGET_WANTS += \
 	systemd-update-utmp-runlevel.service
 RESCUE_TARGET_WANTS += \
 	systemd-update-utmp-runlevel.service
-endif
+endif # HAVE_SYSV_COMPAT
 
 SYSINIT_TARGET_WANTS += \
 	systemd-update-utmp.service
-endif
+endif # HAVE_UTMP
 
 SYSINIT_TARGET_WANTS += \
 	systemd-update-done.service
@@ -1009,7 +1009,7 @@ SYSTEM_UNIT_ALIASES += \
 	multi-user.target runlevel4.target \
 	graphical.target runlevel5.target \
 	reboot.target runlevel6.target
-endif
+endif # HAVE_SYSV_COMPAT
 
 SYSTEM_UNIT_ALIASES += \
 	graphical.target default.target \
@@ -1042,7 +1042,7 @@ INSTALL_DIRS += \
 	$(systemunitdir)/runlevel3.target.wants \
 	$(systemunitdir)/runlevel4.target.wants \
 	$(systemunitdir)/runlevel5.target.wants
-endif
+endif # HAVE_SYSV_COMPAT
 
 INSTALL_DIRS += \
 	$(prefix)/lib/modules-load.d \
@@ -1098,7 +1098,7 @@ else
 DISTCHECK_CONFIGURE_FLAGS += \
 	--with-sysvinit-path= \
 	--with-sysvrcnd-path=
-endif
+endif # HAVE_SYSV_COMPAT
 
 ifneq ($(ENABLE_SPLIT_USR),)
 DISTCHECK_CONFIGURE_FLAGS += \
@@ -1106,7 +1106,7 @@ DISTCHECK_CONFIGURE_FLAGS += \
 else
 DISTCHECK_CONFIGURE_FLAGS += \
 	--disable-split-usr
-endif
+endif # ENABLE_SPLIT_USR
 
 .PHONY: dist-check-help
 

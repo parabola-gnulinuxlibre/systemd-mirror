@@ -52,7 +52,7 @@ GENERAL_ALIASES += \
 nodist_pkgsysconf_DATA += \
 	src/timesync/timesyncd.conf
 
-endif
+endif # ENABLE_TIMESYNCD
 
 gperf_gperf_sources += \
 	src/timesync/timesyncd-gperf.gperf

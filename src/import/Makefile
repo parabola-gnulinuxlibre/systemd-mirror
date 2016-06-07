@@ -176,13 +176,13 @@ test_qcow2_LDADD = \
 	libshared.la \
 	$(ZLIB_LIBS)
 
-endif
-endif
-endif
-endif
-endif
+endif # HAVE_GCRYPT
+endif # HAVE_BZIP2
+endif # HAVE_ZLIB
+endif # HAVE_XZ
+endif # HAVE_LIBCURL
 
-endif
+endif # ENABLE_IMPORTD
 
 polkitpolicy_in_files += \
 	src/import/org.freedesktop.import1.policy.in

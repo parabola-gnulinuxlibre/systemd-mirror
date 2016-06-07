@@ -57,7 +57,7 @@ dist_tmpfiles_DATA = \
 ifneq ($(HAVE_SYSV_COMPAT),)
 dist_tmpfiles_DATA += \
 	tmpfiles.d/legacy.conf
-endif
+endif # HAVE_SYSV_COMPAT
 
 SYSINIT_TARGET_WANTS += \
 	systemd-tmpfiles-setup-dev.service \
@@ -72,7 +72,7 @@ TIMERS_TARGET_WANTS += \
 INSTALL_DIRS += \
 	$(tmpfilesdir) \
 	$(sysconfdir)/tmpfiles.d
-endif
+endif # ENABLE_TMPFILES
 
 EXTRA_DIST += \
 	tmpfiles.d/systemd.conf.m4 \

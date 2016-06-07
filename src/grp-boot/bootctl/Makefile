@@ -49,7 +49,7 @@ dist_bashcompletion_data += \
 
 dist_zshcompletion_data += \
 	shell-completion/zsh/_bootctl
-endif
-
+endif # HAVE_BLKID
+endif # ENABLE_EFI
 $(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

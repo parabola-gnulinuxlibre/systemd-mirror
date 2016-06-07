@@ -42,12 +42,12 @@ manual_tests += \
 ifneq ($(HAVE_LIBIPTC),)
 manual_tests += \
 	test-firewall-util
-endif
+endif # HAVE_LIBIPTC
 
 ifneq ($(HAVE_KMOD),)
 manual_tests += \
 	test-netlink-manual
-endif
+endif # HAVE_KMOD
 
 tests += \
 	test-engine \
@@ -125,7 +125,7 @@ tests += \
 ifneq ($(HAVE_ACL),)
 tests += \
 	test-acl-util
-endif
+endif # HAVE_ACL
 
 EXTRA_DIST += \
 	test/a.service \
@@ -302,7 +302,7 @@ test_boot_timestamp_SOURCES = \
 
 test_boot_timestamp_LDADD = \
 	libshared.la
-endif
+endif # ENABLE_EFI
 
 test_unit_name_SOURCES = \
 	src/test/test-unit-name.c
@@ -652,7 +652,7 @@ test_firewall_util_LDADD = \
 	libfirewall.la \
 	libshared.la \
 	$(LIBIPTC_LIBS)
-endif
+endif # HAVE_LIBIPTC
 
 test_netlink_manual_SOURCES = \
 	src/test/test-netlink-manual.c

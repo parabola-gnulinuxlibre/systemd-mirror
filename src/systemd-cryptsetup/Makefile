@@ -54,7 +54,7 @@ systemd_cryptsetup_generator_LDADD = \
 SYSINIT_TARGET_WANTS += \
 	cryptsetup.target
 
-endif
+endif # HAVE_LIBCRYPTSETUP
 
 $(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

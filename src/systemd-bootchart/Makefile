@@ -43,7 +43,7 @@ dist_pkgsysconf_DATA += \
 
 nodist_systemunit_DATA += \
 	units/systemd-bootchart.service
-endif
+endif # ENABLE_BOOTCHART
 
 EXTRA_DIST += \
 	units/systemd-bootchart.service.in

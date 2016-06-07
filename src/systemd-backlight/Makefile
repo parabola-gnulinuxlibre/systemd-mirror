@@ -35,7 +35,7 @@ systemd_backlight_SOURCES = \
 
 systemd_backlight_LDADD = \
 	libshared.la
-endif
+endif # ENABLE_BACKLIGHT
 
 EXTRA_DIST += \
 	units/systemd-backlight@.service.in

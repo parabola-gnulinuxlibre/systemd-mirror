@@ -64,7 +64,7 @@ systemd_nspawn_LDADD = \
 ifneq ($(HAVE_LIBIPTC),)
 systemd_nspawn_LDADD += \
 	$(topoutdir)/src/libfirewall/libfirewall.la
-endif
+endif # HAVE_LIBIPTC
 
 systemd_nspawn_SOURCES += local-addresses.c
 bin_PROGRAMS += systemd-nspawn

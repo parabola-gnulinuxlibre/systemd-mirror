@@ -46,11 +46,11 @@ nodist_sysusers_DATA = \
 ifneq ($(HAVE_REMOTE),)
 nodist_sysusers_DATA += \
 	sysusers.d/systemd-remote.conf
-endif
+endif # HAVE_REMOTE
 
 INSTALL_DIRS += \
 	$(sysusersdir)
-endif
+endif # ENABLE_SYSUSERS
 
 EXTRA_DIST += \
 	units/systemd-sysusers.service.in \

@@ -48,7 +48,7 @@ SYSINIT_TARGET_WANTS += \
 	systemd-binfmt.service \
 	proc-sys-fs-binfmt_misc.automount
 
-endif
+endif # ENABLE_BINFMT
 
 EXTRA_DIST += \
 	units/systemd-binfmt.service.in

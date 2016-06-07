@@ -50,7 +50,7 @@ nodist_systemunit_DATA += \
 	units/systemd-hibernate.service \
 	units/systemd-hibernate-resume@.service \
 	units/systemd-hybrid-sleep.service
-endif
+endif # ENABLE_HIBERNATE
 
 EXTRA_DIST += \
 	units/systemd-hibernate.service.in \

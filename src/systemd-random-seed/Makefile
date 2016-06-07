@@ -39,7 +39,7 @@ systemd_random_seed_LDADD = \
 SYSINIT_TARGET_WANTS += \
 	systemd-random-seed.service
 
-endif
+endif # ENABLE_RANDOMSEED
 
 EXTRA_DIST += \
 	units/systemd-random-seed.service.in

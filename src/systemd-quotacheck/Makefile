@@ -35,7 +35,7 @@ systemd_quotacheck_SOURCES = \
 
 systemd_quotacheck_LDADD = \
 	libshared.la
-endif
+endif # ENABLE_QUOTACHECK
 
 EXTRA_DIST += \
 	units/systemd-quotacheck.service.in

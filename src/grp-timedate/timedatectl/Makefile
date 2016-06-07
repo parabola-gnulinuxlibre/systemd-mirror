@@ -23,26 +23,21 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(HAVE_MYHOSTNAME),)
-libnss_myhostname_la_SOURCES = \
-	src/nss-myhostname/nss-myhostname.sym \
-	src/nss-myhostname/nss-myhostname.c
+ifneq ($(ENABLE_TIMEDATED),)
+timedatectl_SOURCES = \
+	src/timedate/timedatectl.c
 
-libnss_myhostname_la_LDFLAGS = \
-	$(AM_LDFLAGS) \
-	-module \
-	-export-dynamic \
-	-avoid-version \
-	-shared \
-	-shrext .so.2 \
-	-Wl,--version-script=$(top_srcdir)/src/nss-myhostname/nss-myhostname.sym
+timedatectl_LDADD = \
+	libshared.la
 
-libnss_myhostname_la_LIBADD = \
-	libsystemd-internal.la
+bin_PROGRAMS += \
+	timedatectl
 
-lib_LTLIBRARIES += \
-	libnss_myhostname.la
-endif # HAVE_MYHOSTNAME
+dist_bashcompletion_data += \
+	shell-completion/bash/timedatectl
 
+dist_zshcompletion_data += \
+	shell-completion/zsh/_timedatectl
+endif # ENABLE_TIMEDATED
 $(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -98,26 +98,7 @@ SYSTEM_UNIT_ALIASES += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.machine1.busname
 
-libnss_mymachines_la_SOURCES = \
-	src/nss-mymachines/nss-mymachines.sym \
-	src/nss-mymachines/nss-mymachines.c
-
-libnss_mymachines_la_LDFLAGS = \
-	$(AM_LDFLAGS) \
-	-module \
-	-export-dynamic \
-	-avoid-version \
-	-shared \
-	-shrext .so.2 \
-	-Wl,--version-script=$(top_srcdir)/src/nss-mymachines/nss-mymachines.sym
-
-libnss_mymachines_la_LIBADD = \
-	libsystemd-internal.la
-
-lib_LTLIBRARIES += \
-	libnss_mymachines.la
-
-endif
+endif # ENABLE_MACHINED
 
 polkitpolicy_in_files += \
 	src/machine/org.freedesktop.machine1.policy.in

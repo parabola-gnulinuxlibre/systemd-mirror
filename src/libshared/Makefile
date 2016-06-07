@@ -109,19 +109,19 @@ libshared_la_SOURCES = \
 ifneq ($(HAVE_UTMP),)
 libshared_la_SOURCES += \
 	src/shared/utmp-wtmp.c
-endif
+endif # HAVE_UTMP
 
 ifneq ($(HAVE_SECCOMP),)
 libshared_la_SOURCES += \
 	src/shared/seccomp-util.h \
 	src/shared/seccomp-util.c
-endif
+endif # HAVE_SECCOMP
 
 ifneq ($(HAVE_ACL),)
 libshared_la_SOURCES += \
 	src/shared/acl-util.c \
 	src/shared/acl-util.h
-endif
+endif # HAVE_ACL
 
 libshared_la_CFLAGS = \
 	$(AM_CFLAGS) \

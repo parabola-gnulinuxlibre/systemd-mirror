@@ -193,7 +193,7 @@ test_dnssec_complex_SOURCES = \
 test_dnssec_complex_LDADD = \
 	libshared.la
 
-endif
+endif # ENABLE_RESOLVED
 
 gperf_txt_sources += \
 	src/resolve/dns_type-list.txt

@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+ifneq ($(ENABLE_EFI),)
 ifneq ($(HAVE_GNUEFI),)
 efi_cppflags = \
 	$(EFI_CPPFLAGS) \
@@ -54,13 +55,13 @@ efi_cflags += \
 	-mno-mmx \
 	-DEFI_FUNCTION_WRAPPER \
 	-DGNU_EFI_USE_MS_ABI
-endif
+endif # ARCH_X86_64
 
 ifneq ($(ARCH_IA32),)
 efi_cflags += \
 	-mno-sse \
 	-mno-mmx
-endif
+endif # ARCH_IA32
 
 efi_ldflags = \
 	$(EFI_LDFLAGS) \
@@ -79,9 +80,9 @@ efi_ldflags += --defsym=EFI_SUBSYSTEM=0xa
 EFI_FORMAT = -O binary
 else
 EFI_FORMAT = --target=efi-app-$(EFI_ARCH)
-endif
-endif
-endif
+endif # ARCH_AARCH64
+endif # HAVE_GNUEFI
+endif # ENABLE_EFI
 
 # ------------------------------------------------------------------------------
 systemd_boot_headers = \
@@ -121,8 +122,8 @@ $(systemd_boot_solib): $(systemd_boot_objects)
 $(systemd_boot): $(systemd_boot_solib)
 	$(AM_V_GEN)$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic \
 	  -j .dynsym -j .rel -j .rela -j .reloc $(EFI_FORMAT) $< $@
-endif
-endif
+endif # HAVE_GNUEFI
+endif # ENABLE_EFI
 
 CLEANFILES += $(systemd_boot_objects) $(systemd_boot_solib) $(systemd_boot)
 
@@ -169,8 +170,8 @@ $(stub_solib): $(stub_objects)
 $(stub): $(stub_solib)
 	$(AM_V_GEN)$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic \
 	  -j .dynsym -j .rel -j .rela -j .reloc $(EFI_FORMAT) $< $@
-endif
-endif
+endif # HAVE_GNUEFI
+endif # ENABLE_EFI
 
 CLEANFILES += $(stub_objects) $(stub_solib) $(stub)
 

@@ -51,7 +51,7 @@ bus-proxyd-set-cap-hook:
 	-$(SETCAP) cap_mac_admin+ei $(DESTDIR)$(libexecdir)/systemd-bus-proxyd
 
 INSTALL_EXEC_HOOKS += bus-proxyd-set-cap-hook
-endif
+endif # HAVE_SMACK
 
 $(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

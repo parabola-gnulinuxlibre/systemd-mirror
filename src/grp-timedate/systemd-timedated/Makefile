@@ -54,21 +54,7 @@ SYSTEM_UNIT_ALIASES += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.timedate1.busname
 
-timedatectl_SOURCES = \
-	src/timedate/timedatectl.c
-
-timedatectl_LDADD = \
-	libshared.la
-
-bin_PROGRAMS += \
-	timedatectl
-
-dist_bashcompletion_data += \
-	shell-completion/bash/timedatectl
-
-dist_zshcompletion_data += \
-	shell-completion/zsh/_timedatectl
-endif
+endif # ENABLE_TIMEDATED
 
 polkitpolicy_in_files += \
 	src/timedate/org.freedesktop.timedate1.policy.in

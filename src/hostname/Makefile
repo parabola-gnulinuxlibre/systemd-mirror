@@ -68,7 +68,7 @@ dist_bashcompletion_data += \
 
 dist_zshcompletion_data += \
 	shell-completion/zsh/_hostnamectl
-endif
+endif # ENABLE_HOSTNAMED
 
 polkitpolicy_in_files += \
 	src/hostname/org.freedesktop.hostname1.policy.in

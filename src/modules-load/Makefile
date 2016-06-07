@@ -50,8 +50,8 @@ nodist_systemunit_DATA += \
 
 SYSINIT_TARGET_WANTS += \
 	kmod-static-nodes.service
-endif
-endif
+endif # ENABLE_TMPFILES
+endif # HAVE_KMOD
 
 EXTRA_DIST += \
 	units/systemd-modules-load.service.in \

@@ -41,7 +41,7 @@ nodist_systemunit_DATA += \
 
 SYSINIT_TARGET_WANTS += \
 	systemd-vconsole-setup.service
-endif
+endif # ENABLE_VCONSOLE
 
 EXTRA_DIST += \
 	src/vconsole/90-vconsole.rules.in \

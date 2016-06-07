@@ -39,7 +39,7 @@ systemd_coredump_SOURCES += \
 
 systemd_coredump_LDADD += \
 	$(ELFUTILS_LIBS)
-endif
+endif # HAVE_ELFUTILS
 
 nodist_systemunit_DATA += \
 	units/systemd-coredump@.service
@@ -72,7 +72,7 @@ nodist_sysctl_DATA = \
 
 CLEANFILES += \
 	sysctl.d/50-coredump.conf
-endif
+endif # ENABLE_COREDUMP
 
 EXTRA_DIST += \
 	sysctl.d/50-coredump.conf.in \

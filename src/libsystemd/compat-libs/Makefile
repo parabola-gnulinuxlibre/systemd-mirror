@@ -134,7 +134,7 @@ compat-lib-uninstall-hook:
 
 INSTALL_EXEC_HOOKS += compat-lib-install-hook
 UNINSTALL_EXEC_HOOKS += compat-lib-uninstall-hook
-endif
+endif # ENABLE_COMPAT_LIBS
 
 EXTRA_DIST += \
 	src/compat-libs/linkwarning.h \

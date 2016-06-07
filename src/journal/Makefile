@@ -71,7 +71,7 @@ journalctl_CFLAGS += \
 
 journalctl_LDADD += \
 	$(QRENCODE_LIBS)
-endif
+endif # HAVE_QRENCODE
 
 test_journal_SOURCES = \
 	src/journal/test-journal.c
@@ -247,7 +247,7 @@ ifneq ($(HAVE_COMPRESSION),)
 tests += \
 	test-compress \
 	test-compress-benchmark
-endif
+endif # HAVE_COMPRESSION
 
 
 libexec_PROGRAMS += \
@@ -321,7 +321,7 @@ systemd_journal_gatewayd_LDADD = \
 ifneq ($(HAVE_GNUTLS),)
 systemd_journal_gatewayd_LDADD += \
 	$(GNUTLS_LIBS)
-endif
+endif # HAVE_GNUTLS
 
 systemd_journal_gatewayd_CFLAGS = \
 	$(AM_CFLAGS) \
@@ -340,7 +340,7 @@ nodist_systemunit_DATA += \
 dist_gatewayddocumentroot_DATA = \
 	src/journal-remote/browse.html
 
-endif
+endif # HAVE_MICROHTTPD
 
 EXTRA_DIST += \
 	units/systemd-journal-gatewayd.service.in

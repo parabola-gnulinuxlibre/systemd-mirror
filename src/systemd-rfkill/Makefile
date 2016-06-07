@@ -38,7 +38,7 @@ systemd_rfkill_SOURCES = \
 
 systemd_rfkill_LDADD = \
 	libshared.la
-endif
+endif # ENABLE_RFKILL
 
 EXTRA_DIST += \
 	units/systemd-rfkill.service.in

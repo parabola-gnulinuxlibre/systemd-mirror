@@ -36,7 +36,7 @@ systemd_networkd_LDADD = \
 ifneq ($(HAVE_LIBIPTC),)
 systemd_networkd_LDADD += \
 	libfirewall.la
-endif
+endif # HAVE_LIBIPTC
 
 noinst_LTLIBRARIES += \
 	libnetworkd-core.la
@@ -140,7 +140,7 @@ test_network_LDADD = \
 ifneq ($(HAVE_LIBIPTC),)
 test_network_LDADD += \
 	libfirewall.la
-endif
+endif # HAVE_LIBIPTC
 
 test_network_tables_SOURCES = \
 	src/network/test-network-tables.c \
@@ -153,7 +153,7 @@ test_network_tables_LDADD = \
 ifneq ($(HAVE_LIBIPTC),)
 test_network_tables_LDADD += \
 	libfirewall.la
-endif
+endif # HAVE_LIBIPTC
 
 tests += \
 	test-network \
@@ -186,7 +186,7 @@ SYSTEM_UNIT_ALIASES += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.network1.busname
 
-endif
+endif # ENABLE_NETWORKD
 
 gperf_gperf_sources += \
 	src/network/networkd-network-gperf.gperf \

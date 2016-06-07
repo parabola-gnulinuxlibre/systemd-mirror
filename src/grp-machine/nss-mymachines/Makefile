@@ -23,26 +23,27 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(HAVE_MYHOSTNAME),)
-libnss_myhostname_la_SOURCES = \
-	src/nss-myhostname/nss-myhostname.sym \
-	src/nss-myhostname/nss-myhostname.c
+ifneq ($(ENABLE_MACHINED),)
 
-libnss_myhostname_la_LDFLAGS = \
+libnss_mymachines_la_SOURCES = \
+	src/nss-mymachines/nss-mymachines.sym \
+	src/nss-mymachines/nss-mymachines.c
+
+libnss_mymachines_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
 	-module \
 	-export-dynamic \
 	-avoid-version \
 	-shared \
 	-shrext .so.2 \
-	-Wl,--version-script=$(top_srcdir)/src/nss-myhostname/nss-myhostname.sym
+	-Wl,--version-script=$(top_srcdir)/src/nss-mymachines/nss-mymachines.sym
 
-libnss_myhostname_la_LIBADD = \
+libnss_mymachines_la_LIBADD = \
 	libsystemd-internal.la
 
 lib_LTLIBRARIES += \
-	libnss_myhostname.la
-endif # HAVE_MYHOSTNAME
+	libnss_mymachines.la
 
+endif # ENABLE_MACHINED
 $(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

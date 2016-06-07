@@ -77,7 +77,7 @@ dist_bashcompletion_data += \
 
 dist_zshcompletion_data += \
 	shell-completion/zsh/_localectl
-endif
+endif # ENABLE_LOCALED
 
 .PHONY: update-kbd-model-map
 

@@ -39,7 +39,7 @@ nodist_systemunit_DATA += \
 
 SYSINIT_TARGET_WANTS += \
 	systemd-firstboot.service
-endif
+endif # ENABLE_FIRSTBOOT
 
 EXTRA_DIST += \
 	units/systemd-firstboot.service.in
