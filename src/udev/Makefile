@@ -86,10 +86,10 @@ noinst_LTLIBRARIES += \
 $(outdir)/keyboard-keys-list.txt:
 	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM -include linux/input.h - < /dev/null | $(AWK) '/^#define[ \t]+KEY_[^ ]+[ \t]+[0-9K]/ { if ($$2 != "KEY_MAX") { print $$2 } }' > $@
 
-$(outdir)/keyboard-keys-from-name.gperf: src/udev/keyboard-keys-list.txt
+$(outdir)/keyboard-keys-from-name.gperf: $(outdir)/keyboard-keys-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct key { const char* name; unsigned short id; };"; print "%null-strings"; print "%%";} { print tolower(substr($$1 ,5)) ", " $$1 }' < $< > $@
 
-$(outdir)/keyboard-keys-from-name.h: src/udev/keyboard-keys-from-name.gperf
+$(outdir)/keyboard-keys-from-name.h: $(outdir)/keyboard-keys-from-name.gperf
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t -N keyboard_lookup_key -H hash_key_name -p -C < $< > $@
 
 gperf_txt_sources += \

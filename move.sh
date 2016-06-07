@@ -239,7 +239,11 @@ fixup_makefiles() (
 	    -e 's/ \$\(AM_CPPFLAGS\) / $(ALL_CPPFLAGS) /g' \
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
 	    src/libbasic/Makefile \
-	    src/libsystemd/libsystemd-journal-internal/Makefile
+	    src/libsystemd/libsystemd-journal-internal/Makefile \
+	    src/udev/Makefile
+	find -type f -name Makefile|while read -r filename; do
+		sed -r -i "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="${filename%/*}" config.mk)|" "$filename"
+	done
 )
 
 move() (
