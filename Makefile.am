@@ -6688,5 +6688,10 @@ list-keys:
 
 add-key:
 	gpg --verbose --no-options --no-default-keyring --no-auto-key-locate --batch --trust-model=always --keyring=$(srcdir)/src/import/import-pubring.gpg --import -
+#@src/libudev/Makefile
+at.subdirs += src
+#@src/libsystemd/libsystemd-internal/subdir.mk
+systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
+systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 #@all
 include $(topsrcdir)/build-aux/Makefile.tail.mk
