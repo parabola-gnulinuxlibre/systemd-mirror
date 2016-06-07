@@ -256,10 +256,10 @@ automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $
 at.subdirs += $(_subdirs)
 at.depdirs += $(topoutdir)/src/libbasic
 
-AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += $(libshared.CPPFLAGS)
-AM_CPPFLAGS += -DLIBDIR=\"$(libdir)\"
-AM_CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
+systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
+systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
+systemd.CPPFLAGS += $(libshared.CPPFLAGS)
+systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
+systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

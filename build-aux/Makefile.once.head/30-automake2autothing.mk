@@ -1,0 +1,9 @@
+at.dirlocal += am.CFLAGS am.CPPFLAGS am.LDFLAGS am.LIBTOOLFLAGS
+at.dirlocal += noinst_LTLIBRARIES lib_LTLIBRARIES
+at.dirlocal += bin_PROGRAMS libexec_PROGRAMS
+at.dirlocal += pkgconfiglib_DATA
+automake_name = $(subst -,_,$(subst .,_,$1))
+automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
+automake_lo = $(patsubst %.c,%.lo,$(filter %.c,$(automake_sources)))
+automake_o = $(patsubst %.c,%.o,$(filter %.c,$(automake_sources)))
+automake_libs = $($(automake_name)_LIBADD) $($(automake_name)_LDADD)

@@ -39,7 +39,7 @@ dist_zshcompletion_data += \
 	shell-completion/zsh/_coredumpctl
 
 $(eval $(value automake2autothing))
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += $(libshared.CPPFLAGS)
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
+systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
+systemd.CPPFLAGS += $(libshared.CPPFLAGS)
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
 include $(topsrcdir)/build-aux/Makefile.tail.mk

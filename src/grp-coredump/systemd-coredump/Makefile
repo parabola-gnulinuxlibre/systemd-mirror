@@ -79,9 +79,9 @@ EXTRA_DIST += \
 	units/systemd-coredump@.service.in
 
 $(eval $(value automake2autothing))
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += $(libshared.CPPFLAGS)
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
-AM_CPPFLAGS += -I$(topsrcdir)/src/journal
-AM_CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
+systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
+systemd.CPPFLAGS += $(libshared.CPPFLAGS)
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
+systemd.CPPFLAGS += -I$(topsrcdir)/src/journal
+systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 include $(topsrcdir)/build-aux/Makefile.tail.mk

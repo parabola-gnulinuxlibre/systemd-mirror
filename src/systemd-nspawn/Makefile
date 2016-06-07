@@ -53,7 +53,7 @@ gperf_gperf_sources += \
 	src/nspawn/nspawn-gperf.gperf
 
 systemd_nspawn_CFLAGS = \
-	$(AM_CFLAGS) \
+	$(systemd.CFLAGS) \
 	$(BLKID_CFLAGS) \
 	$(SECCOMP_CFLAGS)
 
@@ -69,11 +69,11 @@ endif # HAVE_LIBIPTC
 bin_PROGRAMS += systemd-nspawn
 $(eval $(value automake2autothing))
 at.depdirs += $(topoutdir)/src/libshared $(if $(HAVE_LIBIPTC),$(topoutdir)/src/libfirewall)
-AM_CPPFLAGS += $(libshared.CPPFLAGS) $(if $(HAVE_LIBIPTC),$(libfirewall.CPPFLAGS))
+systemd.CPPFLAGS += $(libshared.CPPFLAGS) $(if $(HAVE_LIBIPTC),$(libfirewall.CPPFLAGS))
 
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
-AM_CPPFLAGS += -I$(topsrcdir)/src/libudev/src
+systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
+systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

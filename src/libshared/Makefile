@@ -149,26 +149,26 @@ $(eval $(value automake2autothing))
 at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-internal
 at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-journal-internal
 at.depdirs += $(topoutdir)/src/libudev/src
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
+systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
+systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 
-AM_CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
-AM_CPPFLAGS += -DSYSTEM_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/system\"
-AM_CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
-AM_CPPFLAGS += -DSYSTEM_SYSVINIT_PATH=\"$(SYSTEM_SYSVINIT_PATH)\"
-AM_CPPFLAGS += -DSYSTEM_SYSVRCND_PATH=\"$(SYSTEM_SYSVRCND_PATH)\"
-AM_CPPFLAGS += -DUSER_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/user\"
-AM_CPPFLAGS += -DUSER_DATA_UNIT_PATH=\"$(userunitdir)\"
+systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
+systemd.CPPFLAGS += -DSYSTEM_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/system\"
+systemd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
+systemd.CPPFLAGS += -DSYSTEM_SYSVINIT_PATH=\"$(SYSTEM_SYSVINIT_PATH)\"
+systemd.CPPFLAGS += -DSYSTEM_SYSVRCND_PATH=\"$(SYSTEM_SYSVRCND_PATH)\"
+systemd.CPPFLAGS += -DUSER_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/user\"
+systemd.CPPFLAGS += -DUSER_DATA_UNIT_PATH=\"$(userunitdir)\"
 
-AM_CPPFLAGS += -DSYSTEMD_FSCK_PATH=\"$(rootlibexecdir)/systemd-fsck\"
+systemd.CPPFLAGS += -DSYSTEMD_FSCK_PATH=\"$(rootlibexecdir)/systemd-fsck\"
 
-AM_CPPFLAGS += -DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(rootbindir)/systemd-tty-ask-password-agent\"
+systemd.CPPFLAGS += -DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(rootbindir)/systemd-tty-ask-password-agent\"
 
-AM_CPPFLAGS += -DSYSTEM_GENERATOR_PATH=\"$(systemgeneratordir)\"
-AM_CPPFLAGS += -DUSER_GENERATOR_PATH=\"$(usergeneratordir)\"
+systemd.CPPFLAGS += -DSYSTEM_GENERATOR_PATH=\"$(systemgeneratordir)\"
+systemd.CPPFLAGS += -DUSER_GENERATOR_PATH=\"$(usergeneratordir)\"
 
-AM_CPPFLAGS += -DPOLKIT_AGENT_BINARY_PATH=\"$(bindir)/pkttyagent\"
+systemd.CPPFLAGS += -DPOLKIT_AGENT_BINARY_PATH=\"$(bindir)/pkttyagent\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

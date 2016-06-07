@@ -27,11 +27,11 @@ OUR_CPPFLAGS += -MT $@ -MD -MP -MF $(@D)/$(DEPDIR)/$(basename $(@F)).P$(patsubst
 OUR_CPPFLAGS += -include $(topoutdir)/config.h
 OUR_CPPFLAGS += $(if $(<D),-I$(<D)) -I$(@D)
 
-at.dirlocal += AM_CFLAGS AM_CPPFLAGS AM_LDFLAGS AM_LIBTOOLFLAGS
-ALL_CFLAGS = $(OUR_CFLAGS) $(AM_CFLAGS/$(@D)) $(CFLAGS)
-ALL_CPPFLAGS = $(OUR_CPPFLAGS) $(AM_CPPFLAGS/$(@D)) $(CPPFLAGS)
-ALL_LDFLAGS = $(OUR_LDFLAGS) $(AM_LDFLAGS/$(@D)) $(LDFLAGS)
-ALL_LIBTOOLFLAGS = $(OUR_LIBTOOLFLAGS) $(AM_LIBTOOLFLAGS/$(@D)) $(LIBTOOLFLAGS)
+at.dirlocal += systemd.CFLAGS systemd.CPPFLAGS systemd.LDFLAGS systemd.LIBTOOLFLAGS
+ALL_CFLAGS       = $(OUR_CFLAGS)       $(am.CFLAGS/$(@D))       $(systemd.CFLAGS/$(@D))       $(CFLAGS)
+ALL_CPPFLAGS     = $(OUR_CPPFLAGS)     $(am.CPPFLAGS/$(@D))     $(systemd.CPPFLAGS/$(@D))     $(CPPFLAGS)
+ALL_LDFLAGS      = $(OUR_LDFLAGS)      $(am.LDFLAGS/$(@D))      $(systemd.LDFLAGS/$(@D))      $(LDFLAGS)
+ALL_LIBTOOLFLAGS = $(OUR_LIBTOOLFLAGS) $(am.LIBTOOLFLAGS/$(@D)) $(systemd.LIBTOOLFLAGS/$(@D)) $(LIBTOOLFLAGS)
 
 COMPILE   = $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(ALL_LIBTOOLFLAGS) --mode=compile $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
@@ -192,42 +192,3 @@ define generate-sym-test
 endef
 
 at.dirlocal += systemd.sed_files
-
-at.dirlocal += noinst_LTLIBRARIES lib_LTLIBRARIES
-at.dirlocal += bin_PROGRAMS libexec_PROGRAMS
-at.dirlocal += pkgconfiglib_DATA
-automake_name = $(subst -,_,$(subst .,_,$1))
-automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
-automake_lo = $(patsubst %.c,%.lo,$(filter %.c,$(automake_sources)))
-automake_o = $(patsubst %.c,%.o,$(filter %.c,$(automake_sources)))
-automake_libs = $($(automake_name)_LIBADD) $($(automake_name)_LDADD)
-
-define automake2autothing
-std.out_files += $(noinst_LTLIBRARIES) $(lib_LTLIBRARIES)
-std.sys_files += $(addprefix $(libdir)/,$(lib_LTLIBRARIES))
-
-std.out_files += $(bin_PROGRAMS) $(libexec_PROGRAMS)
-std.sys_files += $(addprefix $(bindir)/,$(bin_PROGRAMS))
-std.sys_files += $(addprefix $(libexecdir)/,$(libexec_PROGRAMS))
-
-std.out_files += $(notdir $(pkgconfiglib_DATA))
-std.sys_files += $(addprefix $(pkgconfiglibdir)/,$(notdir $(lib_pkgconfiglib_DATA)))
-
-$(foreach n,$(call automake_name,$(std.out_files)),\
-  $(eval $n_SOURCES ?=)\
-  $(eval nodist_$n_SOURCES ?=)\
-  $(eval $n_CFLAGS ?=)\
-  $(eval $n_CPPFLAGS ?=)\
-  $(eval $n_LDFLAGS ?=)\
-  $(eval $n_LIBADD ?=))
-$(foreach t,$(filter %.la,$(std.out_files)),\
-	$(eval $(outdir)/$t: $(call at.path,$(call automake_lo,$t) $(call automake_libs,$t)) )\
-	$(eval AM_CFLAGS += $($(call automake_name,$t)_CFLAGS)                               )\
-	$(eval AM_CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS)                           )\
-	$(eval AM_LDFLAGS += $($(call automake_name,$t)_LDFLAGS)                             ))
-$(foreach t,$(bin_PROGRAMS) $(libexec_PROGRAMS),\
-	$(eval $(outdir)/$t: $(call at.path,$(call automake_o,$t) $(call automake_libs,$t))  )\
-	$(eval AM_CFLAGS += $($(call automake_name,$t)_CFLAGS)                               )\
-	$(eval AM_CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS)                           )\
-	$(eval AM_LDFLAGS += $($(call automake_name,$t)_LDFLAGS)                             ))
-endef

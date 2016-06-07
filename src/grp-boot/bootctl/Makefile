@@ -54,7 +54,7 @@ endif # ENABLE_EFI
 
 $(eval $(value automake2autothing))
 at.depdirs += $(topoutdir)/src/libshared
-AM_CPPFLAGS += $(libshared.CPPFLAGS)
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+systemd.CPPFLAGS += $(libshared.CPPFLAGS)
+systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

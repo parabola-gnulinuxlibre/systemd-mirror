@@ -35,7 +35,7 @@ busctl_LDADD = \
 	$(topoutdir)/src/libshared/libshared.la
 
 $(eval $(value automake2autothing))
-AM_CPPFLAGS += $(libshared.CPPFLAGS)
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
+systemd.CPPFLAGS += $(libshared.CPPFLAGS)
+systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 include $(topsrcdir)/build-aux/Makefile.tail.mk

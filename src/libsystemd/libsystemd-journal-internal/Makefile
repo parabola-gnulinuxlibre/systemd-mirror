@@ -110,8 +110,7 @@ noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la
 
 $(eval $(value automake2autothing))
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"
+systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
+systemd.CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"
 $(outdir)/audit-type.lo: $(outdir)/audit_type-to-name.h
-
 include $(topsrcdir)/build-aux/Makefile.tail.mk

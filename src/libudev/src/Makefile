@@ -76,10 +76,10 @@ test_libudev_sym_LDADD = \
 
 $(eval $(value automake2autothing))
 systemd.sed_files += libudev.pc
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
-AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-device
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-hwdb
+systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
+systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
+systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-device
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-hwdb
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
