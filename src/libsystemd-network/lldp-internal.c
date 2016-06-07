@@ -18,7 +18,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-lldp.h"
+#include <systemd/sd-lldp.h>
 
 #include "alloc-util.h"
 #include "lldp-internal.h"
