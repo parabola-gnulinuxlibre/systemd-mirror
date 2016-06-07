@@ -1458,7 +1458,7 @@ src/resolve/dns_type-from-name.gperf: src/resolve/dns_type-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct dns_type_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { s=$$1; sub(/_/, "-", s); printf "%s, ", $$s; printf "DNS_TYPE_%s\n", $$1 }' <$< >$@
 
-#@src/system/systemd/Makefile --------------------------------------------------
+#@src/grp-system/systemd/Makefile ----------------------------------------------
 systemd_SOURCES = \
 	src/core/main.c
 
@@ -2828,7 +2828,7 @@ EXTRA_DIST += \
 	units/systemd-hibernate-resume@.service.in \
 	units/systemd-hybrid-sleep.service.in
 
-#@src/boot/Makefile ------------------------------------------------------------
+#@src/grp-boot/bootctl/Makefile ------------------------------------------------
 if ENABLE_EFI
 if HAVE_BLKID
 bootctl_SOURCES = \
@@ -2857,7 +2857,7 @@ dist_zshcompletion_data += \
 	shell-completion/zsh/_bootctl
 endif # HAVE_BLKID
 
-#@discard.mk -------------------------------------------------------------------
+#@src/grp-boot/systemd-boot/Makefile -------------------------------------------
 if HAVE_GNUEFI
 efi_cppflags = \
 	$(EFI_CPPFLAGS) \
@@ -2918,7 +2918,7 @@ endif # ARCH_AARCH64
 endif # HAVE_GNUEFI
 endif # ENABLE_EFI
 
-#@src/boot/efi/Makefile --------------------------------------------------------
+# ------------------------------------------------------------------------------
 systemd_boot_headers = \
 	src/boot/efi/util.h \
 	src/boot/efi/console.h \
@@ -3084,7 +3084,7 @@ systemd_escape_SOURCES = \
 systemd_escape_LDADD = \
 	libsystemd-shared.la
 
-#@src/system/systemctl/Makefile ------------------------------------------------
+#@src/grp-system/systemctl/Makefile --------------------------------------------
 systemctl_SOURCES = \
 	src/systemctl/systemctl.c
 
@@ -3209,14 +3209,14 @@ systemd_run_SOURCES = \
 systemd_run_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/systemd-mount/Makefile ---------------------------------------------------
 systemd_mount_SOURCES = \
 	src/mount/mount-tool.c
 
 systemd_mount_LDADD = \
 	libsystemd-shared.la
 
-# ------------------------------------------------------------------------------
+#@src/systemd-stdio-bridge/Makefile
 systemd_stdio_bridge_SOURCES = \
 	src/stdio-bridge/stdio-bridge.c
 
@@ -3391,6 +3391,7 @@ tests += \
 bin_PROGRAMS += \
 	busctl
 
+#@src/libsystemd/libsystemd-internal/Makefile
 test_bus_marshal_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-marshal.c
 
@@ -3532,6 +3533,7 @@ test_resolve_SOURCES = \
 test_resolve_LDADD = \
 	libsystemd-shared.la
 
+#@src/busctl/Makefile
 busctl_SOURCES = \
 	src/libsystemd/sd-bus/busctl.c \
 	src/libsystemd/sd-bus/busctl-introspect.c \
@@ -4603,7 +4605,7 @@ systemd_socket_proxyd_SOURCES = \
 systemd_socket_proxyd_LDADD = \
 	libsystemd-shared.la
 
-#@src/systemd-coredump/Makefile ------------------------------------------------
+#@src/grp-coredump/systemd-coredump/Makefile -----------------------------------
 if ENABLE_COREDUMP
 systemd_coredump_SOURCES = \
 	src/coredump/coredump.c \
@@ -4642,7 +4644,7 @@ rootlibexec_PROGRAMS += \
 dist_pkgsysconf_DATA += \
 	src/coredump/coredump.conf
 
-#@src/coredumpctl/Makefile
+#@src/grp-coredump/coredumpctl/Makefile
 coredumpctl_SOURCES = \
 	src/coredump/coredumpctl.c
 
@@ -4652,7 +4654,7 @@ coredumpctl_LDADD = \
 bin_PROGRAMS += \
 	coredumpctl
 
-#@src/systemd-coredump/Makefile
+#@src/grp-coredump/systemd-coredump/Makefile
 manual_tests += \
 	test-coredump-vacuum
 
@@ -4664,14 +4666,14 @@ test_coredump_vacuum_SOURCES = \
 test_coredump_vacuum_LDADD = \
 	libsystemd-shared.la
 
-#@src/coredumpctl/Makefile
+#@src/grp-coredump/coredumpctl/Makefile
 dist_bashcompletion_data += \
 	shell-completion/bash/coredumpctl
 
 dist_zshcompletion_data += \
 	shell-completion/zsh/_coredumpctl
 
-#@src/systemd-coredump/Makefile
+#@src/grp-coredump/systemd-coredump/Makefile
 nodist_sysctl_DATA = \
 	sysctl.d/50-coredump.conf
 
@@ -4906,7 +4908,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-hostnamed.service.in
 
-#@src/system/systemd/Makefile --------------------------------------------------
+#@src/grp-system/systemd/Makefile ----------------------------------------------
 dist_systemunit_DATA_busnames += \
 	units/org.freedesktop.systemd1.busname
 
@@ -5142,7 +5144,7 @@ rootlib_LTLIBRARIES += \
 	libnss_myhostname.la
 endif # HAVE_MYHOSTNAME
 
-#@src/machine/src/Makefile -----------------------------------------------------
+#@src/grp-machine/systemd-machined/Makefile ------------------------------------
 if ENABLE_MACHINED
 systemd_machined_SOURCES = \
 	src/machine/machined.c \
@@ -5415,7 +5417,7 @@ EXTRA_DIST += \
 	units/systemd-importd.service.in
 
 
-#@src/resolve/src/Makefile -----------------------------------------------------
+#@src/grp-resolve/systemd-resolved/Makefile ------------------------------------
 if ENABLE_RESOLVED
 
 basic_dns_sources = \
