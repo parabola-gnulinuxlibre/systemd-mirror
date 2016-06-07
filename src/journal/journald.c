@@ -19,8 +19,8 @@
 
 #include <unistd.h>
 
-#include "sd-daemon.h"
-#include "sd-messages.h"
+#include <systemd/sd-daemon.h>
+#include <systemd/sd-messages.h>
 
 #include "formats-util.h"
 #include "journal-authenticate.h"

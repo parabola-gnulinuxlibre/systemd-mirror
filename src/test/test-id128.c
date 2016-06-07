@@ -19,8 +19,8 @@
 
 #include <string.h>
 
-#include "sd-daemon.h"
-#include "sd-id128.h"
+#include <systemd/sd-daemon.h>
+#include <systemd/sd-id128.h>
 
 #include "alloc-util.h"
 #include "macro.h"
