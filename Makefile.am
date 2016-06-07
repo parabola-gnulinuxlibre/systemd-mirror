@@ -2520,7 +2520,7 @@ dist_factory_pam_DATA = \
 	factory/etc/pam.d/other
 endif
 
-#@src/firstboot/Makefile -------------------------------------------------------
+#@src/systemd-firstboot/Makefile -----------------------------------------------
 if ENABLE_FIRSTBOOT
 systemd_firstboot_SOURCES = \
 	src/firstboot/firstboot.c
@@ -2568,21 +2568,21 @@ systemd_sleep_SOURCES = \
 systemd_sleep_LDADD = \
 	libshared.la
 
-#@src/fsck/Makefile ------------------------------------------------------------
+#@src/systemd-fsck/Makefile ----------------------------------------------------
 systemd_fsck_SOURCES = \
 	src/fsck/fsck.c
 
 systemd_fsck_LDADD = \
 	libshared.la
 
-#@src/ac-power/Makefile --------------------------------------------------------
+#@src/systemd-ac-power/Makefile ------------------------------------------------
 systemd_ac_power_SOURCES = \
 	src/ac-power/ac-power.c
 
 systemd_ac_power_LDADD = \
 	libshared.la
 
-#@src/detect-virt/Makefile -----------------------------------------------------
+#@src/systemd-detect-virt/Makefile ---------------------------------------------
 systemd_detect_virt_SOURCES = \
 	src/detect-virt/detect-virt.c
 
@@ -2599,21 +2599,21 @@ systemd_delta_SOURCES = \
 systemd_delta_LDADD = \
 	libshared.la
 
-#@src/getty-generator/Makefile -------------------------------------------------
+#@src/systemd-getty-generator/Makefile -----------------------------------------
 systemd_getty_generator_SOURCES = \
 	src/getty-generator/getty-generator.c
 
 systemd_getty_generator_LDADD = \
 	libshared.la
 
-#@src/debug-generator/Makefile -------------------------------------------------
+#@src/systemd-debug-generator/Makefile -----------------------------------------
 systemd_debug_generator_SOURCES = \
 	src/debug-generator/debug-generator.c
 
 systemd_debug_generator_LDADD = \
 	libshared.la
 
-#@src/fstab-generator/Makefile -------------------------------------------------
+#@src/systemd-fstab-generator/Makefile -----------------------------------------
 systemd_fstab_generator_SOURCES = \
 	src/fstab-generator/fstab-generator.c \
 	src/core/mount-setup.c
@@ -2621,14 +2621,14 @@ systemd_fstab_generator_SOURCES = \
 systemd_fstab_generator_LDADD = \
 	libshared.la
 
-#@src/system-update-generator/Makefile -----------------------------------------
+#@src/systemd-system-update-generator/Makefile ---------------------------------
 systemd_system_update_generator_SOURCES = \
 	src/system-update-generator/system-update-generator.c
 
 systemd_system_update_generator_LDADD = \
 	libshared.la
 
-#@src/hibernate-resume/Makefile ------------------------------------------------
+#@src/systemd-hibernate-resume/Makefile ----------------------------------------
 if ENABLE_HIBERNATE
 systemgenerator_PROGRAMS += \
 	systemd-hibernate-resume-generator
@@ -2856,7 +2856,7 @@ test-efi: test-efi-disk.img
 
 EXTRA_DIST += test/test-efi-create-disk.sh
 
-#@src/gpt-auto-generator/Makefile ----------------------------------------------
+#@src/systemd-gpt-auto-generator/Makefile --------------------------------------
 if HAVE_BLKID
 systemgenerator_PROGRAMS +=  \
 	systemd-gpt-auto-generator
@@ -2874,7 +2874,7 @@ systemd_gpt_auto_generator_CFLAGS = \
 	$(BLKID_CFLAGS)
 endif
 
-#@src/dbus1-generator/Makefile -------------------------------------------------
+#@src/systemd-dbus1-generator/Makefile -----------------------------------------
 systemgenerator_PROGRAMS +=  \
 	systemd-dbus1-generator
 
@@ -2898,14 +2898,14 @@ dist_xinitrc_SCRIPTS = \
 INSTALL_EXEC_HOOKS += dbus1-generator-install-hook
 UNINSTALL_EXEC_HOOKS += dbus1-generator-uninstall-hook
 
-#@src/sysv-generator/Makefile --------------------------------------------------
+#@src/systemd-sysv-generator/Makefile ------------------------------------------
 systemd_sysv_generator_SOURCES = \
 	src/sysv-generator/sysv-generator.c
 
 systemd_sysv_generator_LDADD = \
 	libcore.la
 
-#@src/rc-local-generator/Makefile ----------------------------------------------
+#@src/systemd-rc-local-generator/Makefile --------------------------------------
 systemd_rc_local_generator_SOURCES = \
 	src/rc-local-generator/rc-local-generator.c
 
@@ -3782,7 +3782,7 @@ udevadm_SOURCES = \
 udevadm_LDADD = \
 	libudev-core.la
 
-# ------------------------------------------------------------------------------
+#@src/systemd-hwdb/Makefile ----------------------------------------------------
 if ENABLE_HWDB
 INSTALL_DIRS += \
 	$(sysconfdir)/udev/hwdb.d
@@ -3833,7 +3833,7 @@ EXTRA_DIST += \
 	hwdb/ids-update.pl \
 	hwdb/sdio.ids
 
-# ------------------------------------------------------------------------------
+#@discard.mk -------------------------------------------------------------------
 if ENABLE_TESTS
 TESTS += \
 	test/udev-test.pl
@@ -4466,7 +4466,7 @@ systemd_socket_proxyd_SOURCES = \
 systemd_socket_proxyd_LDADD = \
 	libshared.la
 
-#@src/coredump/Makefile --------------------------------------------------------
+#@src/systemd-coredump/Makefile ------------------------------------------------
 if ENABLE_COREDUMP
 systemd_coredump_SOURCES = \
 	src/coredump/coredump.c \
@@ -4500,6 +4500,7 @@ rootlibexec_PROGRAMS += \
 dist_pkgsysconf_DATA += \
 	src/coredump/coredump.conf
 
+#@src/coredumpctl/Makefile
 coredumpctl_SOURCES = \
 	src/coredump/coredumpctl.c
 
@@ -4509,6 +4510,7 @@ coredumpctl_LDADD = \
 bin_PROGRAMS += \
 	coredumpctl
 
+#@src/systemd-coredump/Makefile
 manual_tests += \
 	test-coredump-vacuum
 
@@ -4520,12 +4522,14 @@ test_coredump_vacuum_SOURCES = \
 test_coredump_vacuum_LDADD = \
 	libshared.la
 
+#@src/coredumpctl/Makefile
 dist_bashcompletion_data += \
 	shell-completion/bash/coredumpctl
 
 dist_zshcompletion_data += \
 	shell-completion/zsh/_coredumpctl
 
+#@src/systemd-coredump/Makefile
 nodist_sysctl_DATA = \
 	sysctl.d/50-coredump.conf
 
