@@ -59,12 +59,12 @@ $(outdir)/%-from-name.h: $(outdir)/%-from-name.gperf
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 
-$(outdir)/%: $(srcdir)/%.in
-	$(SED_PROCESS)
+#$(outdir)/%: $(srcdir)/%.in
+#	$(SED_PROCESS)
 
-$(outdir)/%.sh: $(srcdir)/%.sh.in
-	$(SED_PROCESS)
-	$(AM_V_GEN)chmod +x $@
+#$(outdir)/%.sh: $(srcdir)/%.sh.in
+#	$(SED_PROCESS)
+#	$(AM_V_GEN)chmod +x $@
 
 $(outdir)/%.c: $(srcdir)/%.gperf
 	$(AM_V_GPERF)$(GPERF) < $< > $@

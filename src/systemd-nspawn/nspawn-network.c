@@ -26,7 +26,6 @@
 
 #include "alloc-util.h"
 #include "ether-addr-util.h"
-#include "netlink-util.h"
 #include "nspawn-network.h"
 #include "siphash24.h"
 #include "string-util.h"

@@ -66,14 +66,14 @@ systemd_nspawn_LDADD += \
 	$(topoutdir)/src/libfirewall/libfirewall.la
 endif
 
+systemd_nspawn_SOURCES += local-addresses.c
 bin_PROGRAMS += systemd-nspawn
 $(eval $(value automake2autothing))
 at.depdirs += $(topoutdir)/src/libshared $(if $(HAVE_LIBIPTC),$(topoutdir)/src/libfirewall)
+AM_CPPFLAGS += $(libshared.CPPFLAGS) $(if $(HAVE_LIBIPTC),$(libfirewall.CPPFLAGS))
+
 AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += $(libshared.CPPFLAGS)
 AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
-AM_CPPFLAGS += $(libfirewall.CPPFLAGS)
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-netlink
 AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 AM_CPPFLAGS += -I$(topsrcdir)/src/libudev/src
 

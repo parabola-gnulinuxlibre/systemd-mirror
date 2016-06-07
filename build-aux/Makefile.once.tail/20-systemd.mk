@@ -30,15 +30,15 @@ config_commands = depfiles libtool po/stamp-it
 $(addprefix $(topoutdir)/,config.status $(config_files) $(config_headers)): $(topoutdir)/%: $(topoutdir)/%.stamp
 $(topoutdir)/config.status.stamp: $(topsrcdir)/configure
 	cd $(topoutdir) && ./config.status --recheck
-	@test -f $(topoutdir)/$*
+	test -f $(topoutdir)/$*
 	touch $@
 $(foreach f,$(config_files),$(topoutdir)/$f.stamp): $(topoutdir)/%.stamp: $(topoutdir)/config.status $(topsrcdir)/%.in
 	cd $(topoutdir) && ./config.status --file=$*
-	@test -f $(topoutdir)/$*
+	test -f $(topoutdir)/$*
 	touch $@
 $(foreach f,$(config_headers),$(topoutdir)/$f.stamp): $(topoutdir)/%.stamp: $(topoutdir)/config.status $(topsrcdir)/%.in
 	cd $(topoutdir) && ./config.status --header=$*
-	@test -f $(topoutdir)/$*
+	test -f $(topoutdir)/$*
 	touch $@
 
 # Let's run all tests of the test suite, but under valgrind. Let's

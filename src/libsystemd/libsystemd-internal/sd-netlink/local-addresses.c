@@ -23,7 +23,6 @@
 #include "alloc-util.h"
 #include "local-addresses.h"
 #include "macro.h"
-#include "netlink-util.h"
 
 static int address_compare(const void *_a, const void *_b) {
         const struct local_address *a = _a, *b = _b;
