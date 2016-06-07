@@ -23,7 +23,7 @@
 
 -include $(outdir)/$(DEPDIR)/*.P*
 
-std.clean_files += *.o *.lo .deps/ .libs/
+std.clean_files += *.o *.lo *.so .deps/ .libs/
 std.clean_files += *-list.txt
 std.clean_files += *-from-name.gperf
 std.clean_files += *-from-name.h

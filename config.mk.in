@@ -41,6 +41,10 @@ OUR_CFLAGS = @OUR_CFLAGS@
 OUR_LDFLAGS = @OUR_LDFLAGS@
 OUR_LIBTOOLFLAGS =
 
+EFI_CPPFLAGS =
+EFI_CFLAGS =
+EFI_LDFLAGS =
+
 # Dirs of external packages
 dbuspolicydir=@dbuspolicydir@
 dbussessionservicedir=@dbussessionservicedir@

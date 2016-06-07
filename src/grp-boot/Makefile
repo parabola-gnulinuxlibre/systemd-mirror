@@ -20,41 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_EFI),)
-ifneq ($(HAVE_BLKID),)
-bootctl_SOURCES = \
-	src/boot/bootctl.c
-
-bootctl_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
-	-DEFI_MACHINE_TYPE_NAME=\"$(EFI_MACHINE_TYPE_NAME)\" \
-	-DBOOTLIBDIR=\"$(bootlibdir)\"
-
-bootctl_CFLAGS = \
-	$(AM_CFLAGS) \
-	$(BLKID_CFLAGS)
-
-bootctl_LDADD = \
-	$(topoutdir)/src/libshared/libshared.la \
-	$(BLKID_LIBS)
-
-bin_PROGRAMS += \
-	bootctl
-
-dist_bashcompletion_data += \
-	shell-completion/bash/bootctl
-
-dist_zshcompletion_data += \
-	shell-completion/zsh/_bootctl
-endif # HAVE_BLKID
-endif # ENABLE_EFI
-
-$(eval $(value automake2autothing))
-at.depdirs += $(topoutdir)/src/libshared
-AM_CPPFLAGS += $(libshared.CPPFLAGS)
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+at.subdirs += bootctl systemd-boot
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

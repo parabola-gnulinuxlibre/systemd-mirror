@@ -20,11 +20,12 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(ENABLE_EFI),)
 ifneq ($(HAVE_GNUEFI),)
+# ------------------------------------------------------------------------------
 efi_cppflags = \
 	$(EFI_CPPFLAGS) \
 	-I$(top_builddir) -include config.h \
@@ -81,17 +82,19 @@ EFI_FORMAT = -O binary
 else
 EFI_FORMAT = --target=efi-app-$(EFI_ARCH)
 endif # ARCH_AARCH64
-endif # HAVE_GNUEFI
-endif # ENABLE_EFI
 
+$(outdir)/%.o: $(srcdir)/%.c
+	$(AM_V_CC)$(EFI_CC) $(efi_cppflags) $(efi_cflags) -c $< -o $@
+
+$(outdir)/%.so:
+	@if test $(words $^) = 0; then echo 'Cannot link EFI library with no dependencies: $@' >&2; exit 1; fi
+	$(AM_V_CCLD)$(LD) $(efi_ldflags) $^ -o $@ -lefi -lgnuefi $(shell $(CC) -print-libgcc-file-name)
+	$(AM_V_at)! { nm -D -u $@ | grep ' U '; }
+
+# These next 2 are the same rule
+$(outdir)/%$(EFI_MACHINE_TYPE_NAME).efi     : $(outdir)/%.so; $(AM_V_GEN)$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel -j .rela -j .reloc $(EFI_FORMAT) $< $@
+$(outdir)/%$(EFI_MACHINE_TYPE_NAME).efi.stub: $(outdir)/%.so; $(AM_V_GEN)$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel -j .rela -j .reloc $(EFI_FORMAT) $< $@
 # ------------------------------------------------------------------------------
-systemd_boot_headers = \
-	src/boot/efi/util.h \
-	src/boot/efi/console.h \
-	src/boot/efi/graphics.h \
-	src/boot/efi/pefile.h \
-	src/boot/efi/disk.h
-
 systemd_boot_sources = \
 	src/boot/efi/util.c \
 	src/boot/efi/console.c \
@@ -100,42 +103,11 @@ systemd_boot_sources = \
 	src/boot/efi/disk.c \
 	src/boot/efi/boot.c
 
-EXTRA_DIST += $(systemd_boot_sources) $(systemd_boot_headers)
-
-systemd_boot_objects = $(addprefix $(top_builddir)/,$(systemd_boot_sources:.c=.o))
-systemd_boot_solib = $(top_builddir)/src/boot/efi/systemd_boot.so
 systemd_boot = systemd-boot$(EFI_MACHINE_TYPE_NAME).efi
-
-ifneq ($(ENABLE_EFI),)
-ifneq ($(HAVE_GNUEFI),)
-bootlib_DATA = $(systemd_boot)
-
-$(outdir)/%.o: $(top_srcdir)/src/boot/efi/%.c $(addprefix $(top_srcdir)/,$(systemd_boot_headers))
-	@$(MKDIR_P) $(top_builddir)/src/boot/efi/
-	$(AM_V_CC)$(EFI_CC) $(efi_cppflags) $(efi_cflags) -c $< -o $@
-
-$(systemd_boot_solib): $(systemd_boot_objects)
-	$(AM_V_CCLD)$(LD) $(efi_ldflags) $(systemd_boot_objects) \
-		-o $@ -lefi -lgnuefi $(shell $(CC) -print-libgcc-file-name); \
-	nm -D -u $@ | grep ' U ' && exit 1 || :
-
-$(systemd_boot): $(systemd_boot_solib)
-	$(AM_V_GEN)$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic \
-	  -j .dynsym -j .rel -j .rela -j .reloc $(EFI_FORMAT) $< $@
-endif # HAVE_GNUEFI
-endif # ENABLE_EFI
-
-CLEANFILES += $(systemd_boot_objects) $(systemd_boot_solib) $(systemd_boot)
-
+std.out_files += $(systemd_boot)
+std.sys_files += $(bootlibdir)/$(systemd_boot)
+$(outdir)/systemd-boot.so: $(addprefix $(outdir)/,$(notdir $(systemd_boot_sources:.c=.o)))
 # ------------------------------------------------------------------------------
-stub_headers = \
-	src/boot/efi/util.h \
-	src/boot/efi/pefile.h \
-	src/boot/efi/disk.h \
-	src/boot/efi/graphics.h \
-	src/boot/efi/splash.h \
-	src/boot/efi/linux.h
-
 stub_sources = \
 	src/boot/efi/util.c \
 	src/boot/efi/pefile.c \
@@ -145,47 +117,19 @@ stub_sources = \
 	src/boot/efi/linux.c \
 	src/boot/efi/stub.c
 
-EXTRA_DIST += \
-	$(stub_sources) \
-	$(stub_headers) \
-	test/splash.bmp
-
-stub_objects = $(addprefix $(top_builddir)/,$(stub_sources:.c=.o))
-stub_solib = $(top_builddir)/src/boot/efi/stub.so
 stub = linux$(EFI_MACHINE_TYPE_NAME).efi.stub
-
-ifneq ($(ENABLE_EFI),)
-ifneq ($(HAVE_GNUEFI),)
-bootlib_DATA += $(stub)
-
-$(outdir)/%.o: $(top_srcdir)/src/boot/efi/%.c $(addprefix $(top_srcdir)/,$(stub_headers))
-	@$(MKDIR_P) $(top_builddir)/src/boot/efi/
-	$(AM_V_CC)$(EFI_CC) $(efi_cppflags) $(efi_cflags) -c $< -o $@
-
-$(stub_solib): $(stub_objects)
-	$(AM_V_CCLD)$(LD) $(efi_ldflags) $(stub_objects) \
-		-o $@ -lefi -lgnuefi $(shell $(CC) -print-libgcc-file-name); \
-	nm -D -u $@ | grep ' U ' && exit 1 || :
-
-$(stub): $(stub_solib)
-	$(AM_V_GEN)$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic \
-	  -j .dynsym -j .rel -j .rela -j .reloc $(EFI_FORMAT) $< $@
-endif # HAVE_GNUEFI
-endif # ENABLE_EFI
-
-CLEANFILES += $(stub_objects) $(stub_solib) $(stub)
-
-
+std.out_files += $(stub)
+std.sys_files += $(bootlibdir)/$(stub)
+$(outdir)/linux.so: $(addprefix $(outdir)/,$(notdir $(stub_sources:.c=.o)))
 # ------------------------------------------------------------------------------
-CLEANFILES += test-efi-disk.img
+$(outdir)/test-efi-disk.img: $(outdir)/$(systemd_boot) $(outdir)/$(stub) $(srcdir)/test-efi-create-disk.sh
+	$(AM_V_GEN)$(@D)/test-efi-create-disk.sh
 
-test-efi-disk.img: $(systemd_boot) $(stub) test/test-efi-create-disk.sh
-	$(AM_V_GEN)test/test-efi-create-disk.sh
-
-test-efi: test-efi-disk.img
+test-efi: $(outdir)/test-efi-disk.img
 	$(QEMU) -machine accel=kvm -m 1024 -bios $(QEMU_BIOS) -snapshot test-efi-disk.img
 
-EXTRA_DIST += test/test-efi-create-disk.sh
-
+std.clean_files += test-efi-disk.img
 # ------------------------------------------------------------------------------
+endif # HAVE_GNUEFI
+endif # ENABLE_EFI
 include $(topsrcdir)/build-aux/Makefile.tail.mk
