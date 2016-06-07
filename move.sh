@@ -157,6 +157,9 @@ move_files() (
 	done
 
 	mkdir src/busctl
+	mv src/libsystemd/libsystemd-internal/sd-bus/busctl* src/busctl
+
+	mv -T src/{udev,libudev/src}/udev.h
 )
 
 breakup_makefile() (
