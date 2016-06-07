@@ -31,7 +31,7 @@
 #include <gnutls/gnutls.h>
 #endif
 
-#include "sd-daemon.h"
+#include <systemd/sd-daemon.h>
 
 #include "alloc-util.h"
 #include "conf-parser.h"
