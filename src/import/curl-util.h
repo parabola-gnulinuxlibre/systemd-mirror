@@ -22,7 +22,7 @@
 #include <curl/curl.h>
 #include <sys/types.h>
 
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 
 #include "hashmap.h"
 
