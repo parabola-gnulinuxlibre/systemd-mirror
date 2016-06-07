@@ -23,46 +23,29 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-systemd_machined_SOURCES = \
-	src/machine/machined.c \
-	src/machine/machined.h
+libmachine_core_la_SOURCES = \
+	src/machine/machine.c \
+	src/machine/machine.h \
+	src/machine/machined-dbus.c \
+	src/machine/machine-dbus.c \
+	src/machine/machine-dbus.h \
+	src/machine/image-dbus.c \
+	src/machine/image-dbus.h
 
-systemd_machined_LDADD = \
+libmachine_core_la_LIBADD = \
+	libshared.la
+
+noinst_LTLIBRARIES += \
 	libmachine-core.la
 
-libexec_PROGRAMS += \
-	systemd-machined
+test_machine_tables_SOURCES = \
+	src/machine/test-machine-tables.c
 
-nodist_systemunit_DATA += \
-	units/systemd-machined.service
+test_machine_tables_LDADD = \
+	libmachine-core.la
 
-dist_systemunit_DATA += \
-	units/machine.slice
-
-dist_systemunit_DATA_busnames += \
-	units/org.freedesktop.machine1.busname
-
-dist_dbussystemservice_DATA += \
-	src/machine/org.freedesktop.machine1.service
-
-dist_dbuspolicy_DATA += \
-	src/machine/org.freedesktop.machine1.conf
-
-polkitpolicy_files += \
-	src/machine/org.freedesktop.machine1.policy
-
-SYSTEM_UNIT_ALIASES += \
-	systemd-machined.service dbus-org.freedesktop.machine1.service
-
-BUSNAMES_TARGET_WANTS += \
-	org.freedesktop.machine1.busname
-
-
-polkitpolicy_in_files += \
-	src/machine/org.freedesktop.machine1.policy.in
-
-EXTRA_DIST += \
-	units/systemd-machined.service.in
+tests += \
+	test-machine-tables
 
 $(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

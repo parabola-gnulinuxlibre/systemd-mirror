@@ -23,7 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_MACHINED),)
 
 libnss_mymachines_la_SOURCES = \
 	src/nss-mymachines/nss-mymachines.sym \
@@ -44,7 +43,6 @@ libnss_mymachines_la_LIBADD = \
 lib_LTLIBRARIES += \
 	libnss_mymachines.la
 
-endif # ENABLE_MACHINED
 $(eval $(value automake2autothing))
 at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-internal
 AM_CPPFLAGS += $(libbasic.CPPFLAGS)

@@ -23,46 +23,21 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-systemd_machined_SOURCES = \
-	src/machine/machined.c \
-	src/machine/machined.h
+machinectl_SOURCES = \
+	src/machine/machinectl.c
 
-systemd_machined_LDADD = \
-	libmachine-core.la
+machinectl_LDADD = \
+	libshared.la
 
-libexec_PROGRAMS += \
-	systemd-machined
+bin_PROGRAMS += \
+	machinectl
 
-nodist_systemunit_DATA += \
-	units/systemd-machined.service
+dist_bashcompletion_data += \
+	shell-completion/bash/machinectl
 
-dist_systemunit_DATA += \
-	units/machine.slice
-
-dist_systemunit_DATA_busnames += \
-	units/org.freedesktop.machine1.busname
-
-dist_dbussystemservice_DATA += \
-	src/machine/org.freedesktop.machine1.service
-
-dist_dbuspolicy_DATA += \
-	src/machine/org.freedesktop.machine1.conf
-
-polkitpolicy_files += \
-	src/machine/org.freedesktop.machine1.policy
-
-SYSTEM_UNIT_ALIASES += \
-	systemd-machined.service dbus-org.freedesktop.machine1.service
-
-BUSNAMES_TARGET_WANTS += \
-	org.freedesktop.machine1.busname
-
-
-polkitpolicy_in_files += \
-	src/machine/org.freedesktop.machine1.policy.in
-
-EXTRA_DIST += \
-	units/systemd-machined.service.in
+dist_zshcompletion_data += \
+	shell-completion/zsh/_machinectl \
+	shell-completion/zsh/_sd_machines
 
 $(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk
