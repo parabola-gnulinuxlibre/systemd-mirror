@@ -126,6 +126,7 @@ _subdirs := $(notdir $(patsubst %/,%,$(dir $(call automake_sources,libsystemd-in
 automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
 
 at.subdirs += $(_subdirs)
+at.depdirs += $(topoutdir)/src/libbasic
 
 AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
 AM_CPPFLAGS += $(libbasic.CPPFLAGS)

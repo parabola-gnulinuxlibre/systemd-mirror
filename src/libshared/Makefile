@@ -140,6 +140,7 @@ libshared_la_LIBADD = \
 $(eval $(value automake2autothing))
 at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-internal
 at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-journal-internal
+at.depdirs += $(topoutdir)/src/libudev/src
 AM_CPPFLAGS += $(libbasic.CPPFLAGS)
 AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
 AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
