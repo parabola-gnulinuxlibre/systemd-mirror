@@ -75,6 +75,7 @@ test_libudev_sym_LDADD = \
 	libudev.la
 
 $(eval $(value automake2autothing))
+systemd.sed_files += libudev.pc
 AM_CPPFLAGS += $(libbasic.CPPFLAGS)
 AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
 AM_CPPFLAGS += $(libsystemd.CPPFLAGS)

@@ -27,6 +27,8 @@ noinst_LTLIBRARIES += \
 	libshared.la
 
 libshared_la_SOURCES = \
+	src/libsystemd/sd-netlink/local-addresses.h \
+	src/libsystemd/sd-netlink/local-addresses.c \
 	src/shared/output-mode.h \
 	src/shared/gpt.h \
 	src/shared/udev-util.h \
@@ -137,11 +139,18 @@ libshared_la_LIBADD = \
 	$(LIBIDN_LIBS) \
 	$(SECCOMP_LIBS)
 
+test_local_addresses_SOURCES = \
+	src/libsystemd/sd-netlink/test-local-addresses.c
+
+test_local_addresses_LDADD = \
+	libshared.la
+
 $(eval $(value automake2autothing))
 at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-internal
 at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-journal-internal
 at.depdirs += $(topoutdir)/src/libudev/src
 AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+AM_CPPFLAGS += $(libsystemd.CPPFLAGS)
 AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
 AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 

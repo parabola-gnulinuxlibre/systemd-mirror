@@ -92,8 +92,6 @@ libsystemd_internal_la_SOURCES = \
 	src/libsystemd/sd-netlink/netlink-types.c \
 	src/libsystemd/sd-netlink/netlink-util.h \
 	src/libsystemd/sd-netlink/netlink-util.c \
-	src/libsystemd/sd-netlink/local-addresses.h \
-	src/libsystemd/sd-netlink/local-addresses.c \
 	src/libsystemd/sd-id128/sd-id128.c \
 	src/libsystemd/sd-daemon/sd-daemon.c \
 	src/libsystemd/sd-login/sd-login.c \
@@ -242,12 +240,6 @@ test_netlink_SOURCES = \
 	src/libsystemd/sd-netlink/test-netlink.c
 
 test_netlink_LDADD = \
-	libshared.la
-
-test_local_addresses_SOURCES = \
-	src/libsystemd/sd-netlink/test-local-addresses.c
-
-test_local_addresses_LDADD = \
 	libshared.la
 
 test_resolve_SOURCES = \

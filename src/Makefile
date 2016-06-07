@@ -25,6 +25,12 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 
 at.subdirs += busctl
 at.subdirs += grp-boot
+at.subdirs += grp-coredump
+at.subdirs += libbasic
+at.subdirs += libfirewall
+at.subdirs += libshared
+at.subdirs += libsystemd
+at.subdirs += libudev
 at.subdirs += systemd-nspawn
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
