@@ -21,7 +21,7 @@
 #include <linux/if.h>
 #include <netinet/ether.h>
 
-#include "sd-ndisc.h"
+#include <systemd/sd-ndisc.h>
 
 #include "alloc-util.h"
 #include "condition.h"

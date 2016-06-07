@@ -22,8 +22,8 @@
 
 #include <net/ethernet.h>
 
-#include "sd-event.h"
-#include "sd-lldp.h"
+#include <systemd/sd-event.h>
+#include <systemd/sd-lldp.h>
 
 #include "util.h"
 
