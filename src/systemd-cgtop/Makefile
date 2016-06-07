@@ -29,5 +29,4 @@ systemd_cgtop_SOURCES = \
 systemd_cgtop_LDADD = \
 	libshared.la
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

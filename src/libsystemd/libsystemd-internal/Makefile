@@ -248,12 +248,7 @@ test_resolve_SOURCES = \
 test_resolve_LDADD = \
 	libshared.la
 
-automake_sources = $(patsubst src/libsystemd/%,$(outdir)/%,$(filter %.c,$($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
-$(eval $(value automake2autothing))
-_subdirs := $(notdir $(patsubst %/,%,$(dir $(call automake_sources,libsystemd-internal.la))))
-automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
-
-at.subdirs += $(_subdirs)
+at.subdirs += $(notdir $(patsubst %/,%,$(dir $(call automake_sources,libsystemd-internal.la))))
 at.depdirs += $(topoutdir)/src/libbasic
 
 systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)

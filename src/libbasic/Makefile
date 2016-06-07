@@ -277,7 +277,6 @@ $(outdir)/cap-from-name.gperf: $(outdir)/cap-list.txt
 $(outdir)/cap-from-name.h: $(outdir)/cap-from-name.gperf
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_capability -H hash_capability_name -p -C <$< >$@
 
-$(eval $(value automake2autothing))
 $(outdir)/af-list.lo: $(outdir)/af-from-name.h $(outdir)/af-to-name.h
 $(outdir)/arphrd-list.lo: $(outdir)/arphrd-from-name.h $(outdir)/arphrd-to-name.h
 $(outdir)/cap-list.lo: $(outdir)/cap-from-name.h $(outdir)/cap-to-name.h

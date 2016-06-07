@@ -33,5 +33,4 @@ hwdb-update:
 	wget -O ma-small.txt 'http://standards.ieee.org/develop/regauth/oui36/oui36.txt' && \
 	./ids-update.pl )
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

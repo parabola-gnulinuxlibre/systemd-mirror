@@ -67,7 +67,6 @@ systemd_nspawn_LDADD += \
 endif # HAVE_LIBIPTC
 
 bin_PROGRAMS += systemd-nspawn
-$(eval $(value automake2autothing))
 at.depdirs += $(topoutdir)/src/libshared $(if $(HAVE_LIBIPTC),$(topoutdir)/src/libfirewall)
 systemd.CPPFLAGS += $(libshared.CPPFLAGS) $(if $(HAVE_LIBIPTC),$(libfirewall.CPPFLAGS))
 

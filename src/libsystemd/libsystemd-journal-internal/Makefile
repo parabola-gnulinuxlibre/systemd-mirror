@@ -109,8 +109,8 @@ endif # HAVE_GCRYPT
 noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la
 
-$(eval $(value automake2autothing))
 systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 systemd.CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"
 $(outdir)/audit-type.lo: $(outdir)/audit_type-to-name.h
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

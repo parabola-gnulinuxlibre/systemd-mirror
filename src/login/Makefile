@@ -240,5 +240,4 @@ endif # HAVE_PAM
 EXTRA_DIST += \
 	units/systemd-user-sessions.service.in
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

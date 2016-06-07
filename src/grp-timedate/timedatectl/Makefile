@@ -39,5 +39,4 @@ dist_bashcompletion_data += \
 dist_zshcompletion_data += \
 	shell-completion/zsh/_timedatectl
 endif # ENABLE_TIMEDATED
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

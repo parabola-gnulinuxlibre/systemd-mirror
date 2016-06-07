@@ -44,5 +44,4 @@ lib_LTLIBRARIES += \
 	libnss_myhostname.la
 endif # HAVE_MYHOSTNAME
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

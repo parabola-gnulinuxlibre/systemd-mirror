@@ -29,5 +29,4 @@ systemctl_SOURCES = \
 systemctl_LDADD = \
 	libshared.la
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

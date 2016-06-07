@@ -143,5 +143,4 @@ EXTRA_DIST += \
 	src/compat-libs/libsystemd-id128.pc.in \
 	src/compat-libs/libsystemd-daemon.pc.in
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

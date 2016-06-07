@@ -145,7 +145,6 @@ test_local_addresses_SOURCES = \
 test_local_addresses_LDADD = \
 	libshared.la
 
-$(eval $(value automake2autothing))
 at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-internal
 at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-journal-internal
 at.depdirs += $(topoutdir)/src/libudev/src

@@ -29,5 +29,4 @@ systemd_reply_password_SOURCES = \
 systemd_reply_password_LDADD = \
 	libshared.la
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

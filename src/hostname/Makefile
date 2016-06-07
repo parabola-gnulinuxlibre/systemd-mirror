@@ -76,5 +76,4 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-hostnamed.service.in
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

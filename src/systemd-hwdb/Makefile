@@ -73,5 +73,4 @@ EXTRA_DIST += \
 	hwdb/ids-update.pl \
 	hwdb/sdio.ids
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

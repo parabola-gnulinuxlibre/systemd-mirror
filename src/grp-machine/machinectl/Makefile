@@ -39,5 +39,4 @@ dist_zshcompletion_data += \
 	shell-completion/zsh/_machinectl \
 	shell-completion/zsh/_sd_machines
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -30,5 +30,4 @@ systemd_stdio_bridge_LDADD = \
 	libbus-proxy-core.la \
 	libshared.la
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

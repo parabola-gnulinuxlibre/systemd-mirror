@@ -197,5 +197,4 @@ EXTRA_DIST += \
 	units/systemd-networkd-wait-online.service.in \
 	test/networkd-test.py
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -345,5 +345,4 @@ endif # HAVE_MICROHTTPD
 EXTRA_DIST += \
 	units/systemd-journal-gatewayd.service.in
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

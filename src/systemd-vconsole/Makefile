@@ -47,5 +47,4 @@ EXTRA_DIST += \
 	src/vconsole/90-vconsole.rules.in \
 	units/systemd-vconsole-setup.service.in
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

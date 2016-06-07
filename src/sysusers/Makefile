@@ -58,5 +58,4 @@ EXTRA_DIST += \
 	sysusers.d/systemd-remote.conf.m4 \
 	sysusers.d/basic.conf.in
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

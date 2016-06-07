@@ -78,10 +78,10 @@ EXTRA_DIST += \
 	sysctl.d/50-coredump.conf.in \
 	units/systemd-coredump@.service.in
 
-$(eval $(value automake2autothing))
 systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 systemd.CPPFLAGS += $(libshared.CPPFLAGS)
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
 systemd.CPPFLAGS += -I$(topsrcdir)/src/journal
 systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

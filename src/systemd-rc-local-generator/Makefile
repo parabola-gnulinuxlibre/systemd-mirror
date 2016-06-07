@@ -29,5 +29,4 @@ systemd_rc_local_generator_SOURCES = \
 systemd_rc_local_generator_LDADD = \
 	libshared.la
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

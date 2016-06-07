@@ -846,5 +846,4 @@ test_arphrd_list_SOURCES = \
 test_arphrd_list_LDADD = \
 	libbasic.la
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -44,5 +44,4 @@ endif # ENABLE_RANDOMSEED
 EXTRA_DIST += \
 	units/systemd-random-seed.service.in
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

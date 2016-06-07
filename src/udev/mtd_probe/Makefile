@@ -34,5 +34,4 @@ dist_udevrules_DATA += \
 udevlibexec_PROGRAMS += \
 	mtd_probe
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

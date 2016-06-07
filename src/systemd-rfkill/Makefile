@@ -43,5 +43,4 @@ endif # ENABLE_RFKILL
 EXTRA_DIST += \
 	units/systemd-rfkill.service.in
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -30,5 +30,4 @@ dist_kernelinstall_SCRIPTS = \
 	src/kernel-install/50-depmod.install \
 	src/kernel-install/90-loaderentry.install
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -40,5 +40,4 @@ endif # ENABLE_BACKLIGHT
 EXTRA_DIST += \
 	units/systemd-backlight@.service.in
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

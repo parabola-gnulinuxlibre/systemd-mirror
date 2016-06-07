@@ -43,8 +43,8 @@ libnss_mymachines_la_LIBADD = \
 lib_LTLIBRARIES += \
 	libnss_mymachines.la
 
-$(eval $(value automake2autothing))
 at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-internal
 systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

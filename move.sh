@@ -133,6 +133,7 @@ move_files() (
 	mkdir src/grp-boot
 	mv -T src/boot/efi src/grp-boot/systemd-boot
 	mv -T src/boot src/grp-boot/bootctl
+	mv -T {test,src/grp-boot/systemd-boot}/test-efi-create-disk.sh
 
 	mkdir build-aux
 	mkdir build-aux/Makefile.{once,each}.{head,tail}

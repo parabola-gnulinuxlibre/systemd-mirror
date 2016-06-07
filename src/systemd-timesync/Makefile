@@ -61,5 +61,4 @@ EXTRA_DIST += \
 	units/systemd-timesyncd.service.in \
 	src/timesync/timesyncd.conf.in
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

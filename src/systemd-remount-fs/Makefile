@@ -31,5 +31,4 @@ systemd_remount_fs_SOURCES = \
 systemd_remount_fs_LDADD = \
 	libshared.la
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

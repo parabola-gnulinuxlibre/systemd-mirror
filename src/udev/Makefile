@@ -177,5 +177,4 @@ udevadm_SOURCES = \
 udevadm_LDADD = \
 	libudev-core.la
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

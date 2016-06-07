@@ -29,5 +29,4 @@ systemd_cgroups_agent_SOURCES = \
 systemd_cgroups_agent_LDADD = \
 	libshared.la
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

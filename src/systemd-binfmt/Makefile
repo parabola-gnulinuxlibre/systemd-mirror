@@ -53,5 +53,4 @@ endif # ENABLE_BINFMT
 EXTRA_DIST += \
 	units/systemd-binfmt.service.in
 
-$(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk
