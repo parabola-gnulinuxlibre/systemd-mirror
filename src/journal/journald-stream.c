@@ -24,8 +24,8 @@
 #include <selinux/selinux.h>
 #endif
 
-#include "sd-daemon.h"
-#include "sd-event.h"
+#include <systemd/sd-daemon.h>
+#include <systemd/sd-event.h>
 
 #include "alloc-util.h"
 #include "dirent-util.h"

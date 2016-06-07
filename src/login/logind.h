@@ -22,8 +22,8 @@
 #include <stdbool.h>
 
 #include "libudev.h"
-#include "sd-bus.h"
-#include "sd-event.h"
+#include <systemd/sd-bus.h>
+#include <systemd/sd-event.h>
 
 #include "hashmap.h"
 #include "list.h"
