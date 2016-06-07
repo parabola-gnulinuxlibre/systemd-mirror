@@ -23,60 +23,55 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_COREDUMP),)
-systemd_coredump_SOURCES = \
-	src/coredump/coredump.c \
-	src/coredump/coredump-vacuum.c \
-	src/coredump/coredump-vacuum.h
+ifneq ($(ENABLE_HWDB),)
+INSTALL_DIRS += \
+	$(sysconfdir)/udev/hwdb.d
 
-systemd_coredump_LDADD = \
+systemd_hwdb_SOURCES = \
+	src/libsystemd/sd-hwdb/hwdb-internal.h \
+	src/hwdb/hwdb.c
+
+systemd_hwdb_LDADD = \
 	libshared.la
 
-ifneq ($(HAVE_ELFUTILS),)
-systemd_coredump_SOURCES += \
-	src/coredump/stacktrace.c \
-	src/coredump/stacktrace.h
+bin_PROGRAMS += \
+	systemd-hwdb
 
-systemd_coredump_LDADD += \
-	$(ELFUTILS_LIBS)
-endif
+dist_udevhwdb_DATA = \
+	hwdb/20-pci-vendor-model.hwdb \
+	hwdb/20-pci-classes.hwdb \
+	hwdb/20-usb-vendor-model.hwdb \
+	hwdb/20-usb-classes.hwdb \
+	hwdb/20-sdio-vendor-model.hwdb \
+	hwdb/20-sdio-classes.hwdb \
+	hwdb/20-bluetooth-vendor-product.hwdb \
+	hwdb/20-acpi-vendor.hwdb \
+	hwdb/20-OUI.hwdb \
+	hwdb/20-net-ifname.hwdb \
+	hwdb/60-evdev.hwdb \
+	hwdb/60-keyboard.hwdb \
+	hwdb/70-mouse.hwdb \
+	hwdb/70-pointingstick.hwdb
 
-nodist_systemunit_DATA += \
-	units/systemd-coredump@.service
+SYSINIT_TARGET_WANTS += \
+	systemd-hwdb-update.service
 
-dist_systemunit_DATA += \
-	units/systemd-coredump.socket
+# Update hwdb on installation. Do not bother if installing
+# in DESTDIR, since this is likely for packaging purposes.
+hwdb-update-hook:
+	-test -n "$(DESTDIR)" || $(bindir)/systemd-hwdb update
 
-SOCKETS_TARGET_WANTS += \
-	systemd-coredump.socket
+INSTALL_DATA_HOOKS += \
+	hwdb-update-hook
 
-libexec_PROGRAMS += \
-	systemd-coredump
-
-dist_pkgsysconf_DATA += \
-	src/coredump/coredump.conf
-
-manual_tests += \
-	test-coredump-vacuum
-
-test_coredump_vacuum_SOURCES = \
-	src/coredump/test-coredump-vacuum.c  \
-	src/coredump/coredump-vacuum.c \
-	src/coredump/coredump-vacuum.h
-
-test_coredump_vacuum_LDADD = \
-	libshared.la
-
-nodist_sysctl_DATA = \
-	sysctl.d/50-coredump.conf
-
-CLEANFILES += \
-	sysctl.d/50-coredump.conf
+hwdb-remove-hook:
+	-test -n "$(DESTDIR)" || rm -f /etc/udev/hwdb.bin
 endif
 
 EXTRA_DIST += \
-	sysctl.d/50-coredump.conf.in \
-	units/systemd-coredump@.service.in
+	units/systemd-hwdb-update.service.in \
+	hwdb/ids-update.pl \
+	hwdb/sdio.ids
 
 $(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

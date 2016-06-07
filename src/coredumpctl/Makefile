@@ -23,60 +23,20 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_COREDUMP),)
-systemd_coredump_SOURCES = \
-	src/coredump/coredump.c \
-	src/coredump/coredump-vacuum.c \
-	src/coredump/coredump-vacuum.h
+coredumpctl_SOURCES = \
+	src/coredump/coredumpctl.c
 
-systemd_coredump_LDADD = \
+coredumpctl_LDADD = \
 	libshared.la
 
-ifneq ($(HAVE_ELFUTILS),)
-systemd_coredump_SOURCES += \
-	src/coredump/stacktrace.c \
-	src/coredump/stacktrace.h
+bin_PROGRAMS += \
+	coredumpctl
 
-systemd_coredump_LDADD += \
-	$(ELFUTILS_LIBS)
-endif
+dist_bashcompletion_data += \
+	shell-completion/bash/coredumpctl
 
-nodist_systemunit_DATA += \
-	units/systemd-coredump@.service
-
-dist_systemunit_DATA += \
-	units/systemd-coredump.socket
-
-SOCKETS_TARGET_WANTS += \
-	systemd-coredump.socket
-
-libexec_PROGRAMS += \
-	systemd-coredump
-
-dist_pkgsysconf_DATA += \
-	src/coredump/coredump.conf
-
-manual_tests += \
-	test-coredump-vacuum
-
-test_coredump_vacuum_SOURCES = \
-	src/coredump/test-coredump-vacuum.c  \
-	src/coredump/coredump-vacuum.c \
-	src/coredump/coredump-vacuum.h
-
-test_coredump_vacuum_LDADD = \
-	libshared.la
-
-nodist_sysctl_DATA = \
-	sysctl.d/50-coredump.conf
-
-CLEANFILES += \
-	sysctl.d/50-coredump.conf
-endif
-
-EXTRA_DIST += \
-	sysctl.d/50-coredump.conf.in \
-	units/systemd-coredump@.service.in
+dist_zshcompletion_data += \
+	shell-completion/zsh/_coredumpctl
 
 $(eval $(value automake2autothing))
 include $(topsrcdir)/build-aux/Makefile.tail.mk

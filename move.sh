@@ -21,6 +21,16 @@ move_files() (
 	done
 
 	pfix=(
+		dbus1-generator
+		debug-generator
+		fstab-generator
+		getty-generator
+		gpt-auto-generator
+		rc-local-generator
+		system-update-generator
+		sysv-generator
+
+		ac-power
 		activate
 		analyze
 		ask-password
@@ -30,9 +40,15 @@ move_files() (
 		cgls
 		cgroups-agent
 		cgtop
+		coredump
 		cryptsetup
 		delta
+		detect-virt
 		escape
+		firstboot
+		fsck
+		hibernate-resume
+		hwdb
 		notify
 		nspawn
 		path
@@ -100,6 +116,9 @@ move_files() (
 	mv -T src/libsystemd/{src,libsystemd-internal}
 
 	mkdir src/systemd-shutdown
+
+	mkdir src/coredumpctl
+	mv -T src/{systemd-coredump,coredumpctl}/coredumpctl.c
 
 	mkdir build-aux
 	mkdir build-aux/Makefile.{once,each}.{head,tail}

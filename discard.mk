@@ -801,6 +801,60 @@ noinst_LTLIBRARIES += \
 libudev_internal_la_SOURCES =\
 	$(libudev_la_SOURCES)
 
+ifneq ($(ENABLE_TESTS),)
+TESTS += \
+	test/udev-test.pl
+
+ifneq ($(HAVE_PYTHON),)
+TESTS += \
+	test/rule-syntax-check.py
+
+ifneq ($(HAVE_SYSV_COMPAT),)
+TESTS += \
+	test/sysv-generator-test.py
+endif
+endif
+endif
+
+manual_tests += \
+	test-libudev \
+	test-udev
+
+test_libudev_SOURCES = \
+	src/test/test-libudev.c
+
+test_libudev_LDADD = \
+	libshared.la
+
+test_udev_SOURCES = \
+	src/test/test-udev.c
+
+test_udev_LDADD = \
+	libudev-core.la  \
+	$(BLKID_LIBS) \
+	$(KMOD_LIBS)
+
+ifneq ($(ENABLE_TESTS),)
+check_DATA += \
+	test/sys
+endif
+
+# packed sysfs test tree
+$(outdir)/sys:
+	$(AM_V_at)$(MKDIR_P) $(dir $@)
+	$(AM_V_GEN)tar -C test/ -xJf $(top_srcdir)/test/sys.tar.xz
+
+test-sys-distclean:
+	-rm -rf test/sys
+DISTCLEAN_LOCAL_HOOKS += test-sys-distclean
+
+EXTRA_DIST += \
+	test/sys.tar.xz \
+	test/udev-test.pl \
+	test/rule-syntax-check.py \
+	test/sysv-generator-test.py \
+	test/mocks/fsck
+
 EXTRA_DIST += \
 	test/Makefile \
 	test/README.testsuite \
