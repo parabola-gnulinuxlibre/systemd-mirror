@@ -10,7 +10,7 @@ in_array() {
 }
 
 move_files() (
-	for d in libsystemd libudev machine resolve; do
+	for d in libsystemd libudev; do
 		mkdir src/$d-new
 		mv -T src/$d src/$d-new/src
 		mv -T src/$d-new src/$d
@@ -84,26 +84,31 @@ move_files() (
 	mkdir src/libsystemd/include
 	mv -T src/{,libsystemd/include}/systemd
 
-	mv -T src/{,machine}/nss-mymachines
-	mv -T src/{,resolve}/nss-resolve
+	mkdir src/grp-machine
+	mv -T src/{machine,grp-machine/systemd-machined}
+	mv -T src/{,grp-machine}/nss-mymachines
 
-	mkdir src/system
-	mv -T src/{,system}/systemctl
+	mkdir src/grp-resolve
+	mv -T src/{resolve,grp-resolve/systemd-resolved}
+	mv -T src/{,grp-resolve}/nss-resolve
+
+	mkdir src/grp-system
+	mv -T src/{,grp-system}/systemctl
 
 	mkdir src/libfirewall
 	mv -T src/lib{shared,firewall}/firewall-util.c
 	mv -T src/lib{shared,firewall}/firewall-util.h
 
-	mkdir src/system/systemd
-	mv -T src/{libcore,system/systemd}/main.c
-	mv -T src/{libcore,system/systemd}/macros.systemd.in
-	mv -T src/{libcore,system/systemd}/org.freedesktop.systemd1.conf
-	mv -T src/{libcore,system/systemd}/org.freedesktop.systemd1.policy.in.in
-	mv -T src/{libcore,system/systemd}/org.freedesktop.systemd1.service
-	mv -T src/{libcore,system/systemd}/system.conf
-	mv -T src/{libcore,system/systemd}/systemd.pc.in
-	mv -T src/{libcore,system/systemd}/triggers.systemd.in
-	mv -T src/{libcore,system/systemd}/user.conf
+	mkdir src/grp-system/systemd
+	mv -T src/{libcore,grp-system/systemd}/main.c
+	mv -T src/{libcore,grp-system/systemd}/macros.systemd.in
+	mv -T src/{libcore,grp-system/systemd}/org.freedesktop.systemd1.conf
+	mv -T src/{libcore,grp-system/systemd}/org.freedesktop.systemd1.policy.in.in
+	mv -T src/{libcore,grp-system/systemd}/org.freedesktop.systemd1.service
+	mv -T src/{libcore,grp-system/systemd}/system.conf
+	mv -T src/{libcore,grp-system/systemd}/systemd.pc.in
+	mv -T src/{libcore,grp-system/systemd}/triggers.systemd.in
+	mv -T src/{libcore,grp-system/systemd}/user.conf
 
 	mkdir src/libudev/include
 	mv -T src/libudev/{src,include}/libudev.h
@@ -117,8 +122,14 @@ move_files() (
 
 	mkdir src/systemd-shutdown
 
-	mkdir src/coredumpctl
-	mv -T src/{systemd-coredump,coredumpctl}/coredumpctl.c
+	mkdir src/grp-coredump
+	mv -T src/{,grp-coredump}/systemd-coredump
+	mkdir src/grp-coredump/coredumpctl
+	mv -T src/grp-coredump/{systemd-coredump,coredumpctl}/coredumpctl.c
+
+	mkdir src/grp-boot
+	mv -T src/boot/efi src/grp-boot/systemd-boot
+	mv -T src/boot src/grp-boot/bootctl
 
 	mkdir build-aux
 	mkdir build-aux/Makefile.{once,each}.{head,tail}
@@ -160,6 +171,12 @@ move_files() (
 	mv src/libsystemd/libsystemd-internal/sd-bus/busctl* src/busctl
 
 	mv -T src/{udev,libudev/src}/udev.h
+
+	mv -T src/{bus-proxyd,libbus-proxy-core}
+	mkdir src/systemd-bus-proxyd
+	mv  src/{libbus-proxy-core,systemd-bus-proxyd}/bus-proxyd.c
+	mkdir src/systemd-stdio-bridge
+	mv  src/{libbus-proxy-core,systemd-stdio-bridge}/stdio-bridge.c
 )
 
 breakup_makefile() (

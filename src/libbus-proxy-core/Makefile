@@ -23,19 +23,21 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-bin_PROGRAMS += \
-	busctl
+noinst_LTLIBRARIES += \
+	libbus-proxy-core.la
 
-busctl_SOURCES = \
-	src/libsystemd/sd-bus/busctl.c \
-	src/libsystemd/sd-bus/busctl-introspect.c \
-	src/libsystemd/sd-bus/busctl-introspect.h
+libbus_proxy_core_la_SOURCES = \
+	src/bus-proxyd/bus-xml-policy.c \
+	src/bus-proxyd/bus-xml-policy.h \
+	src/bus-proxyd/driver.c \
+	src/bus-proxyd/driver.h \
+	src/bus-proxyd/proxy.c \
+	src/bus-proxyd/proxy.h \
+	src/bus-proxyd/synthesize.c \
+	src/bus-proxyd/synthesize.h
 
-busctl_LDADD = \
-	$(topoutdir)/src/libshared/libshared.la
+libbus_proxy_core_la_LIBADD = \
+	libshared.la
 
 $(eval $(value automake2autothing))
-AM_CPPFLAGS += $(libshared.CPPFLAGS)
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 include $(topsrcdir)/build-aux/Makefile.tail.mk

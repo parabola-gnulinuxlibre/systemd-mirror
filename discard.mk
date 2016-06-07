@@ -715,66 +715,6 @@ dist_factory_pam_DATA = \
 	factory/etc/pam.d/other
 endif
 
-ifneq ($(HAVE_GNUEFI),)
-efi_cppflags = \
-	$(EFI_CPPFLAGS) \
-	-I$(top_builddir) -include config.h \
-	-I$(EFI_INC_DIR)/efi \
-	-I$(EFI_INC_DIR)/efi/$(EFI_ARCH) \
-	-DEFI_MACHINE_TYPE_NAME=\"$(EFI_MACHINE_TYPE_NAME)\"
-
-efi_cflags = \
-	$(EFI_CFLAGS) \
-	-Wall \
-	-Wextra \
-	-std=gnu90 \
-	-nostdinc \
-	-ggdb -O0 \
-	-fpic \
-	-fshort-wchar \
-	-nostdinc \
-	-ffreestanding \
-	-fno-strict-aliasing \
-	-fno-stack-protector \
-	-Wsign-compare \
-	-Wno-missing-field-initializers
-
-ifneq ($(ARCH_X86_64),)
-efi_cflags += \
-	-mno-red-zone \
-	-mno-sse \
-	-mno-mmx \
-	-DEFI_FUNCTION_WRAPPER \
-	-DGNU_EFI_USE_MS_ABI
-endif
-
-ifneq ($(ARCH_IA32),)
-efi_cflags += \
-	-mno-sse \
-	-mno-mmx
-endif
-
-efi_ldflags = \
-	$(EFI_LDFLAGS) \
-	-T $(EFI_LDS_DIR)/elf_$(EFI_ARCH)_efi.lds \
-	-shared \
-	-Bsymbolic \
-	-nostdlib \
-	-znocombreloc \
-	-L $(EFI_LIB_DIR) \
-	$(EFI_LDS_DIR)/crt0-efi-$(EFI_ARCH).o
-
-# Aarch64 and ARM32 don't have an EFI capable objcopy. Use 'binary' instead,
-# and add required symbols manually.
-ifneq ($(ARCH_AARCH64),)
-efi_ldflags += --defsym=EFI_SUBSYSTEM=0xa
-EFI_FORMAT = -O binary
-else
-EFI_FORMAT = --target=efi-app-$(EFI_ARCH)
-endif
-endif
-endif
-
 libsystemd-install-hook:
 	libname=libsystemd.so && $(move-to-libdir)
 

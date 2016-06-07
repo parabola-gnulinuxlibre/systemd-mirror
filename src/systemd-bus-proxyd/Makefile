@@ -23,19 +23,35 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-bin_PROGRAMS += \
-	busctl
+systemd_bus_proxyd_SOURCES = \
+	src/bus-proxyd/bus-proxyd.c
 
-busctl_SOURCES = \
-	src/libsystemd/sd-bus/busctl.c \
-	src/libsystemd/sd-bus/busctl-introspect.c \
-	src/libsystemd/sd-bus/busctl-introspect.h
+systemd_bus_proxyd_LDADD = \
+	libbus-proxy-core.la \
+	libshared.la
 
-busctl_LDADD = \
-	$(topoutdir)/src/libshared/libshared.la
+nodist_systemunit_DATA += \
+	units/systemd-bus-proxyd.service
+
+dist_systemunit_DATA += \
+	units/systemd-bus-proxyd.socket
+
+nodist_userunit_DATA += \
+	units/user/systemd-bus-proxyd.service
+
+dist_userunit_DATA += \
+	units/user/systemd-bus-proxyd.socket
+
+EXTRA_DIST += \
+	units/systemd-bus-proxyd.service.m4.in \
+	units/user/systemd-bus-proxyd.service.in
+
+ifneq ($(HAVE_SMACK),)
+bus-proxyd-set-cap-hook:
+	-$(SETCAP) cap_mac_admin+ei $(DESTDIR)$(libexecdir)/systemd-bus-proxyd
+
+INSTALL_EXEC_HOOKS += bus-proxyd-set-cap-hook
+endif
 
 $(eval $(value automake2autothing))
-AM_CPPFLAGS += $(libshared.CPPFLAGS)
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 include $(topsrcdir)/build-aux/Makefile.tail.mk
