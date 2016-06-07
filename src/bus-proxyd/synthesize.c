@@ -21,7 +21,7 @@
 
 #include <stddef.h>
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 #include "bus-internal.h"
 #include "bus-match.h"

@@ -23,7 +23,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
 #include "alloc-util.h"
 #include "bus-internal.h"

@@ -24,7 +24,7 @@
 #include <unistd.h>
 
 #include "libudev.h"
-#include "sd-messages.h"
+#include <systemd/sd-messages.h>
 
 #include "escape.h"
 #include "fd-util.h"
