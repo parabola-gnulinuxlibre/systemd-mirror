@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 libmachine_core_la_SOURCES = \
@@ -33,7 +33,7 @@ libmachine_core_la_SOURCES = \
 	src/machine/image-dbus.h
 
 libmachine_core_la_LIBADD = \
-	libshared.la
+	$(topoutdir)/src/libshared/libshared.la
 
 noinst_LTLIBRARIES += \
 	libmachine-core.la
@@ -48,4 +48,8 @@ tests += \
 	test-machine-tables
 
 $(eval $(value automake2autothing))
+at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-internal
+AM_CPPFLAGS += $(libshared.CPPFLAGS)
+AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 include $(topsrcdir)/build-aux/Makefile.tail.mk
