@@ -87,7 +87,6 @@ move_files() (
 	mv -T src/machine src/grp-machine/libmachine-core
 	mkdir src/grp-machine/systemd-machined
 	mv -T src/grp-machine/{libmachine-core,systemd-machined}/machined.c
-	mv -T src/grp-machine/{libmachine-core,systemd-machined}/machined.h
 	mkdir src/grp-machine/machinectl
 	mv -T src/grp-machine/{libmachine-core,machinectl}/machinectl.c
 	mv -T src/{,grp-machine}/nss-mymachines
