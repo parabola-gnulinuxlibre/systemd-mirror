@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+at.subdirs += busctl
 at.subdirs += systemd-nspawn
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
