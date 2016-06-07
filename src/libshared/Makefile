@@ -132,9 +132,9 @@ libshared_la_CFLAGS = \
 	$(SECCOMP_CFLAGS)
 
 libshared_la_LIBADD = \
-	$(topoutdir)/src/libsystemd/libsystemd-internal/libsystemd-internal.la \
-	$(topoutdir)/src/libsystemd/libsystemd-journal-internal/libsystemd-journal-internal.la \
-	$(topoutdir)/src/libudev/src/libudev.la \
+	libsystemd-internal.la \
+	libsystemd-journal-internal.la \
+	libudev.la \
 	$(ACL_LIBS) \
 	$(LIBIDN_LIBS) \
 	$(SECCOMP_LIBS)

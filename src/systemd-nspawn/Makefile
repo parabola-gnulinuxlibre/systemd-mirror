@@ -53,17 +53,17 @@ gperf_gperf_sources += \
 	src/nspawn/nspawn-gperf.gperf
 
 systemd_nspawn_CFLAGS = \
-	$(systemd.CFLAGS) \
+	$(AM_CFLAGS) \
 	$(BLKID_CFLAGS) \
 	$(SECCOMP_CFLAGS)
 
 systemd_nspawn_LDADD = \
-	$(topoutdir)/src/libshared/libshared.la \
+	libshared.la \
 	$(BLKID_LIBS)
 
 ifneq ($(HAVE_LIBIPTC),)
 systemd_nspawn_LDADD += \
-	$(topoutdir)/src/libfirewall/libfirewall.la
+	libfirewall.la
 endif # HAVE_LIBIPTC
 
 bin_PROGRAMS += systemd-nspawn

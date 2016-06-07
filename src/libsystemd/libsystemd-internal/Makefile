@@ -112,7 +112,7 @@ libsystemd_internal_la_SOURCES = \
 	src/libsystemd/sd-resolve/sd-resolve.c
 
 libsystemd_internal_la_LIBADD = \
-	$(topoutdir)/src/libbasic/libbasic.la \
+	libbasic.la \
 	-lresolv
 
 noinst_LTLIBRARIES += \
@@ -250,7 +250,8 @@ test_resolve_LDADD = \
 
 at.subdirs += $(notdir $(patsubst %/,%,$(dir $(call automake_sources,libsystemd-internal.la))))
 at.depdirs += $(topoutdir)/src/libbasic
-
+$(outdir)/libsystemd-internal.la: $(patsubst src/libsystemd/%,$(srcdir)/%,$(filter %.c,$(libsystemd_internal_la_SOURCES)))
+libsystemd_internal_la_SOURCES =
 systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
 systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 systemd.CPPFLAGS += $(libshared.CPPFLAGS)

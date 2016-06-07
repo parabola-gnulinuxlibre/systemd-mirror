@@ -38,7 +38,7 @@ libnss_mymachines_la_LDFLAGS = \
 	-Wl,--version-script=$(srcdir)/nss-mymachines.sym
 
 libnss_mymachines_la_LIBADD = \
-	$(topoutdir)/src/libsystemd/libsystemd-internal/libsystemd-internal.la
+	libsystemd-internal.la
 
 lib_LTLIBRARIES += \
 	libnss_mymachines.la

@@ -27,7 +27,7 @@ coredumpctl_SOURCES = \
 	src/coredump/coredumpctl.c
 
 coredumpctl_LDADD = \
-	$(topoutdir)/src/libshared/libshared.la
+	libshared.la
 
 bin_PROGRAMS += \
 	coredumpctl

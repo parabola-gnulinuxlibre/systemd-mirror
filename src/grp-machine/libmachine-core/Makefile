@@ -33,7 +33,7 @@ libmachine_core_la_SOURCES = \
 	src/machine/image-dbus.h
 
 libmachine_core_la_LIBADD = \
-	$(topoutdir)/src/libshared/libshared.la
+	libshared.la
 
 noinst_LTLIBRARIES += \
 	libmachine-core.la
