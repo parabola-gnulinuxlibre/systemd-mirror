@@ -5151,7 +5151,6 @@ rootlib_LTLIBRARIES += \
 endif # HAVE_MYHOSTNAME
 
 #@src/grp-machine/systemd-machined/Makefile ------------------------------------
-if ENABLE_MACHINED
 systemd_machined_SOURCES = \
 	src/machine/machined.c \
 	src/machine/machined.h
@@ -5162,6 +5161,7 @@ systemd_machined_LDADD = \
 rootlibexec_PROGRAMS += \
 	systemd-machined
 
+#@src/grp-machine/libmachine-core/Makefile
 libmachine_core_la_SOURCES = \
 	src/machine/machine.c \
 	src/machine/machine.h \
@@ -5179,6 +5179,7 @@ libmachine_core_la_LIBADD = \
 noinst_LTLIBRARIES += \
 	libmachine-core.la
 
+#@src/grp-machine/machinectl/Makefile
 machinectl_SOURCES = \
 	src/machine/machinectl.c
 
@@ -5188,6 +5189,7 @@ machinectl_LDADD = \
 rootbin_PROGRAMS += \
 	machinectl
 
+#@src/grp-machine/libmachine-core/Makefile
 test_machine_tables_SOURCES = \
 	src/machine/test-machine-tables.c
 
@@ -5197,6 +5199,7 @@ test_machine_tables_LDADD = \
 tests += \
 	test-machine-tables
 
+#@src/grp-machine/systemd-machined/Makefile
 nodist_systemunit_DATA += \
 	units/systemd-machined.service
 
@@ -5215,6 +5218,7 @@ dist_dbuspolicy_DATA += \
 polkitpolicy_files += \
 	src/machine/org.freedesktop.machine1.policy
 
+#@src/grp-machine/machinectl/Makefile
 dist_bashcompletion_data += \
 	shell-completion/bash/machinectl
 
@@ -5222,15 +5226,14 @@ dist_zshcompletion_data += \
 	shell-completion/zsh/_machinectl \
 	shell-completion/zsh/_sd_machines
 
+#@src/grp-machine/systemd-machined/Makefile
 SYSTEM_UNIT_ALIASES += \
 	systemd-machined.service dbus-org.freedesktop.machine1.service
 
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.machine1.busname
 
-endif # ENABLE_MACHINED
 #@src/grp-machine/nss-mymachines/Makefile
-if ENABLE_MACHINED
 
 libnss_mymachines_la_SOURCES = \
 	src/nss-mymachines/nss-mymachines.sym \
@@ -5252,7 +5255,6 @@ libnss_mymachines_la_LIBADD = \
 rootlib_LTLIBRARIES += \
 	libnss_mymachines.la
 
-endif # ENABLE_MACHINED
 #@src/grp-machine/systemd-machined/Makefile
 
 polkitpolicy_in_files += \
