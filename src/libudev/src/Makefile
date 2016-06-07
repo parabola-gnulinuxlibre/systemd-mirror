@@ -53,7 +53,7 @@ libudev_la_LDFLAGS = \
 	-Wl,--version-script=$(srcdir)/libudev.sym
 
 libudev_la_LIBADD = \
-	$(topoutdir)/src/libsystemd/libsystemd-internal/libsystemd-internal.la
+	libsystemd-internal.la
 
 pkgconfiglib_DATA += \
 	src/libudev/libudev.pc

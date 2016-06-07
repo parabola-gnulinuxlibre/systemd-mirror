@@ -30,7 +30,7 @@ systemd_coredump_SOURCES = \
 	src/coredump/coredump-vacuum.h
 
 systemd_coredump_LDADD = \
-	$(topoutdir)/src/libshared/libshared.la
+	libshared.la
 
 ifneq ($(HAVE_ELFUTILS),)
 systemd_coredump_SOURCES += \

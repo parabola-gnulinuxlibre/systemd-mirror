@@ -38,7 +38,7 @@ bootctl_CFLAGS = \
 	$(BLKID_CFLAGS)
 
 bootctl_LDADD = \
-	$(topoutdir)/src/libshared/libshared.la \
+	libshared.la \
 	$(BLKID_LIBS)
 
 bin_PROGRAMS += \
