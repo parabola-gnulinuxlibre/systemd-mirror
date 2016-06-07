@@ -94,7 +94,6 @@ AC_PROG_INSTALL
 AC_PROG_MKDIR_P
 AC_PROG_LEX
 AC_PROG_LN_S
-AC_PROG_RANLIB
 AC_PROG_SED
 AC_PROG_YACC
 
@@ -1516,7 +1515,17 @@ AC_CONFIG_FILES([
         po/Makefile.in
 ])
 
-AC_OUTPUT
+AC_OUTPUT([], [], [
+if test "$srcdir" != .; then
+	{
+		find "$srcdir" -name Makefile -printf '%P\n'
+		find "$srcdir" -name subdir.mk -printf '%P\n'
+	} | while read -r filename; do
+		mkdir -p "\$(dirname "\$filename")"
+		ln -srfT "$srcdir/\$filename" "\$filename"
+	done
+fi
+])
 AC_MSG_RESULT([
         $PACKAGE_NAME $VERSION
 
