@@ -2857,7 +2857,9 @@ dist_zshcompletion_data += \
 	shell-completion/zsh/_bootctl
 endif # HAVE_BLKID
 
+endif # ENABLE_EFI
 #@src/grp-boot/systemd-boot/Makefile -------------------------------------------
+if ENABLE_EFI
 if HAVE_GNUEFI
 efi_cppflags = \
 	$(EFI_CPPFLAGS) \
@@ -4994,7 +4996,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-localed.service.in
 
-#@src/systemd-timedate/Makefile ------------------------------------------------
+#@src/grp-timedate/systemd-timedated/Makefile ----------------------------------
 if ENABLE_TIMEDATED
 systemd_timedated_SOURCES = \
 	src/timedate/timedated.c
@@ -5026,6 +5028,9 @@ SYSTEM_UNIT_ALIASES += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.timedate1.busname
 
+endif # ENABLE_TIMEDATED
+#@src/grp-timedate/timedatectl/Makefile
+if ENABLE_TIMEDATED
 timedatectl_SOURCES = \
 	src/timedate/timedatectl.c
 
@@ -5041,6 +5046,7 @@ dist_bashcompletion_data += \
 dist_zshcompletion_data += \
 	shell-completion/zsh/_timedatectl
 endif # ENABLE_TIMEDATED
+#@src/grp-timedate/systemd-timedated/Makefile
 
 polkitpolicy_in_files += \
 	src/timedate/org.freedesktop.timedate1.policy.in
@@ -5222,6 +5228,10 @@ SYSTEM_UNIT_ALIASES += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.machine1.busname
 
+endif # ENABLE_MACHINED
+#@src/grp-machine/nss-mymachines/Makefile
+if ENABLE_MACHINED
+
 libnss_mymachines_la_SOURCES = \
 	src/nss-mymachines/nss-mymachines.sym \
 	src/nss-mymachines/nss-mymachines.c
@@ -5243,6 +5253,7 @@ rootlib_LTLIBRARIES += \
 	libnss_mymachines.la
 
 endif # ENABLE_MACHINED
+#@src/grp-machine/systemd-machined/Makefile
 
 polkitpolicy_in_files += \
 	src/machine/org.freedesktop.machine1.policy.in
