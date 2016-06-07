@@ -228,7 +228,8 @@ fixup_makefile() {
 	    -e 's|^if (.*)|ifneq ($(\1),)|' \
 	    -e 's|rootprefix|prefix|g' \
 	    -e 's|rootbin|bin|g' \
-	    -e 's|rootlib|lib|g'
+	    -e 's|rootlib|lib|g' \
+	    -e 's|--version-script=.*/([^/]+)\.sym|--version-script=$(srcdir)/\1.sym|g'
 }
 
 fixup_makefiles() (

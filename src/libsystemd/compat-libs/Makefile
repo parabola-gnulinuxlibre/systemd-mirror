@@ -47,7 +47,7 @@ libsystemd_journal_la_CPPFLAGS = \
 libsystemd_journal_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
 	-version-info $(LIBSYSTEMD_JOURNAL_CURRENT):$(LIBSYSTEMD_JOURNAL_REVISION):$(LIBSYSTEMD_JOURNAL_AGE) \
-	-Wl,--version-script=$(top_srcdir)/src/compat-libs/libsystemd-journal.sym
+	-Wl,--version-script=$(srcdir)/libsystemd-journal.sym
 
 libsystemd_journal_la_LIBADD = \
 	libsystemd-journal-internal.la \
@@ -66,7 +66,7 @@ libsystemd_login_la_CPPFLAGS = \
 libsystemd_login_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
 	-version-info $(LIBSYSTEMD_LOGIN_CURRENT):$(LIBSYSTEMD_LOGIN_REVISION):$(LIBSYSTEMD_LOGIN_AGE) \
-	-Wl,--version-script=$(top_srcdir)/src/compat-libs/libsystemd-login.sym
+	-Wl,--version-script=$(srcdir)/libsystemd-login.sym
 
 libsystemd_login_la_LIBADD = \
 	libsystemd-internal.la
@@ -84,7 +84,7 @@ libsystemd_id128_la_CPPFLAGS = \
 libsystemd_id128_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
 	-version-info $(LIBSYSTEMD_ID128_CURRENT):$(LIBSYSTEMD_ID128_REVISION):$(LIBSYSTEMD_ID128_AGE) \
-	-Wl,--version-script=$(top_srcdir)/src/compat-libs/libsystemd-id128.sym
+	-Wl,--version-script=$(srcdir)/libsystemd-id128.sym
 
 libsystemd_id128_la_LIBADD = \
 	libsystemd-internal.la
@@ -102,7 +102,7 @@ libsystemd_daemon_la_CPPFLAGS = \
 libsystemd_daemon_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
 	-version-info $(LIBSYSTEMD_DAEMON_CURRENT):$(LIBSYSTEMD_DAEMON_REVISION):$(LIBSYSTEMD_DAEMON_AGE) \
-	-Wl,--version-script=$(top_srcdir)/src/compat-libs/libsystemd-daemon.sym
+	-Wl,--version-script=$(srcdir)/libsystemd-daemon.sym
 
 libsystemd_daemon_la_LIBADD = \
 	libsystemd-internal.la

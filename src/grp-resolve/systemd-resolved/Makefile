@@ -126,7 +126,7 @@ libnss_resolve_la_LDFLAGS = \
 	-avoid-version \
 	-shared \
 	-shrext .so.2 \
-	-Wl,--version-script=$(top_srcdir)/src/nss-resolve/nss-resolve.sym
+	-Wl,--version-script=$(srcdir)/nss-resolve.sym
 
 libnss_resolve_la_LIBADD = \
 	libsystemd-internal.la \

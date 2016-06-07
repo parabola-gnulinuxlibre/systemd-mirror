@@ -35,7 +35,7 @@ libnss_myhostname_la_LDFLAGS = \
 	-avoid-version \
 	-shared \
 	-shrext .so.2 \
-	-Wl,--version-script=$(top_srcdir)/src/nss-myhostname/nss-myhostname.sym
+	-Wl,--version-script=$(srcdir)/nss-myhostname.sym
 
 libnss_myhostname_la_LIBADD = \
 	libsystemd-internal.la
