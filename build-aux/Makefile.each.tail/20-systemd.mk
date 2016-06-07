@@ -44,7 +44,7 @@ _systemd.link_files = $(filter %.o %.lo %.la,$^) $(call _systemd.patsubst-all,$(
 $(outdir)/%.la:
 	@if test $(words $^) = 0; then echo 'Cannot link library with no dependencies: $@' >&2; exit 1; fi
 	$(AM_V_CCLD)$(LINK) $(if $(_systemd.rpath),-rpath $(_systemd.rpath)) $(_systemd.link_files)
-$(addprefix $(outdir)/,$(bin_PROGRAMS)): $(outdir)/%:
+$(addprefix $(outdir)/,$(bin_PROGRAMS) $(libexec_PROGRAMS)): $(outdir)/%:
 	@if test $(words $^) = 0; then echo 'Cannot link executable with no dependencies: $@' >&2; exit 1; fi
 	$(AM_V_CCLD)$(LINK) $(_systemd.link_files)
 

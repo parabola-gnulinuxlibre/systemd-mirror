@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(ENABLE_COREDUMP),)
@@ -30,7 +30,7 @@ systemd_coredump_SOURCES = \
 	src/coredump/coredump-vacuum.h
 
 systemd_coredump_LDADD = \
-	libshared.la
+	$(topoutdir)/src/libshared/libshared.la
 
 ifneq ($(HAVE_ELFUTILS),)
 systemd_coredump_SOURCES += \
@@ -79,4 +79,9 @@ EXTRA_DIST += \
 	units/systemd-coredump@.service.in
 
 $(eval $(value automake2autothing))
+AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+AM_CPPFLAGS += $(libshared.CPPFLAGS)
+AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
+AM_CPPFLAGS += -I$(topsrcdir)/src/journal
+AM_CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 include $(topsrcdir)/build-aux/Makefile.tail.mk

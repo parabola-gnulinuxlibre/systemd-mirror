@@ -20,26 +20,9 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-coredumpctl_SOURCES = \
-	src/coredump/coredumpctl.c
+at.subdirs += coredumpctl systemd-coredump
 
-coredumpctl_LDADD = \
-	$(topoutdir)/src/libshared/libshared.la
-
-bin_PROGRAMS += \
-	coredumpctl
-
-dist_bashcompletion_data += \
-	shell-completion/bash/coredumpctl
-
-dist_zshcompletion_data += \
-	shell-completion/zsh/_coredumpctl
-
-$(eval $(value automake2autothing))
-AM_CPPFLAGS += $(libbasic.CPPFLAGS)
-AM_CPPFLAGS += $(libshared.CPPFLAGS)
-AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(ENABLE_MACHINED),)
@@ -36,14 +36,17 @@ libnss_mymachines_la_LDFLAGS = \
 	-avoid-version \
 	-shared \
 	-shrext .so.2 \
-	-Wl,--version-script=$(top_srcdir)/src/nss-mymachines/nss-mymachines.sym
+	-Wl,--version-script=$(srcdir)/nss-mymachines.sym
 
 libnss_mymachines_la_LIBADD = \
-	libsystemd-internal.la
+	$(topoutdir)/src/libsystemd/libsystemd-internal/libsystemd-internal.la
 
 lib_LTLIBRARIES += \
 	libnss_mymachines.la
 
 endif # ENABLE_MACHINED
 $(eval $(value automake2autothing))
+at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-internal
+AM_CPPFLAGS += $(libbasic.CPPFLAGS)
+AM_CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -194,7 +194,7 @@ endef
 at.dirlocal += systemd.sed_files
 
 at.dirlocal += noinst_LTLIBRARIES lib_LTLIBRARIES
-at.dirlocal += bin_PROGRAMS
+at.dirlocal += bin_PROGRAMS libexec_PROGRAMS
 at.dirlocal += pkgconfiglib_DATA
 automake_name = $(subst -,_,$(subst .,_,$1))
 automake_sources = $(addprefix $(outdir)/,$(notdir $($(automake_name)_SOURCES) $(nodist_$(automake_name)_SOURCES)))
@@ -206,8 +206,9 @@ define automake2autothing
 std.out_files += $(noinst_LTLIBRARIES) $(lib_LTLIBRARIES)
 std.sys_files += $(addprefix $(libdir)/,$(lib_LTLIBRARIES))
 
-std.out_files += $(bin_PROGRAMS)
+std.out_files += $(bin_PROGRAMS) $(libexec_PROGRAMS)
 std.sys_files += $(addprefix $(bindir)/,$(bin_PROGRAMS))
+std.sys_files += $(addprefix $(libexecdir)/,$(libexec_PROGRAMS))
 
 std.out_files += $(notdir $(pkgconfiglib_DATA))
 std.sys_files += $(addprefix $(pkgconfiglibdir)/,$(notdir $(lib_pkgconfiglib_DATA)))
@@ -224,7 +225,7 @@ $(foreach t,$(filter %.la,$(std.out_files)),\
 	$(eval AM_CFLAGS += $($(call automake_name,$t)_CFLAGS)                               )\
 	$(eval AM_CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS)                           )\
 	$(eval AM_LDFLAGS += $($(call automake_name,$t)_LDFLAGS)                             ))
-$(foreach t,$(bin_PROGRAMS),\
+$(foreach t,$(bin_PROGRAMS) $(libexec_PROGRAMS),\
 	$(eval $(outdir)/$t: $(call at.path,$(call automake_o,$t) $(call automake_libs,$t))  )\
 	$(eval AM_CFLAGS += $($(call automake_name,$t)_CFLAGS)                               )\
 	$(eval AM_CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS)                           )\
