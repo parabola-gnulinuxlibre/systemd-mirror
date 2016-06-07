@@ -185,6 +185,10 @@ move_files() (
 	mv -T src/timedate src/grp-timedate/systemd-timedated
 	mkdir src/grp-timedate/timedatectl
 	mv -T src/grp-timedate/{systemd-timedated,timedatectl}/timedatectl.c
+
+	mv -T src/{libsystemd/libsystemd-internal/sd-netlink,libshared}/local-addresses.c
+	mv -T src/{libsystemd/libsystemd-internal/sd-netlink,libshared}/local-addresses.h
+	mv -T src/{libsystemd/libsystemd-internal/sd-netlink,libshared}/test-local-addresses.c
 )
 
 breakup_makefile() (
