@@ -191,6 +191,8 @@ define generate-sym-test
 	$(AM_V_at)printf 'return 0; }\n' >> $@
 endef
 
+at.dirlocal += systemd.sed_files
+
 at.dirlocal += noinst_LTLIBRARIES lib_LTLIBRARIES
 at.dirlocal += bin_PROGRAMS
 at.dirlocal += pkgconfiglib_DATA
