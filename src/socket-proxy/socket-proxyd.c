@@ -28,9 +28,9 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-#include "sd-daemon.h"
-#include "sd-event.h"
-#include "sd-resolve.h"
+#include <systemd/sd-daemon.h>
+#include <systemd/sd-event.h>
+#include <systemd/sd-resolve.h>
 
 #include "alloc-util.h"
 #include "fd-util.h"
