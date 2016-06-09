@@ -127,8 +127,6 @@ test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
 $(outdir)/libsystemd.la: $(srcdir)/libsystemd.sym
-$(outdir)/libsystemd.la: $(outdir)/libsystemd-internal/libsystemd-internal.la
-$(outdir)/libsystemd.la: $(outdir)/libsystemd-journal-internal/libsystemd-journal-internal.la
 at.subdirs += libsystemd-internal libsystemd-journal-internal
 systemd.sed_files += libsystemd.pc
 #at.subdirs += compat-libs

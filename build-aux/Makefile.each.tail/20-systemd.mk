@@ -29,11 +29,10 @@ std.clean_files += *-from-name.gperf
 std.clean_files += *-from-name.h
 std.clean_files += *-to-name.h
 
-$(outdir)/%.o: $(srcdir)/%.c $(topoutdir)/config.h | $(outdir)/.deps
-	$(AM_V_CC)$(COMPILE)   -c -o $@ $<
-
-$(outdir)/%.lo: $(srcdir)/%.c $(topoutdir)/config.h | $(outdir)/.deps
-	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
+$(outdir)/%.o : $(srcdir)/%.c $(topoutdir)/config.h | $(outdir)/.deps; $(AM_V_CC)$(COMPILE)   -c -o $@ $<
+$(outdir)/%.o : $(outdir)/%.c $(topoutdir)/config.h | $(outdir)/.deps; $(AM_V_CC)$(COMPILE)   -c -o $@ $<
+$(outdir)/%.lo: $(srcdir)/%.c $(topoutdir)/config.h | $(outdir)/.deps; $(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
+$(outdir)/%.lo: $(outdir)/%.c $(topoutdir)/config.h | $(outdir)/.deps; $(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
 $(outdir)/.deps:
 	$(AM_V_at)$(MKDIR_P) $@

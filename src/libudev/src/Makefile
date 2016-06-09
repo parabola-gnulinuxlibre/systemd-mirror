@@ -75,8 +75,8 @@ test_libudev_sym_LDADD = \
 	libudev.la
 
 systemd.sed_files += libudev.pc
+
 systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
-systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
 systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-device
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-hwdb

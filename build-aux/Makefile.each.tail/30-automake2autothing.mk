@@ -14,14 +14,15 @@ $(foreach n,$(call automake_name,$(std.out_files)),\
   $(eval $n_CFLAGS ?=)\
   $(eval $n_CPPFLAGS ?=)\
   $(eval $n_LDFLAGS ?=)\
-  $(eval $n_LIBADD ?=))
-$(foreach t,$(filter %.la,$(std.out_files)),\
-	$(eval $(outdir)/$t: $(call at.path,$(call automake_lo,$t) $(call automake_libs,$t)) )\
-	$(eval am.CFLAGS += $($(call automake_name,$t)_CFLAGS)                               )\
-	$(eval am.CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS)                           )\
-	$(eval am.LDFLAGS += $($(call automake_name,$t)_LDFLAGS)                             ))
-$(foreach t,$(bin_PROGRAMS) $(libexec_PROGRAMS),\
-	$(eval $(outdir)/$t: $(call at.path,$(call automake_o,$t) $(call automake_libs,$t))  )\
-	$(eval am.CFLAGS += $($(call automake_name,$t)_CFLAGS)                               )\
-	$(eval am.CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS)                           )\
-	$(eval am.LDFLAGS += $($(call automake_name,$t)_LDFLAGS)                             ))
+  $(eval $n_LIBADD ?=)\
+  $(eval $n_LDADD ?=))
+$(foreach t,$(filter %.la,$(std.out_files)),                                                        \
+	$(eval $(outdir)/$t: $(call at.path,$(call automake_lo,$t) $(call automake_lib,$t,LIBADD)) )\
+	$(eval am.CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS) $(call automake_cpp,$t,LIBADD)  )\
+	$(eval am.CFLAGS += $($(call automake_name,$t)_CFLAGS)                                     )\
+	$(eval am.LDFLAGS += $($(call automake_name,$t)_LDFLAGS)                                   ))
+$(foreach t,$(bin_PROGRAMS) $(libexec_PROGRAMS),                                                    \
+	$(eval $(outdir)/$t: $(call at.path,$(call automake_o,$t)  $(call automake_lib,$t,LDADD))  )\
+	$(eval am.CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS) $(call automake_cpp,$t,LDADD)   )\
+	$(eval am.CFLAGS += $($(call automake_name,$t)_CFLAGS)                                     )\
+	$(eval am.LDFLAGS += $($(call automake_name,$t)_LDFLAGS)                                   ))
