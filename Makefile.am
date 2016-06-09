@@ -1444,7 +1444,7 @@ src/journal/audit_type-to-name.h: src/journal/audit_type-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
 
-#@src/journal/Makefile
+#@src/grp-resolve/systemd-resolved/Makefile
 
 src/resolve/dns_type-list.txt: src/resolve/dns-type.h
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -4493,7 +4493,7 @@ endif # HAVE_GCRYPT
 
 noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la
-#@src/journal/Makefile
+#@src/grp-journal/systemd-journald/Makefile
 
 rootlibexec_PROGRAMS += \
 	systemd-journald
@@ -4558,7 +4558,7 @@ EXTRA_DIST += \
 gperf_gperf_sources += \
 	src/journal/journald-gperf.gperf
 
-# ------------------------------------------------------------------------------
+#@src/grp-journal-remote/systemd-journal-gatewayd/Makefile ---------------------
 if HAVE_MICROHTTPD
 gatewayddocumentrootdir=$(pkgdatadir)/gatewayd
 
