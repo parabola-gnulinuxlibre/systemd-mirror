@@ -19,7 +19,7 @@
 
 #include <getopt.h>
 
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 
 #include "alloc-util.h"
 #include "fd-util.h"

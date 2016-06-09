@@ -19,7 +19,7 @@
 
 #include <net/if.h>
 
-#include "sd-netlink.h"
+#include <systemd/sd-netlink.h>
 
 #include "conf-parser.h"
 #include "alloc-util.h"

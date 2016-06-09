@@ -27,7 +27,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "sd-id128.h"
+#include <systemd/sd-id128.h>
 
 #include "alloc-util.h"
 #include "efivars.h"
