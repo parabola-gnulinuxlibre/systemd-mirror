@@ -19,13 +19,13 @@ std.clean_files += $(std.gen_files) $(std.cfg_files) $(std.out_files)
 $(foreach c,src gen cfg out sys clean slow,$(eval std.$c_files := $$(std.$c_files)))
 
 # Make each of the standard variables relative to the correct directory
-std.src_files   := $(patsubst ./%,%,$(addprefix $(srcdir)/,$(std.src_files)))
-std.gen_files   := $(patsubst ./%,%,$(addprefix $(srcdir)/,$(std.gen_files)))
-std.cfg_files   := $(patsubst ./%,%,$(addprefix $(outdir)/,$(std.cfg_files)))
-std.out_files   := $(patsubst ./%,%,$(addprefix $(outdir)/,$(std.out_files)))
-std.sys_files   :=                  $(addprefix $(DESTDIR),$(std.sys_files))
-std.clean_files := $(patsubst ./%,%,$(addprefix $(outdir)/,$(std.clean_files)))
-std.slow_files  := $(patsubst ./%,%,$(addprefix $(outdir)/,$(std.slow_files)))
+std.src_files   := $(call at.addprefix,$(srcdir)/,$(std.src_files))
+std.gen_files   := $(call at.addprefix,$(srcdir)/,$(std.gen_files))
+std.cfg_files   := $(call at.addprefix,$(outdir)/,$(std.cfg_files))
+std.out_files   := $(call at.addprefix,$(outdir)/,$(std.out_files))
+std.sys_files   :=         $(addprefix $(DESTDIR),$(std.sys_files))
+std.clean_files := $(call at.addprefix,$(outdir)/,$(std.clean_files))
+std.slow_files  := $(call at.addprefix,$(outdir)/,$(std.slow_files))
 
 # Creative targets
 $(outdir)/build      :        $(std.out_files)
