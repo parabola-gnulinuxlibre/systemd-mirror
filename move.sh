@@ -48,6 +48,7 @@ move_files() (
 		fsck
 		hibernate-resume
 		hwdb
+		initctl
 		machine-id-setup
 		modules-load
 		notify

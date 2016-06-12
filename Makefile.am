@@ -410,26 +410,39 @@ INTLTOOL_V_MERGE_ = $(INTLTOOL_V_MERGE_$(AM_DEFAULT_VERBOSITY))
 INTLTOOL_V_MERGE_0 = @echo "  ITMRG " $@;
 INTLTOOL_V_MERGE_1 =
 
-#@discard.mk -------------------------------------------------------------------
-rootbin_PROGRAMS = \
-	systemctl \
-	systemd-notify \
-	systemd-ask-password \
-	systemd-tty-ask-password-agent \
-	systemd-machine-id-setup \
-	systemd-escape
+#@src/grp-system/systemctl/Makefile
+rootbit_PROGRAMS += systemctl
+#@src/systemd-notify/Makefile
+rootbit_PROGRAMS += systemd-notify
+#@src/systemd-ask-password/Makefile
+rootbit_PROGRAMS += systemd-ask-password
+#@src/systemd-tty-ask-password-agent/Makefile
+rootbit_PROGRAMS += systemd-tty-ask-password-agent
+#@src/systemd-machine-id-setup/Makefile
+rootbit_PROGRAMS += systemd-machine-id-setup
+#@src/systemd-escape/Makefile
+rootbit_PROGRAMS += systemd-escape
 
-bin_PROGRAMS = \
-	systemd-cgls \
-	systemd-cgtop \
-	systemd-nspawn \
-	systemd-detect-virt \
-	systemd-delta \
-	systemd-analyze \
-	systemd-run \
-	systemd-mount \
-	systemd-stdio-bridge \
-	systemd-path
+#@src/systemd-cgls/Makefile
+bin_PROGRAMS += systemd-cgls
+#@src/systemd-cgtop/Makefile
+bin_PROGRAMS += systemd-cgtop
+#@src/systemd-nspawn/Makefile
+bin_PROGRAMS += systemd-nspawn
+#@src/systemd-detect-virt/Makefile
+bin_PROGRAMS += systemd-detect-virt
+#@src/systemd-delta/Makefile
+bin_PROGRAMS += systemd-delta
+#@src/systemd-analyze/Makefile
+bin_PROGRAMS += systemd-analyze
+#@src/systemd-run/Makefile
+bin_PROGRAMS += systemd-run
+#@src/systemd-mount/Makefile
+bin_PROGRAMS += systemd-mount
+#@src/systemd-stdio-bridge/Makefile
+bin_PROGRAMS += systemd-stdio-bridge
+#@src/systemd-path/Makefile
+bin_PROGRAMS += systemd-path
 
 #@src/kernel-install/Makefile
 dist_bin_SCRIPTS = \
@@ -439,32 +452,47 @@ dist_kernelinstall_SCRIPTS = \
 	src/kernel-install/50-depmod.install \
 	src/kernel-install/90-loaderentry.install
 
-#@discard.mk
-rootlibexec_PROGRAMS = \
-	systemd \
-	systemd-cgroups-agent \
-	systemd-initctl \
-	systemd-shutdown \
-	systemd-remount-fs \
-	systemd-reply-password \
-	systemd-fsck \
-	systemd-ac-power \
-	systemd-sysctl \
-	systemd-sleep \
-	systemd-socket-proxyd \
-	systemd-update-done
+#@src/grp-system/systemd/Makefile
+rootlibexec_PROGRAMS += systemd
+#@src/systemd-cgroups-agent/Makefile
+rootlibexec_PROGRAMS += systemd-cgroups-agent
+#@src/systemd-initctl/Makefile
+rootlibexec_PROGRAMS += systemd-initctl
+#@src/systemd-shutdown/Makefile
+rootlibexec_PROGRAMS += systemd-shutdown
+#@src/systemd-remount-fs/Makefile
+rootlibexec_PROGRAMS += systemd-remount-fs
+#@src/systemd-reply-password/Makefile
+rootlibexec_PROGRAMS += systemd-reply-password
+#@src/systemd-fsck/Makefile
+rootlibexec_PROGRAMS += systemd-fsck
+#@src/systemd-ac-power/Makefile
+rootlibexec_PROGRAMS += systemd-ac-power
+#@src/systemd-sysctl/Makefile
+rootlibexec_PROGRAMS += systemd-sysctl
+#@src/systemd-sleep/Makefile
+rootlibexec_PROGRAMS += systemd-sleep
+#@src/systemd-socket-proxyd/Makefile
+rootlibexec_PROGRAMS += systemd-socket-proxyd
+#@src/systemd-update-done/Makefile
+rootlibexec_PROGRAMS += systemd-update-done
 
+#@src/systemd-update-utmp/Makefile
 if HAVE_UTMP
 rootlibexec_PROGRAMS += \
 	systemd-update-utmp
 endif # HAVE_UTMP
 
-systemgenerator_PROGRAMS = \
-	systemd-getty-generator \
-	systemd-fstab-generator \
-	systemd-system-update-generator \
-	systemd-debug-generator
+#@src/systemd-getty-generator/Makefile
+systemgenerator_PROGRAMS += systemd-getty-generator
+#@src/systemd-fstab-generator/Makefile
+systemgenerator_PROGRAMS += systemd-fstab-generator
+#@src/systemd-system-update-generator/Makefile
+systemgenerator_PROGRAMS += systemd-system-update-generator
+#@src/systemd-debug-generator/Makefile
+systemgenerator_PROGRAMS += systemd-debug-generator
 
+#@discard.mk
 dist_bashcompletion_data = \
 	shell-completion/bash/busctl \
 	shell-completion/bash/journalctl \
@@ -2501,7 +2529,7 @@ systemd_analyze_CFLAGS = \
 systemd_analyze_LDADD = \
 	libcore.la
 
-#@src/initctl/Makefile ---------------------------------------------------------
+#@src/systemd-initctl/Makefile -------------------------------------------------
 systemd_initctl_SOURCES = \
 	src/initctl/initctl.c
 
