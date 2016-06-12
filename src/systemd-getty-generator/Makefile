@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+systemgenerator_PROGRAMS += systemd-getty-generator
 systemd_getty_generator_SOURCES = \
 	src/getty-generator/getty-generator.c
 

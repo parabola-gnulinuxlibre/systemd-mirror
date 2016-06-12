@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+libexec_PROGRAMS += systemd-ac-power
 systemd_ac_power_SOURCES = \
 	src/ac-power/ac-power.c
 

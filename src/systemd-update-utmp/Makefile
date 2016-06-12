@@ -23,6 +23,11 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+ifneq ($(HAVE_UTMP),)
+libexec_PROGRAMS += \
+	systemd-update-utmp
+endif # HAVE_UTMP
+
 systemd_update_utmp_SOURCES = \
 	src/update-utmp/update-utmp.c
 

@@ -23,6 +23,8 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+libexec_PROGRAMS += systemd-update-done
+
 systemd_update_done_SOURCES = \
 	src/update-done/update-done.c
 

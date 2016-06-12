@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+bin_PROGRAMS += systemd-cgtop
 systemd_cgtop_SOURCES = \
 	src/cgtop/cgtop.c
 

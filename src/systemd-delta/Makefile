@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+bin_PROGRAMS += systemd-delta
 systemd_delta_SOURCES = \
 	src/delta/delta.c
 

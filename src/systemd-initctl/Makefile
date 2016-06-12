@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+libexec_PROGRAMS += systemd-initctl
 systemd_initctl_SOURCES = \
 	src/initctl/initctl.c
 

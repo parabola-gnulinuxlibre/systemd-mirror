@@ -23,6 +23,8 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+systemgenerator_PROGRAMS += systemd-debug-generator
+
 systemd_debug_generator_SOURCES = \
 	src/debug-generator/debug-generator.c
 

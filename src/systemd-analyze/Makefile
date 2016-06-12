@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+bin_PROGRAMS += systemd-analyze
 systemd_analyze_SOURCES = \
 	src/analyze/analyze.c \
 	src/analyze/analyze-verify.c \

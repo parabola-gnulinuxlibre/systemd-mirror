@@ -264,50 +264,6 @@ INSTALL_EXEC_HOOKS += \
 INSTALL_EXEC_HOOKS += \
 	install-busnames-target-wants-hook
 
-bin_PROGRAMS = \
-	systemctl \
-	systemd-notify \
-	systemd-ask-password \
-	systemd-tty-ask-password-agent \
-	systemd-machine-id-setup \
-	systemd-escape
-
-bin_PROGRAMS = \
-	systemd-cgls \
-	systemd-cgtop \
-	systemd-nspawn \
-	systemd-detect-virt \
-	systemd-delta \
-	systemd-analyze \
-	systemd-run \
-	systemd-stdio-bridge \
-	systemd-path
-
-libexec_PROGRAMS = \
-	systemd \
-	systemd-cgroups-agent \
-	systemd-initctl \
-	systemd-shutdown \
-	systemd-remount-fs \
-	systemd-reply-password \
-	systemd-fsck \
-	systemd-ac-power \
-	systemd-sysctl \
-	systemd-sleep \
-	systemd-socket-proxyd \
-	systemd-update-done
-
-ifneq ($(HAVE_UTMP),)
-libexec_PROGRAMS += \
-	systemd-update-utmp
-endif # HAVE_UTMP
-
-systemgenerator_PROGRAMS = \
-	systemd-getty-generator \
-	systemd-fstab-generator \
-	systemd-system-update-generator \
-	systemd-debug-generator
-
 dist_bashcompletion_data = \
 	shell-completion/bash/busctl \
 	shell-completion/bash/journalctl \

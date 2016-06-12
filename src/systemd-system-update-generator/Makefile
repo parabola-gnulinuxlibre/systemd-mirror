@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+systemgenerator_PROGRAMS += systemd-system-update-generator
 systemd_system_update_generator_SOURCES = \
 	src/system-update-generator/system-update-generator.c
 

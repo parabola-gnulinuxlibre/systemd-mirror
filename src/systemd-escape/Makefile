@@ -23,6 +23,8 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+rootbit_PROGRAMS += systemd-escape
+
 systemd_escape_SOURCES = \
 	src/escape/escape.c
 

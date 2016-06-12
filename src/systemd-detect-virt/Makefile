@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+bin_PROGRAMS += systemd-detect-virt
 systemd_detect_virt_SOURCES = \
 	src/detect-virt/detect-virt.c
 

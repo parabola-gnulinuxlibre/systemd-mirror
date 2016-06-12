@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+bin_PROGRAMS += systemd-nspawn
 systemd_nspawn_SOURCES = \
 	src/nspawn/nspawn.c \
 	src/nspawn/nspawn-settings.c \

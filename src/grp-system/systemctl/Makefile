@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+rootbit_PROGRAMS += systemctl
 systemctl_SOURCES = \
 	src/systemctl/systemctl.c
 

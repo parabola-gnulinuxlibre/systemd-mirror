@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+libexec_PROGRAMS += systemd-sleep
 systemd_sleep_SOURCES = \
 	src/sleep/sleep.c
 
