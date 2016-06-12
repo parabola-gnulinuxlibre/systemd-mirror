@@ -49,7 +49,6 @@ test_machine_tables_LDADD = \
 tests += \
 	test-machine-tables
 
-at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-internal
 systemd.CPPFLAGS += $(libshared.CPPFLAGS)
 systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)

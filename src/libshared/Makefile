@@ -148,9 +148,6 @@ test_local_addresses_SOURCES = \
 test_local_addresses_LDADD = \
 	libshared.la
 
-at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-internal
-at.depdirs += $(topoutdir)/src/libsystemd/libsystemd-journal-internal
-at.depdirs += $(topoutdir)/src/libudev/src
 systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal

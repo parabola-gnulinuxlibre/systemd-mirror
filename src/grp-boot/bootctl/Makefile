@@ -52,7 +52,6 @@ dist_zshcompletion_data += \
 endif # HAVE_BLKID
 endif # ENABLE_EFI
 
-at.depdirs += $(topoutdir)/src/libshared
 systemd.CPPFLAGS += $(libshared.CPPFLAGS)
 systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 
