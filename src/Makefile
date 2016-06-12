@@ -44,6 +44,14 @@ at.subdirs += libsystemd
 at.subdirs += libsystemd-network
 at.subdirs += libudev
 #at.subdirs += grp-locale
+#at.subdirs += grp-login
+#at.subdirs += systemd-machine-id-setup
+#at.subdirs += systemd-modules-load
+#at.subdirs += grp-network
+at.subdirs += nss-myhostname
+#at.subdirs += systemd-sleep
+#at.subdirs += systemd-socket-proxyd
+#at.subdirs += systemd-sysctl
 
 at.subdirs += systemd-nspawn
 
