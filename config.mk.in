@@ -22,10 +22,8 @@
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
 ifeq ($(origin topsrcdir),undefined)
-
 topoutdir := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
-abs_topsrcdir := @abs_top_srcdir@
-topsrcdir = $(if $(value am_path),$(call am_path,$(abs_topsrcdir)),$(abs_topsrcdir))
+topsrcdir := $(topoutdir)/@top_srcdir@
 
 MAKEFLAGS += --warn-undefined-variables
 include $(topsrcdir)/build-aux/no-builtin-variables.mk
@@ -108,12 +106,12 @@ libbasic.DEPENDS                     =   $(topoutdir)/src/libbasic/libbasic.la
 #libcore.DEPENDS                      =
 libfirewall.CPPFLAGS                 = -I$(topsrcdir)/src/libfirewall -I$(topoutdir)/src/libfirewall
 libfirewall.DEPENDS                  =   $(topoutdir)/src/libfirewall/libfirewall.la
-libshared.CPPFLAGS                   = -I$(topsrcdir)/src/libshared -I$(topoutdir)/src/libshared $(libbasic.CPPFLAGS)
-libshared.DEPENDS                    =   $(topoutdir)/src/libshared/libshared.la                 $(libbasic.DEPENDS)
-libsystemd-internal.CPPFLAGS         = $(libsystemd.CPPFLAGS)
-libsystemd-internal.DEPENDS          =   $(topoutdir)/src/libsystemd/libsystemd-internal/libsystemd-internal.la
+libshared.CPPFLAGS                   = $(libsystemd-internal.CPPFLAGS) -I$(topsrcdir)/src/libshared -I$(topoutdir)/src/libshared
+libshared.DEPENDS                    = $(libsystemd-internal.DEPENDS)   $(topoutdir)/src/libshared/libshared.la                
+libsystemd-internal.CPPFLAGS         = $(libbasic.CPPFLAGS) $(libsystemd.CPPFLAGS)
+libsystemd-internal.DEPENDS          = $(libbasic.DEPENDS)  $(topoutdir)/src/libsystemd/libsystemd-internal/libsystemd-internal.la
 libsystemd-journal-internal.CPPFLAGS = $(libsystemd.CPPFLAGS)
-libsystemd-journal-internal.DEPENDS  =   $(topoutdir)/src/libsystemd/libsystemd-journal-internal/libsystemd-journal-internal.la
+libsystemd-journal-internal.DEPENDS  = $(topoutdir)/src/libsystemd/libsystemd-journal-internal/libsystemd-journal-internal.la 
 #libsystemd-network.CPPFLAGS          =
 #libsystemd-network.DEPENDS           =
 libsystemd.CPPFLAGS                  = -I$(topsrcdir)/src/libsystemd/include
