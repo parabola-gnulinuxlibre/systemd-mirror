@@ -17,8 +17,8 @@
 
 include $(call _at.reverse,$(sort $(wildcard $(topsrcdir)/build-aux/Makefile.each.tail/*.mk)))
 
-at.subdirs := $(patsubst ./%,%,$(addprefix $(outdir)/,$(at.subdirs)))
-at.depdirs :=                                         $(at.depdirs)
+at.subdirs := $(call at.addprefix,$(outdir)/,$(at.subdirs))
+at.depdirs := $(call at.addprefix,$(outdir)/,$(at.depdirs))
 
 # Move all of the dirlocal variables to their namespaced version
 $(foreach v,$(at.dirlocal),$(eval $v/$(outdir) := $$($v)))
@@ -35,7 +35,7 @@ $(foreach t,$(at.phony),$(eval $(outdir)/$t: $(addsuffix /$t,$(at.subdirs/$(outd
 
 # Include Makefiles from other directories
 $(foreach _at.NO_ONCE,y,\
-	$(foreach makefile,$(call at.path,$(addsuffix /Makefile,$(at.subdirs/$(outdir)) $(at.depdirs/$(outdir)))),\
+	$(foreach makefile,$(call at.path,$(addsuffix /$(at.Makefile),$(at.subdirs/$(outdir)) $(at.depdirs/$(outdir)))),\
 		$(eval include $(filter-out $(_at.included_makefiles),$(makefile)))))
 
 # This bit only gets evaluated once, after all of the other Makefiles are read
