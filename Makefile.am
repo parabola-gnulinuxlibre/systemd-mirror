@@ -5538,6 +5538,7 @@ GENERAL_ALIASES += \
 nodist_pkgsysconf_DATA += \
 	src/resolve/resolved.conf
 
+#@src/grp-resolve/nss-resolve/Makefile
 libnss_resolve_la_SOURCES = \
 	src/nss-resolve/nss-resolve.sym \
 	src/nss-resolve/nss-resolve.c
@@ -5559,6 +5560,7 @@ libnss_resolve_la_LIBADD = \
 rootlib_LTLIBRARIES += \
 	libnss_resolve.la
 
+#@src/grp-resolve/systemd-resolved/Makefile
 systemd_resolve_SOURCES = \
 	src/resolve/resolve-tool.c \
 	$(basic_dns_sources) \
@@ -6070,7 +6072,7 @@ EXTRA_DIST += \
 	units/systemd-logind.service.in \
 	src/login/logind.conf.in
 
-# ------------------------------------------------------------------------------
+#@src/systemd-user-sessions/Makefile -------------------------------------------
 if HAVE_PAM
 
 systemd_user_sessions_SOURCES = \
@@ -6706,6 +6708,20 @@ at.subdirs += coredumpctl systemd-coredump
 #@src/grp-machine/Makefile
 at.subdirs += machinectl systemd-machined
 at.subdirs += nss-mymachines
+
+#@src/grp-journal-remote/Makefile
+at.subdirs += systemd-journa-gatewayd
+at.subdirs += systemd-journa-remote
+at.subdirs += systemd-journa-upload
+
+#@src/grp-resolve/Makefile
+at.subdirs += systemd-resolved nss-resolve
+
+#@src/grp-system/Makefile
+at.subdirs += systemctl systemd
+
+#@src/grp-timedate/Makefile
+at.subdirs += timedatectl systemd-timedated
 
 #@all
 include $(topsrcdir)/build-aux/Makefile.tail.mk
