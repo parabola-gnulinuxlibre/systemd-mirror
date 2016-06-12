@@ -34,7 +34,6 @@ busctl_SOURCES = \
 busctl_LDADD = \
 	libshared.la
 
-busctl_LDADD += libbasic.la # was hidden by libshared->libsystemd->libbasic
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -25,6 +25,12 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 
 at.subdirs += busctl
 at.subdirs += grp-boot
+at.subdirs += grp-coredump
+#at.subdirs += grp-journal
+#at.subdirs += grp-journal-remote
+#at.subdirs += grp-machine
+#at.subdirs += grp-resolve
+
 at.subdirs += libbasic
 at.subdirs += libfirewall
 at.subdirs += libshared

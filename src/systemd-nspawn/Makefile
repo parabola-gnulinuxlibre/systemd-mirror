@@ -82,8 +82,6 @@ manual_tests += \
 	test-patch-uid
 
 bin_PROGRAMS += systemd-nspawn
-systemd_nspawn_LDADD += libsystemd.la # was hidden by libshared->libsystemd
-systemd_nspawn_LDADD += libbasic.la # was hidden by libshared->libsystemd->libbasic
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
 

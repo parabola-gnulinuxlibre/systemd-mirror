@@ -79,7 +79,7 @@ EXTRA_DIST += \
 	units/systemd-coredump@.service.in
 
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
-systemd.CPPFLAGS += -I$(topsrcdir)/src/journal
+systemd.CPPFLAGS += -I$(topsrcdir)/src/grp-journal/libjournal-core
 systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
