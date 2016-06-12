@@ -21,14 +21,14 @@
 
 #include <endian.h>
 
-#include "sd-bus.h"
-#include "sd-dhcp-client.h"
-#include "sd-dhcp-server.h"
-#include "sd-dhcp6-client.h"
-#include "sd-ipv4ll.h"
-#include "sd-lldp.h"
-#include "sd-ndisc.h"
-#include "sd-netlink.h"
+#include <systemd/sd-bus.h>
+#include <systemd/sd-dhcp-client.h>
+#include <systemd/sd-dhcp-server.h>
+#include <systemd/sd-dhcp6-client.h>
+#include <systemd/sd-ipv4ll.h>
+#include <systemd/sd-lldp.h>
+#include <systemd/sd-ndisc.h>
+#include <systemd/sd-netlink.h>
 
 #include "list.h"
 #include "set.h"

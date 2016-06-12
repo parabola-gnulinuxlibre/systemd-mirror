@@ -21,7 +21,7 @@
 #include <linux/fs.h>
 #include <sys/xattr.h>
 
-#include "sd-daemon.h"
+#include <systemd/sd-daemon.h>
 
 #include "alloc-util.h"
 #include "btrfs-util.h"

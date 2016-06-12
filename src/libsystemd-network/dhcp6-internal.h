@@ -22,7 +22,7 @@
 #include <net/ethernet.h>
 #include <netinet/in.h>
 
-#include "sd-event.h"
+#include <systemd/sd-event.h>
 
 #include "list.h"
 #include "macro.h"

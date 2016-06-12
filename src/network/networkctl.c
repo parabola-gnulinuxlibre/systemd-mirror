@@ -21,11 +21,11 @@
 #include <net/if.h>
 #include <stdbool.h>
 
-#include "sd-device.h"
-#include "sd-hwdb.h"
-#include "sd-lldp.h"
-#include "sd-netlink.h"
-#include "sd-network.h"
+#include <systemd/sd-device.h>
+#include <systemd/sd-hwdb.h>
+#include <systemd/sd-lldp.h>
+#include <systemd/sd-netlink.h>
+#include <systemd/sd-network.h>
 
 #include "alloc-util.h"
 #include "arphrd-list.h"

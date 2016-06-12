@@ -20,8 +20,8 @@
 #include <sys/socket.h>
 #include <linux/if.h>
 
-#include "sd-daemon.h"
-#include "sd-netlink.h"
+#include <systemd/sd-daemon.h>
+#include <systemd/sd-netlink.h>
 
 #include "alloc-util.h"
 #include "bus-util.h"

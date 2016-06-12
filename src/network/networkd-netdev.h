@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-netlink.h"
+#include <systemd/sd-netlink.h>
 
 #include "list.h"
 #include "time-util.h"
