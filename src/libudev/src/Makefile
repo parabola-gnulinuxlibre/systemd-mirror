@@ -61,6 +61,12 @@ pkgconfiglib_DATA += \
 EXTRA_DIST += \
 	src/libudev/libudev.pc.in
 
+noinst_LTLIBRARIES += \
+	libudev-internal.la
+
+libudev_internal_la_SOURCES =\
+	$(libudev_la_SOURCES)
+
 $(outdir)/test-libudev-sym.c: \
 		$(srcdir)/libudev.sym \
 		$(srcdir)/udev.h
@@ -74,16 +80,9 @@ test_libudev_sym_CFLAGS = \
 test_libudev_sym_LDADD = \
 	libudev.la
 
-noinst_LTLIBRARIES += \
-	libudev-internal.la
-
-libudev_internal_la_SOURCES =\
-	$(libudev_la_SOURCES)
-
-systemd.sed_files += libudev.pc
-
 libudev_la_LIBADD += libbasic.la # was hidden by libsystemd->libbasic
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-device
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-hwdb
+systemd.sed_files += libudev.pc
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

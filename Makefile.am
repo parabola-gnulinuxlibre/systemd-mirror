@@ -3655,7 +3655,7 @@ libudev-uninstall-hook:
 INSTALL_EXEC_HOOKS += libudev-install-hook
 UNINSTALL_EXEC_HOOKS += libudev-uninstall-hook
 
-# ------------------------------------------------------------------------------
+#@src/libudev/src/Makefile -----------------------------------------------------
 noinst_LTLIBRARIES += \
 	libudev-internal.la
 

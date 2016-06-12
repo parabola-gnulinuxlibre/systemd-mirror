@@ -738,13 +738,6 @@ libudev-uninstall-hook:
 INSTALL_EXEC_HOOKS += libudev-install-hook
 UNINSTALL_EXEC_HOOKS += libudev-uninstall-hook
 
-# ------------------------------------------------------------------------------
-noinst_LTLIBRARIES += \
-	libudev-internal.la
-
-libudev_internal_la_SOURCES =\
-	$(libudev_la_SOURCES)
-
 ifneq ($(ENABLE_TESTS),)
 TESTS += \
 	test/udev-test.pl
