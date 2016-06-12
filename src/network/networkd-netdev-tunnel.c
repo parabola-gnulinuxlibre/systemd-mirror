@@ -23,7 +23,7 @@
 #include <linux/if_tunnel.h>
 #include <linux/ip6_tunnel.h>
 
-#include "sd-netlink.h"
+#include <systemd/sd-netlink.h>
 
 #include "conf-parser.h"
 #include "missing.h"
