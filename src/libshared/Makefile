@@ -30,14 +30,13 @@ libshared_la_SOURCES = \
 	src/libsystemd/sd-netlink/local-addresses.h \
 	src/libsystemd/sd-netlink/local-addresses.c \
 	src/shared/output-mode.h \
+	src/shared/output-mode.c \
 	src/shared/gpt.h \
 	src/shared/udev-util.h \
 	src/shared/linux/auto_dev-ioctl.h \
 	src/shared/initreq.h \
 	src/shared/dns-domain.c \
 	src/shared/dns-domain.h \
-	src/shared/architecture.c \
-	src/shared/architecture.h \
 	src/shared/efivars.c \
 	src/shared/efivars.h \
 	src/shared/fstab-util.c \
@@ -106,7 +105,11 @@ libshared_la_SOURCES = \
 	src/shared/machine-pool.c \
 	src/shared/machine-pool.h \
 	src/shared/resolve-util.c \
-	src/shared/resolve-util.h
+	src/shared/resolve-util.h \
+	src/shared/bus-unit-util.c \
+	src/shared/bus-unit-util.h \
+	src/shared/tests.h \
+	src/shared/tests.c
 
 ifneq ($(HAVE_UTMP),)
 libshared_la_SOURCES += \

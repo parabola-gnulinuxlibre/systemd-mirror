@@ -95,12 +95,21 @@ $(outdir)/%.so:
 $(outdir)/%$(EFI_MACHINE_TYPE_NAME).efi     : $(outdir)/%.so; $(AM_V_GEN)$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel -j .rela -j .reloc $(EFI_FORMAT) $< $@
 $(outdir)/%$(EFI_MACHINE_TYPE_NAME).efi.stub: $(outdir)/%.so; $(AM_V_GEN)$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel -j .rela -j .reloc $(EFI_FORMAT) $< $@
 # ------------------------------------------------------------------------------
+systemd_boot_headers = \
+	src/boot/efi/util.h \
+	src/boot/efi/console.h \
+	src/boot/efi/graphics.h \
+	src/boot/efi/pefile.h \
+	src/boot/efi/measure.h \
+	src/boot/efi/disk.h
+
 systemd_boot_sources = \
 	src/boot/efi/util.c \
 	src/boot/efi/console.c \
 	src/boot/efi/graphics.c \
 	src/boot/efi/pefile.c \
 	src/boot/efi/disk.c \
+	src/boot/efi/measure.c \
 	src/boot/efi/boot.c
 
 systemd_boot = systemd-boot$(EFI_MACHINE_TYPE_NAME).efi
@@ -108,6 +117,15 @@ std.out_files += $(systemd_boot)
 std.sys_files += $(bootlibdir)/$(systemd_boot)
 $(outdir)/systemd-boot.so: $(addprefix $(outdir)/,$(notdir $(systemd_boot_sources:.c=.o)))
 # ------------------------------------------------------------------------------
+stub_headers = \
+	src/boot/efi/util.h \
+	src/boot/efi/pefile.h \
+	src/boot/efi/disk.h \
+	src/boot/efi/graphics.h \
+	src/boot/efi/splash.h \
+	src/boot/efi/measure.h \
+	src/boot/efi/linux.h
+
 stub_sources = \
 	src/boot/efi/util.c \
 	src/boot/efi/pefile.c \
@@ -115,6 +133,7 @@ stub_sources = \
 	src/boot/efi/graphics.c \
 	src/boot/efi/splash.c \
 	src/boot/efi/linux.c \
+	src/boot/efi/measure.c \
 	src/boot/efi/stub.c
 
 stub = linux$(EFI_MACHINE_TYPE_NAME).efi.stub

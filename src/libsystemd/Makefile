@@ -23,27 +23,9 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-LIBSYSTEMD_CURRENT=14
+LIBSYSTEMD_CURRENT=15
 LIBSYSTEMD_REVISION=0
-LIBSYSTEMD_AGE=14
-
-# The following four libraries only exist for compatibility reasons,
-# their version info should not be bumped anymore
-LIBSYSTEMD_LOGIN_CURRENT=9
-LIBSYSTEMD_LOGIN_REVISION=3
-LIBSYSTEMD_LOGIN_AGE=9
-
-LIBSYSTEMD_DAEMON_CURRENT=0
-LIBSYSTEMD_DAEMON_REVISION=12
-LIBSYSTEMD_DAEMON_AGE=0
-
-LIBSYSTEMD_ID128_CURRENT=0
-LIBSYSTEMD_ID128_REVISION=28
-LIBSYSTEMD_ID128_AGE=0
-
-LIBSYSTEMD_JOURNAL_CURRENT=11
-LIBSYSTEMD_JOURNAL_REVISION=5
-LIBSYSTEMD_JOURNAL_AGE=11
+LIBSYSTEMD_AGE=15
 
 EXTRA_DIST += \
 	src/libsystemd/libsystemd.pc.in \
@@ -95,7 +77,6 @@ tests += \
 	test-bus-cleanup \
 	test-bus-server \
 	test-bus-match \
-	test-bus-proxy \
 	test-bus-kernel \
 	test-bus-kernel-bloom \
 	test-bus-zero-copy \

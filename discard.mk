@@ -57,8 +57,12 @@ TEST_EXTENSIONS = .py
 PY_LOG_COMPILER = $(PYTHON)
 DISABLE_HARD_ERRORS = yes
 ifneq ($(ENABLE_TESTS),)
-noinst_PROGRAMS = $(manual_tests) $(tests)
+noinst_PROGRAMS = $(manual_tests) $(tests) $(unsafe_tests)
 TESTS = $(tests)
+ifneq ($(ENABLE_UNSAFE_TESTS),)
+TESTS += \
+	$(unsafe_tests)
+endif
 else
 noinst_PROGRAMS =
 TESTS =
@@ -290,7 +294,6 @@ libexec_PROGRAMS = \
 	systemd-ac-power \
 	systemd-sysctl \
 	systemd-sleep \
-	systemd-bus-proxyd \
 	systemd-socket-proxyd \
 	systemd-update-done
 
@@ -361,6 +364,7 @@ dist_systemunit_DATA = \
 	units/local-fs-pre.target \
 	units/initrd.target \
 	units/initrd-fs.target \
+	units/initrd-root-device.target \
 	units/initrd-root-fs.target \
 	units/remote-fs.target \
 	units/remote-fs-pre.target \
@@ -756,8 +760,10 @@ endif # HAVE_SYSV_COMPAT
 endif # HAVE_PYTHON
 endif # ENABLE_TESTS
 
+tests += \
+	test-libudev
+
 manual_tests += \
-	test-libudev \
 	test-udev
 
 test_libudev_SOURCES = \
@@ -780,9 +786,11 @@ check_DATA += \
 endif # ENABLE_TESTS
 
 # packed sysfs test tree
-$(outdir)/sys:
+$(outdir)/sys: test/sys.tar.xz
+	-rm -rf test/sys
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)tar -C test/ -xJf $(top_srcdir)/test/sys.tar.xz
+	-touch test/sys
 
 test-sys-distclean:
 	-rm -rf test/sys
@@ -794,6 +802,16 @@ EXTRA_DIST += \
 	test/rule-syntax-check.py \
 	test/sysv-generator-test.py \
 	test/mocks/fsck
+
+test_nss_SOURCES = \
+	src/test/test-nss.c
+
+test_nss_LDADD = \
+	libsystemd-internal.la \
+	-ldl
+
+manual_tests += \
+	test-nss
 
 EXTRA_DIST += \
 	test/Makefile \
@@ -822,6 +840,16 @@ EXTRA_DIST += \
 	test/TEST-07-ISSUE-1981/Makefile \
 	test/TEST-07-ISSUE-1981/test-segfault.sh \
 	test/TEST-07-ISSUE-1981/test.sh \
+	test/TEST-08-ISSUE-2730/Makefile \
+	test/TEST-08-ISSUE-2730/test.sh \
+	test/TEST-09-ISSUE-2691/Makefile \
+	test/TEST-09-ISSUE-2691/test.sh \
+	test/TEST-10-ISSUE-2467/Makefile \
+	test/TEST-10-ISSUE-2467/test.sh \
+	test/TEST-11-ISSUE-3166/Makefile \
+	test/TEST-11-ISSUE-3166/test.sh \
+	test/TEST-12-ISSUE-3171/Makefile \
+	test/TEST-12-ISSUE-3171/test.sh \
 	test/test-functions
 
 EXTRA_DIST += \
@@ -1109,7 +1137,6 @@ DISTCHECK_CONFIGURE_FLAGS += \
 endif # ENABLE_SPLIT_USR
 
 .PHONY: dist-check-help
-
 dist-check-help: $(bin_PROGRAMS) $(bin_PROGRAMS)
 	for i in $(abspath $^); do                                             \
             if $$i  --help | grep -v 'default:' | grep -E -q '.{80}.' ; then   \
@@ -1117,6 +1144,18 @@ dist-check-help: $(bin_PROGRAMS) $(bin_PROGRAMS)
 	        $$i  --help | awk 'length > 80' | grep -E --color=yes '.{80}'; \
 	        exit 1;                                                        \
             fi; done
+
+include_compilers = "$(CC)" "$(CC) -ansi" "$(CC) -std=iso9899:1990"
+public_headers = $(filter-out src/systemd/_sd-common.h, $(pkginclude_HEADERS) $(include_HEADERS))
+.PHONY: dist-check-includes
+dist-check-includes: $(public_headers)
+	@res=0;                                                        	        \
+	for i in $(abspath $^); do	                                        \
+	    for cc in $(include_compilers); do                                  \
+	        echo "$$cc -o/dev/null -c -x c -include "$$i" - </dev/null";    \
+	        $$cc -o/dev/null -c -x c -include "$$i" - </dev/null || res=1;  \
+	    done;                                                               \
+	done; exit $$res
 
 .PHONY: built-sources
 built-sources: $(BUILT_SOURCES)

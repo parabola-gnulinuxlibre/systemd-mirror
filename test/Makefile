@@ -26,18 +26,16 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 
 manual_tests += \
 	test-ns \
-	test-loopback \
-	test-hostname \
-	test-daemon \
 	test-cgroup \
 	test-install \
-	test-watchdog \
-	test-log \
-	test-ipcrm \
 	test-btrfs \
 	test-acd \
 	test-ipv4ll-manual \
 	test-ask-password-api
+
+unsafe_tests = \
+	test-hostname \
+	test-ipcrm
 
 ifneq ($(HAVE_LIBIPTC),)
 manual_tests += \
@@ -50,10 +48,14 @@ manual_tests += \
 endif # HAVE_KMOD
 
 tests += \
+	test-daemon \
+	test-log \
+	test-loopback \
 	test-engine \
+	test-watchdog \
 	test-cgroup-mask \
 	test-job-type \
-	test-env-replace \
+	test-env-util \
 	test-strbuf \
 	test-strv \
 	test-path \
@@ -65,6 +67,18 @@ tests += \
 	test-utf8 \
 	test-ellipsize \
 	test-util \
+	test-cpu-set-util \
+	test-hexdecoct \
+	test-escape \
+	test-alloc-util \
+	test-proc-cmdline \
+	test-io-util \
+	test-glob-util \
+	test-xattr-util \
+	test-fs-util \
+	test-web-util \
+	test-stat-util \
+	test-fd-util \
 	test-string-util \
 	test-extract-word \
 	test-parse-util \
@@ -87,6 +101,7 @@ tests += \
 	test-prioq \
 	test-fileio \
 	test-time \
+	test-clock \
 	test-hashmap \
 	test-set \
 	test-bitmap \
@@ -95,7 +110,6 @@ tests += \
 	test-tables \
 	test-device-nodes \
 	test-xml \
-	test-json \
 	test-architecture \
 	test-socket-util \
 	test-fdset \
@@ -106,21 +120,20 @@ tests += \
 	test-ratelimit \
 	test-condition \
 	test-uid-range \
-	test-bus-policy \
 	test-locale-util \
 	test-execute \
 	test-copy \
 	test-cap-list \
 	test-sigbus \
-	test-rbtree \
 	test-verbs \
 	test-af-list \
 	test-arphrd-list \
 	test-dns-domain \
-	test-resolve-tables \
 	test-install-root \
 	test-rlimit-util \
-	test-signal-util
+	test-signal-util \
+	test-selinux \
+	test-sizeof
 
 ifneq ($(HAVE_ACL),)
 tests += \
@@ -183,6 +196,7 @@ EXTRA_DIST += \
 	test/test-execute/exec-passenvironment-repeated.service \
 	test/test-execute/exec-passenvironment.service \
 	test/test-execute/exec-group.service \
+	test/test-execute/exec-group-nfsnobody.service \
 	test/test-execute/exec-ignoresigpipe-no.service \
 	test/test-execute/exec-ignoresigpipe-yes.service \
 	test/test-execute/exec-personality-x86-64.service \
@@ -192,12 +206,16 @@ EXTRA_DIST += \
 	test/test-execute/exec-privatedevices-yes.service \
 	test/test-execute/exec-privatetmp-no.service \
 	test/test-execute/exec-privatetmp-yes.service \
+	test/test-execute/exec-spec-interpolation.service \
 	test/test-execute/exec-systemcallerrornumber.service \
 	test/test-execute/exec-systemcallfilter-failing2.service \
 	test/test-execute/exec-systemcallfilter-failing.service \
 	test/test-execute/exec-systemcallfilter-not-failing2.service \
 	test/test-execute/exec-systemcallfilter-not-failing.service \
+	test/test-execute/exec-systemcallfilter-system-user.service \
+	test/test-execute/exec-systemcallfilter-system-user-nfsnobody.service \
 	test/test-execute/exec-user.service \
+	test/test-execute/exec-user-nfsnobody.service \
 	test/test-execute/exec-workingdirectory.service \
 	test/test-execute/exec-umask-0177.service \
 	test/test-execute/exec-umask-default.service \
@@ -213,6 +231,14 @@ EXTRA_DIST += \
 	test/test-execute/exec-capabilityboundingset-merge.service \
 	test/test-execute/exec-capabilityboundingset-reset.service \
 	test/test-execute/exec-capabilityboundingset-simple.service \
+	test/test-execute/exec-capabilityambientset.service \
+	test/test-execute/exec-capabilityambientset-nfsnobody.service \
+	test/test-execute/exec-capabilityambientset-merge.service \
+	test/test-execute/exec-capabilityambientset-merge-nfsnobody.service \
+	test/test-execute/exec-runtimedirectory.service \
+	test/test-execute/exec-runtimedirectory-mode.service \
+	test/test-execute/exec-runtimedirectory-owner.service \
+	test/test-execute/exec-runtimedirectory-owner-nfsnobody.service \
 	test/bus-policy/hello.conf \
 	test/bus-policy/methods.conf \
 	test/bus-policy/ownerships.conf \
@@ -282,25 +308,15 @@ test_dns_domain_LDADD = \
 	libsystemd-network.la \
 	libshared.la
 
-test_resolve_tables_SOURCES = \
-	src/resolve/test-resolve-tables.c \
-	src/shared/test-tables.h \
-	src/resolve/dns-type.c \
-	src/resolve/dns-type.h \
-	src/resolve/dns_type-from-name.h \
-	src/resolve/dns_type-to-name.h
-
-test_resolve_tables_LDADD = \
-	libshared.la
 
 ifneq ($(ENABLE_EFI),)
-manual_tests += \
-	test-boot-timestamp
+tests += \
+	test-boot-timestamps
 
-test_boot_timestamp_SOURCES = \
+test_boot_timestamps_SOURCES = \
 	src/test/test-boot-timestamps.c
 
-test_boot_timestamp_LDADD = \
+test_boot_timestamps_LDADD = \
 	libshared.la
 endif # ENABLE_EFI
 
@@ -362,12 +378,6 @@ test_sigbus_SOURCES = \
 test_sigbus_LDADD = \
 	libshared.la
 
-test_rbtree_SOURCES = \
-	src/test/test-rbtree.c
-
-test_rbtree_LDADD = \
-	libshared.la
-
 test_condition_SOURCES = \
 	src/test/test-condition.c
 
@@ -397,6 +407,78 @@ test_util_SOURCES = \
 
 test_util_LDADD = \
 	libshared.la
+
+test_hexdecoct_SOURCES = \
+	src/test/test-hexdecoct.c
+
+test_hexdecoct_LDADD = \
+	libbasic.la
+
+test_alloc_util_SOURCES = \
+	src/test/test-alloc-util.c
+
+test_alloc_util_LDADD = \
+	libbasic.la
+
+test_xattr_util_SOURCES = \
+	src/test/test-xattr-util.c
+
+test_xattr_util_LDADD = \
+	libbasic.la
+
+test_io_util_SOURCES = \
+	src/test/test-io-util.c
+
+test_io_util_LDADD = \
+	libbasic.la
+
+test_glob_util_SOURCES = \
+	src/test/test-glob-util.c
+
+test_glob_util_LDADD = \
+	libbasic.la
+
+test_fs_util_SOURCES = \
+	src/test/test-fs-util.c
+
+test_fs_util_LDADD = \
+	libbasic.la
+
+test_proc_cmdline_SOURCES = \
+	src/test/test-proc-cmdline.c
+
+test_proc_cmdline_LDADD = \
+	libbasic.la
+
+test_fd_util_SOURCES = \
+	src/test/test-fd-util.c
+
+test_fd_util_LDADD = \
+	libbasic.la
+
+test_web_util_SOURCES = \
+	src/test/test-web-util.c
+
+test_web_util_LDADD = \
+	libbasic.la
+
+test_cpu_set_util_SOURCES = \
+	src/test/test-cpu-set-util.c
+
+test_cpu_set_util_LDADD = \
+	libbasic.la
+
+test_stat_util_SOURCES = \
+	src/test/test-stat-util.c
+
+test_stat_util_LDADD = \
+	libbasic.la
+
+test_escape_SOURCES = \
+	src/test/test-escape.c
+
+test_escape_LDADD = \
+	libbasic.la
 
 test_string_util_SOURCES = \
 	src/test/test-string-util.c
@@ -518,6 +600,18 @@ test_signal_util_SOURCES = \
 test_signal_util_LDADD = \
 	libshared.la
 
+test_selinux_SOURCES = \
+	src/test/test-selinux.c
+
+test_selinux_LDADD = \
+	libshared.la
+
+test_sizeof_SOURCES = \
+	src/test/test-sizeof.c
+
+test_sizeof_LDADD = \
+	libshared.la
+
 BUILT_SOURCES += \
 	src/test/test-hashmap-ordered.c
 
@@ -558,12 +652,6 @@ test_xml_SOURCES = \
 test_xml_LDADD = \
 	libshared.la
 
-test_json_SOURCES = \
-	src/test/test-json.c
-
-test_json_LDADD = \
-	libshared.la
-
 test_list_SOURCES = \
 	src/test/test-list.c
 
@@ -579,14 +667,11 @@ test_unaligned_SOURCES = \
 test_tables_SOURCES = \
 	src/test/test-tables.c \
 	src/shared/test-tables.h \
-	src/bus-proxyd/bus-xml-policy.c \
-	src/bus-proxyd/bus-xml-policy.h \
 	src/journal/journald-server.c \
 	src/journal/journald-server.h
 
 test_tables_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
-	-I$(top_srcdir)/src/bus-proxyd
+	$(AM_CPPFLAGS)
 
 test_tables_CFLAGS = \
 	$(AM_CFLAGS) \
@@ -614,6 +699,12 @@ test_time_SOURCES = \
 	src/test/test-time.c
 
 test_time_LDADD = \
+	libshared.la
+
+test_clock_SOURCES = \
+	src/test/test-clock.c
+
+test_clock_LDADD = \
 	libshared.la
 
 test_architecture_SOURCES = \
@@ -733,10 +824,10 @@ test_cgroup_util_SOURCES = \
 test_cgroup_util_LDADD = \
 	libshared.la
 
-test_env_replace_SOURCES = \
-	src/test/test-env-replace.c
+test_env_util_SOURCES = \
+	src/test/test-env-util.c
 
-test_env_replace_LDADD = \
+test_env_util_LDADD = \
 	libshared.la
 
 test_strbuf_SOURCES = \
@@ -825,13 +916,6 @@ test_conf_parser_SOURCES = \
 	src/test/test-conf-parser.c
 
 test_conf_parser_LDADD = \
-	libshared.la
-
-test_bus_policy_SOURCES = \
-	src/bus-proxyd/test-bus-xml-policy.c
-
-test_bus_policy_LDADD = \
-	libbus-proxy-core.la \
 	libshared.la
 
 test_af_list_SOURCES = \

@@ -28,10 +28,9 @@ noinst_LTLIBRARIES += \
 
 libbasic_la_SOURCES = \
 	src/basic/missing.h \
+	src/basic/missing_syscall.h \
 	src/basic/capability-util.c \
 	src/basic/capability-util.h \
-	src/basic/c-rbtree.c \
-	src/basic/c-rbtree.h \
 	src/basic/conf-files.c \
 	src/basic/conf-files.h \
 	src/basic/stdio-util.h \
@@ -138,6 +137,8 @@ libbasic_la_SOURCES = \
 	src/basic/exit-status.h \
 	src/basic/virt.c \
 	src/basic/virt.h \
+	src/basic/architecture.c \
+	src/basic/architecture.h \
 	src/basic/smack-util.c \
 	src/basic/smack-util.h \
 	src/basic/device-nodes.c \
@@ -182,8 +183,6 @@ libbasic_la_SOURCES = \
 	src/basic/audit-util.h \
 	src/basic/xml.c \
 	src/basic/xml.h \
-	src/basic/json.c \
-	src/basic/json.h \
 	src/basic/barrier.c \
 	src/basic/barrier.h \
 	src/basic/async.c \

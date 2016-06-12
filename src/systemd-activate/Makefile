@@ -24,13 +24,13 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 
-libexec_PROGRAMS += \
-	systemd-activate
+bin_PROGRAMS += \
+	systemd-socket-activate
 
-systemd_activate_SOURCES = \
+systemd_socket_activate_SOURCES = \
 	src/activate/activate.c
 
-systemd_activate_LDADD = \
+systemd_socket_activate_LDADD = \
 	libshared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

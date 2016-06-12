@@ -194,12 +194,6 @@ test_bus_match_SOURCES = \
 test_bus_match_LDADD = \
 	libshared.la
 
-test_bus_proxy_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-proxy.c
-
-test_bus_proxy_LDADD = \
-	libshared.la
-
 test_bus_kernel_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-kernel.c
 

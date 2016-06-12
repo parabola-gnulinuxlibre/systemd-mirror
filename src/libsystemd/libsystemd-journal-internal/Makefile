@@ -60,7 +60,9 @@ libsystemd_journal_internal_la_SOURCES = \
 	src/journal/mmap-cache.h \
 	src/journal/compress.c \
 	src/journal/audit-type.h \
-	src/journal/audit-type.c
+	src/journal/audit-type.c \
+	src/shared/gcrypt-util.h \
+	src/shared/gcrypt-util.c
 
 nodist_libsystemd_journal_internal_la_SOURCES = \
 	src/journal/audit_type-to-name.h

@@ -2,8 +2,6 @@
   This file is part of systemd.
 
   Copyright 2010 Lennart Poettering
-  Copyright 2013 Daniel Mack
-  Copyright 2014 Kay Sievers
 
   systemd is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -21,6 +19,7 @@
 
 #include <errno.h>
 #include <getopt.h>
+#include <poll.h>
 #include <stddef.h>
 #include <string.h>
 #include <unistd.h>
@@ -28,30 +27,24 @@
 #include <systemd/sd-bus.h>
 #include <systemd/sd-daemon.h>
 
-#include "alloc-util.h"
 #include "bus-internal.h"
 #include "bus-util.h"
-#include "def.h"
-#include "formats-util.h"
+#include "build.h"
 #include "log.h"
-#include "proxy.h"
-#include "strv.h"
-#include "user-util.h"
 #include "util.h"
 
-static char *arg_address = NULL;
-static char *arg_command_line_buffer = NULL;
+#define DEFAULT_BUS_PATH "unix:path=/run/dbus/system_bus_socket"
+
+const char *arg_bus_path = DEFAULT_BUS_PATH;
 
 static int help(void) {
 
         printf("%s [OPTIONS...]\n\n"
-               "Connect STDIO to a given bus address.\n\n"
-               "  -h --help               Show this help\n"
-               "     --version            Show package version\n"
-               "     --machine=MACHINE    Connect to specified machine\n"
-               "     --address=ADDRESS    Connect to the bus specified by ADDRESS\n"
-               "                          (default: " DEFAULT_SYSTEM_BUS_ADDRESS ")\n",
-               program_invocation_short_name);
+               "STDIO or socket-activatable proxy to a given DBus endpoint.\n\n"
+               "  -h --help              Show this help\n"
+               "     --version           Show package version\n"
+               "     --bus-path=PATH     Path to the kernel bus (default: %s)\n",
+               program_invocation_short_name, DEFAULT_BUS_PATH);
 
         return 0;
 }
@@ -60,16 +53,12 @@ static int parse_argv(int argc, char *argv[]) {
 
         enum {
                 ARG_VERSION = 0x100,
-                ARG_ADDRESS,
-                ARG_MACHINE,
         };
 
         static const struct option options[] = {
-                { "help",            no_argument,       NULL, 'h'                 },
-                { "version",         no_argument,       NULL, ARG_VERSION         },
-                { "address",         required_argument, NULL, ARG_ADDRESS         },
-                { "machine",         required_argument, NULL, ARG_MACHINE         },
-                {},
+                { "help",            no_argument,       NULL, 'h'     },
+                { "bus-path",        required_argument, NULL, 'p'     },
+                { NULL,              0,                 NULL, 0       }
         };
 
         int c;
@@ -77,7 +66,7 @@ static int parse_argv(int argc, char *argv[]) {
         assert(argc >= 0);
         assert(argv);
 
-        while ((c = getopt_long(argc, argv, "h", options, NULL)) >= 0)
+        while ((c = getopt_long(argc, argv, "hsup:", options, NULL)) >= 0) {
 
                 switch (c) {
 
@@ -88,132 +77,27 @@ static int parse_argv(int argc, char *argv[]) {
                 case ARG_VERSION:
                         return version();
 
-                case ARG_ADDRESS: {
-                        char *a;
-
-                        a = strdup(optarg);
-                        if (!a)
-                                return log_oom();
-
-                        free(arg_address);
-                        arg_address = a;
-                        break;
-                }
-
-                case ARG_MACHINE: {
-                        _cleanup_free_ char *e = NULL;
-                        char *a;
-
-                        e = bus_address_escape(optarg);
-                        if (!e)
-                                return log_oom();
-
-                        a = strjoin("x-machine-kernel:machine=", e, ";x-machine-unix:machine=", e, NULL);
-                        if (!a)
-                                return log_oom();
-
-                        free(arg_address);
-                        arg_address = a;
-
-                        break;
-                }
-
                 case '?':
                         return -EINVAL;
 
+                case 'p':
+                        arg_bus_path = optarg;
+                        break;
+
                 default:
-                        assert_not_reached("Unhandled option");
+                        log_error("Unknown option code %c", c);
+                        return -EINVAL;
                 }
-
-        /* If the first command line argument is only "x" characters
-         * we'll write who we are talking to into it, so that "ps" is
-         * explanatory */
-        arg_command_line_buffer = argv[optind];
-        if (argc > optind + 1 || (arg_command_line_buffer && !in_charset(arg_command_line_buffer, "x"))) {
-                log_error("Too many arguments");
-                return -EINVAL;
-        }
-
-        if (!arg_address) {
-                arg_address = strdup(DEFAULT_SYSTEM_BUS_ADDRESS);
-                if (!arg_address)
-                        return log_oom();
         }
 
         return 1;
 }
 
-static int rename_service(sd_bus *a, sd_bus *b) {
-        _cleanup_(sd_bus_creds_unrefp) sd_bus_creds *creds = NULL;
-        _cleanup_free_ char *p = NULL, *name = NULL;
-        const char *comm;
-        char **cmdline;
-        uid_t uid;
-        pid_t pid;
-        int r;
-
-        assert(a);
-        assert(b);
-
-        r = sd_bus_get_owner_creds(b, SD_BUS_CREDS_EUID|SD_BUS_CREDS_PID|SD_BUS_CREDS_CMDLINE|SD_BUS_CREDS_COMM|SD_BUS_CREDS_AUGMENT, &creds);
-        if (r < 0)
-                return r;
-
-        r = sd_bus_creds_get_euid(creds, &uid);
-        if (r < 0)
-                return r;
-
-        r = sd_bus_creds_get_pid(creds, &pid);
-        if (r < 0)
-                return r;
-
-        r = sd_bus_creds_get_cmdline(creds, &cmdline);
-        if (r < 0)
-                return r;
-
-        r = sd_bus_creds_get_comm(creds, &comm);
-        if (r < 0)
-                return r;
-
-        name = uid_to_name(uid);
-        if (!name)
-                return -ENOMEM;
-
-        p = strv_join(cmdline, " ");
-        if (!p)
-                return -ENOMEM;
-
-        /* The status string gets the full command line ... */
-        sd_notifyf(false,
-                   "STATUS=Processing requests from client PID "PID_FMT" (%s); UID "UID_FMT" (%s)",
-                   pid, p,
-                   uid, name);
-
-        /* ... and the argv line only the short comm */
-        if (arg_command_line_buffer) {
-                size_t m, w;
-
-                m = strlen(arg_command_line_buffer);
-                w = snprintf(arg_command_line_buffer, m,
-                             "[PID "PID_FMT"/%s; UID "UID_FMT"/%s]",
-                             pid, comm,
-                             uid, name);
-
-                if (m > w)
-                        memzero(arg_command_line_buffer + w, m - w);
-        }
-
-        log_debug("Running on behalf of PID "PID_FMT" (%s), UID "UID_FMT" (%s), %s",
-                  pid, p,
-                  uid, name,
-                  a->unique_name);
-
-        return 0;
-}
-
 int main(int argc, char *argv[]) {
-        _cleanup_(proxy_freep) Proxy *p = NULL;
-        int r;
+        _cleanup_(sd_bus_unrefp) sd_bus *a = NULL, *b = NULL;
+        sd_id128_t server_id;
+        bool is_unix;
+        int r, in_fd, out_fd;
 
         log_set_target(LOG_TARGET_JOURNAL_OR_KMSG);
         log_parse_environment();
@@ -223,22 +107,196 @@ int main(int argc, char *argv[]) {
         if (r <= 0)
                 goto finish;
 
-        r = proxy_new(&p, STDIN_FILENO, STDOUT_FILENO, arg_address);
-        if (r < 0)
+        r = sd_listen_fds(0);
+        if (r == 0) {
+                in_fd = STDIN_FILENO;
+                out_fd = STDOUT_FILENO;
+        } else if (r == 1) {
+                in_fd = SD_LISTEN_FDS_START;
+                out_fd = SD_LISTEN_FDS_START;
+        } else {
+                log_error("Illegal number of file descriptors passed\n");
                 goto finish;
+        }
 
-        r = rename_service(p->destination_bus, p->local_bus);
-        if (r < 0)
-                log_debug_errno(r, "Failed to rename process: %m");
+        is_unix =
+                sd_is_socket(in_fd, AF_UNIX, 0, 0) > 0 &&
+                sd_is_socket(out_fd, AF_UNIX, 0, 0) > 0;
 
-        r = proxy_run(p);
+        r = sd_bus_new(&a);
+        if (r < 0) {
+                log_error_errno(r, "Failed to allocate bus: %m");
+                goto finish;
+        }
+
+        r = sd_bus_set_address(a, arg_bus_path);
+        if (r < 0) {
+                log_error_errno(r, "Failed to set address to connect to: %m");
+                goto finish;
+        }
+
+        r = sd_bus_negotiate_fds(a, is_unix);
+        if (r < 0) {
+                log_error_errno(r, "Failed to set FD negotiation: %m");
+                goto finish;
+        }
+
+        r = sd_bus_start(a);
+        if (r < 0) {
+                log_error_errno(r, "Failed to start bus client: %m");
+                goto finish;
+        }
+
+        r = sd_bus_get_bus_id(a, &server_id);
+        if (r < 0) {
+                log_error_errno(r, "Failed to get server ID: %m");
+                goto finish;
+        }
+
+        r = sd_bus_new(&b);
+        if (r < 0) {
+                log_error_errno(r, "Failed to allocate bus: %m");
+                goto finish;
+        }
+
+        r = sd_bus_set_fd(b, in_fd, out_fd);
+        if (r < 0) {
+                log_error_errno(r, "Failed to set fds: %m");
+                goto finish;
+        }
+
+        r = sd_bus_set_server(b, 1, server_id);
+        if (r < 0) {
+                log_error_errno(r, "Failed to set server mode: %m");
+                goto finish;
+        }
+
+        r = sd_bus_negotiate_fds(b, is_unix);
+        if (r < 0) {
+                log_error_errno(r, "Failed to set FD negotiation: %m");
+                goto finish;
+        }
+
+        r = sd_bus_set_anonymous(b, true);
+        if (r < 0) {
+                log_error_errno(r, "Failed to set anonymous authentication: %m");
+                goto finish;
+        }
+
+        r = sd_bus_start(b);
+        if (r < 0) {
+                log_error_errno(r, "Failed to start bus client: %m");
+                goto finish;
+        }
+
+        for (;;) {
+                _cleanup_(sd_bus_message_unrefp)sd_bus_message *m = NULL;
+                int events_a, events_b, fd;
+                uint64_t timeout_a, timeout_b, t;
+                struct timespec _ts, *ts;
+
+                r = sd_bus_process(a, &m);
+                if (r < 0) {
+                        log_error_errno(r, "Failed to process bus a: %m");
+                        goto finish;
+                }
+
+                if (m) {
+                        r = sd_bus_send(b, m, NULL);
+                        if (r < 0) {
+                                log_error_errno(r, "Failed to send message: %m");
+                                goto finish;
+                        }
+                }
+
+                if (r > 0)
+                        continue;
+
+                r = sd_bus_process(b, &m);
+                if (r < 0) {
+                        /* treat 'connection reset by peer' as clean exit condition */
+                        if (r == -ECONNRESET)
+                                r = 0;
+
+                        goto finish;
+                }
+
+                if (m) {
+                        r = sd_bus_send(a, m, NULL);
+                        if (r < 0) {
+                                log_error_errno(r, "Failed to send message: %m");
+                                goto finish;
+                        }
+                }
+
+                if (r > 0)
+                        continue;
+
+                fd = sd_bus_get_fd(a);
+                if (fd < 0) {
+                        r = fd;
+                        log_error_errno(r, "Failed to get fd: %m");
+                        goto finish;
+                }
+
+                events_a = sd_bus_get_events(a);
+                if (events_a < 0) {
+                        r = events_a;
+                        log_error_errno(r, "Failed to get events mask: %m");
+                        goto finish;
+                }
+
+                r = sd_bus_get_timeout(a, &timeout_a);
+                if (r < 0) {
+                        log_error_errno(r, "Failed to get timeout: %m");
+                        goto finish;
+                }
+
+                events_b = sd_bus_get_events(b);
+                if (events_b < 0) {
+                        r = events_b;
+                        log_error_errno(r, "Failed to get events mask: %m");
+                        goto finish;
+                }
+
+                r = sd_bus_get_timeout(b, &timeout_b);
+                if (r < 0) {
+                        log_error_errno(r, "Failed to get timeout: %m");
+                        goto finish;
+                }
+
+                t = timeout_a;
+                if (t == (uint64_t) -1 || (timeout_b != (uint64_t) -1 && timeout_b < timeout_a))
+                        t = timeout_b;
+
+                if (t == (uint64_t) -1)
+                        ts = NULL;
+                else {
+                        usec_t nw;
+
+                        nw = now(CLOCK_MONOTONIC);
+                        if (t > nw)
+                                t -= nw;
+                        else
+                                t = 0;
+
+                        ts = timespec_store(&_ts, t);
+                }
+
+                {
+                        struct pollfd p[3] = {
+                                {.fd = fd,            .events = events_a, },
+                                {.fd = STDIN_FILENO,  .events = events_b & POLLIN, },
+                                {.fd = STDOUT_FILENO, .events = events_b & POLLOUT, }};
+
+                        r = ppoll(p, ELEMENTSOF(p), ts, NULL);
+                }
+                if (r < 0) {
+                        log_error("ppoll() failed: %m");
+                        goto finish;
+                }
+        }
 
 finish:
-        sd_notify(false,
-                  "STOPPING=1\n"
-                  "STATUS=Shutting down.");
-
-        free(arg_address);
-
         return r < 0 ? EXIT_FAILURE : EXIT_SUCCESS;
 }

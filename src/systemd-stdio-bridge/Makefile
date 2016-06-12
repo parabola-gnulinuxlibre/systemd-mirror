@@ -24,10 +24,9 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 systemd_stdio_bridge_SOURCES = \
-	src/bus-proxyd/stdio-bridge.c
+	src/stdio-bridge/stdio-bridge.c
 
 systemd_stdio_bridge_LDADD = \
-	libbus-proxy-core.la \
 	libshared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

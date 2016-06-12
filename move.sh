@@ -36,7 +36,6 @@ move_files() (
 		ask-password
 		backlight
 		binfmt
-		bootchart
 		cgls
 		cgroups-agent
 		cgtop
@@ -58,6 +57,7 @@ move_files() (
 		reply-password
 		rfkill
 		run
+		stdio-bridge
 		timesync
 		tmpfiles
 		tty-ask-password-agent
@@ -70,16 +70,12 @@ move_files() (
 		mv -T src/{,systemd-}$d
 	done
 
-
-	mv -T {,src/journal/}catalog
-
 	mv -T {shell-completion/bash/,src/kernel-install/bash-completion_}kernel-install
 	mv -T {shell-completion/zsh/_,src/kernel-install/zsh-completion_}kernel-install
 	mv -T {man,src/kernel-install}/kernel-install.xml
 
 	mv -T src/lib{shared,core}/linux
 
-	mv -T src/{,libsystemd/}/compat-libs
 	mkdir src/libsystemd/include
 	mv -T src/{,libsystemd/include}/systemd
 
@@ -115,8 +111,6 @@ move_files() (
 
 	mkdir src/libudev/include
 	mv -T src/libudev/{src,include}/libudev.h
-
-	mv -T {man,src/systemd-activate}/systemd-activate.xml
 
 	mv -T src/libsystemd/{src,}/libsystemd.pc.in
 	mv -T src/libsystemd/{src,}/libsystemd.sym
@@ -176,12 +170,6 @@ move_files() (
 
 	mv -T src/{udev,libudev/src}/udev.h
 
-	mv -T src/{bus-proxyd,libbus-proxy-core}
-	mkdir src/systemd-bus-proxyd
-	mv  src/{libbus-proxy-core,systemd-bus-proxyd}/bus-proxyd.c
-	mkdir src/systemd-stdio-bridge
-	mv  src/{libbus-proxy-core,systemd-stdio-bridge}/stdio-bridge.c
-
 	mkdir src/grp-timedate
 	mv -T src/timedate src/grp-timedate/systemd-timedated
 	mkdir src/grp-timedate/timedatectl
@@ -190,6 +178,20 @@ move_files() (
 	mv -T src/{libsystemd/libsystemd-internal/sd-netlink,libshared}/local-addresses.c
 	mv -T src/{libsystemd/libsystemd-internal/sd-netlink,libshared}/local-addresses.h
 	mv -T src/{libsystemd/libsystemd-internal/sd-netlink,libshared}/test-local-addresses.c
+
+	mv -T src/{journal,grp-journal}
+	mv -T {,src/grp-journal/}catalog
+	mkdir src/grp-journal/{systemd-journald,journalctl,libjournal-core}
+	mv -T src/grp-journal/{,systemd-journald}/journald.c
+	mv -T src/grp-journal/{,journalctl}/journalctl.c
+	mv    src/grp-journal/*.* src/grp-journal/libjournal-core/
+
+	mv -T src/{,grp-}journal-remote
+	local suffix
+	for suffix in gatewayd remote upload; do
+		mkdir src/grp-journal-remote/systemd-journal-$suffix
+		mv src/grp-journal-remote/journal-$suffix* src/grp-journal-remote/systemd-journal-$suffix/
+	done
 )
 
 breakup_makefile() (
