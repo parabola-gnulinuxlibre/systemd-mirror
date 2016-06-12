@@ -48,6 +48,8 @@ move_files() (
 		fsck
 		hibernate-resume
 		hwdb
+		machine-id-setup
+		modules-load
 		notify
 		nspawn
 		path
@@ -57,7 +59,10 @@ move_files() (
 		reply-password
 		rfkill
 		run
+		sleep
 		stdio-bridge
+		socket-proxy
+		sysctl
 		timesync
 		tmpfiles
 		tty-ask-password-agent
@@ -69,6 +74,8 @@ move_files() (
 	for d in "${pfix[@]}"; do
 		mv -T src/{,systemd-}$d
 	done
+
+	mv -T src/systemd-socket-proxy{,d}
 
 	mv -T {shell-completion/bash/,src/kernel-install/bash-completion_}kernel-install
 	mv -T {shell-completion/zsh/_,src/kernel-install/zsh-completion_}kernel-install
@@ -192,6 +199,12 @@ move_files() (
 		mkdir src/grp-journal-remote/systemd-journal-$suffix
 		mv src/grp-journal-remote/journal-$suffix* src/grp-journal-remote/systemd-journal-$suffix/
 	done
+
+	mv -T src/{,grp-}hostname
+	mv -T src/{,grp-}import
+	mv -T src/{,grp-}locale
+	mv -T src/{,grp-}login
+	mv -T src/{,grp-}network
 )
 
 breakup_makefile() (

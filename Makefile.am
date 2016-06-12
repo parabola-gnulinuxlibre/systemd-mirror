@@ -2540,7 +2540,7 @@ systemd_shutdown_SOURCES = \
 systemd_shutdown_LDADD = \
 	libsystemd-shared.la
 
-#@src/modules-load/Makefile ----------------------------------------------------
+#@src/systemd-modules-load/Makefile --------------------------------------------
 if HAVE_KMOD
 systemd_modules_load_SOURCES = \
 	src/modules-load/modules-load.c
@@ -2707,7 +2707,7 @@ endif # ENABLE_FIRSTBOOT
 EXTRA_DIST += \
 	units/systemd-firstboot.service.in
 
-#@src/machine-id-setup/Makefile ------------------------------------------------
+#@src/systemd-machine-id-setup/Makefile ----------------------------------------
 systemd_machine_id_setup_SOURCES = \
 	src/machine-id-setup/machine-id-setup-main.c \
 	src/core/machine-id-setup.c \
@@ -2719,14 +2719,14 @@ systemd_machine_id_setup_LDADD = \
 SYSINIT_TARGET_WANTS += \
 	systemd-machine-id-commit.service
 
-#@src/sysctl/Makefile ----------------------------------------------------------
+#@src/systemd-sysctl/Makefile --------------------------------------------------
 systemd_sysctl_SOURCES = \
 	src/sysctl/sysctl.c
 
 systemd_sysctl_LDADD = \
 	libsystemd-shared.la
 
-#@src/sleep/Makefile -----------------------------------------------------------
+#@src/systemd-sleep/Makefile ---------------------------------------------------
 systemd_sleep_SOURCES = \
 	src/sleep/sleep.c
 
@@ -4601,7 +4601,7 @@ endif # HAVE_MICROHTTPD
 EXTRA_DIST += \
 	units/systemd-journal-gatewayd.service.in
 
-#@src/socket-proxy/Makefile ----------------------------------------------------
+#@src/systemd-socket-proxyd/Makefile -------------------------------------------
 
 systemd_socket_proxyd_SOURCES = \
 	src/socket-proxy/socket-proxyd.c
@@ -4858,7 +4858,7 @@ SYSINIT_TARGET_WANTS += \
 
 endif # HAVE_LIBCRYPTSETUP
 
-#@src/hostname/Makefile --------------------------------------------------------
+#@src/grp-hostname/Makefile ----------------------------------------------------
 if ENABLE_HOSTNAMED
 systemd_hostnamed_SOURCES = \
 	src/hostname/hostnamed.c
@@ -4919,7 +4919,7 @@ dist_systemunit_DATA_busnames += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.systemd1.busname
 
-#@src/locale/Makefile ----------------------------------------------------------
+#@src/grp-locale/Makefile ------------------------------------------------------
 if ENABLE_LOCALED
 systemd_localed_SOURCES = \
 	src/locale/localed.c \
@@ -5265,7 +5265,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-machined.service.in
 
-#@src/import/Makefile ----------------------------------------------------------
+#@src/grp-import/Makefile ------------------------------------------------------
 if ENABLE_IMPORTD
 
 if HAVE_LIBCURL
@@ -5679,7 +5679,7 @@ EXTRA_DIST += \
 dist_rootlibexec_DATA += \
 	src/resolve/resolv.conf
 
-#@src/network/Makefile ---------------------------------------------------------
+#@src/grp-network/Makefile -----------------------------------------------------
 if ENABLE_NETWORKD
 rootlibexec_PROGRAMS += \
 	systemd-networkd
@@ -5874,7 +5874,7 @@ EXTRA_DIST += \
 	units/systemd-networkd-wait-online.service.in \
 	test/networkd-test.py
 
-#@src/login/Makefile -----------------------------------------------------------
+#@src/grp-login/Makefile -------------------------------------------------------
 if ENABLE_LOGIND
 systemd_logind_SOURCES = \
 	src/login/logind.c \
