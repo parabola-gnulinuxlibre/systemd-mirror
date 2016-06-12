@@ -35,7 +35,7 @@ at.relto = $(foreach p,$2,$(call _at.relto,$1,$p))
 at.path = $(call at.relto,.,$1)
 
 _at.addprefix = $(if $(filter /%,$2),$2,$1/$2)
-at.addprefix = $(call at.path,$(foreach f,$2, $(call _at.addprefix,$1,$f) ))
+at.addprefix = $(foreach f,$2, $(addsuffix $(if $(filter %/,$f),/),$(call at.path,$(call _at.addprefix,$1,$f)) ))
 
 define at.nl
 
