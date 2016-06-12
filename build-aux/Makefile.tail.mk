@@ -17,12 +17,13 @@
 
 include $(call _at.reverse,$(sort $(wildcard $(topsrcdir)/build-aux/Makefile.each.tail/*.mk)))
 
-at.subdirs := $(call at.addprefix,$(outdir)/,$(at.subdirs))
-at.depdirs := $(call at.addprefix,$(outdir)/,$(at.depdirs))
-
 # Move all of the dirlocal variables to their namespaced version
 $(foreach v,$(at.dirlocal),$(eval $v/$(outdir) := $$($v)))
 $(foreach v,$(at.dirlocal),$(eval undefine $v))
+
+# Adjust subdirs and depdirs to be relative to $(outdir)
+at.subdirs/$(outdir) := $(sort $(patsubst %/,%,$(call at.addprefix,$(outdir)/,$(at.subdirs/$(outdir)))))
+at.depdirs/$(outdir) := $(sort $(patsubst %/,%,$(call at.addprefix,$(outdir)/,$(at.depdirs/$(outdir)))))
 
 # Remember that this is a directory that we've visited
 _at.outdirs := $(_at.outdirs) $(outdir)
