@@ -218,27 +218,4 @@ EXTRA_DIST += \
 	units/systemd-logind.service.in \
 	src/login/logind.conf.in
 
-# ------------------------------------------------------------------------------
-ifneq ($(HAVE_PAM),)
-
-systemd_user_sessions_SOURCES = \
-	src/user-sessions/user-sessions.c
-
-systemd_user_sessions_LDADD = \
-	libshared.la
-
-libexec_PROGRAMS += \
-	systemd-user-sessions
-
-nodist_systemunit_DATA += \
-	units/systemd-user-sessions.service
-
-MULTI_USER_TARGET_WANTS += \
-	systemd-user-sessions.service
-
-endif # HAVE_PAM
-
-EXTRA_DIST += \
-	units/systemd-user-sessions.service.in
-
 include $(topsrcdir)/build-aux/Makefile.tail.mk

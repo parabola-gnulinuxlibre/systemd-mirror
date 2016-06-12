@@ -133,26 +133,6 @@ GENERAL_ALIASES += \
 nodist_pkgsysconf_DATA += \
 	src/resolve/resolved.conf
 
-libnss_resolve_la_SOURCES = \
-	src/nss-resolve/nss-resolve.sym \
-	src/nss-resolve/nss-resolve.c
-
-libnss_resolve_la_LDFLAGS = \
-	$(AM_LDFLAGS) \
-	-module \
-	-export-dynamic \
-	-avoid-version \
-	-shared \
-	-shrext .so.2 \
-	-Wl,--version-script=$(srcdir)/nss-resolve.sym
-
-libnss_resolve_la_LIBADD = \
-	libsystemd-internal.la \
-        -ldl
-
-lib_LTLIBRARIES += \
-	libnss_resolve.la
-
 systemd_resolve_SOURCES = \
 	src/resolve/resolve-tool.c \
 	$(basic_dns_sources) \
