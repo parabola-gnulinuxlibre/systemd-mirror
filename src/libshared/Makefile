@@ -148,6 +148,7 @@ test_local_addresses_SOURCES = \
 test_local_addresses_LDADD = \
 	libshared.la
 
+libshared_la_LIBADD += libbasic.la # was hidden by libsystemd->libbasic
 systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal

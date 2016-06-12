@@ -52,6 +52,7 @@ dist_zshcompletion_data += \
 endif # HAVE_BLKID
 endif # ENABLE_EFI
 
+bootctl_LDADD += libbasic.la # was hidden by libshared->libsystemd->libbasic
 systemd.CPPFLAGS += $(libshared.CPPFLAGS)
 systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 

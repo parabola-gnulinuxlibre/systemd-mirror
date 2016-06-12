@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-libsystemd_internal_la_SOURCES = \
+_libsystemd_internal_la_SOURCES = \
 	src/systemd/sd-bus.h \
 	src/systemd/sd-bus-protocol.h \
 	src/systemd/sd-bus-vtable.h \
@@ -115,7 +115,7 @@ libsystemd_internal_la_LIBADD = \
 	libbasic.la \
 	-lresolv
 
-_noinst_LTLIBRARIES += \
+noinst_LTLIBRARIES += \
 	libsystemd-internal.la
 
 test_bus_marshal_SOURCES = \
@@ -242,9 +242,8 @@ test_resolve_SOURCES = \
 test_resolve_LDADD = \
 	libshared.la
 
-at.out_files += libsystemd-internal.la
-libsystemd-internal.la_SOURCES = $(patsubst src/libsystemd/%,%,$(filter %.c,$(libsystemd_internal_la_SOURCES)))
-$(outdir)/libsystemd-internal.la: $(addprefix $(outdir)/,$(libsystemd-internal.la_SOURCES:.c=.o))
-at.subdirs += $(sort $(patsubst %/,%,$(dir $(libsystemd-internal.la_SOURCES))))
+libsystemd-internal.la.SOURCES = $(patsubst src/libsystemd/%,%,$(filter %.c,$(_libsystemd_internal_la_SOURCES)))
+libsystemd-internal.la.DEPENDS = $(addprefix $(outdir)/,$(libsystemd-internal.la.SOURCES:.c=.lo))
+at.subdirs += $(sort $(dir $(libsystemd-internal.la.SOURCES)))
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

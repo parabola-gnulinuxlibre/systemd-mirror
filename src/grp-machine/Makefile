@@ -24,6 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 at.subdirs += machinectl systemd-machined
+at.subdirs += libmachine-core
 at.subdirs += nss-mymachines
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

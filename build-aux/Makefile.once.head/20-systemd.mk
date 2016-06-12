@@ -25,7 +25,9 @@ SHELL = bash -o pipefail
 
 OUR_CPPFLAGS += -MT $@ -MD -MP -MF $(@D)/$(DEPDIR)/$(basename $(@F)).P$(patsubst .%,%,$(suffix $(@F)))
 OUR_CPPFLAGS += -include $(topoutdir)/config.h
-OUR_CPPFLAGS += $(if $(<D),-I$(<D)) -I$(@D)
+OUR_CPPFLAGS += $(sort $(if $(<D),-I$(<D)) \
+                       $(if $(filter $(abspath $(topoutdir))/%,$(abspath $<)),-I$(call at.path,$(dir $(patsubst $(abspath $(topoutdir))/%,$(abspath $(topsrcdir))/%,$(abspath $<))))) \
+                       -I$(@D) )
 
 at.dirlocal += systemd.CFLAGS systemd.CPPFLAGS systemd.LDFLAGS systemd.LIBTOOLFLAGS
 ALL_CFLAGS       = $(OUR_CFLAGS)       $(am.CFLAGS/$(@D))       $(systemd.CFLAGS/$(@D))       $(CFLAGS)
@@ -36,11 +38,6 @@ ALL_LIBTOOLFLAGS = $(OUR_LIBTOOLFLAGS) $(am.LIBTOOLFLAGS/$(@D)) $(systemd.LIBTOO
 COMPILE   = $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(ALL_LIBTOOLFLAGS) --mode=compile $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
 LINK      = $(LIBTOOL) $(AM_V_lt) --tag=CC $(ALL_LIBTOOLFLAGS) --mode=link $(CCLD) $(ALL_CFLAGS) $(ALL_LDFLAGS) -o $@
-
-SED_PROCESS = \
-	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
-	$(SED) $(subst '|,-e 's|@,$(subst =,\@|,$(subst |',|g',$(substitutions)))) \
-		< $< > $@
 
 # remove targets if the command fails
 .DELETE_ON_ERROR:
