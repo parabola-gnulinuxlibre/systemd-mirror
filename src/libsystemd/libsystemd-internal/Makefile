@@ -115,7 +115,7 @@ libsystemd_internal_la_LIBADD = \
 	libbasic.la \
 	-lresolv
 
-noinst_LTLIBRARIES += \
+_noinst_LTLIBRARIES += \
 	libsystemd-internal.la
 
 test_bus_marshal_SOURCES = \
@@ -242,14 +242,9 @@ test_resolve_SOURCES = \
 test_resolve_LDADD = \
 	libshared.la
 
-at.subdirs += $(notdir $(patsubst %/,%,$(dir $(call automake_sources,libsystemd-internal.la))))
-at.depdirs += $(topoutdir)/src/libbasic
-$(outdir)/libsystemd-internal.la: $(patsubst src/libsystemd/%,$(srcdir)/%,$(filter %.c,$(libsystemd_internal_la_SOURCES)))
-libsystemd_internal_la_SOURCES =
-systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
-systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
-systemd.CPPFLAGS += $(libshared.CPPFLAGS)
-systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
-systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
+at.out_files += libsystemd-internal.la
+libsystemd-internal.la_SOURCES = $(patsubst src/libsystemd/%,%,$(filter %.c,$(libsystemd_internal_la_SOURCES)))
+$(outdir)/libsystemd-internal.la: $(addprefix $(outdir)/,$(libsystemd-internal.la_SOURCES:.c=.o))
+at.subdirs += $(sort $(patsubst %/,%,$(dir $(libsystemd-internal.la_SOURCES))))
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
