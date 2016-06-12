@@ -3733,7 +3733,7 @@ pkgconfiglib_DATA += \
 EXTRA_DIST += \
 	src/libudev/libudev.pc.in
 
-# ------------------------------------------------------------------------------
+#@src/libudev/src/Makefile -----------------------------------------------------
 noinst_LTLIBRARIES += \
 	libudev-internal.la
 
