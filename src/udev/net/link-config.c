@@ -19,7 +19,7 @@
 
 #include <netinet/ether.h>
 
-#include "sd-netlink.h"
+#include <systemd/sd-netlink.h>
 
 #include "alloc-util.h"
 #include "conf-files.h"

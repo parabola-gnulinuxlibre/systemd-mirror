@@ -24,8 +24,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "sd-event.h"
-#include "sd-lldp.h"
+#include <systemd/sd-event.h>
+#include <systemd/sd-lldp.h>
 
 #include "alloc-util.h"
 #include "fd-util.h"
