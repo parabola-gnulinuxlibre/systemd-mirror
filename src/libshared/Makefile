@@ -137,7 +137,7 @@ libshared_la_CFLAGS = \
 libshared_la_LIBADD = \
 	libsystemd-internal.la \
 	libsystemd-journal-internal.la \
-	libudev.la \
+	libudev-internal.la \
 	$(ACL_LIBS) \
 	$(LIBIDN_LIBS) \
 	$(SECCOMP_LIBS)
@@ -149,8 +149,6 @@ test_local_addresses_LDADD = \
 	libshared.la
 
 libshared_la_LIBADD += libbasic.la # was hidden by libsystemd->libbasic
-systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
-systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 
@@ -162,9 +160,9 @@ systemd.CPPFLAGS += -DSYSTEM_SYSVRCND_PATH=\"$(SYSTEM_SYSVRCND_PATH)\"
 systemd.CPPFLAGS += -DUSER_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/user\"
 systemd.CPPFLAGS += -DUSER_DATA_UNIT_PATH=\"$(userunitdir)\"
 
-systemd.CPPFLAGS += -DSYSTEMD_FSCK_PATH=\"$(rootlibexecdir)/systemd-fsck\"
+systemd.CPPFLAGS += -DSYSTEMD_FSCK_PATH=\"$(libexecdir)/systemd-fsck\"
 
-systemd.CPPFLAGS += -DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(rootbindir)/systemd-tty-ask-password-agent\"
+systemd.CPPFLAGS += -DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(bindir)/systemd-tty-ask-password-agent\"
 
 systemd.CPPFLAGS += -DSYSTEM_GENERATOR_PATH=\"$(systemgeneratordir)\"
 systemd.CPPFLAGS += -DUSER_GENERATOR_PATH=\"$(usergeneratordir)\"

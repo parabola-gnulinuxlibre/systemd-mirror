@@ -74,10 +74,15 @@ test_libudev_sym_CFLAGS = \
 test_libudev_sym_LDADD = \
 	libudev.la
 
+noinst_LTLIBRARIES += \
+	libudev-internal.la
+
+libudev_internal_la_SOURCES =\
+	$(libudev_la_SOURCES)
+
 systemd.sed_files += libudev.pc
 
-systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
-systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
+libudev_la_LIBADD += libbasic.la # was hidden by libsystemd->libbasic
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-device
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-hwdb
 

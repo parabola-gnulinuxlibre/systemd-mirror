@@ -6,7 +6,7 @@ std.sys_files += $(addprefix $(bindir)/,$(bin_PROGRAMS))
 std.sys_files += $(addprefix $(libexecdir)/,$(libexec_PROGRAMS))
 
 std.out_files += $(notdir $(pkgconfiglib_DATA))
-std.sys_files += $(addprefix $(pkgconfiglibdir)/,$(notdir $(lib_pkgconfiglib_DATA)))
+std.sys_files += $(addprefix $(pkgconfiglibdir)/,$(notdir $(pkgconfiglib_DATA)))
 
 $(foreach n,$(call automake_name,$(std.out_files)),\
   $(eval $n_SOURCES ?=)\

@@ -1,4 +1,5 @@
 top_builddir = $(topoutdir)
+top_srcdir = $(topsrcdir)
 
 PACKAGE = @PACKAGE@
 VERSION = @VERSION@

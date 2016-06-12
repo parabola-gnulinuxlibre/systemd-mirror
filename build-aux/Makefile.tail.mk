@@ -40,7 +40,7 @@ $(foreach _at.NO_ONCE,y,\
 		$(eval include $(filter-out $(_at.included_makefiles),$(makefile)))))
 
 # This bit only gets evaluated once, after all of the other Makefiles are read
-ifeq ($(_at.NO_ONCE),)
+ifeq ($(origin _at.NO_ONCE),undefined)
 
 outdir = /bogus
 srcdir = /bogus

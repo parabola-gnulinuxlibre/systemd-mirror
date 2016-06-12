@@ -38,9 +38,13 @@ $(outdir)/%.lo: $(outdir)/%.c $(topoutdir)/config.h | $(outdir)/.deps; $(AM_V_CC
 $(outdir)/.deps:
 	$(AM_V_at)$(MKDIR_P) $@
 
-_systemd.rpath = $(dir $(patsubst $(DESTDIR)%,%,$(filter %/$(@F),$(std.sys_files/$(@D)))))
+_systemd.dups = $(sort $(foreach l,$1,$(if $(filter-out 1,$(words $(filter $l,$1))),$l)))
 _systemd.patsubst-all = $(if $1,$(call _systemd.patsubst-all,$(wordlist 2,$(words $1),$1),$2,$(patsubst $(firstword $1),$2,$3)),$3)
-_systemd.link_files = $(filter %.o %.lo %.la,$^) $(call _systemd.patsubst-all,$(.LIBPATTERNS),-l%,$(filter $(.LIBPATTERNS),$(notdir $^)))
+_systemd.lt_libs = $(foreach l,$(filter %.la,$1), $l $(call _systemd.lt_libs,$($(notdir $l).DEPENDS)))
+_systemd.lt_filter = $(filter-out $(call _systemd.dups,$(call _systemd.lt_libs,$1)),$1)
+
+_systemd.rpath = $(dir $(patsubst $(DESTDIR)%,%,$(filter %/$(@F),$(std.sys_files/$(@D)))))
+_systemd.link_files = $(call _systemd.lt_filter,$(filter %.o %.lo %.la,$^)) $(call _systemd.patsubst-all,$(.LIBPATTERNS),-l%,$(filter $(.LIBPATTERNS),$(notdir $^)))
 $(outdir)/%.la:
 	@if test $(words $^) = 0; then echo 'Cannot link library with no dependencies: $@' >&2; exit 1; fi
 	$(AM_V_CCLD)$(LINK) $(if $(_systemd.rpath),-rpath $(_systemd.rpath)) $(_systemd.link_files)

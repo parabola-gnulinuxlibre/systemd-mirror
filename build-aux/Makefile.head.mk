@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # This bit only gets evaluated once, at the very beginning
-ifeq ($(_at.NO_ONCE),)
+ifeq ($(origin _at.NO_ONCE),undefined)
 
 ifeq ($(topsrcdir),)
 $(error topsrcdir must be set before including Makefile.head.mk)
@@ -49,6 +49,9 @@ _at.reverse = $(if $1,$(call _at.reverse,$(_at.rest))) $(firstword $1)
 
 at.dirlocal += at.subdirs
 at.dirlocal += at.depdirs
+
+_at.outdirs ?=
+_at.included_makefiles ?=
 
 include $(sort $(wildcard $(topsrcdir)/build-aux/Makefile.once.head/*.mk))
 

@@ -49,9 +49,6 @@ test_machine_tables_LDADD = \
 tests += \
 	test-machine-tables
 
-systemd.CPPFLAGS += $(libshared.CPPFLAGS)
-systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
-systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

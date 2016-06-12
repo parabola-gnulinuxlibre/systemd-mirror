@@ -21,7 +21,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
-ifeq ($(topsrcdir),)
+ifeq ($(origin topsrcdir),undefined)
 
 topoutdir := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 abs_topsrcdir := @abs_top_srcdir@
@@ -40,6 +40,11 @@ OUR_CPPFLAGS = @OUR_CPPFLAGS@
 OUR_CFLAGS = @OUR_CFLAGS@
 OUR_LDFLAGS = @OUR_LDFLAGS@
 OUR_LIBTOOLFLAGS =
+
+AM_CPPFLAGS =
+AM_CFLAGS =
+AM_LDFLAGS =
+AM_LIBTOOLFLAGS =
 
 EFI_CPPFLAGS =
 EFI_CFLAGS =
@@ -105,9 +110,9 @@ libfirewall.CPPFLAGS                 = -I$(topsrcdir)/src/libfirewall -I$(topout
 libfirewall.DEPENDS                  =   $(topoutdir)/src/libfirewall/libfirewall.la
 libshared.CPPFLAGS                   = -I$(topsrcdir)/src/libshared -I$(topoutdir)/src/libshared
 libshared.DEPENDS                    =   $(topoutdir)/src/libshared/libshared.la
-#libsystemd-internal.CPPFLAGS         =
+libsystemd-internal.CPPFLAGS         = $(libsystemd.CPPFLAGS)
 libsystemd-internal.DEPENDS          =   $(topoutdir)/src/libsystemd/libsystemd-internal/libsystemd-internal.la
-#libsystemd-journal-internal.CPPFLAGS =
+libsystemd-journal-internal.CPPFLAGS = $(libsystemd.CPPFLAGS)
 libsystemd-journal-internal.DEPENDS  =   $(topoutdir)/src/libsystemd/libsystemd-journal-internal/libsystemd-journal-internal.la
 #libsystemd-network.CPPFLAGS          =
 #libsystemd-network.DEPENDS           =
@@ -115,6 +120,8 @@ libsystemd.CPPFLAGS                  = -I$(topsrcdir)/src/libsystemd/include
 libsystemd.DEPENDS                   =   $(topoutdir)/src/libsystemd/libsystemd.la
 libudev.CPPFLAGS                     = -I$(topsrcdir)/src/libudev/include
 libudev.DEPENDS                      =   $(topoutdir)/src/libudev/src/libudev.la
+libudev-internal.CPPFLAGS            = $(libudev.CPPFLAGS)
+libudev-internal.DEPENDS             =   $(topoutdir)/src/libudev/src/libudev.la
 # # -core libs
 # libbus-proxy-core.CPPFLAGS =
 # libbus-proxy-core.DEPENDS  =
