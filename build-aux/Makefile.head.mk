@@ -34,10 +34,15 @@ at.relto = $(foreach p,$2,$(call _at.relto,$1,$p))
 # itself.
 at.path = $(call at.relto,.,$1)
 
+_at.addprefix = $(if $(filter /%,$2),$2,$1/$2)
+at.addprefix = $(call at.path,$(foreach f,$2, $(call _at.addprefix,$1,$f) ))
+
 define at.nl
 
 
 endef
+
+at.Makefile ?= Makefile
 
 _at.rest = $(wordlist 2,$(words $1),$1)
 _at.reverse = $(if $1,$(call _at.reverse,$(_at.rest))) $(firstword $1)
@@ -56,7 +61,7 @@ endif # _at.NO_ONCE
 outdir := $(call at.path,$(dir $(lastword $(filter-out %.mk,$(MAKEFILE_LIST)))))
 srcdir := $(call at.path,$(topsrcdir)/$(call _at.relto,$(topoutdir),$(outdir)))
 
-_at.included_makefiles := $(_at.included_makefiles) $(call at.path,$(outdir)/Makefile)
+_at.included_makefiles := $(_at.included_makefiles) $(call at.path,$(outdir)/$(at.Makefile))
 
 $(foreach v,$(at.dirlocal),$(eval $v=))
 
