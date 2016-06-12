@@ -121,7 +121,7 @@ libsystemd.DEPENDS                   =   $(topoutdir)/src/libsystemd/libsystemd.
 libudev.CPPFLAGS                     = -I$(topsrcdir)/src/libudev/include
 libudev.DEPENDS                      =   $(topoutdir)/src/libudev/src/libudev.la
 libudev-internal.CPPFLAGS            = $(libudev.CPPFLAGS)
-libudev-internal.DEPENDS             =   $(topoutdir)/src/libudev/src/libudev.la
+libudev-internal.DEPENDS             =   $(topoutdir)/src/libudev/src/libudev-internal.la
 # # -core libs
 # libbus-proxy-core.CPPFLAGS =
 # libbus-proxy-core.DEPENDS  =
