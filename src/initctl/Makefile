@@ -29,4 +29,7 @@ systemd_initctl_SOURCES = \
 systemd_initctl_LDADD = \
 	libshared.la
 
+libexec_PROGRAMS += systemd-initctl
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

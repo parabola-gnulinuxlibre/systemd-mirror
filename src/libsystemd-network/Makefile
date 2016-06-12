@@ -170,4 +170,7 @@ tests += \
 	test-dhcp6-client \
 	test-lldp
 
+systemd.CPPFLAGS += $(libshared.CPPFLAGS)
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

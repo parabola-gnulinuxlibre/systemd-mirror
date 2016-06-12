@@ -29,13 +29,22 @@ at.subdirs += grp-coredump
 #at.subdirs += grp-journal
 #at.subdirs += grp-journal-remote
 #at.subdirs += grp-machine
-#at.subdirs += grp-resolve
-
+at.subdirs += grp-resolve
+#at.subdirs += grp-system
+at.subdirs += grp-timedate
+#at.subdirs += grp-hostname
+#at.subdirs += grp-import
+at.subdirs += initctl
+at.subdirs += kernel-install
 at.subdirs += libbasic
+#at.subdirs += libcore
 at.subdirs += libfirewall
 at.subdirs += libshared
 at.subdirs += libsystemd
+at.subdirs += libsystemd-network
 at.subdirs += libudev
+#at.subdirs += grp-locale
+
 at.subdirs += systemd-nspawn
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -28,7 +28,6 @@
 #include "fileio-label.h"
 #include "hostname-util.h"
 #include "io-util.h"
-#include "netlink-util.h"
 #include "network-internal.h"
 #include "ordered-set.h"
 #include "parse-util.h"

@@ -24,16 +24,13 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 
-$(outdir)/dns_type-list.txt: src/resolve/dns-type.h
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
+$(outdir)/dns_type-list.txt: $(srcdir)/dns-type.h
 	$(AM_V_GEN)$(SED) -n -r 's/.* DNS_TYPE_(\w+).*/\1/p' <$< >$@
 
-$(outdir)/dns_type-to-name.h: src/resolve/dns_type-list.txt
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
+$(outdir)/dns_type-to-name.h: $(outdir)/dns_type-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *dns_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case DNS_TYPE_%s: return ", $$1; sub(/_/, "-"); printf "\"%s\";\n", $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
 
-$(outdir)/dns_type-from-name.gperf: src/resolve/dns_type-list.txt
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
+$(outdir)/dns_type-from-name.gperf: $(outdir)/dns_type-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct dns_type_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { s=$$1; sub(/_/, "-", s); printf "%s, ", $$s; printf "DNS_TYPE_%s\n", $$1 }' <$< >$@
 
 ifneq ($(ENABLE_RESOLVED),)
@@ -223,5 +220,10 @@ gperf_gperf_sources += \
 EXTRA_DIST += \
 	units/systemd-resolved.service.m4.in \
 	src/resolve/resolved.conf.in
+
+
+$(outdir)/dns-type.o: $(outdir)/dns_type-from-name.h $(outdir)/dns_type-to-name.h
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
+systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -62,4 +62,6 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-timedated.service.in
 
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk
