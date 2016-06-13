@@ -20,77 +20,20 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
-
-INSTALL_DIRS += \
-	$(sysconfdir)/udev/rules.d
-
-dist_network_DATA = \
-	network/99-default.link \
-	network/80-container-host0.network \
-	network/80-container-ve.network \
-	network/80-container-vz.network
-
-dist_udevrules_DATA += \
-	rules/50-udev-default.rules \
-	rules/60-block.rules \
-	rules/60-drm.rules \
-	rules/60-evdev.rules \
-	rules/60-persistent-storage-tape.rules \
-	rules/60-persistent-input.rules \
-	rules/60-persistent-alsa.rules \
-	rules/60-persistent-storage.rules \
-	rules/60-serial.rules \
-	rules/64-btrfs.rules \
-	rules/70-mouse.rules \
-	rules/75-net-description.rules \
-	rules/78-sound-card.rules \
-	rules/80-net-setup-link.rules
-
-nodist_udevrules_DATA += \
-	rules/99-systemd.rules
-
-udevconfdir = $(sysconfdir)/udev
-dist_udevconf_DATA = \
-	src/udev/udev.conf
-
-pkgconfigdata_DATA += \
-	src/udev/udev.pc
-
-EXTRA_DIST += \
-	rules/99-systemd.rules.in \
-	src/udev/udev.pc.in
-
-EXTRA_DIST += \
-	units/systemd-udevd.service.in \
-	units/systemd-udev-trigger.service.in \
-	units/systemd-udev-settle.service.in
-
-SOCKETS_TARGET_WANTS += \
-	systemd-udevd-control.socket \
-	systemd-udevd-kernel.socket
-
-SYSINIT_TARGET_WANTS += \
-	systemd-udevd.service \
-	systemd-udev-trigger.service
-
-bin_PROGRAMS += \
-	udevadm
-
-libexec_PROGRAMS += \
-	systemd-udevd
 
 noinst_LTLIBRARIES += \
 	libudev-core.la
 
 $(outdir)/keyboard-keys-list.txt:
-	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM -include linux/input.h - < /dev/null | $(AWK) '/^#define[ \t]+KEY_[^ ]+[ \t]+[0-9K]/ { if ($$2 != "KEY_MAX") { print $$2 } }' > $@
+	$(AM_V_at)$(MKDIR_P) $(dir $@)
+	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM -include linux/input.h - < /dev/null | $(AWK) '/^#define[ \t]+KEY_[^ ]+[ \t]+[0-9K]/ { if ($$2 != "KEY_MAX") { print $$2 } }' > $@
 
-$(outdir)/keyboard-keys-from-name.gperf: $(outdir)/keyboard-keys-list.txt
+$(outdir)/keyboard-keys-from-name.gperf: src/udev/keyboard-keys-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct key { const char* name; unsigned short id; };"; print "%null-strings"; print "%%";} { print tolower(substr($$1 ,5)) ", " $$1 }' < $< > $@
 
-$(outdir)/keyboard-keys-from-name.h: $(outdir)/keyboard-keys-from-name.gperf
+$(outdir)/keyboard-keys-from-name.h: src/udev/keyboard-keys-from-name.gperf
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t -N keyboard_lookup_key -H hash_key_name -p -C < $< > $@
 
 gperf_txt_sources += \
@@ -155,27 +98,5 @@ libudev_core_la_SOURCES += \
 	src/libsystemd/sd-login/sd-login.c \
 	src/systemd/sd-login.h
 endif # HAVE_ACL
-
-systemd_udevd_SOURCES = \
-	src/udev/udevd.c
-
-systemd_udevd_LDADD = \
-	libudev-core.la
-
-udevadm_SOURCES = \
-	src/udev/udevadm.c \
-	src/udev/udevadm-info.c \
-	src/udev/udevadm-control.c \
-	src/udev/udevadm-monitor.c \
-	src/udev/udevadm-hwdb.c \
-	src/udev/udevadm-settle.c \
-	src/udev/udevadm-trigger.c \
-	src/udev/udevadm-test.c \
-	src/udev/udevadm-test-builtin.c \
-	src/udev/udevadm-util.c \
-	src/udev/udevadm-util.h
-
-udevadm_LDADD = \
-	libudev-core.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

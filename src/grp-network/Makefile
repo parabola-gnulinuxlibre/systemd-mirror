@@ -23,6 +23,12 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+dist_network_DATA = \
+	network/99-default.link \
+	network/80-container-host0.network \
+	network/80-container-ve.network \
+	network/80-container-vz.network
+
 ifneq ($(ENABLE_NETWORKD),)
 libexec_PROGRAMS += \
 	systemd-networkd
