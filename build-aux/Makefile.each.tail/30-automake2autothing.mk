@@ -1,9 +1,12 @@
 std.out_files += $(noinst_LTLIBRARIES) $(lib_LTLIBRARIES)
 std.sys_files += $(addprefix $(libdir)/,$(lib_LTLIBRARIES))
 
-std.out_files += $(bin_PROGRAMS) $(libexec_PROGRAMS)
-std.sys_files += $(addprefix $(bindir)/,$(bin_PROGRAMS))
-std.sys_files += $(addprefix $(libexecdir)/,$(libexec_PROGRAMS))
+_programs =
+$(foreach d,$(am.bindirs),                                               \
+	$(eval _programs     += $($d_PROGRAMS)                          )\
+	$(eval std.sys_files += $(addprefix $($(d)dir)/,$($d_PROGRAMS)) ))
+std.out_files += $(_programs)
+# TODO: noinst_PROGRAMS (test)
 
 std.out_files += $(notdir $(pkgconfiglib_DATA))
 std.sys_files += $(addprefix $(pkgconfiglibdir)/,$(notdir $(pkgconfiglib_DATA)))
@@ -23,7 +26,7 @@ $(foreach t,$(filter %.la,$(std.out_files)),                                    
 	$(eval $t: private ALL_LDFLAGS += $($(call automake_name,$t)_LDFLAGS)                      )\
 	$(eval $(outdir)/$t: $($t.DEPENDS)                                                         )\
 	$(eval at.depdirs += $(abspath $(sort $(dir $(filter-out -l% /%,$($t.DEPENDS)))))          ))
-$(foreach t,$(bin_PROGRAMS) $(libexec_PROGRAMS),                                                    \
+$(foreach t,$(_programs),                                                                           \
 	$(eval $t.DEPENDS += $(call at.path,$(call automake_o,$t)  $(call automake_lib,$t,LDADD))  )\
 	$(eval am.CPPFLAGS += $($(call automake_name,$t)_CPPFLAGS) $(call automake_cpp,$t,LDADD)   )\
 	$(eval am.CFLAGS += $($(call automake_name,$t)_CFLAGS)                                     )\

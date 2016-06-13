@@ -95,11 +95,11 @@ factory_pamdir = $(datadir)/factory/etc/pam.d
 bootlibdir = $(prefix)/lib/systemd/boot/efi
 
 # And these are the special ones for /
-prefix=@prefix@
-bindir=$(prefix)/bin
-libexecdir=$(prefix)/lib/systemd
+rootprefix=@rootprefix@
+rootbindir=$(rootprefix)/bin
+rootlibexecdir=$(rootprefix)/lib/systemd
 
-# Libraries we depend on
+# Libraries we provide
 libbasic.CPPFLAGS                    = -I$(topsrcdir)/src/libbasic -I$(topoutdir)/src/libbasic
 libbasic.DEPENDS                     =   $(topoutdir)/src/libbasic/libbasic.la
 libcore.CPPFLAGS                     = -I$(topsrcdir)/src/libcore $(libshared.CPPFLAGS)
@@ -120,36 +120,28 @@ libudev.CPPFLAGS                     = -I$(topsrcdir)/src/libudev/include
 libudev.DEPENDS                      =   $(topoutdir)/src/libudev/src/libudev.la
 libudev-internal.CPPFLAGS            = $(libudev.CPPFLAGS)
 libudev-internal.DEPENDS             =   $(topoutdir)/src/libudev/src/libudev-internal.la
-# # -core libs
-# libbus-proxy-core.CPPFLAGS =
-# libbus-proxy-core.DEPENDS  =
-# libjournal-core.CPPFLAGS   =
-# libjournal-core.DEPENDS    =
-# liblogind-core.CPPFLAGS    =
-# liblogind-core.DEPENDS     =
-# libmachine-core.CPPFLAGS   =
-# libmachine-core.DEPENDS    =
-# libnetworkd-core.CPPFLAGS  =
-# libnetworkd-core.DEPENDS   =
-# libudev-core.CPPFLAGS      =
-# libudev-core.DEPENDS       =
-# # compat-libs
-# libsystemd-daemon.CPPFLAGS  =
-# libsystemd-daemon.DEPENDS   =
-# libsystemd-id128.CPPFLAGS   =
-# libsystemd-id128.DEPENDS    =
-# libsystemd-journal.CPPFLAGS =
-# libsystemd-journal.DEPENDS  =
-# libsystemd-login.CPPFLAGS   =
-# libsystemd-login.DEPENDS    =
-# # NSS modules
-# libnss_myhostname.CPPFLAGS =
-# libnss_myhostname.DEPENDS  =
-# libnss_mymachines.CPPFLAGS =
-# libnss_mymachines.DEPENDS  =
-# libnss_resolve.CPPFLAGS    =
-# libnss_resolve.DEPENDS     =
+# -core libs
+#libbus-proxy-core.CPPFLAGS =
+#libbus-proxy-core.DEPENDS  =
+#libjournal-core.CPPFLAGS   =
+#libjournal-core.DEPENDS    =
+#liblogind-core.CPPFLAGS    =
+#liblogind-core.DEPENDS     =
+#libmachine-core.CPPFLAGS   =
+#libmachine-core.DEPENDS    =
+#libnetworkd-core.CPPFLAGS  =
+#libnetworkd-core.DEPENDS   =
+libudev-core.CPPFLAGS      = -I$(topoutdir)/src/grp-udev/libudev-core $(libsystemd-network.CPPFLAGS) $(libshared.CPPFLAGS)
+libudev-core.DEPENDS       =   $(topoutdir)/src/grp-udev/libudev-core/libudev-core.la
+# NSS modules
+#libnss_myhostname.CPPFLAGS =
+#libnss_myhostname.DEPENDS  =
+#libnss_mymachines.CPPFLAGS =
+#libnss_mymachines.DEPENDS  =
+#libnss_resolve.CPPFLAGS    =
+#libnss_resolve.DEPENDS     =
 
+# Libraries we use
 HAVE_ACL        = @HAVE_ACL_TRUE@1
      ACL_CFLAGS = #XXX
      ACL_LIBS   = @ACL_LIBS@
@@ -235,6 +227,7 @@ HAVE_ZLIB        = @HAVE_ZLIB_TRUE@1
      ZLIB_CFLAGS = @ZLIB_CFLAGS@
      ZLIB_LIBS   = @ZLIB_LIBS@
 
+# Other stuff
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 
 ARCH_AARCH64 = @ARCH_AARCH64_TRUE@1
@@ -348,6 +341,8 @@ NTP_SERVERS = @NTP_SERVERS@
 OBJEXT = @OBJEXT@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
+
+# FIXME: hardcoded
 PATH_SEPARATOR = :
 PKG_CONFIG_LIBDIR =
 PKG_CONFIG_PATH = /home/luke/.prefix/lib/pkgconfig

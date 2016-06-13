@@ -34,4 +34,6 @@ dist_udevrules_DATA += \
 udevlibexec_PROGRAMS += \
 	mtd_probe
 
+mtd_probe_LDADD += libbasic.la
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -53,7 +53,6 @@
 #include "fs-util.h"
 #include "hashmap.h"
 #include "io-util.h"
-#include "netlink-util.h"
 #include "parse-util.h"
 #include "proc-cmdline.h"
 #include "process-util.h"

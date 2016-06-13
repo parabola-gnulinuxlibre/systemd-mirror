@@ -20,26 +20,12 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(HAVE_BLKID),)
-systemgenerator_PROGRAMS +=  \
-	systemd-gpt-auto-generator
-
-systemd_gpt_auto_generator_SOURCES = \
-	src/gpt-auto-generator/gpt-auto-generator.c \
-	src/basic/blkid-util.h
-
-systemd_gpt_auto_generator_LDADD = \
-	libshared.la \
-	$(BLKID_LIBS)
-
-systemd_gpt_auto_generator_CFLAGS = \
-	$(AM_CFLAGS) \
-	$(BLKID_CFLAGS)
-endif # HAVE_BLKID
-
-systemd.CPPFLAGS += -DSYSTEMD_CRYPTSETUP_PATH=\"$(rootlibexecdir)/systemd-cryptsetup\"
+systemd.CPPFLAGS += $(libshared.CPPFLAGS)
+systemd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-netlink
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

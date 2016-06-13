@@ -18,7 +18,7 @@
 ***/
 
 #include "alloc-util.h"
-#include "link-config.h"
+#include "net/link-config.h"
 #include "log.h"
 #include "udev.h"
 

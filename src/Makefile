@@ -37,6 +37,7 @@ at.subdirs += grp-coredump
 at.subdirs += grp-resolve
 #at.subdirs += grp-system
 at.subdirs += grp-timedate
+at.subdirs += grp-udev
 at.subdirs += kernel-install
 at.subdirs += libbasic
 at.subdirs += libcore
@@ -96,6 +97,5 @@ at.subdirs += systemd-update-done
 at.subdirs += systemd-update-utmp
 at.subdirs += systemd-user-sessions
 at.subdirs += systemd-vconsole
-#at.subdirs += udev
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
