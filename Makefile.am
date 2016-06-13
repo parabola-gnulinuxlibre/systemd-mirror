@@ -411,17 +411,17 @@ INTLTOOL_V_MERGE_0 = @echo "  ITMRG " $@;
 INTLTOOL_V_MERGE_1 =
 
 #@src/grp-system/systemctl/Makefile
-rootbit_PROGRAMS += systemctl
+rootbin_PROGRAMS += systemctl
 #@src/systemd-notify/Makefile
-rootbit_PROGRAMS += systemd-notify
+rootbin_PROGRAMS += systemd-notify
 #@src/systemd-ask-password/Makefile
-rootbit_PROGRAMS += systemd-ask-password
+rootbin_PROGRAMS += systemd-ask-password
 #@src/systemd-tty-ask-password-agent/Makefile
-rootbit_PROGRAMS += systemd-tty-ask-password-agent
+rootbin_PROGRAMS += systemd-tty-ask-password-agent
 #@src/systemd-machine-id-setup/Makefile
-rootbit_PROGRAMS += systemd-machine-id-setup
+rootbin_PROGRAMS += systemd-machine-id-setup
 #@src/systemd-escape/Makefile
-rootbit_PROGRAMS += systemd-escape
+rootbin_PROGRAMS += systemd-escape
 
 #@src/systemd-cgls/Makefile
 bin_PROGRAMS += systemd-cgls
