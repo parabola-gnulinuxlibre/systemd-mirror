@@ -2667,7 +2667,7 @@ EXTRA_DIST += \
 	units/systemd-tmpfiles-setup.service.in \
 	units/systemd-tmpfiles-clean.service.in
 
-#@src/sysusers/Makefile --------------------------------------------------------
+#@src/systemd-sysusers/Makefile ------------------------------------------------
 if ENABLE_SYSUSERS
 systemd_sysusers_SOURCES = \
 	src/sysusers/sysusers.c
