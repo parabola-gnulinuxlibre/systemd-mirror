@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-rootbit_PROGRAMS += systemd-ask-password
+rootbin_PROGRAMS += systemd-ask-password
 systemd_ask_password_SOURCES = \
 	src/ask-password/ask-password.c
 

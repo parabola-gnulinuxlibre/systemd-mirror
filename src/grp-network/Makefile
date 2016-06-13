@@ -30,7 +30,7 @@ dist_network_DATA = \
 	network/80-container-vz.network
 
 ifneq ($(ENABLE_NETWORKD),)
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-networkd
 
 systemd_networkd_SOURCES = \
@@ -111,7 +111,7 @@ libnetworkd_core_la_LIBADD = \
 	libsystemd-network.la \
 	libshared.la
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-networkd-wait-online
 
 systemd_networkd_wait_online_CFLAGS = \
@@ -129,7 +129,7 @@ systemd_networkd_wait_online_LDADD = \
 	libsystemd-network.la \
 	libshared.la
 
-bin_PROGRAMS += \
+rootbin_PROGRAMS += \
 	networkctl
 
 networkctl_SOURCES = \

@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-libexec_PROGRAMS += systemd-remount-fs
+rootlibexec_PROGRAMS += systemd-remount-fs
 systemd_remount_fs_SOURCES = \
 	src/remount-fs/remount-fs.c \
 	src/core/mount-setup.c \

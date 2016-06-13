@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-libexec_PROGRAMS += systemd-cgroups-agent
+rootlibexec_PROGRAMS += systemd-cgroups-agent
 systemd_cgroups_agent_SOURCES = \
 	src/cgroups-agent/cgroups-agent.c
 

@@ -30,7 +30,7 @@ systemd_tmpfiles_SOURCES = \
 systemd_tmpfiles_LDADD = \
 	libshared.la
 
-bin_PROGRAMS += \
+rootbin_PROGRAMS += \
 	systemd-tmpfiles
 
 dist_systemunit_DATA += \

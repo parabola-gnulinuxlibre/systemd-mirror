@@ -27,7 +27,7 @@ ifneq ($(ENABLE_HIBERNATE),)
 systemgenerator_PROGRAMS += \
 	systemd-hibernate-resume-generator
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-hibernate-resume
 
 systemd_hibernate_resume_SOURCES = \

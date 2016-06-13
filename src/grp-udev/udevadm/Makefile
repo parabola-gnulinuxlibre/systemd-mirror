@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-bin_PROGRAMS += \
+rootbin_PROGRAMS += \
 	udevadm
 
 udevadm_SOURCES = \

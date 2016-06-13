@@ -24,7 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(ENABLE_RANDOMSEED),)
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-random-seed
 
 nodist_systemunit_DATA += \

@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-libexec_PROGRAMS += systemd-sysctl
+rootlibexec_PROGRAMS += systemd-sysctl
 systemd_sysctl_SOURCES = \
 	src/sysctl/sysctl.c
 

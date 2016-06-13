@@ -265,9 +265,6 @@ fixup_makefile() {
 	sed -r \
 	    -e '/^[^#	]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' \
 	    -e 's|^if (.*)|ifneq ($(\1),)|' \
-	    -e 's|rootprefix|prefix|g' \
-	    -e 's|rootbin|bin|g' \
-	    -e 's|rootlib|lib|g' \
 	    -e 's|--version-script=.*/([^/]+)\.sym|--version-script=$(srcdir)/\1.sym|g'
 }
 
@@ -279,7 +276,8 @@ fixup_makefiles() (
 	    -e 's/ \$\(AM_CPPFLAGS\) / $(ALL_CPPFLAGS) /g' \
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
 	    src/libbasic/Makefile \
-	    src/libsystemd/libsystemd-journal-internal/Makefile
+	    src/libsystemd/libsystemd-journal-internal/Makefile \
+	    src/grp-udev/libudev-core/Makefile
 	find -type f -name Makefile|while read -r filename; do
 		sed -r -i "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="${filename%/*}" config.mk)|" "$filename"
 	done

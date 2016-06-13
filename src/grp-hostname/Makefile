@@ -30,7 +30,7 @@ systemd_hostnamed_SOURCES = \
 systemd_hostnamed_LDADD = \
 	libshared.la
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-hostnamed
 
 nodist_systemunit_DATA += \

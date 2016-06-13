@@ -31,7 +31,7 @@ systemd_firstboot_LDADD = \
 	libshared.la \
 	-lcrypt
 
-bin_PROGRAMS += \
+rootbin_PROGRAMS += \
 	systemd-firstboot
 
 nodist_systemunit_DATA += \

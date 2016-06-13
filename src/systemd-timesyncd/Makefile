@@ -40,7 +40,7 @@ systemd_timesyncd_LDADD = \
 	libsystemd-network.la \
 	libshared.la
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-timesyncd
 
 nodist_systemunit_DATA += \

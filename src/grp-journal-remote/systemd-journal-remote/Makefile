@@ -24,7 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(HAVE_MICROHTTPD),)
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-journal-remote
 
 systemd_journal_remote_SOURCES = \

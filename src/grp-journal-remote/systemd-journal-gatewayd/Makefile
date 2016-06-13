@@ -26,7 +26,7 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 ifneq ($(HAVE_MICROHTTPD),)
 gatewayddocumentrootdir=$(pkgdatadir)/gatewayd
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-journal-gatewayd
 
 systemd_journal_gatewayd_SOURCES = \

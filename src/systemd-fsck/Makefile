@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-libexec_PROGRAMS += systemd-fsck
+rootlibexec_PROGRAMS += systemd-fsck
 systemd_fsck_SOURCES = \
 	src/fsck/fsck.c
 

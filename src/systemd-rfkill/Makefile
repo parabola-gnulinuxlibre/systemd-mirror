@@ -24,7 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(ENABLE_RFKILL),)
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-rfkill
 
 nodist_systemunit_DATA += \

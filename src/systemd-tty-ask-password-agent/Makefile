@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-rootbit_PROGRAMS += systemd-tty-ask-password-agent
+rootbin_PROGRAMS += systemd-tty-ask-password-agent
 systemd_tty_ask_password_agent_SOURCES = \
 	src/tty-ask-password-agent/tty-ask-password-agent.c
 

@@ -50,7 +50,7 @@ dist_systemunit_DATA += \
 SOCKETS_TARGET_WANTS += \
 	systemd-coredump.socket
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-coredump
 
 dist_pkgsysconf_DATA += \

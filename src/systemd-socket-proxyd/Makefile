@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-libexec_PROGRAMS += systemd-socket-proxyd
+rootlibexec_PROGRAMS += systemd-socket-proxyd
 
 systemd_socket_proxyd_SOURCES = \
 	src/socket-proxy/socket-proxyd.c

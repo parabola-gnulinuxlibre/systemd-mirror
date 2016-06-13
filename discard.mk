@@ -105,18 +105,18 @@ AM_CPPFLAGS = \
 	-DUSER_DATA_UNIT_PATH=\"$(userunitdir)\" \
 	-DCERTIFICATE_ROOT=\"$(CERTIFICATEROOT)\" \
 	-DCATALOG_DATABASE=\"$(catalogstatedir)/database\" \
-	-DSYSTEMD_CGROUP_AGENT_PATH=\"$(libexecdir)/systemd-cgroups-agent\" \
-	-DSYSTEMD_BINARY_PATH=\"$(libexecdir)/systemd\" \
-	-DSYSTEMD_FSCK_PATH=\"$(libexecdir)/systemd-fsck\" \
-	-DSYSTEMD_SHUTDOWN_BINARY_PATH=\"$(libexecdir)/systemd-shutdown\" \
-	-DSYSTEMD_SLEEP_BINARY_PATH=\"$(libexecdir)/systemd-sleep\" \
-	-DSYSTEMCTL_BINARY_PATH=\"$(bindir)/systemctl\" \
-	-DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(bindir)/systemd-tty-ask-password-agent\" \
+	-DSYSTEMD_CGROUP_AGENT_PATH=\"$(rootlibexecdir)/systemd-cgroups-agent\" \
+	-DSYSTEMD_BINARY_PATH=\"$(rootlibexecdir)/systemd\" \
+	-DSYSTEMD_FSCK_PATH=\"$(rootlibexecdir)/systemd-fsck\" \
+	-DSYSTEMD_SHUTDOWN_BINARY_PATH=\"$(rootlibexecdir)/systemd-shutdown\" \
+	-DSYSTEMD_SLEEP_BINARY_PATH=\"$(rootlibexecdir)/systemd-sleep\" \
+	-DSYSTEMCTL_BINARY_PATH=\"$(rootbindir)/systemctl\" \
+	-DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(rootbindir)/systemd-tty-ask-password-agent\" \
 	-DSYSTEMD_STDIO_BRIDGE_BINARY_PATH=\"$(bindir)/systemd-stdio-bridge\" \
-	-DROOTPREFIX=\"$(prefix)\" \
+	-DROOTPREFIX=\"$(rootprefix)\" \
 	-DRANDOM_SEED_DIR=\"$(localstatedir)/lib/systemd/\" \
 	-DRANDOM_SEED=\"$(localstatedir)/lib/systemd/random-seed\" \
-	-DSYSTEMD_CRYPTSETUP_PATH=\"$(libexecdir)/systemd-cryptsetup\" \
+	-DSYSTEMD_CRYPTSETUP_PATH=\"$(rootlibexecdir)/systemd-cryptsetup\" \
 	-DSYSTEM_GENERATOR_PATH=\"$(systemgeneratordir)\" \
 	-DUSER_GENERATOR_PATH=\"$(usergeneratordir)\" \
 	-DSYSTEM_SHUTDOWN_PATH=\"$(systemshutdowndir)\" \
@@ -130,8 +130,8 @@ AM_CPPFLAGS = \
 	-DMOUNT_PATH=\"$(MOUNT_PATH)\" \
 	-DUMOUNT_PATH=\"$(UMOUNT_PATH)\" \
 	-DLIBDIR=\"$(libdir)\" \
-	-DROOTLIBDIR=\"$(libdir)\" \
-	-DROOTLIBEXECDIR=\"$(libexecdir)\" \
+	-DROOTLIBDIR=\"$(rootlibdir)\" \
+	-DROOTLIBEXECDIR=\"$(rootlibexecdir)\" \
 	-DTEST_DIR=\"$(abs_top_srcdir)/test\" \
 	-I $(top_srcdir)/src \
 	-I $(top_builddir)/src/basic \
@@ -168,13 +168,13 @@ AM_CFLAGS = $(OUR_CFLAGS)
 AM_LDFLAGS = $(OUR_LDFLAGS)
 
 # ------------------------------------------------------------------------------
-define move-to-libdir
-	if test "$(libdir)" != "$(libdir)"; then \
-		$(MKDIR_P) $(DESTDIR)$(libdir) && \
+define move-to-rootlibdir
+	if test "$(libdir)" != "$(rootlibdir)"; then \
+		$(MKDIR_P) $(DESTDIR)$(rootlibdir) && \
 		so_img_name=$$(readlink $(DESTDIR)$(libdir)/$$libname) && \
 		rm -f $(DESTDIR)$(libdir)/$$libname && \
-		$(LN_S) --relative -f $(DESTDIR)$(libdir)/$$so_img_name $(DESTDIR)$(libdir)/$$libname && \
-		mv $(DESTDIR)$(libdir)/$$libname.* $(DESTDIR)$(libdir); \
+		$(LN_S) --relative -f $(DESTDIR)$(rootlibdir)/$$so_img_name $(DESTDIR)$(libdir)/$$libname && \
+		mv $(DESTDIR)$(libdir)/$$libname.* $(DESTDIR)$(rootlibdir); \
 	fi
 endef
 
@@ -676,20 +676,20 @@ dist_factory_pam_DATA = \
 endif # HAVE_PAM
 
 libsystemd-install-hook:
-	libname=libsystemd.so && $(move-to-libdir)
+	libname=libsystemd.so && $(move-to-rootlibdir)
 
 libsystemd-uninstall-hook:
-	rm -f $(DESTDIR)$(libdir)/libsystemd.so*
+	rm -f $(DESTDIR)$(rootlibdir)/libsystemd.so*
 
 INSTALL_EXEC_HOOKS += libsystemd-install-hook
 UNINSTALL_EXEC_HOOKS += libsystemd-uninstall-hook
 
-# move lib from $(libdir) to $(libdir) and update devel link, if needed
+# move lib from $(libdir) to $(rootlibdir) and update devel link, if needed
 libudev-install-hook:
-	libname=libudev.so && $(move-to-libdir)
+	libname=libudev.so && $(move-to-rootlibdir)
 
 libudev-uninstall-hook:
-	rm -f $(DESTDIR)$(libdir)/libudev.so*
+	rm -f $(DESTDIR)$(rootlibdir)/libudev.so*
 
 INSTALL_EXEC_HOOKS += libudev-install-hook
 UNINSTALL_EXEC_HOOKS += libudev-uninstall-hook
@@ -1064,7 +1064,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--with-zshcompletiondir=$$dc_install_base/$(zshcompletiondir) \
 	--with-pamlibdir=$$dc_install_base/$(pamlibdir) \
 	--with-pamconfdir=$$dc_install_base/$(pamconfdir) \
-	--with-prefix=$$dc_install_base \
+	--with-rootprefix=$$dc_install_base \
 	--enable-compat-libs
 
 ifneq ($(HAVE_SYSV_COMPAT),)
@@ -1086,7 +1086,7 @@ DISTCHECK_CONFIGURE_FLAGS += \
 endif # ENABLE_SPLIT_USR
 
 .PHONY: dist-check-help
-dist-check-help: $(bin_PROGRAMS) $(bin_PROGRAMS)
+dist-check-help: $(rootbin_PROGRAMS) $(bin_PROGRAMS)
 	for i in $(abspath $^); do                                             \
             if $$i  --help | grep -v 'default:' | grep -E -q '.{80}.' ; then   \
 		echo "$(basename $$i) --help output is too wide:";             \

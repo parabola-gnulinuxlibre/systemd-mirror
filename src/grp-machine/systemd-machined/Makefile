@@ -30,7 +30,7 @@ systemd_machined_SOURCES = \
 systemd_machined_LDADD = \
 	libmachine-core.la
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-machined
 
 nodist_systemunit_DATA += \

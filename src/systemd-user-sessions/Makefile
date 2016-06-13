@@ -31,7 +31,7 @@ systemd_user_sessions_SOURCES = \
 systemd_user_sessions_LDADD = \
 	libshared.la
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-user-sessions
 
 nodist_systemunit_DATA += \

@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-udevd
 
 systemd_udevd_SOURCES = \

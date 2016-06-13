@@ -24,7 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(HAVE_LIBCURL),)
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
         systemd-journal-upload
 
 systemd_journal_upload_SOURCES = \

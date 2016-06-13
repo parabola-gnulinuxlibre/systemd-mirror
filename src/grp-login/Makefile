@@ -70,7 +70,7 @@ endif # HAVE_ACL
 noinst_LTLIBRARIES += \
 	liblogind-core.la
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-logind
 
 loginctl_SOURCES = \
@@ -81,7 +81,7 @@ loginctl_SOURCES = \
 loginctl_LDADD = \
 	libshared.la
 
-bin_PROGRAMS += \
+rootbin_PROGRAMS += \
 	loginctl
 
 dist_bashcompletion_data += \
@@ -97,7 +97,7 @@ systemd_inhibit_SOURCES = \
 systemd_inhibit_LDADD = \
 	libshared.la
 
-bin_PROGRAMS += \
+rootbin_PROGRAMS += \
 	systemd-inhibit
 
 test_login_SOURCES = \

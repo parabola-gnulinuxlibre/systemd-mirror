@@ -135,7 +135,7 @@ UNINSTALL_EXEC_HOOKS += journal-uninstall-hook
 # Update catalog on installation. Do not bother if installing
 # in DESTDIR, since this is likely for packaging purposes.
 catalog-update-hook:
-	-test -n "$(DESTDIR)" || $(bindir)/journalctl --update-catalog
+	-test -n "$(DESTDIR)" || $(rootbindir)/journalctl --update-catalog
 
 INSTALL_DATA_HOOKS += \
 	catalog-update-hook

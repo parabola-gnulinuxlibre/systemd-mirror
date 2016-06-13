@@ -24,7 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(HAVE_UTMP),)
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-update-utmp
 endif # HAVE_UTMP
 

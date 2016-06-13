@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-rootbit_PROGRAMS += systemd-notify
+rootbin_PROGRAMS += systemd-notify
 systemd_notify_SOURCES = \
 	src/notify/notify.c
 

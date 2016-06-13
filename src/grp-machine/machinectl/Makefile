@@ -29,7 +29,7 @@ machinectl_SOURCES = \
 machinectl_LDADD = \
 	libshared.la
 
-bin_PROGRAMS += \
+rootbin_PROGRAMS += \
 	machinectl
 
 dist_bashcompletion_data += \

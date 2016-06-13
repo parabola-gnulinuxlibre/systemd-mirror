@@ -30,7 +30,7 @@ systemd_sysusers_SOURCES = \
 systemd_sysusers_LDADD = \
 	libshared.la
 
-bin_PROGRAMS += \
+rootbin_PROGRAMS += \
 	systemd-sysusers
 
 nodist_systemunit_DATA += \

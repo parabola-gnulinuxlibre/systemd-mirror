@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-rootbit_PROGRAMS += systemd-machine-id-setup
+rootbin_PROGRAMS += systemd-machine-id-setup
 systemd_machine_id_setup_SOURCES = \
 	src/machine-id-setup/machine-id-setup-main.c \
 	src/core/machine-id-setup.c \

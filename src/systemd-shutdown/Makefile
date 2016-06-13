@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-libexec_PROGRAMS += systemd-shutdown
+rootlibexec_PROGRAMS += systemd-shutdown
 systemd_shutdown_SOURCES = \
 	src/core/umount.c \
 	src/core/umount.h \

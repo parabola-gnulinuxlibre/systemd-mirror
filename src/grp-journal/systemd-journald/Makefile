@@ -38,10 +38,10 @@ systemd_cat_LDADD = \
 	libjournal-core.la
 
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-journald
 
-bin_PROGRAMS += \
+rootbin_PROGRAMS += \
 	journalctl
 
 bin_PROGRAMS += \

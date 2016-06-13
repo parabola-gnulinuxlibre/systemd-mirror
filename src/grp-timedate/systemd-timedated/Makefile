@@ -30,7 +30,7 @@ systemd_timedated_SOURCES = \
 systemd_timedated_LDADD = \
 	libshared.la
 
-libexec_PROGRAMS += \
+rootlibexec_PROGRAMS += \
 	systemd-timedated
 
 dist_dbussystemservice_DATA += \

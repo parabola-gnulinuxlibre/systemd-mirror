@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-libexec_PROGRAMS += systemd-reply-password
+rootlibexec_PROGRAMS += systemd-reply-password
 systemd_reply_password_SOURCES = \
 	src/reply-password/reply-password.c
 
