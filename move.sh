@@ -223,6 +223,10 @@ move_files() (
 	mv src/grp-udev/udev* src/grp-udev/libudev-core/
 	mv -T src/grp-udev/{,libudev-core}/net
 	mv -T src/grp-udev/{d-,}udevadm
+
+	mv -T src/{libcore,systemd-shutdown}/shutdown.c
+	mv -T src/{libcore,systemd-shutdown}/umount.c
+	mv -T src/{libcore,systemd-shutdown}/umount.h
 )
 
 breakup_makefile() (
