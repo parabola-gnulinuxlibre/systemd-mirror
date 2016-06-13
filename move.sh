@@ -77,7 +77,13 @@ move_files() (
 		mv -T src/{,systemd-}$d
 	done
 
-	mv -T src/systemd-socket-proxy{,d}
+	dmon=(
+		systemd-socket-proxy
+		systemd-timesync
+	)
+	for d in "${dmon[@]}"; do
+		mv -T "src/$d"{,d}
+	done
 
 	mv -T {shell-completion/bash/,src/kernel-install/bash-completion_}kernel-install
 	mv -T {shell-completion/zsh/_,src/kernel-install/zsh-completion_}kernel-install
@@ -207,6 +213,16 @@ move_files() (
 	mv -T src/{,grp-}locale
 	mv -T src/{,grp-}login
 	mv -T src/{,grp-}network
+	mv -T src/{,grp-}udev
+
+	mkdir src/grp-udev/d-udevadm
+	mv src/grp-udev/udevadm* src/grp-udev/d-udevadm/
+	mkdir src/grp-udev/systemd-udevd
+	mv -T src/grp-udev/{,systemd-udevd}/udevd.c
+	mkdir src/grp-udev/libudev-core
+	mv src/grp-udev/udev* src/grp-udev/libudev-core/
+	mv -T src/grp-udev/{,libudev-core}/net
+	mv -T src/grp-udev/{d-,}udevadm
 )
 
 breakup_makefile() (
@@ -257,8 +273,7 @@ fixup_makefiles() (
 	    -e 's/ \$\(AM_CPPFLAGS\) / $(ALL_CPPFLAGS) /g' \
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
 	    src/libbasic/Makefile \
-	    src/libsystemd/libsystemd-journal-internal/Makefile \
-	    src/udev/Makefile
+	    src/libsystemd/libsystemd-journal-internal/Makefile
 	find -type f -name Makefile|while read -r filename; do
 		sed -r -i "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="${filename%/*}" config.mk)|" "$filename"
 	done

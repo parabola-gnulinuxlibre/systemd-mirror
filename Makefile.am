@@ -3768,16 +3768,18 @@ noinst_LTLIBRARIES += \
 libudev_internal_la_SOURCES =\
 	$(libudev_la_SOURCES)
 
-#@src/udev/Makefile ------------------------------------------------------------
+#@src/grp-udev/Makefile --------------------------------------------------------
 INSTALL_DIRS += \
 	$(sysconfdir)/udev/rules.d
 
+#@src/grp-network/Makefile
 dist_network_DATA = \
 	network/99-default.link \
 	network/80-container-host0.network \
 	network/80-container-ve.network \
 	network/80-container-vz.network
 
+#@src/grp-udev/Makefile
 dist_udevrules_DATA += \
 	rules/50-udev-default.rules \
 	rules/60-block.rules \
@@ -3822,12 +3824,15 @@ SYSINIT_TARGET_WANTS += \
 	systemd-udevd.service \
 	systemd-udev-trigger.service
 
+#@src/grp-udev/udevadm/Makefile
 rootbin_PROGRAMS += \
 	udevadm
 
+#@src/grp-udev/systemd-udevd/Makefile
 rootlibexec_PROGRAMS += \
 	systemd-udevd
 
+#@src/grp-udev/libudev-core/Makefile
 noinst_LTLIBRARIES += \
 	libudev-core.la
 
@@ -3904,6 +3909,7 @@ libudev_core_la_SOURCES += \
 	src/systemd/sd-login.h
 endif # HAVE_ACL
 
+#@src/grp-udev/systemd-udevd/Makefile
 systemd_udevd_SOURCES = \
 	src/udev/udevd.c
 
@@ -3911,6 +3917,7 @@ systemd_udevd_LDADD = \
 	libudev-core.la \
 	libbasic.la
 
+#@src/grp-udev/udevadm/Makefile
 udevadm_SOURCES = \
 	src/udev/udevadm.c \
 	src/udev/udevadm-info.c \
@@ -4043,7 +4050,7 @@ EXTRA_DIST += \
 	test/mocks/fsck \
 	hwdb/parse_hwdb.py
 
-#@src/udev/ata_id/Makefile -----------------------------------------------------
+#@src/grp-udev/ata_id/Makefile -------------------------------------------------
 ata_id_SOURCES = \
 	src/udev/ata_id/ata_id.c
 
@@ -4053,7 +4060,7 @@ ata_id_LDADD = \
 udevlibexec_PROGRAMS += \
 	ata_id
 
-#@src/udev/cdrom_id/Makefile ---------------------------------------------------
+#@src/grp-udev/cdrom_id/Makefile -----------------------------------------------
 cdrom_id_SOURCES = \
 	src/udev/cdrom_id/cdrom_id.c
 
@@ -4066,7 +4073,7 @@ udevlibexec_PROGRAMS += \
 dist_udevrules_DATA += \
 	rules/60-cdrom_id.rules
 
-#@src/udev/collect/Makefile ----------------------------------------------------
+#@src/grp-udev/collect/Makefile ------------------------------------------------
 collect_SOURCES = \
 	src/udev/collect/collect.c
 
@@ -4076,7 +4083,7 @@ collect_LDADD = \
 udevlibexec_PROGRAMS += \
 	collect
 
-#@src/udev/scsi_id/Makefile ----------------------------------------------------
+#@src/grp-udev/scsi_id/Makefile ------------------------------------------------
 scsi_id_SOURCES =\
 	src/udev/scsi_id/scsi_id.c \
 	src/udev/scsi_id/scsi_serial.c \
@@ -4092,7 +4099,7 @@ udevlibexec_PROGRAMS += \
 EXTRA_DIST += \
 	src/udev/scsi_id/README
 
-#@src/udev/v4l_id/Makefile -----------------------------------------------------
+#@src/grp-udev/v4l_id/Makefile -------------------------------------------------
 v4l_id_SOURCES = \
 	src/udev/v4l_id/v4l_id.c
 
@@ -4105,7 +4112,7 @@ udevlibexec_PROGRAMS += \
 dist_udevrules_DATA += \
 	rules/60-persistent-v4l.rules
 
-#@src/udev/mtd_probe/Makefile --------------------------------------------------
+#@src/grp-udev/mtd_probe/Makefile ----------------------------------------------
 mtd_probe_SOURCES =  \
 	src/udev/mtd_probe/mtd_probe.c \
 	src/udev/mtd_probe/mtd_probe.h \
@@ -5084,7 +5091,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-timedated.service.in
 
-#@src/systemd-timesync/Makefile ------------------------------------------------
+#@src/systemd-timesyncd/Makefile -----------------------------------------------
 if ENABLE_TIMESYNCD
 systemd_timesyncd_SOURCES = \
 	src/timesync/timesyncd.c \
