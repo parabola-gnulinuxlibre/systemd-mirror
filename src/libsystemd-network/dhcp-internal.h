@@ -25,7 +25,7 @@
 #include <net/if_arp.h>
 #include <stdint.h>
 
-#include "sd-dhcp-client.h"
+#include <systemd/sd-dhcp-client.h>
 
 #include "dhcp-protocol.h"
 #include "socket-util.h"
