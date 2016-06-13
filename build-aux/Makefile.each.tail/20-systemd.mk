@@ -72,6 +72,8 @@ $(addprefix $(outdir)/,$(systemd.sed_files)): $(outdir)/%: $(srcdir)/%.in
 
 $(outdir)/%.c: $(srcdir)/%.gperf
 	$(AM_V_GPERF)$(GPERF) < $< > $@
+$(outdir)/%.c: $(outdir)/%.gperf
+	$(AM_V_GPERF)$(GPERF) < $< > $@
 
 $(outdir)/%: $(srcdir)/%.m4 $(top_builddir)/config.status
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@

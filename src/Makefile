@@ -37,10 +37,9 @@ at.subdirs += grp-coredump
 at.subdirs += grp-resolve
 #at.subdirs += grp-system
 at.subdirs += grp-timedate
-at.subdirs += initctl
 at.subdirs += kernel-install
 at.subdirs += libbasic
-#at.subdirs += libcore
+at.subdirs += libcore
 at.subdirs += libfirewall
 at.subdirs += libshared
 at.subdirs += libsystemd
@@ -48,8 +47,8 @@ at.subdirs += libsystemd-network
 at.subdirs += libudev
 at.subdirs += nss-myhostname
 at.subdirs += systemd-activate
-at.subdirs += systemd-ac-power
-at.subdirs += systemd-analyze
+#at.subdirs += systemd-ac-power
+#at.subdirs += systemd-analyze
 
 #at.subdirs += systemd-machine-id-setup
 #at.subdirs += systemd-modules-load
@@ -58,5 +57,6 @@ at.subdirs += systemd-analyze
 #at.subdirs += systemd-sysctl
 
 at.subdirs += systemd-nspawn
+at.subdirs += systemd-initctl
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

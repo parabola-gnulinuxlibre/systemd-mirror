@@ -163,8 +163,14 @@ libcore_la_LIBADD = \
 	$(APPARMOR_LIBS) \
 	$(MOUNT_LIBS)
 
-$(outdir)/load-fragment-gperf-nulstr.c: src/core/load-fragment-gperf.gperf
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
+$(outdir)/load-fragment-gperf-nulstr.c: $(outdir)/load-fragment-gperf.gperf
 	$(AM_V_GEN)$(AWK) 'BEGIN{ keywords=0 ; FS="," ; print "extern const char load_fragment_gperf_nulstr[];" ; print "const char load_fragment_gperf_nulstr[] ="} ; keyword==1 { print "\"" $$1 "\\0\"" } ; /%%/ { keyword=1} ; END { print ";" }' < $< > $@
+
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
+systemd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
+systemd.CPPFLAGS += -DMOUNT_PATH=\"$(MOUNT_PATH)\"
+systemd.CPPFLAGS += -DUMOUNT_PATH=\"$(UMOUNT_PATH)\"
+systemd.CPPFLAGS += -DSYSTEMD_CGROUP_AGENT_PATH=\"$(libexecdir)/systemd-cgroups-agent\"
+systemd.CPPFLAGS += -DSYSTEMD_BINARY_PATH=\"$(libexecdir)/systemd\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

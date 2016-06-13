@@ -82,7 +82,6 @@ test_patch_uid_LDADD = \
 manual_tests += \
 	test-patch-uid
 
-bin_PROGRAMS += systemd-nspawn
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
 

@@ -84,11 +84,11 @@ EFI_FORMAT = --target=efi-app-$(EFI_ARCH)
 endif # ARCH_AARCH64
 
 $(outdir)/%.o: $(srcdir)/%.c
-	$(AM_V_CC)$(EFI_CC) $(efi_cppflags) $(efi_cflags) -c $< -o $@
+	$(AM_V_EFI_CC)$(EFI_CC) $(efi_cppflags) $(efi_cflags) -c $< -o $@
 
 $(outdir)/%.so:
 	@if test $(words $^) = 0; then echo 'Cannot link EFI library with no dependencies: $@' >&2; exit 1; fi
-	$(AM_V_CCLD)$(LD) $(efi_ldflags) $^ -o $@ -lefi -lgnuefi $(shell $(CC) -print-libgcc-file-name)
+	$(AM_V_EFI_CCLD)$(LD) $(efi_ldflags) $^ -o $@ -lefi -lgnuefi $(shell $(CC) -print-libgcc-file-name)
 	$(AM_V_at)! { nm -D -u $@ | grep ' U '; }
 
 # These next 2 are the same rule

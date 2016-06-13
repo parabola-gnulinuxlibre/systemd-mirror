@@ -82,6 +82,16 @@ AM_V_CCLD_ = $(AM_V_CCLD_$(AM_DEFAULT_VERBOSITY))
 AM_V_CCLD_0 = @echo "  CCLD    " $@;
 AM_V_CCLD_1 =
 
+AM_V_EFI_CC = $(AM_V_EFI_CC_$(V))
+AM_V_EFI_CC_ = $(AM_V_EFI_CC_$(AM_DEFAULT_VERBOSITY))
+AM_V_EFI_CC_0 = @echo "  EFI_CC  " $@;
+AM_V_EFI_CC_1 =
+
+AM_V_EFI_CCLD = $(AM_V_EFI_CCLD_$(V))
+AM_V_EFI_CCLD_ = $(AM_V_EFI_CCLD_$(AM_DEFAULT_VERBOSITY))
+AM_V_EFI_CCLD_0 = @echo "  EFI_CCLD" $@;
+AM_V_EFI_CCLD_1 =
+
 AM_V_P = $(AM_V_P_$(V))
 AM_V_P_ = $(AM_V_P_$(AM_DEFAULT_VERBOSITY))
 AM_V_P_0 = false
