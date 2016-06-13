@@ -255,8 +255,10 @@ breakup_makefile() (
 
 fixup_includes() (
 	find src \( -name '*.h' -o -name '*.c' \) \
-	     -exec grep '#include "sd-' -l -- {} + |
-	    xargs -d $'\n' sed -ri 's|#include "(sd-[^"]*)"|#include <systemd/\1>|'
+	     -exec grep '#include ["<]sd-' -l -- {} + |
+	    xargs -d $'\n' sed -ri \
+		  -e 's|#include "(sd-[^"]*)"|#include <systemd/\1>|' \
+		  -e 's|#include <(sd-[^>]*)>|#include <systemd/\1>|'
 )
 
 fixup_makefile() {
