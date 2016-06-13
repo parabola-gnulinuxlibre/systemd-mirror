@@ -61,9 +61,10 @@ move_files() (
 		rfkill
 		run
 		sleep
-		stdio-bridge
 		socket-proxy
+		stdio-bridge
 		sysctl
+		sysusers
 		timesync
 		tmpfiles
 		tty-ask-password-agent
