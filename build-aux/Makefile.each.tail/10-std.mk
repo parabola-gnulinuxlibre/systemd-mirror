@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 # Add some more defaults to the *_files variables
 std.clean_files += $(std.gen_files) $(std.cfg_files) $(std.out_files)
 
@@ -38,7 +39,13 @@ _std.mostlyclean/$(outdir)      := $(filter-out $(std.slow_files) $(std.cfg_file
 _std.clean/$(outdir)            := $(filter-out                   $(std.cfg_files) $(std.gen_files) $(std.src_files),$(std.clean_files))
 _std.distclean/$(outdir)        := $(filter-out                                    $(std.gen_files) $(std.src_files),$(std.clean_files))
 _std.maintainer-clean/$(outdir) := $(filter-out                                                     $(std.src_files),$(std.clean_files))
-$(addprefix $(outdir)/,uninstall mostlyclean clean distclean maintainer-clean): %: %-hook
+$(addprefix $(outdir)/,mostlyclean clean distclean maintainer-clean): %: %-hook
+	$(RM)    -- $(sort $(filter-out %/,$(_std.$(@F)/$(@D))))
+	$(RM) -r -- $(sort $(filter     %/,$(_std.$(@F)/$(@D))))
+	$(RMDIR_P) $(sort $(dir $(_std.$(@F)/$(@D)))) 2>/dev/null || $(TRUE)
+# separate uninstall to support GNU Coding Standards' NORMAL_UNINSTALL
+$(addprefix $(outdir)/,uninstall): %: %-hook
+	$(NORMAL_UNINSTALL)
 	$(RM)    -- $(sort $(filter-out %/,$(_std.$(@F)/$(@D))))
 	$(RM) -r -- $(sort $(filter     %/,$(_std.$(@F)/$(@D))))
 	$(RMDIR_P) $(sort $(dir $(_std.$(@F)/$(@D)))) 2>/dev/null || $(TRUE)
