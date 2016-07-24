@@ -20,29 +20,25 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(HAVE_PAM),)
-
-systemd_user_sessions_SOURCES = \
-	src/user-sessions/user-sessions.c
-
-systemd_user_sessions_LDADD = \
-	libshared.la
-
 rootlibexec_PROGRAMS += \
-	systemd-user-sessions
+	systemd-networkd-wait-online
 
-nodist_systemunit_DATA += \
-	units/systemd-user-sessions.service
+systemd_networkd_wait_online_CFLAGS = \
+	$(AM_CFLAGS)
 
-MULTI_USER_TARGET_WANTS += \
-	systemd-user-sessions.service
+systemd_networkd_wait_online_SOURCES = \
+	src/libsystemd-network/network-internal.h \
+	src/network/networkd-wait-online.h \
+	src/network/networkd-wait-online-link.h \
+	src/network/networkd-wait-online.c \
+	src/network/networkd-wait-online-manager.c \
+	src/network/networkd-wait-online-link.c
 
-endif # HAVE_PAM
-
-EXTRA_DIST += \
-	units/systemd-user-sessions.service.in
+systemd_networkd_wait_online_LDADD = \
+	libsystemd-network.la \
+	libshared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

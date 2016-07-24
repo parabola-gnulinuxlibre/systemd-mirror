@@ -20,17 +20,43 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-bin_PROGRAMS += systemd-detect-virt
-systemd_detect_virt_SOURCES = \
-	src/detect-virt/detect-virt.c
+liblogind_core_la_SOURCES = \
+	src/login/logind-core.c \
+	src/login/logind-device.c \
+	src/login/logind-device.h \
+	src/login/logind-button.c \
+	src/login/logind-button.h \
+	src/login/logind-action.c \
+	src/login/logind-action.h \
+	src/login/logind-seat.c \
+	src/login/logind-seat.h \
+	src/login/logind-session.c \
+	src/login/logind-session.h \
+	src/login/logind-session-device.c \
+	src/login/logind-session-device.h \
+	src/login/logind-user.c \
+	src/login/logind-user.h \
+	src/login/logind-inhibit.c \
+	src/login/logind-inhibit.h \
+	src/login/logind-dbus.c \
+	src/login/logind-session-dbus.c \
+	src/login/logind-seat-dbus.c \
+	src/login/logind-user-dbus.c \
+	src/login/logind-utmp.c \
+	src/login/logind-acl.h
 
-systemd_detect_virt_LDADD = \
+liblogind_core_la_LIBADD = \
 	libshared.la
 
-INSTALL_EXEC_HOOKS += \
-	systemd-detect-virt-install-hook
+ifneq ($(HAVE_ACL),)
+liblogind_core_la_SOURCES += \
+	src/login/logind-acl.c
+endif # HAVE_ACL
+
+noinst_LTLIBRARIES += \
+	liblogind-core.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

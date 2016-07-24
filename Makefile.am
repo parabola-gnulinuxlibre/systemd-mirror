@@ -430,7 +430,7 @@ bin_PROGRAMS += systemd-cgls
 bin_PROGRAMS += systemd-cgtop
 #@src/systemd-nspawn/Makefile
 bin_PROGRAMS += systemd-nspawn
-#@src/systemd-detect-virt/Makefile
+#@src/grp-helperunits/systemd-detect-virt/Makefile
 bin_PROGRAMS += systemd-detect-virt
 #@src/systemd-delta/Makefile
 bin_PROGRAMS += systemd-delta
@@ -469,7 +469,7 @@ rootlibexec_PROGRAMS += systemd-fsck
 rootlibexec_PROGRAMS += systemd-ac-power
 #@src/systemd-sysctl/Makefile
 rootlibexec_PROGRAMS += systemd-sysctl
-#@src/systemd-sleep/Makefile
+#@src/grp-helperunits/systemd-sleep/Makefile
 rootlibexec_PROGRAMS += systemd-sleep
 #@src/systemd-socket-proxyd/Makefile
 rootlibexec_PROGRAMS += systemd-socket-proxyd
@@ -2661,7 +2661,7 @@ systemd_sysctl_SOURCES = \
 systemd_sysctl_LDADD = \
 	libshared.la
 
-#@src/systemd-sleep/Makefile ---------------------------------------------------
+#@src/grp-helperunits/systemd-sleep/Makefile -----------------------------------
 systemd_sleep_SOURCES = \
 	src/sleep/sleep.c
 
@@ -2682,7 +2682,7 @@ systemd_ac_power_SOURCES = \
 systemd_ac_power_LDADD = \
 	libshared.la
 
-#@src/systemd-detect-virt/Makefile ---------------------------------------------
+#@src/grp-helperunits/systemd-detect-virt/Makefile -----------------------------
 systemd_detect_virt_SOURCES = \
 	src/detect-virt/detect-virt.c
 
@@ -4621,7 +4621,7 @@ EXTRA_DIST += \
 	sysctl.d/50-coredump.conf.in \
 	units/systemd-coredump@.service.in
 
-#@src/systemd-binfmt/Makefile --------------------------------------------------
+#@src/grp-helperunits/systemd-binfmt/Makefile ----------------------------------
 if ENABLE_BINFMT
 systemd_binfmt_SOURCES = \
 	src/binfmt/binfmt.c
@@ -4652,7 +4652,7 @@ endif # ENABLE_BINFMT
 EXTRA_DIST += \
 	units/systemd-binfmt.service.in
 
-#@src/systemd-vconsole/Makefile ------------------------------------------------
+#@src/grp-helperunits/systemd-vconsole-setup/Makefile --------------------------
 if ENABLE_VCONSOLE
 systemd_vconsole_setup_SOURCES = \
 	src/vconsole/vconsole-setup.c
@@ -4677,7 +4677,7 @@ EXTRA_DIST += \
 	src/vconsole/90-vconsole.rules.in \
 	units/systemd-vconsole-setup.service.in
 
-#@src/systemd-quotacheck/Makefile ----------------------------------------------
+#@src/grp-helperunits/systemd-quotacheck/Makefile ------------------------------
 if ENABLE_QUOTACHECK
 rootlibexec_PROGRAMS += \
 	systemd-quotacheck
@@ -4698,7 +4698,7 @@ EXTRA_DIST += \
 nodist_systemunit_DATA += \
 	units/quotaon.service
 
-#@src/systemd-random-seed/Makefile ---------------------------------------------
+#@src/grp-helperunits/systemd-random-seed/Makefile -----------------------------
 if ENABLE_RANDOMSEED
 rootlibexec_PROGRAMS += \
 	systemd-random-seed
@@ -4720,7 +4720,7 @@ endif # ENABLE_RANDOMSEED
 EXTRA_DIST += \
 	units/systemd-random-seed.service.in
 
-#@src/systemd-backlight/Makefile -----------------------------------------------
+#@src/grp-helperunits/systemd-backlight/Makefile -------------------------------
 if ENABLE_BACKLIGHT
 rootlibexec_PROGRAMS += \
 	systemd-backlight
@@ -4738,7 +4738,7 @@ endif # ENABLE_BACKLIGHT
 EXTRA_DIST += \
 	units/systemd-backlight@.service.in
 
-#@src/systemd-rfkill/Makefile --------------------------------------------------
+#@src/grp-helperunits/systemd-rfkill/Makefile ----------------------------------
 if ENABLE_RFKILL
 rootlibexec_PROGRAMS += \
 	systemd-rfkill
@@ -5170,12 +5170,16 @@ if HAVE_ZLIB
 if HAVE_BZIP2
 if HAVE_GCRYPT
 
-rootlibexec_PROGRAMS += \
-	systemd-importd \
-	systemd-pull \
-	systemd-import \
-	systemd-export
+#@src/grp-import/systemd-importd/Makefile
+rootlibexec_PROGRAMS += systemd-importd
+#@src/grp-import/systemd-pull/Makefile
+rootlibexec_PROGRAMS += systemd-pull
+#@src/grp-import/systemd-import/Makefile
+rootlibexec_PROGRAMS += systemd-import
+#@src/grp-import/systemd-export/Makefile
+rootlibexec_PROGRAMS += systemd-export
 
+#@src/grp-import/systemd-importd/Makefile
 systemd_importd_SOURCES = \
 	src/import/importd.c
 
@@ -5188,6 +5192,7 @@ systemd_importd_CFLAGS = \
 systemd_importd_LDADD = \
 	libshared.la
 
+#@src/grp-import/systemd-pull/Makefile
 systemd_pull_SOURCES = \
 	src/import/pull.c \
 	src/import/pull-raw.c \
@@ -5225,6 +5230,7 @@ systemd_pull_LDADD = \
 	$(BZIP2_LIBS) \
 	$(GCRYPT_LIBS)
 
+#@src/grp-import/systemd-import/Makefile
 systemd_import_SOURCES = \
 	src/import/import.c \
 	src/import/import-raw.c \
@@ -5250,6 +5256,7 @@ systemd_import_LDADD = \
 	$(ZLIB_LIBS) \
 	$(BZIP2_LIBS)
 
+#@src/grp-import/systemd-export/Makefile
 systemd_export_SOURCES = \
 	src/import/export.c \
 	src/import/export-tar.c \
@@ -5273,6 +5280,7 @@ systemd_export_LDADD = \
 	$(ZLIB_LIBS) \
 	$(BZIP2_LIBS)
 
+#@src/grp-import/Makefile
 dist_rootlibexec_DATA = \
 	src/import/import-pubring.gpg
 
@@ -5541,6 +5549,7 @@ EXTRA_DIST += \
 
 #@src/grp-network/Makefile -----------------------------------------------------
 if ENABLE_NETWORKD
+#@src/grp-network/systemd-networkd/Makefile
 rootlibexec_PROGRAMS += \
 	systemd-networkd
 
@@ -5555,6 +5564,7 @@ systemd_networkd_LDADD += \
 	libfirewall.la
 endif # HAVE_LIBIPTC
 
+#@src/grp-network/libnetworkd-core/Makefile
 noinst_LTLIBRARIES += \
 	libnetworkd-core.la
 
@@ -5622,6 +5632,7 @@ libnetworkd_core_la_LIBADD = \
 	libsystemd-network.la \
 	libshared.la
 
+#@src/grp-network/systemd-networkd-wait-online/Makefile
 rootlibexec_PROGRAMS += \
 	systemd-networkd-wait-online
 
@@ -5640,6 +5651,7 @@ systemd_networkd_wait_online_LDADD = \
 	libsystemd-network.la \
 	libshared.la
 
+#@src/grp-network/networkctl/Makefile
 rootbin_PROGRAMS += \
 	networkctl
 
@@ -5653,6 +5665,7 @@ networkctl_LDADD = \
 dist_bashcompletion_data += \
 	shell-completion/bash/networkctl
 
+#@src/grp-network/Makefile
 test_networkd_conf_SOURCES = \
 	src/network/test-networkd-conf.c
 
@@ -5729,6 +5742,7 @@ EXTRA_DIST += \
 
 #@src/grp-login/Makefile -------------------------------------------------------
 if ENABLE_LOGIND
+#@src/grp-login/systemd-logind/Makefile
 systemd_logind_SOURCES = \
 	src/login/logind.c \
 	src/login/logind.h
@@ -5739,6 +5753,7 @@ nodist_systemd_logind_SOURCES = \
 systemd_logind_LDADD = \
 	liblogind-core.la
 
+#@src/grp-login/liblogind-core/Makefile
 liblogind_core_la_SOURCES = \
 	src/login/logind-core.c \
 	src/login/logind-device.c \
@@ -5775,9 +5790,11 @@ endif # HAVE_ACL
 noinst_LTLIBRARIES += \
 	liblogind-core.la
 
+#@src/grp-login/systemd-logind/Makefile
 rootlibexec_PROGRAMS += \
 	systemd-logind
 
+#@src/grp-login/loginctl/Makefile
 loginctl_SOURCES = \
 	src/login/loginctl.c \
 	src/login/sysfs-show.h \
@@ -5792,9 +5809,9 @@ rootbin_PROGRAMS += \
 dist_bashcompletion_data += \
 	shell-completion/bash/loginctl
 
-dist_zshcompletion_data += \
-	shell-completion/zsh/_loginctl \
-	shell-completion/zsh/_systemd-inhibit
+dist_zshcompletion_data += shell-completion/zsh/_loginctl
+#@src/grp-login/systemd-inhibit/Makefile
+dist_zshcompletion_data += shell-completion/zsh/_systemd-inhibit
 
 systemd_inhibit_SOURCES = \
 	src/login/inhibit.c
@@ -5805,6 +5822,7 @@ systemd_inhibit_LDADD = \
 rootbin_PROGRAMS += \
 	systemd-inhibit
 
+#@src/grp-login/Makefile
 test_login_SOURCES = \
 	src/libsystemd/sd-login/test-login.c
 
@@ -5837,6 +5855,7 @@ tests += \
 	test-login-tables \
 	test-login-shared
 
+#@src/grp-login/pam_systemd/Makefile
 if HAVE_PAM
 pam_systemd_la_SOURCES = \
 	src/login/pam_systemd.sym \
@@ -5867,6 +5886,7 @@ dist_pamconf_DATA = \
 EXTRA_DIST += \
 	src/login/systemd-user.m4
 endif # HAVE_PAM
+#@src/grp-login/Makefile
 
 nodist_systemunit_DATA += \
 	units/systemd-logind.service
@@ -5923,7 +5943,7 @@ EXTRA_DIST += \
 	units/systemd-logind.service.in \
 	src/login/logind.conf.in
 
-#@src/systemd-user-sessions/Makefile -------------------------------------------
+#@src/grp-helperunits/systemd-user-sessions/Makefile ---------------------------
 if HAVE_PAM
 
 systemd_user_sessions_SOURCES = \

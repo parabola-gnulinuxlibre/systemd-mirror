@@ -20,37 +20,45 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_BINFMT),)
-systemd_binfmt_SOURCES = \
-	src/binfmt/binfmt.c
+rootlibexec_PROGRAMS += systemd-pull
+systemd_pull_SOURCES = \
+	src/import/pull.c \
+	src/import/pull-raw.c \
+	src/import/pull-raw.h \
+	src/import/pull-tar.c \
+	src/import/pull-tar.h \
+	src/import/pull-job.c \
+	src/import/pull-job.h \
+	src/import/pull-common.c \
+	src/import/pull-common.h \
+	src/import/import-common.c \
+	src/import/import-common.h \
+	src/import/import-compress.c \
+	src/import/import-compress.h \
+	src/import/curl-util.c \
+	src/import/curl-util.h \
+	src/import/qcow2-util.c \
+	src/import/qcow2-util.h
 
-systemd_binfmt_LDADD = \
-	libshared.la
+systemd_pull_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(LIBCURL_CFLAGS) \
+	$(XZ_CFLAGS) \
+	$(ZLIB_CFLAGS) \
+	$(BZIP2_CFLAGS) \
+	$(GCRYPT_CFLAGS) \
+	-D VENDOR_KEYRING_PATH=\"$(rootlibexecdir)/import-pubring.gpg\" \
+	-D USER_KEYRING_PATH=\"$(pkgsysconfdir)/import-pubring.gpg\"
 
-rootlibexec_PROGRAMS += \
-	systemd-binfmt
-
-dist_systemunit_DATA += \
-	units/proc-sys-fs-binfmt_misc.automount \
-	units/proc-sys-fs-binfmt_misc.mount
-
-nodist_systemunit_DATA += \
-	units/systemd-binfmt.service
-
-INSTALL_DIRS += \
-	$(prefix)/lib/binfmt.d \
-	$(sysconfdir)/binfmt.d
-
-SYSINIT_TARGET_WANTS += \
-	systemd-binfmt.service \
-	proc-sys-fs-binfmt_misc.automount
-
-endif # ENABLE_BINFMT
-
-EXTRA_DIST += \
-	units/systemd-binfmt.service.in
+systemd_pull_LDADD = \
+	libshared.la \
+	$(LIBCURL_LIBS) \
+	$(XZ_LIBS) \
+	$(ZLIB_LIBS) \
+	$(BZIP2_LIBS) \
+	$(GCRYPT_LIBS)
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

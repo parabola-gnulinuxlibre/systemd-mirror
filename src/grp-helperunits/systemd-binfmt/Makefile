@@ -20,24 +20,37 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_BACKLIGHT),)
+ifneq ($(ENABLE_BINFMT),)
+systemd_binfmt_SOURCES = \
+	src/binfmt/binfmt.c
+
+systemd_binfmt_LDADD = \
+	libshared.la
+
 rootlibexec_PROGRAMS += \
-	systemd-backlight
+	systemd-binfmt
+
+dist_systemunit_DATA += \
+	units/proc-sys-fs-binfmt_misc.automount \
+	units/proc-sys-fs-binfmt_misc.mount
 
 nodist_systemunit_DATA += \
-	units/systemd-backlight@.service
+	units/systemd-binfmt.service
 
-systemd_backlight_SOURCES = \
-	src/backlight/backlight.c
+INSTALL_DIRS += \
+	$(prefix)/lib/binfmt.d \
+	$(sysconfdir)/binfmt.d
 
-systemd_backlight_LDADD = \
-	libshared.la
-endif # ENABLE_BACKLIGHT
+SYSINIT_TARGET_WANTS += \
+	systemd-binfmt.service \
+	proc-sys-fs-binfmt_misc.automount
+
+endif # ENABLE_BINFMT
 
 EXTRA_DIST += \
-	units/systemd-backlight@.service.in
+	units/systemd-binfmt.service.in
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

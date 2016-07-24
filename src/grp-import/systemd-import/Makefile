@@ -20,31 +20,33 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_RANDOMSEED),)
-rootlibexec_PROGRAMS += \
-	systemd-random-seed
+rootlibexec_PROGRAMS += systemd-import
+systemd_import_SOURCES = \
+	src/import/import.c \
+	src/import/import-raw.c \
+	src/import/import-raw.h \
+	src/import/import-tar.c \
+	src/import/import-tar.h \
+	src/import/import-common.c \
+	src/import/import-common.h \
+	src/import/import-compress.c \
+	src/import/import-compress.h \
+	src/import/qcow2-util.c \
+	src/import/qcow2-util.h
 
-nodist_systemunit_DATA += \
-	units/systemd-random-seed.service
+systemd_import_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(XZ_CFLAGS) \
+	$(ZLIB_CFLAGS) \
+	$(BZIP2_CFLAGS)
 
-systemd_random_seed_SOURCES = \
-	src/random-seed/random-seed.c
-
-systemd_random_seed_LDADD = \
-	libshared.la
-
-SYSINIT_TARGET_WANTS += \
-	systemd-random-seed.service
-
-endif # ENABLE_RANDOMSEED
-
-EXTRA_DIST += \
-	units/systemd-random-seed.service.in
-
-systemd.CPPFLAGS += -DRANDOM_SEED_DIR=\"$(localstatedir)/lib/systemd/\"
-systemd.CPPFLAGS += -DRANDOM_SEED=\"$(localstatedir)/lib/systemd/random-seed\"
+systemd_import_LDADD = \
+	libshared.la \
+	$(XZ_LIBS) \
+	$(ZLIB_LIBS) \
+	$(BZIP2_LIBS)
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -20,31 +20,29 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_VCONSOLE),)
-systemd_vconsole_setup_SOURCES = \
-	src/vconsole/vconsole-setup.c
+ifneq ($(HAVE_PAM),)
 
-systemd_vconsole_setup_LDADD = \
+systemd_user_sessions_SOURCES = \
+	src/user-sessions/user-sessions.c
+
+systemd_user_sessions_LDADD = \
 	libshared.la
 
 rootlibexec_PROGRAMS += \
-	systemd-vconsole-setup
-
-nodist_udevrules_DATA += \
-	src/vconsole/90-vconsole.rules
+	systemd-user-sessions
 
 nodist_systemunit_DATA += \
-	units/systemd-vconsole-setup.service
+	units/systemd-user-sessions.service
 
-SYSINIT_TARGET_WANTS += \
-	systemd-vconsole-setup.service
-endif # ENABLE_VCONSOLE
+MULTI_USER_TARGET_WANTS += \
+	systemd-user-sessions.service
+
+endif # HAVE_PAM
 
 EXTRA_DIST += \
-	src/vconsole/90-vconsole.rules.in \
-	units/systemd-vconsole-setup.service.in
+	units/systemd-user-sessions.service.in
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

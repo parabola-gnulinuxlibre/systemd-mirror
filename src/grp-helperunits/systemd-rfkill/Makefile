@@ -20,29 +20,27 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_QUOTACHECK),)
+ifneq ($(ENABLE_RFKILL),)
 rootlibexec_PROGRAMS += \
-	systemd-quotacheck
+	systemd-rfkill
 
 nodist_systemunit_DATA += \
-	units/systemd-quotacheck.service
+	units/systemd-rfkill.service
 
-systemd_quotacheck_SOURCES = \
-	src/quotacheck/quotacheck.c
+dist_systemunit_DATA += \
+	units/systemd-rfkill.socket
 
-systemd_quotacheck_LDADD = \
+systemd_rfkill_SOURCES = \
+	src/rfkill/rfkill.c
+
+systemd_rfkill_LDADD = \
 	libshared.la
-endif # ENABLE_QUOTACHECK
+endif # ENABLE_RFKILL
 
 EXTRA_DIST += \
-	units/systemd-quotacheck.service.in
-
-nodist_systemunit_DATA += \
-	units/quotaon.service
-
-systemd.CPPFLAGS += -DQUOTACHECK=\"$(QUOTACHECK)\"
+	units/systemd-rfkill.service.in
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

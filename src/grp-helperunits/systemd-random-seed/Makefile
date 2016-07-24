@@ -20,16 +20,31 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-rootlibexec_PROGRAMS += systemd-sleep
-systemd_sleep_SOURCES = \
-	src/sleep/sleep.c
+ifneq ($(ENABLE_RANDOMSEED),)
+rootlibexec_PROGRAMS += \
+	systemd-random-seed
 
-systemd_sleep_LDADD = \
+nodist_systemunit_DATA += \
+	units/systemd-random-seed.service
+
+systemd_random_seed_SOURCES = \
+	src/random-seed/random-seed.c
+
+systemd_random_seed_LDADD = \
 	libshared.la
 
-systemd.CPPFLAGS += -DSYSTEM_SLEEP_PATH=\"$(systemsleepdir)\"
+SYSINIT_TARGET_WANTS += \
+	systemd-random-seed.service
+
+endif # ENABLE_RANDOMSEED
+
+EXTRA_DIST += \
+	units/systemd-random-seed.service.in
+
+systemd.CPPFLAGS += -DRANDOM_SEED_DIR=\"$(localstatedir)/lib/systemd/\"
+systemd.CPPFLAGS += -DRANDOM_SEED=\"$(localstatedir)/lib/systemd/random-seed\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

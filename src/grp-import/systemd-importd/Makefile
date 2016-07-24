@@ -20,27 +20,20 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_RFKILL),)
-rootlibexec_PROGRAMS += \
-	systemd-rfkill
+rootlibexec_PROGRAMS += systemd-importd
+systemd_importd_SOURCES = \
+	src/import/importd.c
 
-nodist_systemunit_DATA += \
-	units/systemd-rfkill.service
+systemd_importd_CFLAGS = \
+	$(AM_CFLAGS) \
+	-D SYSTEMD_PULL_PATH=\"$(rootlibexecdir)/systemd-pull\" \
+	-D SYSTEMD_IMPORT_PATH=\"$(rootlibexecdir)/systemd-import\" \
+	-D SYSTEMD_EXPORT_PATH=\"$(rootlibexecdir)/systemd-export\"
 
-dist_systemunit_DATA += \
-	units/systemd-rfkill.socket
-
-systemd_rfkill_SOURCES = \
-	src/rfkill/rfkill.c
-
-systemd_rfkill_LDADD = \
+systemd_importd_LDADD = \
 	libshared.la
-endif # ENABLE_RFKILL
-
-EXTRA_DIST += \
-	units/systemd-rfkill.service.in
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
