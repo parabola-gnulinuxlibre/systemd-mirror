@@ -71,11 +71,11 @@ move_files() (
 		update-done
 		update-utmp
 		user-sessions
-		vconsole
 	)
 	for d in "${pfix[@]}"; do
 		mv -T src/{,systemd-}$d
 	done
+	mv -T src/vconsole src/systemd-vconsole-setup
 
 	dmon=(
 		systemd-socket-proxy
@@ -209,11 +209,44 @@ move_files() (
 	done
 
 	mv -T src/{,grp-}hostname
-	mv -T src/{,grp-}import
 	mv -T src/{,grp-}locale
-	mv -T src/{,grp-}login
-	mv -T src/{,grp-}network
 	mv -T src/{,grp-}udev
+
+	mv -T src/{,grp-}import
+	mkdir src/grp-import/systemd-importd
+	mv src/grp-import/{,systemd-importd}/importd.c
+	mkdir src/grp-import/systemd-pull
+	mv src/grp-import/pull* src/grp-import/systemd-pull
+	mkdir src/grp-import/systemd-import
+	mv src/grp-import/import* src/grp-import/systemd-import
+	mkdir src/grp-import/systemd-export
+	mv src/grp-import/export* src/grp-import/systemd-export
+	
+	mv -T src/{,grp-}network
+	mkdir src/grp-network/systemd-networkd
+	mv src/grp-network/{,systemd-networkd}/networkd.c
+	mkdir src/grp-network/systemd-networkd-wait-online
+	mv src/grp-network/networkd-wait-online* src/grp-network/systemd-networkd-wait-online
+	mkdir src/grp-network/networkctl
+	mv src/grp-network/{,networkctl}/networkctl.c
+	mkdir src/grp-network/libnetworkd-core
+	mv src/grp-network/networkd* src/grp-network/libnetworkd-core
+
+	mv -T src/{,grp-}login
+	mkdir src/grp-login/systemd-logind
+	mv -T src/grp-login/{,systemd-logind}/logind.c
+	mv -T src/grp-login/{,systemd-logind}/logind.h
+	mkdir src/grp-login/liblogind-core
+	mv src/grp-login/logind-* src/grp-login/liblogind-core
+	mkdir src/grp-login/loginctl
+	mv -T src/grp-login/{,loginctl}/loginctl.c
+	mv -T src/grp-login/{,loginctl}/sysfs-show.h
+	mv -T src/grp-login/{,loginctl}/sysfs-show.c
+	mkdir src/grp-login/systemd-inhibit
+	mv -T src/grp-login/{,systemd-inhibit}/inhibit.c
+	mkdir src/grp-login/pam_systemd
+	mv -T src/grp-login/{,pam_systemd}/pam_systemd.c
+	mv -T src/grp-login/{,pam_systemd}/pam_systemd.sym
 
 	mkdir src/grp-udev/d-udevadm
 	mv src/grp-udev/udevadm* src/grp-udev/d-udevadm/
@@ -227,6 +260,22 @@ move_files() (
 	mv -T src/{libcore,systemd-shutdown}/shutdown.c
 	mv -T src/{libcore,systemd-shutdown}/umount.c
 	mv -T src/{libcore,systemd-shutdown}/umount.h
+
+	mkdir src/grp-helperunits
+	helperunits=(
+		backlight
+		binfmt
+		detect-virt
+		quotacheck
+		random-seed
+		rfkill
+		sleep
+		vconsole-setup
+		user-sessions
+	)
+	for hu in "${helperunits[@]}"; do
+		mv -T src/systemd-"$hu" src/grp-helperunits/systemd-"$hu"
+	done
 )
 
 breakup_makefile() (
