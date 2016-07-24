@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sd-dhcp-lease.h"
+#include <systemd/sd-dhcp-lease.h>
 
 #include "alloc-util.h"
 #include "dhcp-lease-internal.h"

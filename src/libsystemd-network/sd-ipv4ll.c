@@ -24,8 +24,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sd-ipv4acd.h"
-#include "sd-ipv4ll.h"
+#include <systemd/sd-ipv4acd.h>
+#include <systemd/sd-ipv4ll.h>
 
 #include "alloc-util.h"
 #include "in-addr-util.h"
