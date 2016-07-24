@@ -52,8 +52,21 @@ $(addprefix $(outdir)/,$(foreach d,$(am.bindirs),$($d_PROGRAMS))): $(outdir)/%:
 	@if test $(words $^) = 0; then echo 'Cannot link executable with no dependencies: $@' >&2; exit 1; fi
 	$(AM_V_CCLD)$(LINK) $(_systemd.link_files)
 
+$(DESTDIR)$(bindir)/%: $(outdir)/%
+	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+$(DESTDIR)$(rootbindir)/%: $(outdir)/%
+	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+$(DESTDIR)$(libexecdir)/%: $(outdir)/%
+	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+$(DESTDIR)$(rootlibexecdir)/%: $(outdir)/%
+	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+$(DESTDIR)$(systemgeneratordir)/%: $(outdir)/%
+	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+$(DESTDIR)$(udevlibexecdir)/%: $(outdir)/%
+	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+
 $(DESTDIR)$(libdir)/%.la: $(outdir)/%.la
-	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $< $(@D)
+	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
 
 $(outdir)/%-from-name.gperf: $(outdir)/%-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)

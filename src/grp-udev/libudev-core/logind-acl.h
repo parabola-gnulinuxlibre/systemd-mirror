@@ -1,1 +1,1 @@
-../../grp-login/logind-acl.h
+../../grp-login/liblogind-core/logind-acl.h
