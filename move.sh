@@ -130,7 +130,6 @@ move_files() (
 	mv -T src/libsystemd/{src,}/libsystemd.pc.in
 	mv -T src/libsystemd/{src,}/libsystemd.sym
 	mv -T src/libsystemd/{src,}/.gitignore
-	mv -T src/libsystemd/{src,libsystemd-internal}
 
 	mkdir src/systemd-shutdown
 
@@ -148,7 +147,7 @@ move_files() (
 	mkdir build-aux/Makefile.{once,each}.{head,tail}
 	touch build-aux/Makefile.{once,each}.{head,tail}/.gitignore
 
-	mkdir src/libsystemd/libsystemd-journal-internal
+	mkdir src/libsystemd/src/sd-journal
 
 	libsystemd_journal_files=(
 		audit-type.c
@@ -177,11 +176,11 @@ move_files() (
 		sd-journal.c
 	)
 	for file in "${libsystemd_journal_files[@]}"; do
-		mv -T src/{journal,libsystemd/libsystemd-journal-internal}/$file
+		mv -T src/{journal,libsystemd/src/sd-journal}/$file
 	done
 
 	mkdir src/busctl
-	mv src/libsystemd/libsystemd-internal/sd-bus/busctl* src/busctl
+	mv src/libsystemd/src/sd-bus/busctl* src/busctl
 
 	mv -T src/{udev,libudev/src}/udev.h
 
@@ -189,10 +188,6 @@ move_files() (
 	mv -T src/timedate src/grp-timedate/systemd-timedated
 	mkdir src/grp-timedate/timedatectl
 	mv -T src/grp-timedate/{systemd-timedated,timedatectl}/timedatectl.c
-
-	mv -T src/{libsystemd/libsystemd-internal/sd-netlink,libshared}/local-addresses.c
-	mv -T src/{libsystemd/libsystemd-internal/sd-netlink,libshared}/local-addresses.h
-	mv -T src/{libsystemd/libsystemd-internal/sd-netlink,libshared}/test-local-addresses.c
 
 	mv -T src/{journal,grp-journal}
 	mv -T {,src/grp-journal/}catalog
@@ -325,7 +320,7 @@ fixup_makefiles() (
 	    -e 's/ \$\(AM_CPPFLAGS\) / $(ALL_CPPFLAGS) /g' \
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
 	    src/libbasic/Makefile \
-	    src/libsystemd/libsystemd-journal-internal/Makefile \
+	    src/libsystemd/src/Makefile \
 	    src/grp-udev/libudev-core/Makefile
 	find -type f -name Makefile|while read -r filename; do
 		sed -r -i "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="${filename%/*}" config.mk)|" "$filename"
