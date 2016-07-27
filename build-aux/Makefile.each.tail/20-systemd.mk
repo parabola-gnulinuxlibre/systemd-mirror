@@ -21,7 +21,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
--include $(outdir)/$(DEPDIR)/*.P*
+-include $(wildcard $(outdir)/$(DEPDIR)/*.P*)
 
 std.clean_files += *.o *.lo *.so .deps/ .libs/
 std.clean_files += *-list.txt
@@ -52,21 +52,19 @@ $(addprefix $(outdir)/,$(foreach d,$(am.bindirs),$($d_PROGRAMS))): $(outdir)/%:
 	@if test $(words $^) = 0; then echo 'Cannot link executable with no dependencies: $@' >&2; exit 1; fi
 	$(AM_V_CCLD)$(LINK) $(_systemd.link_files)
 
-$(DESTDIR)$(bindir)/%: $(outdir)/%
-	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
-$(DESTDIR)$(rootbindir)/%: $(outdir)/%
-	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
-$(DESTDIR)$(libexecdir)/%: $(outdir)/%
-	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
-$(DESTDIR)$(rootlibexecdir)/%: $(outdir)/%
-	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
-$(DESTDIR)$(systemgeneratordir)/%: $(outdir)/%
-	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
-$(DESTDIR)$(udevlibexecdir)/%: $(outdir)/%
-	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+_systemd.in_destdir = $(foreach f,$(std.sys_files),$(if $(filter $1,$(patsubst %/,%,$(dir $f))),$(DESTDIR)$f))
 
-$(DESTDIR)$(libdir)/%.la: $(outdir)/%.la
+define install_bindir
+$(call _systemd.in_destdir,$(bindir)): $(DESTDIR)$(bindir)/%: $(outdir)/%
 	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+endef
+$(foreach bindir,$(sort $(foreach d,$(am.bindirs),$($ddir))),$(eval $(value install_bindir)))
+
+define install_libdir
+$(call _systemd.in_destdir,$(libdir)): $(DESTDIR)$(libdir)/%.la: $(outdir)/%.la
+	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+endef
+$(foreach libdir,$(sort $(foreach d,lib rootlib,$($ddir))),$(eval $(value install_libdir)))
 
 $(outdir)/%-from-name.gperf: $(outdir)/%-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)

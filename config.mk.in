@@ -98,6 +98,7 @@ bootlibdir = $(prefix)/lib/systemd/boot/efi
 rootprefix=@rootprefix@
 rootbindir=$(rootprefix)/bin
 rootlibexecdir=$(rootprefix)/lib/systemd
+rootlibdir=$(rootprefix)/lib
 
 # Libraries we provide
 libbasic.CPPFLAGS                    = -I$(topsrcdir)/src/libbasic -I$(topoutdir)/src/libbasic
