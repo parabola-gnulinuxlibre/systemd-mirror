@@ -98,7 +98,7 @@ bootlibdir = $(prefix)/lib/systemd/boot/efi
 rootprefix=@rootprefix@
 rootbindir=$(rootprefix)/bin
 rootlibexecdir=$(rootprefix)/lib/systemd
-rootlibdir=$(rootprefix)/lib
+rootlibdir=@rootlibdir@
 
 # Libraries we provide
 libbasic.CPPFLAGS                    = -I$(topsrcdir)/src/libbasic -I$(topoutdir)/src/libbasic
@@ -288,6 +288,8 @@ pkglibdir = $(libdir)/@PACKAGE@
 pkglibexecdir = $(libexecdir)/@PACKAGE@
 pkgpyexecdir = @pkgpyexecdir@
 pkgpythondir = @pkgpythondir@
+
+INSTALL = install -D
 
 INTLTOOL_EXTRACT = @INTLTOOL_EXTRACT@
 INTLTOOL_MERGE = @INTLTOOL_MERGE@

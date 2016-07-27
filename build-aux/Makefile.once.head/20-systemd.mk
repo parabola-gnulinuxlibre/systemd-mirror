@@ -38,6 +38,11 @@ ALL_CPPFLAGS     = $(OUR_CPPFLAGS)     $(am.CPPFLAGS/$(@D))     $(systemd.CPPFLA
 ALL_LDFLAGS      = $(OUR_LDFLAGS)      $(am.LDFLAGS/$(@D))      $(systemd.LDFLAGS/$(@D))      $(LDFLAGS)
 ALL_LIBTOOLFLAGS = $(OUR_LIBTOOLFLAGS) $(am.LIBTOOLFLAGS/$(@D)) $(systemd.LIBTOOLFLAGS/$(@D)) $(LIBTOOLFLAGS)
 
+SYS_CFLAGS       = $(OUR_CFLAGS)       $(am.CFLAGS/$(<D))       $(systemd.CFLAGS/$(<D))       $(CFLAGS)
+SYS_CPPFLAGS     = $(OUR_CPPFLAGS)     $(am.CPPFLAGS/$(<D))     $(systemd.CPPFLAGS/$(<D))     $(CPPFLAGS)
+SYS_LDFLAGS      = $(OUR_LDFLAGS)      $(am.LDFLAGS/$(<D))      $(systemd.LDFLAGS/$(<D))      $(LDFLAGS)
+SYS_LIBTOOLFLAGS = $(OUR_LIBTOOLFLAGS) $(am.LIBTOOLFLAGS/$(<D)) $(systemd.LIBTOOLFLAGS/$(<D)) $(LIBTOOLFLAGS)
+
 COMPILE   = $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(ALL_LIBTOOLFLAGS) --mode=compile $(CC) $(ALL_CPPFLAGS) $(ALL_CFLAGS)
 LINK      = $(LIBTOOL) $(AM_V_lt) --tag=CC $(ALL_LIBTOOLFLAGS) --mode=link $(CCLD) $(ALL_CFLAGS) $(ALL_LDFLAGS) -o $@
@@ -101,6 +106,21 @@ AM_V_GEN = $(AM_V_GEN_$(V))
 AM_V_GEN_ = $(AM_V_GEN_$(AM_DEFAULT_VERBOSITY))
 AM_V_GEN_0 = @echo "  GEN     " $@;
 AM_V_GEN_1 =
+
+AM_V_DATA = $(AM_V_DATA_$(V))
+AM_V_DATA_ = $(AM_V_DATA_$(AM_DEFAULT_VERBOSITY))
+AM_V_DATA_0 = @echo "  DATA    " $@;
+AM_V_DATA_1 =
+
+AM_V_PROG = $(AM_V_PROG_$(V))
+AM_V_PROG_ = $(AM_V_PROG_$(AM_DEFAULT_VERBOSITY))
+AM_V_PROG_0 = @echo "  PROG    " $@;
+AM_V_PROG_1 =
+
+AM_V_LIB = $(AM_V_LIB_$(V))
+AM_V_LIB_ = $(AM_V_LIB_$(AM_DEFAULT_VERBOSITY))
+AM_V_LIB_0 = @echo "  LIB     " $@;
+AM_V_LIB_1 =
 
 AM_V_at = $(AM_V_at_$(V))
 AM_V_at_ = $(AM_V_at_$(AM_DEFAULT_VERBOSITY))

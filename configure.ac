@@ -1665,6 +1665,7 @@ AC_MSG_RESULT([
         tests:                             ${enable_tests}
 
         prefix:                            ${prefix}
+        exec_prefix:                       ${exec_prefix}
         rootprefix:                        ${with_rootprefix}
         sysconf dir:                       ${sysconfdir}
         datarootdir:                       ${datarootdir}

@@ -29,5 +29,6 @@ systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 systemd.CPPFLAGS += $(libshared.CPPFLAGS)
 systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
 systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
+systemd.CPPFLAGS += -DROOTLIBDIR=\"$(rootlibdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

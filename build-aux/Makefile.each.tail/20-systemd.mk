@@ -56,15 +56,24 @@ _systemd.in_destdir = $(foreach f,$(std.sys_files),$(if $(filter $1,$(patsubst %
 
 define install_bindir
 $(call _systemd.in_destdir,$(bindir)): $(DESTDIR)$(bindir)/%: $(outdir)/%
-	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+	@$(NORMAL_INSTALL)
+	$(AM_V_PROG)$(LIBTOOL) $(AM_V_lt) --tag=CC $(SYS_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
 endef
 $(foreach bindir,$(sort $(foreach d,$(am.bindirs),$($ddir))),$(eval $(value install_bindir)))
 
 define install_libdir
 $(call _systemd.in_destdir,$(libdir)): $(DESTDIR)$(libdir)/%.la: $(outdir)/%.la
-	$(LIBTOOL) $(ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+	@$(NORMAL_INSTALL)
+	$(AM_V_LIB)$(LIBTOOL) $(AM_V_lt) --tag=CC $(SYS_LIBTOOLFLAGS) --mode=install $(INSTALL) $< $@
 endef
 $(foreach libdir,$(sort $(foreach d,lib rootlib,$($ddir))),$(eval $(value install_libdir)))
+
+define install_datadir
+$(call _systemd.in_destdir,$(datadir)): $(DESTDIR)$(datadir)/%: $(outdir)/%
+	@$(NORMAL_INSTALL)
+	$(AM_V_DATA)$(INSTALL_DATA) $< $@
+endef
+$(foreach datadir,$(sort $(foreach d,pkgconfigdata pkgconfiglib bootlib,$($ddir))),$(eval $(value install_datadir)))
 
 $(outdir)/%-from-name.gperf: $(outdir)/%-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
