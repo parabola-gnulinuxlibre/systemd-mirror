@@ -22,7 +22,7 @@
 #include <sys/ioctl.h>
 #include <linux/if_infiniband.h>
 
-#include "sd-dhcp6-client.h"
+#include <systemd/sd-dhcp6-client.h>
 
 #include "alloc-util.h"
 #include "dhcp-identifier.h"
