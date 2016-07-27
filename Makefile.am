@@ -1413,7 +1413,7 @@ src/basic/cap-from-name.h: src/basic/cap-from-name.gperf
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_capability -H hash_capability_name -p -C <$< >$@
 
-#@src/libsystemd/libsystemd-journal-internal/Makefile
+#@src/libsystemd/src/Makefile
 audit_list_includes = -include linux/audit.h -include missing.h
 if HAVE_AUDIT
 audit_list_includes += -include libaudit.h
@@ -3169,7 +3169,7 @@ systemd_tty_ask_password_agent_SOURCES = \
 systemd_tty_ask_password_agent_LDADD = \
 	libshared.la
 
-#@src/libsystemd/libsystemd-internal/Makefile ----------------------------------
+#@src/libsystemd/src/Makefile --------------------------------------------------
 libsystemd_internal_la_SOURCES = \
 	src/systemd/sd-bus.h \
 	src/systemd/sd-bus-protocol.h \
@@ -3346,7 +3346,7 @@ tests += \
 bin_PROGRAMS += \
 	busctl
 
-#@src/libsystemd/libsystemd-internal/Makefile
+#@src/libsystemd/src/Makefile
 test_bus_marshal_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-marshal.c
 
@@ -3472,7 +3472,7 @@ test_local_addresses_SOURCES = \
 test_local_addresses_LDADD = \
 	libshared.la
 
-#@src/libsystemd/libsystemd-internal/Makefile
+#@src/libsystemd/src/Makefile
 test_resolve_SOURCES = \
 	src/libsystemd/sd-resolve/test-resolve.c
 
@@ -4363,7 +4363,7 @@ tests += \
 	test-compress-benchmark
 endif # HAVE_COMPRESSION
 
-#@src/libsystemd/libsystemd-journal-internal/Makefile
+#@src/libsystemd/src/Makefile
 pkginclude_HEADERS += \
 	src/systemd/sd-journal.h \
 	src/systemd/sd-messages.h \
@@ -6572,7 +6572,7 @@ add-key:
 #@src/libudev/Makefile
 at.subdirs += src
 
-#@src/libsystemd/libsystemd-internal/subdir.mk
+#@src/libsystemd/src/subdir.mk
 systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
 systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 

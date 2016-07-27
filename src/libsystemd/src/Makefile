@@ -258,7 +258,7 @@ pkginclude_HEADERS += \
 	src/systemd/sd-messages.h \
 	src/systemd/_sd-common.h
 
-libsystemd_journal_internal_la_SOURCES = \
+_libsystemd_journal_internal_la_SOURCES = \
 	src/journal/sd-journal.c \
 	src/systemd/sd-journal.h \
 	src/systemd/_sd-common.h \
@@ -312,7 +312,7 @@ libsystemd_journal_internal_la_LIBADD += \
 endif # HAVE_LZ4
 
 ifneq ($(HAVE_GCRYPT),)
-libsystemd_journal_internal_la_SOURCES += \
+_libsystemd_journal_internal_la_SOURCES += \
 	src/journal/journal-authenticate.c \
 	src/journal/journal-authenticate.h \
 	src/journal/fsprg.c \
@@ -334,7 +334,9 @@ systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 systemd.CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"
 $(outdir)/audit-type.lo: $(outdir)/audit_type-to-name.h
 
-libsystemd-internal.la.SOURCES = $(patsubst src/libsystemd/%,%,$(filter %.c,$(_libsystemd_internal_la_SOURCES)))
+libsystemd-internal.la.SOURCES =
+libsystemd-internal.la.SOURCES += $(patsubst src/libsystemd/%,src/%,$(filter %.c,$(_libsystemd_internal_la_SOURCES)))
+libsystemd-internal.la.SOURCES += $(addprefix src/sd-journal/,$(notdir $(filter %.c,$(_libsystemd_journal_internal_la_SOURCES))))
 libsystemd-internal.la.DEPENDS = $(addprefix $(outdir)/,$(libsystemd-internal.la.SOURCES:.c=.lo))
 at.subdirs += $(sort $(dir $(libsystemd-internal.la.SOURCES)))
 
