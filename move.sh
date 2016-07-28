@@ -20,6 +20,12 @@ move_files() (
 		mv -T src/{,lib}$d
 	done
 
+	mkdir src/libbasic/src
+	mv src/libbasic/*.c src/libbasic/src/
+	mkdir src/libbasic/include
+	mkdir src/libbasic/include/basic
+	mv src/libbasic/.gitignore src/libbasic/*.h src/libbasic/include/basic/
+
 	pfix=(
 		dbus1-generator
 		debug-generator
@@ -319,7 +325,7 @@ fixup_makefiles() (
 	    -e 's/ \$\(CPPFLAGS\) / /g' \
 	    -e 's/ \$\(AM_CPPFLAGS\) / $(ALL_CPPFLAGS) /g' \
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
-	    src/libbasic/Makefile \
+	    src/libbasic/include/basic/Makefile \
 	    src/libsystemd/src/Makefile \
 	    src/libsystemd/src/sd-journal/Makefile \
 	    src/grp-udev/libudev-core/Makefile
