@@ -40,6 +40,4 @@ dist_zshcompletion_data += \
 	shell-completion/zsh/_timedatectl
 endif # ENABLE_TIMEDATED
 
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
-
 include $(topsrcdir)/build-aux/Makefile.tail.mk

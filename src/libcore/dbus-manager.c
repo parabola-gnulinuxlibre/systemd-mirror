@@ -24,7 +24,7 @@
 #include "alloc-util.h"
 #include "architecture.h"
 #include "build.h"
-#include "bus-common-errors.h"
+#include "sd-bus/bus-common-errors.h"
 #include "clock-util.h"
 #include "dbus-execute.h"
 #include "dbus-job.h"

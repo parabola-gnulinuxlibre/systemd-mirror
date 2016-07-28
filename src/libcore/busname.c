@@ -20,15 +20,15 @@
 #include <sys/mman.h>
 
 #include "alloc-util.h"
-#include "bus-internal.h"
-#include "bus-kernel.h"
+#include "sd-bus/bus-internal.h"
+#include "sd-bus/bus-kernel.h"
 #include "bus-policy.h"
 #include "bus-util.h"
 #include "busname.h"
 #include "dbus-busname.h"
 #include "fd-util.h"
 #include "formats-util.h"
-#include "kdbus.h"
+#include "sd-bus/kdbus.h"
 #include "parse-util.h"
 #include "process-util.h"
 #include "service.h"

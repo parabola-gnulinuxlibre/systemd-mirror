@@ -78,7 +78,6 @@ EXTRA_DIST += \
 	sysctl.d/50-coredump.conf.in \
 	units/systemd-coredump@.service.in
 
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
 systemd.CPPFLAGS += -I$(topsrcdir)/src/grp-journal/libjournal-core
 systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 

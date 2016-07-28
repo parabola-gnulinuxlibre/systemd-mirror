@@ -18,7 +18,7 @@
 ***/
 
 #include "alloc-util.h"
-#include "bus-common-errors.h"
+#include "sd-bus/bus-common-errors.h"
 #include "bus-util.h"
 #include "dns-domain.h"
 #include "resolved-bus.h"

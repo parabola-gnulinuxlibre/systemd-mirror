@@ -32,8 +32,8 @@
 
 #include "af-list.h"
 #include "alloc-util.h"
-#include "bus-error.h"
-#include "bus-internal.h"
+#include "sd-bus/bus-error.h"
+#include "sd-bus/bus-internal.h"
 #include "bus-util.h"
 #include "cap-list.h"
 #include "capability-util.h"

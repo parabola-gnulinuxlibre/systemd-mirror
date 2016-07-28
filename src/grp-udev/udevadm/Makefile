@@ -42,7 +42,6 @@ udevadm_SOURCES = \
 udevadm_LDADD = \
 	libudev-core.la
 
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-hwdb
 systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

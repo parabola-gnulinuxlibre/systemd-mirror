@@ -30,6 +30,4 @@ systemd_initctl_SOURCES = \
 systemd_initctl_LDADD = \
 	libshared.la
 
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
-
 include $(topsrcdir)/build-aux/Makefile.tail.mk

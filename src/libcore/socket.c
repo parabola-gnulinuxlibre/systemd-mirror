@@ -29,7 +29,7 @@
 #include <linux/sctp.h>
 
 #include "alloc-util.h"
-#include "bus-error.h"
+#include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "copy.h"
 #include "dbus-socket.h"

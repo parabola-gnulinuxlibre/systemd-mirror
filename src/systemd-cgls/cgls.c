@@ -26,7 +26,7 @@
 #include <systemd/sd-bus.h>
 
 #include "alloc-util.h"
-#include "bus-error.h"
+#include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "cgroup-show.h"
 #include "cgroup-util.h"

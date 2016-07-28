@@ -23,8 +23,8 @@
 
 #include "alloc-util.h"
 #include "async.h"
-#include "bus-error.h"
-#include "bus-kernel.h"
+#include "sd-bus/bus-error.h"
+#include "sd-bus/bus-kernel.h"
 #include "bus-util.h"
 #include "dbus-service.h"
 #include "def.h"

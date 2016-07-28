@@ -36,7 +36,7 @@
 #include "alloc-util.h"
 #include "capability-util.h"
 #include "cgroup-util.h"
-#include "compress.h"
+#include "sd-journal/compress.h"
 #include "conf-parser.h"
 #include "copy.h"
 #include "coredump-vacuum.h"

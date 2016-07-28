@@ -102,8 +102,6 @@ libudev-core.la.SOURCES = $(patsubst src/udev/%,%,$(filter %.c,$(_libudev_core_l
 libudev-core.la.DEPENDS = $(addprefix $(outdir)/,$(libudev-core.la.SOURCES:.c=.lo))
 at.subdirs += net
 $(outdir)/udev-builtin-keyboard.lo: $(outdir)/keyboard-keys-from-name.h
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-netlink
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-hwdb
 systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

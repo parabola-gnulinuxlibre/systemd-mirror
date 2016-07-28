@@ -27,7 +27,7 @@
 typedef struct Server Server;
 
 #include "hashmap.h"
-#include "journal-file.h"
+#include "sd-journal/journal-file.h"
 #include "journald-rate-limit.h"
 #include "journald-stream.h"
 #include "list.h"

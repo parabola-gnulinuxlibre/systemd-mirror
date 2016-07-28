@@ -27,7 +27,7 @@
 
 #include "alloc-util.h"
 #include "ask-password-api.h"
-#include "device-util.h"
+#include "sd-device/device-util.h"
 #include "escape.h"
 #include "fileio.h"
 #include "log.h"

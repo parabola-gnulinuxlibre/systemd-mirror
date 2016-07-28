@@ -21,7 +21,7 @@
 #include "dns-domain.h"
 #include "dns-type.h"
 #include "hostname-util.h"
-#include "local-addresses.h"
+#include "sd-netlink/local-addresses.h"
 #include "resolved-dns-query.h"
 #include "resolved-dns-synthesize.h"
 #include "resolved-etc-hosts.h"

@@ -20,7 +20,7 @@
 #include <errno.h>
 
 #include "alloc-util.h"
-#include "bus-error.h"
+#include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "dbus-timer.h"
 #include "fs-util.h"

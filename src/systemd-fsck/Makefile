@@ -30,6 +30,4 @@ systemd_fsck_SOURCES = \
 systemd_fsck_LDADD = \
 	libshared.la
 
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-device
-
 include $(topsrcdir)/build-aux/Makefile.tail.mk

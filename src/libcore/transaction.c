@@ -21,8 +21,8 @@
 #include <unistd.h>
 
 #include "alloc-util.h"
-#include "bus-common-errors.h"
-#include "bus-error.h"
+#include "sd-bus/bus-common-errors.h"
+#include "sd-bus/bus-error.h"
 #include "terminal-util.h"
 #include "transaction.h"
 #include "dbus-unit.h"

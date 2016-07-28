@@ -26,8 +26,8 @@
 #include <systemd/sd-messages.h>
 
 #include "alloc-util.h"
-#include "bus-common-errors.h"
-#include "bus-error.h"
+#include "sd-bus/bus-common-errors.h"
+#include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "clock-util.h"
 #include "def.h"

@@ -20,7 +20,7 @@
 
 #include "libudev.h"
 
-#include "device-private.h"
+#include "sd-device/device-private.h"
 #include "libudev-device-internal.h"
 #include "libudev-private.h"
 

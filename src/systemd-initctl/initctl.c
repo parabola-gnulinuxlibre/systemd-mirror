@@ -27,7 +27,7 @@
 #include <systemd/sd-daemon.h>
 
 #include "alloc-util.h"
-#include "bus-error.h"
+#include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "def.h"
 #include "fd-util.h"

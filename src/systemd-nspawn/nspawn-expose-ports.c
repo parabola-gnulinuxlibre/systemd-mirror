@@ -23,7 +23,7 @@
 #include "fd-util.h"
 #include "firewall-util.h"
 #include "in-addr-util.h"
-#include "local-addresses.h"
+#include "sd-netlink/local-addresses.h"
 #include "nspawn-expose-ports.h"
 #include "parse-util.h"
 #include "socket-util.h"

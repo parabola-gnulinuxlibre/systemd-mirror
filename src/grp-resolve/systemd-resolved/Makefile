@@ -223,7 +223,6 @@ EXTRA_DIST += \
 
 
 $(outdir)/dns-type.o: $(outdir)/dns_type-from-name.h $(outdir)/dns_type-to-name.h
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

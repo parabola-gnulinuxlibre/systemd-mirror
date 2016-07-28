@@ -26,7 +26,7 @@
 
 #include "alloc-util.h"
 #include "hostname-util.h"
-#include "local-addresses.h"
+#include "sd-netlink/local-addresses.h"
 #include "macro.h"
 #include "nss-util.h"
 #include "signal-util.h"

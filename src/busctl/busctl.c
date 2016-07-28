@@ -22,10 +22,10 @@
 #include <systemd/sd-bus.h>
 
 #include "alloc-util.h"
-#include "bus-dump.h"
-#include "bus-internal.h"
-#include "bus-signature.h"
-#include "bus-type.h"
+#include "sd-bus/bus-dump.h"
+#include "sd-bus/bus-internal.h"
+#include "sd-bus/bus-signature.h"
+#include "sd-bus/bus-type.h"
 #include "bus-util.h"
 #include "busctl-introspect.h"
 #include "escape.h"

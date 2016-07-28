@@ -38,6 +38,4 @@ dist_bashcompletion_data += \
 dist_zshcompletion_data += \
 	shell-completion/zsh/_coredumpctl
 
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
-
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -24,7 +24,7 @@
 #include "clock-util.h"
 #include "fd-util.h"
 #include "fs-util.h"
-#include "network-util.h"
+#include "sd-network/network-util.h"
 #include "signal-util.h"
 #include "timesyncd-conf.h"
 #include "timesyncd-manager.h"

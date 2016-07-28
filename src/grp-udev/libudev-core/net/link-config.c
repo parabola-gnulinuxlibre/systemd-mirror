@@ -30,7 +30,7 @@
 #include "link-config.h"
 #include "log.h"
 #include "missing.h"
-#include "netlink-util.h"
+#include "sd-netlink/netlink-util.h"
 #include "network-internal.h"
 #include "parse-util.h"
 #include "path-util.h"

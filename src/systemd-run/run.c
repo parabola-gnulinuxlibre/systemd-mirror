@@ -24,7 +24,7 @@
 #include <systemd/sd-event.h>
 
 #include "alloc-util.h"
-#include "bus-error.h"
+#include "sd-bus/bus-error.h"
 #include "bus-unit-util.h"
 #include "bus-util.h"
 #include "calendarspec.h"

@@ -20,7 +20,7 @@
 #include <systemd/sd-bus.h>
 
 #include "alloc-util.h"
-#include "bus-common-errors.h"
+#include "sd-bus/bus-common-errors.h"
 #include "cgroup-util.h"
 #include "dbus-unit.h"
 #include "dbus.h"

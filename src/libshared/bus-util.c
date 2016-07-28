@@ -35,9 +35,9 @@
 #include <systemd/sd-id128.h>
 
 #include "alloc-util.h"
-#include "bus-internal.h"
+#include "sd-bus/bus-internal.h"
 #include "bus-label.h"
-#include "bus-message.h"
+#include "sd-bus/bus-message.h"
 #include "bus-util.h"
 #include "def.h"
 #include "escape.h"

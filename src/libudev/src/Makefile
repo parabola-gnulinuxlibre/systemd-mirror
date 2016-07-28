@@ -80,8 +80,6 @@ test_libudev_sym_CFLAGS = \
 test_libudev_sym_LDADD = \
 	libudev.la
 
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-device
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-hwdb
 systemd.sed_files += libudev.pc
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

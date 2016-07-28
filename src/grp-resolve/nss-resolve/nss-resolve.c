@@ -26,7 +26,7 @@
 
 #include <systemd/sd-bus.h>
 
-#include "bus-common-errors.h"
+#include "sd-bus/bus-common-errors.h"
 #include "in-addr-util.h"
 #include "macro.h"
 #include "nss-util.h"

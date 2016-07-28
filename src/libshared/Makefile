@@ -27,8 +27,6 @@ noinst_LTLIBRARIES += \
 	libshared.la
 
 libshared_la_SOURCES = \
-	src/libsystemd/sd-netlink/local-addresses.h \
-	src/libsystemd/sd-netlink/local-addresses.c \
 	src/shared/output-mode.h \
 	src/shared/output-mode.c \
 	src/shared/gpt.h \
@@ -136,7 +134,6 @@ libshared_la_CFLAGS = \
 
 libshared_la_LIBADD = \
 	libsystemd-internal.la \
-	libsystemd-journal-internal.la \
 	libudev-internal.la \
 	$(ACL_LIBS) \
 	$(LIBIDN_LIBS) \
@@ -147,9 +144,6 @@ test_local_addresses_SOURCES = \
 
 test_local_addresses_LDADD = \
 	libshared.la
-
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-journal-internal
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
 
 systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 systemd.CPPFLAGS += -DSYSTEM_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/system\"

@@ -31,10 +31,10 @@
 #include <systemd/sd-device.h>
 
 #include "alloc-util.h"
-#include "bus-common-errors.h"
-#include "bus-error.h"
+#include "sd-bus/bus-common-errors.h"
+#include "sd-bus/bus-error.h"
 #include "bus-util.h"
-#include "device-util.h"
+#include "sd-device/device-util.h"
 #include "fd-util.h"
 #include "fs-util.h"
 #include "parse-util.h"

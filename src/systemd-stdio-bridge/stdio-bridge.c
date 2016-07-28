@@ -27,7 +27,7 @@
 #include <systemd/sd-bus.h>
 #include <systemd/sd-daemon.h>
 
-#include "bus-internal.h"
+#include "sd-bus/bus-internal.h"
 #include "bus-util.h"
 #include "build.h"
 #include "log.h"

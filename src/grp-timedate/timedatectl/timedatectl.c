@@ -25,7 +25,7 @@
 
 #include <systemd/sd-bus.h>
 
-#include "bus-error.h"
+#include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "pager.h"
 #include "parse-util.h"

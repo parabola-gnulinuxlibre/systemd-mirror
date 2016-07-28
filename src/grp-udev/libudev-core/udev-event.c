@@ -33,7 +33,7 @@
 #include "alloc-util.h"
 #include "fd-util.h"
 #include "formats-util.h"
-#include "netlink-util.h"
+#include "sd-netlink/netlink-util.h"
 #include "process-util.h"
 #include "signal-util.h"
 #include "string-util.h"

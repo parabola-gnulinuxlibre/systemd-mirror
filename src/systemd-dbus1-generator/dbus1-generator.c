@@ -18,7 +18,7 @@
 ***/
 
 #include "alloc-util.h"
-#include "bus-internal.h"
+#include "sd-bus/bus-internal.h"
 #include "bus-util.h"
 #include "cgroup-util.h"
 #include "conf-parser.h"

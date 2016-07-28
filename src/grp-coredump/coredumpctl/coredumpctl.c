@@ -27,10 +27,10 @@
 #include <systemd/sd-journal.h>
 
 #include "alloc-util.h"
-#include "compress.h"
+#include "sd-journal/compress.h"
 #include "fd-util.h"
 #include "fileio.h"
-#include "journal-internal.h"
+#include "sd-journal/journal-internal.h"
 #include "log.h"
 #include "macro.h"
 #include "pager.h"

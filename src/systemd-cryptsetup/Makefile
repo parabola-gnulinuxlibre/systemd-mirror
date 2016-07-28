@@ -56,7 +56,6 @@ SYSINIT_TARGET_WANTS += \
 
 endif # HAVE_LIBCRYPTSETUP
 
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-device
 systemd.CPPFLAGS += -DSYSTEMD_CRYPTSETUP_PATH=\"$(rootlibexecdir)/systemd-cryptsetup\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

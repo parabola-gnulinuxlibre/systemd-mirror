@@ -19,7 +19,7 @@
 
 #include <systemd/sd-bus.h>
 
-#include "bus-error.h" /* for bus_error_message */
+#include "sd-bus/bus-error.h" /* for bus_error_message */
 #include "bus-unit-util.h"
 #include "bus-util.h"
 #include "nspawn-register.h"

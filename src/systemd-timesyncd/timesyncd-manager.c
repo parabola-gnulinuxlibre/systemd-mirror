@@ -37,7 +37,7 @@
 #include "list.h"
 #include "log.h"
 #include "missing.h"
-#include "network-util.h"
+#include "sd-network/network-util.h"
 #include "ratelimit.h"
 #include "socket-util.h"
 #include "sparse-endian.h"

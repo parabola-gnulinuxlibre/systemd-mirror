@@ -30,7 +30,7 @@
 #include "alloc-util.h"
 #include "async.h"
 #include "automount.h"
-#include "bus-error.h"
+#include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "dbus-automount.h"
 #include "fd-util.h"

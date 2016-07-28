@@ -21,7 +21,7 @@
 #include <sys/reboot.h>
 #include <linux/reboot.h>
 
-#include "bus-error.h"
+#include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "failure-action.h"
 #include "special.h"

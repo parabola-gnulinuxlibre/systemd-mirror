@@ -23,17 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-audit_list_includes = -include linux/audit.h -include $(topsrcdir)/src/libbasic/missing.h
-ifneq ($(HAVE_AUDIT),)
-audit_list_includes += -include libaudit.h
-endif # HAVE_AUDIT
-
-$(outdir)/audit_type-list.txt: $(call at.path,$(topsrcdir)/src/libbasic/missing.h)
-	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM $(audit_list_includes) - </dev/null | grep -vE 'AUDIT_.*(FIRST|LAST)_' | $(SED) -r -n 's/^#define\s+AUDIT_(\w+)\s+([0-9]{4})\s*$$/\1\t\2/p' | sort -k2 >$@
-
-$(outdir)/audit_type-to-name.h: $(outdir)/audit_type-list.txt
-	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
-
 _libsystemd_internal_la_SOURCES = \
 	src/systemd/sd-bus.h \
 	src/systemd/sd-bus-protocol.h \
@@ -103,6 +92,8 @@ _libsystemd_internal_la_SOURCES = \
 	src/libsystemd/sd-netlink/netlink-types.c \
 	src/libsystemd/sd-netlink/netlink-util.h \
 	src/libsystemd/sd-netlink/netlink-util.c \
+	src/libsystemd/sd-netlink/local-addresses.h \
+	src/libsystemd/sd-netlink/local-addresses.c \
 	src/libsystemd/sd-id128/sd-id128.c \
 	src/libsystemd/sd-daemon/sd-daemon.c \
 	src/libsystemd/sd-login/sd-login.c \
@@ -327,16 +318,16 @@ libsystemd_journal_internal_la_CFLAGS += \
 	-Wno-pointer-arith
 endif # HAVE_GCRYPT
 
-noinst_LTLIBRARIES += \
+_noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la
 
-systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
-systemd.CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"
-$(outdir)/audit-type.lo: $(outdir)/audit_type-to-name.h
+libsystemd_internal_la_CFLAGS   += $(libsystemd_journal_internal_la_CFLAGS)
+libsystemd_internal_la_LIBADD   += $(libsystemd_journal_internal_la_LIBADD)
+libsystemd_internal_la_LDADD    += $(libsystemd_journal_internal_la_LDADD)
 
 libsystemd-internal.la.SOURCES =
-libsystemd-internal.la.SOURCES += $(patsubst src/libsystemd/%,src/%,$(filter %.c,$(_libsystemd_internal_la_SOURCES)))
-libsystemd-internal.la.SOURCES += $(addprefix src/sd-journal/,$(notdir $(filter %.c,$(_libsystemd_journal_internal_la_SOURCES))))
+libsystemd-internal.la.SOURCES += $(patsubst src/libsystemd/%,%,$(filter %.c,$(_libsystemd_internal_la_SOURCES)))
+libsystemd-internal.la.SOURCES += $(addprefix sd-journal/,$(notdir $(filter %.c,$(_libsystemd_journal_internal_la_SOURCES))))
 libsystemd-internal.la.DEPENDS = $(addprefix $(outdir)/,$(libsystemd-internal.la.SOURCES:.c=.lo))
 at.subdirs += $(sort $(dir $(libsystemd-internal.la.SOURCES)))
 

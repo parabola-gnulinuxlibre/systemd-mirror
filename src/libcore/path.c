@@ -22,7 +22,7 @@
 #include <sys/inotify.h>
 #include <unistd.h>
 
-#include "bus-error.h"
+#include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "dbus-path.h"
 #include "fd-util.h"

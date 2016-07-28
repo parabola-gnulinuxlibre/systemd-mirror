@@ -108,7 +108,7 @@ test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
 $(outdir)/libsystemd.la: $(srcdir)/libsystemd.sym
-at.subdirs += libsystemd-internal libsystemd-journal-internal
+at.subdirs += src
 systemd.sed_files += libsystemd.pc
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

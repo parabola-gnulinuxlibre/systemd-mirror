@@ -43,6 +43,4 @@ libnss_mymachines_la_LIBADD = \
 lib_LTLIBRARIES += \
 	libnss_mymachines.la
 
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libsystemd/libsystemd-internal/sd-bus
-
 include $(topsrcdir)/build-aux/Makefile.tail.mk
