@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-#include <systemd/sd-dhcp-lease.h>
+#include "systemd-network/sd-dhcp-lease.h"
 
 #include "shared/condition.h"
 #include "udev.h"

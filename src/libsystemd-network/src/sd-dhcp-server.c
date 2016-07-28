@@ -20,7 +20,7 @@
 
 #include <sys/ioctl.h>
 
-#include <systemd/sd-dhcp-server.h>
+#include "systemd-network/sd-dhcp-server.h"
 
 #include "basic/alloc-util.h"
 #include "systemd-network/dhcp-internal.h"

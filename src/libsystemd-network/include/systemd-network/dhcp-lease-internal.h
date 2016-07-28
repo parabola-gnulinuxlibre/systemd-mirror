@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <linux/if_packet.h>
 
-#include <systemd/sd-dhcp-client.h>
+#include "systemd-network/sd-dhcp-client.h"
 
 #include "systemd-network/dhcp-protocol.h"
 #include "basic/list.h"

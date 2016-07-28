@@ -24,7 +24,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <systemd/sd-dhcp6-client.h>
+#include "systemd-network/sd-dhcp6-client.h"
 #include <systemd/sd-event.h>
 
 #include "systemd-network/dhcp6-internal.h"

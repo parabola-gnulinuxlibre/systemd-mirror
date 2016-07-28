@@ -20,8 +20,7 @@
 #include <netinet/ether.h>
 #include <linux/if.h>
 
-#include <systemd/sd-dhcp6-client.h>
-
+#include "systemd-network/sd-dhcp6-client.h"
 #include "systemd-network/network-internal.h"
 #include "networkd.h"
 

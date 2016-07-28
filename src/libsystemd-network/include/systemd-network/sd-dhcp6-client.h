@@ -24,10 +24,10 @@
 #include <net/ethernet.h>
 #include <sys/types.h>
 
-#include <systemd/sd-dhcp6-lease.h>
+#include "systemd-network/sd-dhcp6-lease.h"
 #include <systemd/sd-event.h>
 
-#include "_sd-common.h"
+#include <systemd/_sd-common.h>
 
 _SD_BEGIN_DECLARATIONS;
 

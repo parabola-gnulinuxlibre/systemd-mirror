@@ -22,7 +22,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include <systemd/sd-dhcp-client.h>
+#include "systemd-network/sd-dhcp-client.h"
 #include <systemd/sd-event.h>
 
 #include "basic/alloc-util.h"

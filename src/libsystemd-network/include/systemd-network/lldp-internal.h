@@ -21,7 +21,7 @@
 ***/
 
 #include <systemd/sd-event.h>
-#include <systemd/sd-lldp.h>
+#include "systemd-network/sd-lldp.h"
 
 #include "basic/hashmap.h"
 #include "basic/log.h"

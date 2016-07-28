@@ -25,7 +25,7 @@
 
 #include <systemd/sd-event.h>
 
-#include "_sd-common.h"
+#include <systemd/_sd-common.h>
 
 _SD_BEGIN_DECLARATIONS;
 

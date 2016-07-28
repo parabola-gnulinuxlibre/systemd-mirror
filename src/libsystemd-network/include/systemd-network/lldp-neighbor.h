@@ -23,7 +23,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include <systemd/sd-lldp.h>
+#include "systemd-network/sd-lldp.h"
 
 #include "basic/hash-funcs.h"
 #include "systemd-network/lldp-internal.h"

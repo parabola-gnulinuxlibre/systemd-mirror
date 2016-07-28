@@ -22,7 +22,7 @@
 #include <netinet/in.h>
 #include <linux/if.h>
 
-#include <systemd/sd-ndisc.h>
+#include "systemd-network/sd-ndisc.h"
 
 #include "networkd.h"
 

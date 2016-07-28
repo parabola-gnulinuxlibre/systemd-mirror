@@ -25,7 +25,7 @@
 #include <net/if.h>
 
 #include <systemd/sd-event.h>
-#include <systemd/sd-ipv4acd.h>
+#include "systemd-network/sd-ipv4acd.h"
 #include <systemd/sd-netlink.h>
 
 #include "basic/in-addr-util.h"

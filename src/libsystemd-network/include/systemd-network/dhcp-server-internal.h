@@ -20,7 +20,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <systemd/sd-dhcp-server.h>
+#include "systemd-network/sd-dhcp-server.h"
 #include <systemd/sd-event.h>
 
 #include "systemd-network/dhcp-internal.h"

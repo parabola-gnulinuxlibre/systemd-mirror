@@ -24,7 +24,7 @@
 #include <linux/veth.h>
 
 #include <systemd/sd-event.h>
-#include <systemd/sd-ipv4ll.h>
+#include "systemd-network/sd-ipv4ll.h"
 #include <systemd/sd-netlink.h>
 
 #include "basic/alloc-util.h"

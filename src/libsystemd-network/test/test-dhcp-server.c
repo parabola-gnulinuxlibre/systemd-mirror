@@ -20,7 +20,7 @@
 
 #include <errno.h>
 
-#include <systemd/sd-dhcp-server.h>
+#include "systemd-network/sd-dhcp-server.h"
 #include <systemd/sd-event.h>
 
 #include "systemd-network/dhcp-server-internal.h"

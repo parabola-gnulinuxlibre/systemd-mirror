@@ -21,7 +21,7 @@
 #include <netinet/in.h>
 #include <string.h>
 
-#include <systemd/sd-dhcp6-client.h>
+#include "systemd-network/sd-dhcp6-client.h"
 
 #include "basic/alloc-util.h"
 #include "systemd-network/dhcp6-internal.h"

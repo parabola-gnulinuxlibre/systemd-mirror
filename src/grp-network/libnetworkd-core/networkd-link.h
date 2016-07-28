@@ -22,12 +22,12 @@
 #include <endian.h>
 
 #include <systemd/sd-bus.h>
-#include <systemd/sd-dhcp-client.h>
-#include <systemd/sd-dhcp-server.h>
-#include <systemd/sd-dhcp6-client.h>
-#include <systemd/sd-ipv4ll.h>
-#include <systemd/sd-lldp.h>
-#include <systemd/sd-ndisc.h>
+#include "systemd-network/sd-dhcp-client.h"
+#include "systemd-network/sd-dhcp-server.h"
+#include "systemd-network/sd-dhcp6-client.h"
+#include "systemd-network/sd-ipv4ll.h"
+#include "systemd-network/sd-lldp.h"
+#include "systemd-network/sd-ndisc.h"
 #include <systemd/sd-netlink.h>
 
 #include "basic/list.h"

@@ -23,7 +23,7 @@
 
 #include <systemd/sd-device.h>
 #include <systemd/sd-hwdb.h>
-#include <systemd/sd-lldp.h>
+#include "systemd-network/sd-lldp.h"
 #include <systemd/sd-netlink.h>
 #include <systemd/sd-network.h>
 

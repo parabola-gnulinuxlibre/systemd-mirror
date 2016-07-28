@@ -109,15 +109,17 @@ libfirewall.CPPFLAGS                 = -I$(topsrcdir)/src/libfirewall
 libfirewall.DEPENDS                  =   $(topoutdir)/src/libfirewall/libfirewall.la
 libshared.CPPFLAGS                   = -I$(topsrcdir)/src/libshared/include $(libsystemd-internal.CPPFLAGS) -I$(topsrcdir)/src/libudev/src
 libshared.DEPENDS                    =   $(topoutdir)/src/libshared/src/libshared.la
+
 libsystemd-internal.CPPFLAGS         = -I$(topsrcdir)/src/libsystemd/src -I$(topoutdir)/src/libsystemd/src $(libsystemd.CPPFLAGS) $(libbasic.CPPFLAGS)
 libsystemd-internal.DEPENDS          = $(topoutdir)/src/libsystemd/src/libsystemd-internal.la
 libsystemd-network.CPPFLAGS          = -I$(topsrcdir)/src/libsystemd-network/include
 libsystemd-network.DEPENDS           =   $(topoutdir)/src/libsystemd-network/src/libsystemd-network.la
 libsystemd.CPPFLAGS                  = -I$(topsrcdir)/src/libsystemd/include
 libsystemd.DEPENDS                   =   $(topoutdir)/src/libsystemd/libsystemd.la
+
 libudev.CPPFLAGS                     = -I$(topsrcdir)/src/libudev/include
 libudev.DEPENDS                      =   $(topoutdir)/src/libudev/src/libudev.la
-libudev-internal.CPPFLAGS            = $(libudev.CPPFLAGS)
+libudev-internal.CPPFLAGS            = $(libudev.CPPFLAGS) $(libbasic.CPPFLAGS)
 libudev-internal.DEPENDS             =   $(topoutdir)/src/libudev/src/libudev-internal.la
 # -core libs
 #libbus-proxy-core.CPPFLAGS =

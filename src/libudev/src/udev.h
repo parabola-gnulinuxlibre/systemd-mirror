@@ -22,14 +22,15 @@
 #include <sys/sysmacros.h>
 #include <sys/types.h>
 
-#include "libudev.h"
+#include <libudev.h>
 #include <systemd/sd-netlink.h>
 
 #include "basic/label.h"
-#include "libudev-private.h"
 #include "basic/macro.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+
+#include "libudev-private.h"
 
 struct udev_event {
         struct udev *udev;
