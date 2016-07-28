@@ -24,9 +24,9 @@
 #include <linux/veth.h>
 #include <net/if.h>
 
-#include "sd-event.h"
-#include "sd-ipv4acd.h"
-#include "sd-netlink.h"
+#include <systemd/sd-event.h>
+#include <systemd/sd-ipv4acd.h>
+#include <systemd/sd-netlink.h>
 
 #include "in-addr-util.h"
 #include "netlink-util.h"

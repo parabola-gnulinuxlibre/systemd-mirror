@@ -23,9 +23,9 @@
 #include <unistd.h>
 #include <linux/veth.h>
 
-#include "sd-event.h"
-#include "sd-ipv4ll.h"
-#include "sd-netlink.h"
+#include <systemd/sd-event.h>
+#include <systemd/sd-ipv4ll.h>
+#include <systemd/sd-netlink.h>
 
 #include "alloc-util.h"
 #include "in-addr-util.h"
