@@ -238,6 +238,12 @@ test_netlink_SOURCES = \
 test_netlink_LDADD = \
 	libshared.la
 
+test_local_addresses_SOURCES = \
+	src/libsystemd/sd-netlink/test-local-addresses.c
+
+test_local_addresses_LDADD = \
+	libshared.la
+
 test_resolve_SOURCES = \
 	src/libsystemd/sd-resolve/test-resolve.c
 

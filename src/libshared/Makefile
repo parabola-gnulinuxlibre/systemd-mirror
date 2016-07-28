@@ -139,12 +139,6 @@ libshared_la_LIBADD = \
 	$(LIBIDN_LIBS) \
 	$(SECCOMP_LIBS)
 
-test_local_addresses_SOURCES = \
-	src/libsystemd/sd-netlink/test-local-addresses.c
-
-test_local_addresses_LDADD = \
-	libshared.la
-
 systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 systemd.CPPFLAGS += -DSYSTEM_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/system\"
 systemd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
