@@ -321,6 +321,7 @@ fixup_makefiles() (
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
 	    src/libbasic/Makefile \
 	    src/libsystemd/src/Makefile \
+	    src/libsystemd/src/sd-journal/Makefile \
 	    src/grp-udev/libudev-core/Makefile
 	find -type f -name Makefile|while read -r filename; do
 		sed -r -i "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="${filename%/*}" config.mk)|" "$filename"
