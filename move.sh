@@ -38,6 +38,14 @@ move_files() (
 	mkdir src/libshared/include/shared
 	mv src/libshared/*.h src/libshared/include/shared/
 
+	mkdir src/libsystemd-network/test
+	mv src/libsystemd-network/test-* src/libsystemd-network/test
+	mkdir src/libsystemd-network/src
+	mv src/libsystemd-network/*.c src/libsystemd-network/src/
+	mkdir src/libsystemd-network/include
+	mkdir src/libsystemd-network/include/systemd-network
+	mv src/libsystemd-network/*.h src/libsystemd-network/include/systemd-network/
+
 	pfix=(
 		dbus1-generator
 		debug-generator
