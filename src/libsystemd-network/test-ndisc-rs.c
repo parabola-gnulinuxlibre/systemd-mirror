@@ -19,7 +19,7 @@
 
 #include <netinet/icmp6.h>
 
-#include "sd-ndisc.h"
+#include <systemd/sd-ndisc.h>
 
 #include "icmp6-util.h"
 #include "socket-util.h"
