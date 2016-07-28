@@ -26,6 +26,18 @@ move_files() (
 	mkdir src/libbasic/include/basic
 	mv src/libbasic/.gitignore src/libbasic/*.h src/libbasic/include/basic/
 
+	mv -T src/lib{shared,core}/linux
+
+	mkdir src/libfirewall
+	mv -T src/lib{shared,firewall}/firewall-util.c
+	mv -T src/lib{shared,firewall}/firewall-util.h
+
+	mkdir src/libshared/src
+	mv src/libshared/*.c src/libshared/src/
+	mkdir src/libshared/include
+	mkdir src/libshared/include/shared
+	mv src/libshared/*.h src/libshared/include/shared/
+
 	pfix=(
 		dbus1-generator
 		debug-generator
@@ -95,8 +107,6 @@ move_files() (
 	mv -T {shell-completion/zsh/_,src/kernel-install/zsh-completion_}kernel-install
 	mv -T {man,src/kernel-install}/kernel-install.xml
 
-	mv -T src/lib{shared,core}/linux
-
 	mkdir src/libsystemd/include
 	mv -T src/{,libsystemd/include}/systemd
 
@@ -114,10 +124,6 @@ move_files() (
 
 	mkdir src/grp-system
 	mv -T src/{,grp-system}/systemctl
-
-	mkdir src/libfirewall
-	mv -T src/lib{shared,firewall}/firewall-util.c
-	mv -T src/lib{shared,firewall}/firewall-util.h
 
 	mkdir src/grp-system/systemd
 	mv -T src/{libcore,grp-system/systemd}/main.c
