@@ -20,6 +20,12 @@ move_files() (
 		mv -T src/{,lib}$d
 	done
 
+	mkdir src/libbasic/src
+	mv src/libbasic/*.c src/libbasic/src/
+	mkdir src/libbasic/include
+	mkdir src/libbasic/include/basic
+	mv src/libbasic/.gitignore src/libbasic/*.h src/libbasic/include/basic/
+
 	pfix=(
 		dbus1-generator
 		debug-generator
