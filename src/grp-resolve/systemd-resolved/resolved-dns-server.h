@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "in-addr-util.h"
+#include "basic/in-addr-util.h"
 
 typedef struct DnsServer DnsServer;
 

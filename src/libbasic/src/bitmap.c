@@ -23,10 +23,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "bitmap.h"
-#include "hashmap.h"
-#include "macro.h"
+#include "basic/alloc-util.h"
+#include "basic/bitmap.h"
+#include "basic/hashmap.h"
+#include "basic/macro.h"
 
 struct Bitmap {
         uint64_t *bitmaps;

@@ -24,7 +24,7 @@
 
 #include <systemd/sd-event.h>
 
-#include "hashmap.h"
+#include "basic/hashmap.h"
 
 typedef struct CurlGlue CurlGlue;
 

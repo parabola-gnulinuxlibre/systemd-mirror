@@ -24,9 +24,9 @@
 #include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "failure-action.h"
-#include "special.h"
-#include "string-table.h"
-#include "terminal-util.h"
+#include "basic/special.h"
+#include "basic/string-table.h"
+#include "basic/terminal-util.h"
 
 static void log_and_status(Manager *m, const char *message) {
         log_warning("%s", message);

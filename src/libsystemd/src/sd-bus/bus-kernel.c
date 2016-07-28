@@ -32,24 +32,24 @@
 #include <libgen.h>
 #undef basename
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-bloom.h"
 #include "bus-internal.h"
 #include "bus-kernel.h"
-#include "bus-label.h"
+#include "basic/bus-label.h"
 #include "bus-message.h"
 #include "bus-util.h"
-#include "capability-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "formats-util.h"
-#include "memfd-util.h"
-#include "parse-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/capability-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/formats-util.h"
+#include "basic/memfd-util.h"
+#include "basic/parse-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 #define UNIQUE_NAME_MAX (3+DECIMAL_STR_MAX(uint64_t))
 

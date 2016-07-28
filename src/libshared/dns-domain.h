@@ -24,8 +24,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "hashmap.h"
-#include "in-addr-util.h"
+#include "basic/hashmap.h"
+#include "basic/in-addr-util.h"
 
 /* Length of a single label, with all escaping removed, excluding any trailing dot or NUL byte */
 #define DNS_LABEL_MAX 63

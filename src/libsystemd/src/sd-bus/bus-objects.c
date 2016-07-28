@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-internal.h"
 #include "bus-introspect.h"
 #include "bus-message.h"
@@ -26,9 +26,9 @@
 #include "bus-slot.h"
 #include "bus-type.h"
 #include "bus-util.h"
-#include "set.h"
-#include "string-util.h"
-#include "strv.h"
+#include "basic/set.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
 
 static int node_vtable_get_userdata(
                 sd_bus *bus,

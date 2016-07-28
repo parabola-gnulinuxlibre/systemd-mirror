@@ -27,12 +27,12 @@
 
 #include <systemd/sd-id128.h>
 
-#include "hashmap.h"
+#include "basic/hashmap.h"
 #include "journal-def.h"
-#include "macro.h"
+#include "basic/macro.h"
 #include "mmap-cache.h"
 #include <systemd/sd-event.h>
-#include "sparse-endian.h"
+#include "basic/sparse-endian.h"
 
 typedef struct JournalMetrics {
         /* For all these: -1 means "pick automatically", and 0 means "no limit enforced" */

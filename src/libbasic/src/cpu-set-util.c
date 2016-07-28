@@ -22,13 +22,13 @@
 #include <stddef.h>
 #include <syslog.h>
 
-#include "alloc-util.h"
-#include "cpu-set-util.h"
-#include "extract-word.h"
-#include "log.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "string-util.h"
+#include "basic/alloc-util.h"
+#include "basic/cpu-set-util.h"
+#include "basic/extract-word.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/string-util.h"
 
 cpu_set_t* cpu_set_malloc(unsigned *ncpus) {
         cpu_set_t *c;

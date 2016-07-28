@@ -30,8 +30,8 @@
 #include <systemd/sd-ndisc.h>
 #include <systemd/sd-netlink.h>
 
-#include "list.h"
-#include "set.h"
+#include "basic/list.h"
+#include "basic/set.h"
 
 typedef enum LinkState {
         LINK_STATE_PENDING,

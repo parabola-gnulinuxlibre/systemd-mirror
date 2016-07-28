@@ -20,9 +20,9 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#include "dirent-util.h"
-#include "path-util.h"
-#include "string-util.h"
+#include "basic/dirent-util.h"
+#include "basic/path-util.h"
+#include "basic/string-util.h"
 
 int dirent_ensure_type(DIR *d, struct dirent *de) {
         struct stat st;

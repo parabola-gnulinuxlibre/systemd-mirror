@@ -23,22 +23,22 @@
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-netlink.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-util.h"
 #include "conf-parser.h"
-#include "def.h"
+#include "basic/def.h"
 #include "dns-domain.h"
-#include "fd-util.h"
-#include "fileio.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
 #include "libudev-private.h"
 #include "local-addresses.h"
 #include "netlink-util.h"
 #include "networkd.h"
-#include "ordered-set.h"
-#include "path-util.h"
-#include "set.h"
+#include "basic/ordered-set.h"
+#include "basic/path-util.h"
+#include "basic/set.h"
 #include "udev-util.h"
-#include "virt.h"
+#include "basic/virt.h"
 
 /* use 8 MB for receive socket kernel queue. */
 #define RCVBUF_SIZE    (8*1024*1024)

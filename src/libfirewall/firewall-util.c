@@ -38,11 +38,11 @@
 #include <linux/netfilter/xt_addrtype.h>
 #include <libiptc/libiptc.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "firewall-util.h"
-#include "in-addr-util.h"
-#include "macro.h"
-#include "socket-util.h"
+#include "basic/in-addr-util.h"
+#include "basic/macro.h"
+#include "basic/socket-util.h"
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(struct xtc_handle*, iptc_free);
 

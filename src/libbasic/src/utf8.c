@@ -46,10 +46,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "hexdecoct.h"
-#include "macro.h"
-#include "utf8.h"
+#include "basic/alloc-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/macro.h"
+#include "basic/utf8.h"
 
 bool unichar_is_valid(char32_t ch) {
 

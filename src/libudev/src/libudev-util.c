@@ -26,11 +26,11 @@
 
 #include "libudev.h"
 
-#include "MurmurHash2.h"
-#include "device-nodes.h"
+#include "basic/MurmurHash2.h"
+#include "basic/device-nodes.h"
 #include "libudev-private.h"
-#include "syslog-util.h"
-#include "utf8.h"
+#include "basic/syslog-util.h"
+#include "basic/utf8.h"
 
 /**
  * SECTION:libudev-util

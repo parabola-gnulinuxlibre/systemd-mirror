@@ -21,7 +21,7 @@
 
 #include <systemd/sd-daemon.h>
 
-#include "strv.h"
+#include "basic/strv.h"
 
 int main(int argc, char*argv[]) {
         _cleanup_strv_free_ char **l = NULL;

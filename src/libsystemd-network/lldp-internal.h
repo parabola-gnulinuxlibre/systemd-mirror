@@ -23,9 +23,9 @@
 #include <systemd/sd-event.h>
 #include <systemd/sd-lldp.h>
 
-#include "hashmap.h"
-#include "log.h"
-#include "prioq.h"
+#include "basic/hashmap.h"
+#include "basic/log.h"
+#include "basic/prioq.h"
 
 struct sd_lldp {
         int ifindex;

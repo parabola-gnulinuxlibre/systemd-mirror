@@ -25,15 +25,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "conf-files.h"
-#include "def.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "log.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/conf-files.h"
+#include "basic/def.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/log.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 static const char conf_file_dirs[] = CONF_PATHS_NULSTR("binfmt.d");
 

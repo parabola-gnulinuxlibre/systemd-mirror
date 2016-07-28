@@ -21,13 +21,13 @@
 #include <sys/unistd.h>
 #include <sys/wait.h>
 
-#include "fd-util.h"
-#include "log.h"
+#include "basic/fd-util.h"
+#include "basic/log.h"
 #include "nspawn-stub-pid1.h"
-#include "process-util.h"
-#include "signal-util.h"
-#include "time-util.h"
-#include "def.h"
+#include "basic/process-util.h"
+#include "basic/signal-util.h"
+#include "basic/time-util.h"
+#include "basic/def.h"
 
 int stub_pid1(void) {
         enum {

@@ -21,17 +21,17 @@
 #include <sys/socket.h>
 #include <time.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "formats-util.h"
-#include "io-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/formats-util.h"
+#include "basic/io-util.h"
 #include "journald-console.h"
 #include "journald-server.h"
-#include "parse-util.h"
-#include "process-util.h"
-#include "stdio-util.h"
-#include "terminal-util.h"
+#include "basic/parse-util.h"
+#include "basic/process-util.h"
+#include "basic/stdio-util.h"
+#include "basic/terminal-util.h"
 
 static bool prefix_timestamp(void) {
 

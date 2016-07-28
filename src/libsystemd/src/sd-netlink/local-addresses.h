@@ -22,7 +22,7 @@
 
 #include <systemd/sd-netlink.h>
 
-#include "in-addr-util.h"
+#include "basic/in-addr-util.h"
 
 struct local_address {
         int family, ifindex;

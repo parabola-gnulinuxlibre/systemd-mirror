@@ -28,8 +28,8 @@
 #include <linux/if_packet.h>
 
 #include "dhcp-internal.h"
-#include "fd-util.h"
-#include "socket-util.h"
+#include "basic/fd-util.h"
+#include "basic/socket-util.h"
 
 static int _bind_raw_socket(int ifindex, union sockaddr_union *link,
                             uint32_t xid, const uint8_t *mac_addr,

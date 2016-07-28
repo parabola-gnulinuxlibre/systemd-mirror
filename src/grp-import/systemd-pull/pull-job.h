@@ -23,7 +23,7 @@
 
 #include "curl-util.h"
 #include "import-compress.h"
-#include "macro.h"
+#include "basic/macro.h"
 
 typedef struct PullJob PullJob;
 

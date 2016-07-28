@@ -21,7 +21,7 @@
 
 #include <systemd/sd-event.h>
 
-#include "hashmap.h"
+#include "basic/hashmap.h"
 #include "journal-remote-parse.h"
 #include "journal-remote-write.h"
 #include "microhttpd-util.h"

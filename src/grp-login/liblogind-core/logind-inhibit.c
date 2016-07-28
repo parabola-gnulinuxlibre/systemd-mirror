@@ -22,18 +22,18 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "escape.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "formats-util.h"
+#include "basic/alloc-util.h"
+#include "basic/escape.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/formats-util.h"
 #include "logind-inhibit.h"
-#include "mkdir.h"
-#include "parse-util.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/mkdir.h"
+#include "basic/parse-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 Inhibitor* inhibitor_new(Manager *m, const char* id) {
         Inhibitor *i;

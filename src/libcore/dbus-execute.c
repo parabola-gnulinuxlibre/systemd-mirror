@@ -23,28 +23,28 @@
 #include <seccomp.h>
 #endif
 
-#include "af-list.h"
-#include "alloc-util.h"
+#include "basic/af-list.h"
+#include "basic/alloc-util.h"
 #include "bus-util.h"
-#include "capability-util.h"
+#include "basic/capability-util.h"
 #include "dbus-execute.h"
-#include "env-util.h"
+#include "basic/env-util.h"
 #include "execute.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "ioprio.h"
-#include "missing.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/ioprio.h"
+#include "basic/missing.h"
 #include "namespace.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "process-util.h"
-#include "rlimit-util.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/process-util.h"
+#include "basic/rlimit-util.h"
 #ifdef HAVE_SECCOMP
 #include "seccomp-util.h"
 #endif
-#include "strv.h"
-#include "syslog-util.h"
-#include "utf8.h"
+#include "basic/strv.h"
+#include "basic/syslog-util.h"
+#include "basic/utf8.h"
 
 BUS_DEFINE_PROPERTY_GET_ENUM(bus_property_get_exec_output, exec_output, ExecOutput);
 

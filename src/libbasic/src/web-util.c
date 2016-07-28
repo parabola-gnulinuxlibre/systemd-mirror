@@ -19,9 +19,9 @@
 
 #include <stdbool.h>
 
-#include "string-util.h"
-#include "utf8.h"
-#include "web-util.h"
+#include "basic/string-util.h"
+#include "basic/utf8.h"
+#include "basic/web-util.h"
 
 bool http_etag_is_valid(const char *etag) {
         if (isempty(etag))

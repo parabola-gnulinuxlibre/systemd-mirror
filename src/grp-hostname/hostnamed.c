@@ -22,19 +22,19 @@
 #include <sys/utsname.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-util.h"
-#include "def.h"
-#include "env-util.h"
-#include "fileio-label.h"
-#include "hostname-util.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "selinux-util.h"
-#include "strv.h"
-#include "user-util.h"
-#include "util.h"
-#include "virt.h"
+#include "basic/def.h"
+#include "basic/env-util.h"
+#include "basic/fileio-label.h"
+#include "basic/hostname-util.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/selinux-util.h"
+#include "basic/strv.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
+#include "basic/virt.h"
 
 #define VALID_DEPLOYMENT_CHARS (DIGITS LETTERS "-.:")
 

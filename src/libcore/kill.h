@@ -24,7 +24,7 @@ typedef struct KillContext KillContext;
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 typedef enum KillMode {
         /* The kill mode is a property of a unit. */

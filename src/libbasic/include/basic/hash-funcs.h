@@ -20,8 +20,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "macro.h"
-#include "siphash24.h"
+#include "basic/macro.h"
+#include "basic/siphash24.h"
 
 typedef void (*hash_func_t)(const void *p, struct siphash *state);
 typedef int (*compare_func_t)(const void *a, const void *b);

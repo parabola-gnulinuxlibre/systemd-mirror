@@ -33,14 +33,14 @@
 #include <unistd.h>
 
 #include "clean-ipc.h"
-#include "dirent-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "formats-util.h"
-#include "log.h"
-#include "macro.h"
-#include "string-util.h"
-#include "strv.h"
+#include "basic/dirent-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/formats-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
 
 static int clean_sysvipc_shm(uid_t delete_uid) {
         _cleanup_fclose_ FILE *f = NULL;

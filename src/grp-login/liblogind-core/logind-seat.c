@@ -24,18 +24,18 @@
 
 #include <systemd/sd-messages.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "formats-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/formats-util.h"
 #include "logind-acl.h"
 #include "logind-seat.h"
-#include "mkdir.h"
-#include "parse-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "terminal-util.h"
-#include "util.h"
+#include "basic/mkdir.h"
+#include "basic/parse-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
+#include "basic/terminal-util.h"
+#include "basic/util.h"
 
 Seat *seat_new(Manager *m, const char *id) {
         Seat *s;

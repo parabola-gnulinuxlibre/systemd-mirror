@@ -22,12 +22,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "hashmap.h"
-#include "lockfile-util.h"
-#include "macro.h"
-#include "path-util.h"
-#include "string-util.h"
-#include "time-util.h"
+#include "basic/hashmap.h"
+#include "basic/lockfile-util.h"
+#include "basic/macro.h"
+#include "basic/path-util.h"
+#include "basic/string-util.h"
+#include "basic/time-util.h"
 
 typedef enum ImageType {
         IMAGE_DIRECTORY,

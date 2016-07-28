@@ -18,8 +18,8 @@
 ***/
 
 #include "import-compress.h"
-#include "string-table.h"
-#include "util.h"
+#include "basic/string-table.h"
+#include "basic/util.h"
 
 void import_compress_free(ImportCompress *c) {
         assert(c);

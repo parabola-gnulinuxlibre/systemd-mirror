@@ -23,16 +23,16 @@
 
 #include <systemd/sd-id128.h>
 
-#include "alloc-util.h"
-#include "dirent-util.h"
-#include "fd-util.h"
+#include "basic/alloc-util.h"
+#include "basic/dirent-util.h"
+#include "basic/fd-util.h"
 #include "journal-def.h"
 #include "journal-file.h"
 #include "journal-vacuum.h"
-#include "parse-util.h"
-#include "string-util.h"
-#include "util.h"
-#include "xattr-util.h"
+#include "basic/parse-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
+#include "basic/xattr-util.h"
 
 struct vacuum_info {
         uint64_t usage;

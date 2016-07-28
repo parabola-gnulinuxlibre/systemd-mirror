@@ -23,22 +23,22 @@
 #include <sys/statvfs.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fs-util.h"
-#include "io-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fs-util.h"
+#include "basic/io-util.h"
 #include "journald-console.h"
 #include "journald-kmsg.h"
 #include "journald-native.h"
 #include "journald-server.h"
 #include "journald-syslog.h"
 #include "journald-wall.h"
-#include "memfd-util.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "selinux-util.h"
-#include "socket-util.h"
-#include "string-util.h"
+#include "basic/memfd-util.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/selinux-util.h"
+#include "basic/socket-util.h"
+#include "basic/string-util.h"
 
 bool valid_user_field(const char *p, size_t l, bool allow_protected) {
         const char *a;

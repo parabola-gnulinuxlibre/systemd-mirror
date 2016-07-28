@@ -19,8 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "list.h"
-#include "macro.h"
+#include "basic/list.h"
+#include "basic/macro.h"
 
 typedef struct Network Network;
 typedef struct FdbEntry FdbEntry;

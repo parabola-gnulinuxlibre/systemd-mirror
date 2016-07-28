@@ -17,11 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "networkd-address-pool.h"
 #include "networkd.h"
-#include "set.h"
-#include "string-util.h"
+#include "basic/set.h"
+#include "basic/string-util.h"
 
 int address_pool_new(
                 Manager *m,

@@ -22,14 +22,14 @@
 #include <stdio.h>
 #include <sys/socket.h>
 
-#include "alloc-util.h"
-#include "audit-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "process-util.h"
-#include "user-util.h"
+#include "basic/alloc-util.h"
+#include "basic/audit-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/process-util.h"
+#include "basic/user-util.h"
 
 int audit_session_from_pid(pid_t pid, uint32_t *id) {
         _cleanup_free_ char *s = NULL;

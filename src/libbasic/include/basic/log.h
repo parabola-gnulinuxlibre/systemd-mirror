@@ -29,7 +29,7 @@
 
 #include <systemd/sd-id128.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 typedef enum LogTarget{
         LOG_TARGET_CONSOLE,

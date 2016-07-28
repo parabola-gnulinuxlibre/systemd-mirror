@@ -19,13 +19,13 @@
 
 #include <stdlib.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "sd-bus/bus-kernel.h"
 #include "bus-policy.h"
 #include "sd-bus/kdbus.h"
-#include "string-table.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/string-table.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 int bus_kernel_translate_access(BusPolicyAccess access) {
         assert(access >= 0);

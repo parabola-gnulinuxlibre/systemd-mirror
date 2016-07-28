@@ -24,16 +24,16 @@
 #include <systemd/sd-id128.h>
 #include <systemd/sd-netlink.h>
 
-#include "alloc-util.h"
-#include "ether-addr-util.h"
-#include "lockfile-util.h"
+#include "basic/alloc-util.h"
+#include "basic/ether-addr-util.h"
+#include "basic/lockfile-util.h"
 #include "nspawn-network.h"
-#include "siphash24.h"
-#include "socket-util.h"
-#include "stat-util.h"
-#include "string-util.h"
+#include "basic/siphash24.h"
+#include "basic/socket-util.h"
+#include "basic/stat-util.h"
+#include "basic/string-util.h"
 #include "udev-util.h"
-#include "util.h"
+#include "basic/util.h"
 
 #define HOST_HASH_KEY SD_ID128_MAKE(1a,37,6f,c7,46,ec,45,0b,ad,a3,d5,31,06,60,5d,b1)
 #define CONTAINER_HASH_KEY SD_ID128_MAKE(c3,c4,f9,19,b5,57,b2,1c,e6,cf,14,27,03,9c,ee,a2)

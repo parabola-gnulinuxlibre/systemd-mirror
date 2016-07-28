@@ -38,21 +38,21 @@
 #include <termios.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "fs-util.h"
-#include "io-util.h"
-#include "log.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "process-util.h"
-#include "socket-util.h"
-#include "stat-util.h"
-#include "string-util.h"
-#include "terminal-util.h"
-#include "time-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/fs-util.h"
+#include "basic/io-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/process-util.h"
+#include "basic/socket-util.h"
+#include "basic/stat-util.h"
+#include "basic/string-util.h"
+#include "basic/terminal-util.h"
+#include "basic/time-util.h"
+#include "basic/util.h"
 
 static volatile unsigned cached_columns = 0;
 static volatile unsigned cached_lines = 0;

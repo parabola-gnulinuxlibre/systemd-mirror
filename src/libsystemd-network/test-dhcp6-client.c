@@ -30,10 +30,10 @@
 #include "dhcp6-internal.h"
 #include "dhcp6-lease-internal.h"
 #include "dhcp6-protocol.h"
-#include "fd-util.h"
-#include "macro.h"
-#include "socket-util.h"
-#include "virt.h"
+#include "basic/fd-util.h"
+#include "basic/macro.h"
+#include "basic/socket-util.h"
+#include "basic/virt.h"
 
 static struct ether_addr mac_addr = {
         .ether_addr_octet = {'A', 'B', 'C', '1', '2', '3'}

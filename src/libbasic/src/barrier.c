@@ -27,9 +27,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "barrier.h"
-#include "fd-util.h"
-#include "macro.h"
+#include "basic/barrier.h"
+#include "basic/fd-util.h"
+#include "basic/macro.h"
 
 /**
  * Barriers

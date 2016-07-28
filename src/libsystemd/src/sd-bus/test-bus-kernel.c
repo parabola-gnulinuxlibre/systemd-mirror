@@ -21,13 +21,13 @@
 
 #include <systemd/sd-bus.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-dump.h"
 #include "bus-kernel.h"
 #include "bus-util.h"
-#include "fd-util.h"
-#include "log.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/log.h"
+#include "basic/util.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_close_ int bus_ref = -1;

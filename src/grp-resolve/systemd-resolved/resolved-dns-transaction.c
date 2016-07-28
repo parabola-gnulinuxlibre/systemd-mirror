@@ -19,16 +19,16 @@
 
 #include <systemd/sd-messages.h>
 
-#include "af-list.h"
-#include "alloc-util.h"
+#include "basic/af-list.h"
+#include "basic/alloc-util.h"
 #include "dns-domain.h"
-#include "errno-list.h"
-#include "fd-util.h"
-#include "random-util.h"
+#include "basic/errno-list.h"
+#include "basic/fd-util.h"
+#include "basic/random-util.h"
 #include "resolved-dns-cache.h"
 #include "resolved-dns-transaction.h"
 #include "resolved-llmnr.h"
-#include "string-table.h"
+#include "basic/string-table.h"
 
 #define TRANSACTIONS_MAX 4096
 

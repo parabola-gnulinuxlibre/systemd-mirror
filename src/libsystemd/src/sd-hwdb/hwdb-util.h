@@ -21,6 +21,6 @@
 
 #include <systemd/sd-hwdb.h>
 
-#include "util.h"
+#include "basic/util.h"
 
 bool hwdb_validate(sd_hwdb *hwdb);

@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "socket-util.h"
+#include "basic/socket-util.h"
 
 typedef struct DnsStream DnsStream;
 

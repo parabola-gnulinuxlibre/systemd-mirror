@@ -26,11 +26,11 @@
 
 #include <systemd/sd-id128.h>
 
-#include "alloc-util.h"
-#include "hostname-util.h"
-#include "macro.h"
+#include "basic/alloc-util.h"
+#include "basic/hostname-util.h"
+#include "basic/macro.h"
 #include "specifier.h"
-#include "string-util.h"
+#include "basic/string-util.h"
 
 /*
  * Generic infrastructure for replacing %x style specifiers in

@@ -23,16 +23,16 @@
 #include <systemd/sd-bus.h>
 #include <systemd/sd-login.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-common-errors.h"
-#include "hostname-util.h"
-#include "in-addr-util.h"
-#include "macro.h"
-#include "nss-util.h"
-#include "signal-util.h"
-#include "string-util.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/hostname-util.h"
+#include "basic/in-addr-util.h"
+#include "basic/macro.h"
+#include "basic/nss-util.h"
+#include "basic/signal-util.h"
+#include "basic/string-util.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 NSS_GETHOSTBYNAME_PROTOTYPES(mymachines);
 NSS_GETPW_PROTOTYPES(mymachines);

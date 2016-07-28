@@ -22,10 +22,10 @@
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-id128.h>
 
-#include "alloc-util.h"
-#include "macro.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 #define ID128_WALDI SD_ID128_MAKE(01, 02, 03, 04, 05, 06, 07, 08, 09, 0a, 0b, 0c, 0d, 0e, 0f, 10)
 #define STR_WALDI "0102030405060708090a0b0c0d0e0f10"

@@ -24,9 +24,9 @@
 #include <systemd/sd-event.h>
 
 #include "dhcp-internal.h"
-#include "hashmap.h"
-#include "log.h"
-#include "util.h"
+#include "basic/hashmap.h"
+#include "basic/log.h"
+#include "basic/util.h"
 
 typedef struct DHCPClientId {
         size_t length;

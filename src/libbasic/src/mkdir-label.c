@@ -22,8 +22,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "label.h"
-#include "mkdir.h"
+#include "basic/label.h"
+#include "basic/mkdir.h"
 
 int mkdir_safe_label(const char *path, mode_t mode, uid_t uid, gid_t gid) {
         return mkdir_safe_internal(path, mode, uid, gid, mkdir_label);

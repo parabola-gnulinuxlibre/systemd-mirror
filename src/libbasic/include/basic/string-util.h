@@ -24,7 +24,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 /* What is interpreted as whitespace? */
 #define WHITESPACE        " \t\n\r"

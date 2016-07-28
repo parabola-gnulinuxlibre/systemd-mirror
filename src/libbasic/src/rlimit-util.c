@@ -20,14 +20,14 @@
 #include <errno.h>
 #include <sys/resource.h>
 
-#include "alloc-util.h"
-#include "extract-word.h"
-#include "formats-util.h"
-#include "macro.h"
-#include "missing.h"
-#include "rlimit-util.h"
-#include "string-table.h"
-#include "time-util.h"
+#include "basic/alloc-util.h"
+#include "basic/extract-word.h"
+#include "basic/formats-util.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
+#include "basic/rlimit-util.h"
+#include "basic/string-table.h"
+#include "basic/time-util.h"
 
 int setrlimit_closest(int resource, const struct rlimit *rlim) {
         struct rlimit highest, fixed;

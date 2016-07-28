@@ -24,7 +24,7 @@
 #include "bus-internal.h"
 #include "bus-message.h"
 #include "bus-util.h"
-#include "refcnt.h"
+#include "basic/refcnt.h"
 
 static void test_bus_new(void) {
         _cleanup_(sd_bus_unrefp) sd_bus *bus = NULL;

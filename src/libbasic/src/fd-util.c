@@ -24,15 +24,15 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "fd-util.h"
-#include "fs-util.h"
-#include "macro.h"
-#include "missing.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "socket-util.h"
-#include "stdio-util.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/fs-util.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/socket-util.h"
+#include "basic/stdio-util.h"
+#include "basic/util.h"
 
 int close_nointr(int fd) {
         assert(fd >= 0);

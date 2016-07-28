@@ -19,8 +19,8 @@
 
 #include "bus-internal.h"
 #include "bus-signature.h"
-#include "log.h"
-#include "string-util.h"
+#include "basic/log.h"
+#include "basic/string-util.h"
 
 int main(int argc, char *argv[]) {
         char prefix[256];

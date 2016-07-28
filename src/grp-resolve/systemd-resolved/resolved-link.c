@@ -21,12 +21,12 @@
 
 #include <systemd/sd-network.h>
 
-#include "alloc-util.h"
-#include "missing.h"
-#include "parse-util.h"
+#include "basic/alloc-util.h"
+#include "basic/missing.h"
+#include "basic/parse-util.h"
 #include "resolved-link.h"
-#include "string-util.h"
-#include "strv.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
 
 int link_new(Manager *m, Link **ret, int ifindex) {
         _cleanup_(link_freep) Link *l = NULL;

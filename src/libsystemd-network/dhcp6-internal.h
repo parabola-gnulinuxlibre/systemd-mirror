@@ -24,9 +24,9 @@
 
 #include <systemd/sd-event.h>
 
-#include "list.h"
-#include "macro.h"
-#include "sparse-endian.h"
+#include "basic/list.h"
+#include "basic/macro.h"
+#include "basic/sparse-endian.h"
 
 typedef struct DHCP6Address DHCP6Address;
 

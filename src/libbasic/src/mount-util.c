@@ -25,17 +25,17 @@
 #include <sys/statvfs.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "escape.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "hashmap.h"
-#include "mount-util.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "set.h"
-#include "stdio-util.h"
-#include "string-util.h"
+#include "basic/alloc-util.h"
+#include "basic/escape.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/hashmap.h"
+#include "basic/mount-util.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/set.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
 
 static int fd_fdinfo_mnt_id(int fd, const char *filename, int flags, int *mnt_id) {
         char path[strlen("/proc/self/fdinfo/") + DECIMAL_STR_MAX(int)];

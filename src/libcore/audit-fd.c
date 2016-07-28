@@ -27,9 +27,9 @@
 #include <libaudit.h>
 #include <stdbool.h>
 
-#include "fd-util.h"
-#include "log.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/log.h"
+#include "basic/util.h"
 
 static bool initialized = false;
 static int audit_fd;

@@ -19,18 +19,18 @@
 
 #include <unistd.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-error.h"
 #include "bus-util.h"
 #include "conf-parser.h"
-#include "formats-util.h"
+#include "basic/formats-util.h"
 #include "logind-action.h"
-#include "process-util.h"
+#include "basic/process-util.h"
 #include "sleep-config.h"
-#include "special.h"
-#include "string-table.h"
-#include "terminal-util.h"
-#include "user-util.h"
+#include "basic/special.h"
+#include "basic/string-table.h"
+#include "basic/terminal-util.h"
+#include "basic/user-util.h"
 
 int manager_handle_action(
                 Manager *m,

@@ -22,7 +22,7 @@
 #include <microhttpd.h>
 #include <stdarg.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 /* Compatiblity with libmicrohttpd < 0.9.38 */
 #ifndef MHD_HTTP_NOT_ACCEPTABLE

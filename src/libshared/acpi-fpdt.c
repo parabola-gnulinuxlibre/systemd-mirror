@@ -25,10 +25,10 @@
 #include <unistd.h>
 
 #include "acpi-fpdt.h"
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "time-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/time-util.h"
 
 struct acpi_table_header {
         char signature[4];

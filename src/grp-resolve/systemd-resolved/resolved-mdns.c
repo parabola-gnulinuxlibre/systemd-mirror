@@ -21,7 +21,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "fd-util.h"
+#include "basic/fd-util.h"
 #include "resolved-manager.h"
 #include "resolved-mdns.h"
 

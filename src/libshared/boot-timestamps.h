@@ -20,6 +20,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <time-util.h>
+#include "basic/time-util.h"
 
 int boot_timestamps(const dual_timestamp *n, dual_timestamp *firmware, dual_timestamp *loader);

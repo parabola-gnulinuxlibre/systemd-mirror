@@ -39,9 +39,9 @@
 
 #include "libudev.h"
 
-#include "fd-util.h"
+#include "basic/fd-util.h"
 #include "libudev-private.h"
-#include "log.h"
+#include "basic/log.h"
 #include "udev-util.h"
 
 #define COMMAND_TIMEOUT_MSEC (30 * 1000)

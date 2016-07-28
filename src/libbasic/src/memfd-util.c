@@ -28,13 +28,13 @@
 #include <sys/mman.h>
 #include <sys/prctl.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "macro.h"
-#include "memfd-util.h"
-#include "missing.h"
-#include "string-util.h"
-#include "utf8.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/macro.h"
+#include "basic/memfd-util.h"
+#include "basic/missing.h"
+#include "basic/string-util.h"
+#include "basic/utf8.h"
 
 int memfd_new(const char *name) {
         _cleanup_free_ char *g = NULL;

@@ -21,7 +21,7 @@
 
 typedef struct Device Device;
 
-#include "list.h"
+#include "basic/list.h"
 #include "logind-seat.h"
 #include "logind-session-device.h"
 

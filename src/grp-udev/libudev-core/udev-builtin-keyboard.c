@@ -23,10 +23,10 @@
 #include <sys/ioctl.h>
 #include <linux/input.h>
 
-#include "fd-util.h"
-#include "parse-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
+#include "basic/fd-util.h"
+#include "basic/parse-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
 #include "udev.h"
 
 static const struct key *keyboard_lookup_key(const char *str, unsigned len);

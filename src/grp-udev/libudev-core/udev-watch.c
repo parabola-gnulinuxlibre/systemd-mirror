@@ -24,7 +24,7 @@
 #include <sys/inotify.h>
 #include <unistd.h>
 
-#include "stdio-util.h"
+#include "basic/stdio-util.h"
 #include "udev.h"
 
 static int inotify_fd = -1;

@@ -22,7 +22,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-#include "in-addr-util.h"
+#include "basic/in-addr-util.h"
 
 typedef struct Address Address;
 

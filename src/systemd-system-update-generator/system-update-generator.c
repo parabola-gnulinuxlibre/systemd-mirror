@@ -20,10 +20,10 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "fs-util.h"
-#include "log.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/fs-util.h"
+#include "basic/log.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 /*
  * Implements the logic described in

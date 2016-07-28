@@ -21,11 +21,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "alloc-util.h"
-#include "log.h"
-#include "string-util.h"
-#include "strv.h"
-#include "unit-name.h"
+#include "basic/alloc-util.h"
+#include "basic/log.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/unit-name.h"
 
 static enum {
         ACTION_ESCAPE,

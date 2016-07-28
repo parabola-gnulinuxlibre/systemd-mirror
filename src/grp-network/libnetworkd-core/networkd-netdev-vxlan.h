@@ -21,7 +21,7 @@
 
 typedef struct VxLan VxLan;
 
-#include "in-addr-util.h"
+#include "basic/in-addr-util.h"
 #include "networkd-netdev.h"
 
 #define VXLAN_VID_MAX (1u << 24) - 1

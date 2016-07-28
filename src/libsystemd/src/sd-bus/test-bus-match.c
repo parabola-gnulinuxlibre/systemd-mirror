@@ -21,8 +21,8 @@
 #include "bus-message.h"
 #include "bus-slot.h"
 #include "bus-util.h"
-#include "log.h"
-#include "macro.h"
+#include "basic/log.h"
+#include "basic/macro.h"
 
 static bool mask[32];
 

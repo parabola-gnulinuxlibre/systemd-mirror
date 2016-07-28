@@ -41,10 +41,10 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "formats-util.h"
-#include "macro.h"
-#include "missing.h"
-#include "time-util.h"
+#include "basic/formats-util.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
+#include "basic/time-util.h"
 
 size_t page_size(void) _pure_;
 #define PAGE_ALIGN(l) ALIGN_TO((l), page_size())

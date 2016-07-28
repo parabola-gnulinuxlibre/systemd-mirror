@@ -19,16 +19,16 @@
 
 #include <systemd/sd-path.h>
 
-#include "alloc-util.h"
-#include "architecture.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "missing.h"
-#include "path-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/architecture.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/missing.h"
+#include "basic/path-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 static int from_environment(const char *envname, const char *fallback, const char **ret) {
         assert(ret);

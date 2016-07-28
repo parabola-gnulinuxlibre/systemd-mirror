@@ -21,17 +21,17 @@
 #include <poll.h>
 #include <sys/ioctl.h>
 
-#include "af-list.h"
-#include "alloc-util.h"
+#include "basic/af-list.h"
+#include "basic/alloc-util.h"
 #include "dns-domain.h"
-#include "fd-util.h"
-#include "fileio-label.h"
-#include "hostname-util.h"
-#include "io-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio-label.h"
+#include "basic/hostname-util.h"
+#include "basic/io-util.h"
 #include "network-internal.h"
-#include "ordered-set.h"
-#include "parse-util.h"
-#include "random-util.h"
+#include "basic/ordered-set.h"
+#include "basic/parse-util.h"
+#include "basic/random-util.h"
 #include "resolved-bus.h"
 #include "resolved-conf.h"
 #include "resolved-etc-hosts.h"
@@ -39,10 +39,10 @@
 #include "resolved-manager.h"
 #include "resolved-mdns.h"
 #include "resolved-resolv-conf.h"
-#include "socket-util.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "utf8.h"
+#include "basic/socket-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/utf8.h"
 
 #define SEND_TIMEOUT_USEC (200 * USEC_PER_MSEC)
 

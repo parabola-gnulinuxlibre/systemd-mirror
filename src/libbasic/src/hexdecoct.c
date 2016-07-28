@@ -22,10 +22,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "alloc-util.h"
-#include "hexdecoct.h"
-#include "macro.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/macro.h"
+#include "basic/util.h"
 
 char octchar(int x) {
         return '0' + (x & 7);

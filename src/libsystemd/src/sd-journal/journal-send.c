@@ -29,15 +29,15 @@
 
 #include <systemd/sd-journal.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "io-util.h"
-#include "memfd-util.h"
-#include "socket-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/io-util.h"
+#include "basic/memfd-util.h"
+#include "basic/socket-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 #define SNDBUF_SIZE (8*1024*1024)
 

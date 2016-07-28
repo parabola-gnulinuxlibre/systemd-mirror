@@ -36,10 +36,10 @@
 #include "libudev.h"
 
 #include "libudev-private.h"
-#include "random-util.h"
+#include "basic/random-util.h"
 #include "scsi.h"
 #include "scsi_id.h"
-#include "string-util.h"
+#include "basic/string-util.h"
 
 /*
  * A priority based list of id, naa, and binary/ascii for the identifier

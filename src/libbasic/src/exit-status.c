@@ -20,9 +20,9 @@
 #include <signal.h>
 #include <stdlib.h>
 
-#include "exit-status.h"
-#include "macro.h"
-#include "set.h"
+#include "basic/exit-status.h"
+#include "basic/macro.h"
+#include "basic/set.h"
 
 const char* exit_status_to_string(ExitStatus status, ExitStatusLevel level) {
 

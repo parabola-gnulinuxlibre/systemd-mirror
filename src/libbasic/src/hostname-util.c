@@ -24,11 +24,11 @@
 #include <sys/utsname.h>
 #include <unistd.h>
 
-#include "fd-util.h"
-#include "fileio.h"
-#include "hostname-util.h"
-#include "macro.h"
-#include "string-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/hostname-util.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
 
 bool hostname_is_set(void) {
         struct utsname u;

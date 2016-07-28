@@ -26,15 +26,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "dirent-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "log.h"
-#include "macro.h"
+#include "basic/alloc-util.h"
+#include "basic/dirent-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/log.h"
+#include "basic/macro.h"
 #include "smack-setup.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 #ifdef HAVE_SMACK
 

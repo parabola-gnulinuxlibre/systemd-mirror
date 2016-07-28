@@ -25,18 +25,18 @@
 #include "libudev.h"
 #include <systemd/sd-daemon.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-error.h"
 #include "bus-util.h"
 #include "conf-parser.h"
-#include "def.h"
-#include "dirent-util.h"
-#include "fd-util.h"
-#include "formats-util.h"
+#include "basic/def.h"
+#include "basic/dirent-util.h"
+#include "basic/fd-util.h"
+#include "basic/formats-util.h"
 #include "logind.h"
-#include "selinux-util.h"
-#include "signal-util.h"
-#include "strv.h"
+#include "basic/selinux-util.h"
+#include "basic/signal-util.h"
+#include "basic/strv.h"
 #include "udev-util.h"
 
 static void manager_free(Manager *m);

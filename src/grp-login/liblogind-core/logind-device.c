@@ -19,9 +19,9 @@
 
 #include <string.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "logind-device.h"
-#include "util.h"
+#include "basic/util.h"
 
 Device* device_new(Manager *m, const char *sysfs, bool master) {
         Device *d;

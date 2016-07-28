@@ -25,9 +25,9 @@
 #endif
 
 #include "bus-util.h"
-#include "capability-util.h"
+#include "basic/capability-util.h"
 #include "kmod-setup.h"
-#include "macro.h"
+#include "basic/macro.h"
 
 #ifdef HAVE_KMOD
 static void systemd_kmod_log(

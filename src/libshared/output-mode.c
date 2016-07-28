@@ -18,7 +18,7 @@
 ***/
 
 #include "output-mode.h"
-#include "string-table.h"
+#include "basic/string-table.h"
 
 static const char *const output_mode_table[_OUTPUT_MODE_MAX] = {
         [OUTPUT_SHORT] = "short",

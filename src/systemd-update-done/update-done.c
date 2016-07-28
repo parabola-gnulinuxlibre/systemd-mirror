@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "fd-util.h"
-#include "io-util.h"
-#include "selinux-util.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/io-util.h"
+#include "basic/selinux-util.h"
+#include "basic/util.h"
 
 #define MESSAGE                                                         \
         "This file was created by systemd-update-done. Its only \n"     \

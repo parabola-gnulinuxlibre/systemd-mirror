@@ -25,8 +25,8 @@
 
 #include <systemd/sd-netlink.h>
 
-#include "macro.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/util.h"
 
 static int load_module(const char *mod_name) {
         struct kmod_ctx *ctx;

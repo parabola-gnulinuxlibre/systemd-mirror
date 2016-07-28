@@ -18,8 +18,8 @@
 ***/
 
 #include "bus-bloom.h"
-#include "siphash24.h"
-#include "util.h"
+#include "basic/siphash24.h"
+#include "basic/util.h"
 
 static inline void set_bit(uint64_t filter[], unsigned long b) {
         filter[b >> 6] |= 1ULL << (b & 63);

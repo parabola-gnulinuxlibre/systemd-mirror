@@ -20,11 +20,11 @@
 #include <curl/curl.h>
 #include <stdbool.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "journal-upload.h"
-#include "log.h"
-#include "utf8.h"
-#include "util.h"
+#include "basic/log.h"
+#include "basic/utf8.h"
+#include "basic/util.h"
 #include <systemd/sd-daemon.h>
 
 /**

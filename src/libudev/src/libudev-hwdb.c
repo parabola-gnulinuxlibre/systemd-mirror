@@ -19,7 +19,7 @@
 
 #include <systemd/sd-hwdb.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "sd-hwdb/hwdb-util.h"
 #include "libudev-private.h"
 

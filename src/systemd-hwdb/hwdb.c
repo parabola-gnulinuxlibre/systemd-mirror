@@ -22,19 +22,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "conf-files.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "fs-util.h"
+#include "basic/alloc-util.h"
+#include "basic/conf-files.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/fs-util.h"
 #include "sd-hwdb/hwdb-internal.h"
 #include "sd-hwdb/hwdb-util.h"
-#include "mkdir.h"
-#include "strbuf.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
-#include "verbs.h"
+#include "basic/mkdir.h"
+#include "basic/strbuf.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
+#include "basic/verbs.h"
 
 /*
  * Generic udev properties, key/value database based on modalias strings.

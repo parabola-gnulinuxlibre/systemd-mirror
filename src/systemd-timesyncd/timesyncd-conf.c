@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "def.h"
-#include "extract-word.h"
-#include "string-util.h"
+#include "basic/alloc-util.h"
+#include "basic/def.h"
+#include "basic/extract-word.h"
+#include "basic/string-util.h"
 #include "timesyncd-conf.h"
 #include "timesyncd-manager.h"
 #include "timesyncd-server.h"

@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "string-util.h"
+#include "basic/string-util.h"
 #include "udev.h"
 
 static bool initialized;

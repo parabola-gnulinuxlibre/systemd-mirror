@@ -26,10 +26,10 @@
 
 #include <systemd/sd-journal.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 #include "output-mode.h"
-#include "time-util.h"
-#include "util.h"
+#include "basic/time-util.h"
+#include "basic/util.h"
 
 int output_journal(
                 FILE *f,

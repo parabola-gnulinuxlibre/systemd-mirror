@@ -27,16 +27,16 @@
 #include <sys/prctl.h>
 #include <unistd.h>
 
-#include "copy.h"
-#include "fd-util.h"
-#include "locale-util.h"
-#include "log.h"
-#include "macro.h"
+#include "basic/copy.h"
+#include "basic/fd-util.h"
+#include "basic/locale-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
 #include "pager.h"
-#include "process-util.h"
-#include "signal-util.h"
-#include "string-util.h"
-#include "terminal-util.h"
+#include "basic/process-util.h"
+#include "basic/signal-util.h"
+#include "basic/string-util.h"
+#include "basic/terminal-util.h"
 
 static pid_t pager_pid = 0;
 

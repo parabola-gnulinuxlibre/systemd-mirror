@@ -6,7 +6,7 @@
 
 #include <stdlib.h>
 
-#include "gunicode.h"
+#include "basic/gunicode.h"
 
 #define unichar uint32_t
 

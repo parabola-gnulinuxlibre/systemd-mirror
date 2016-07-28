@@ -22,8 +22,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "list.h"
-#include "macro.h"
+#include "basic/list.h"
+#include "basic/macro.h"
 
 typedef enum ConditionType {
         CONDITION_ARCHITECTURE,

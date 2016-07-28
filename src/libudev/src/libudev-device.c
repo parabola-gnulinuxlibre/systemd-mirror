@@ -37,12 +37,12 @@
 #include "libudev.h"
 #include <systemd/sd-device.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "sd-device/device-private.h"
 #include "sd-device/device-util.h"
 #include "libudev-device-internal.h"
 #include "libudev-private.h"
-#include "parse-util.h"
+#include "basic/parse-util.h"
 
 /**
  * SECTION:libudev-device

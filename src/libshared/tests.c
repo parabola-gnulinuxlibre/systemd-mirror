@@ -18,8 +18,8 @@
 ***/
 
 #include <stdlib.h>
-#include <util.h>
 
+#include "basic/util.h"
 #include "tests.h"
 
 char* setup_fake_runtime_dir(void) {

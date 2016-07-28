@@ -26,11 +26,11 @@
 #include <systemd/sd-bus.h>
 #include <systemd/sd-event.h>
 
-#include "cgroup-util.h"
-#include "fdset.h"
-#include "hashmap.h"
-#include "list.h"
-#include "ratelimit.h"
+#include "basic/cgroup-util.h"
+#include "basic/fdset.h"
+#include "basic/hashmap.h"
+#include "basic/list.h"
+#include "basic/ratelimit.h"
 
 /* Enforce upper limit how many names we allow */
 #define MANAGER_MAX_NAMES 131072 /* 128K */
@@ -72,7 +72,7 @@ typedef enum StatusType {
 #include "job.h"
 #include "path-lookup.h"
 #include "show-status.h"
-#include "unit-name.h"
+#include "basic/unit-name.h"
 
 struct Manager {
         /* Note that the set of units we know of is allowed to be

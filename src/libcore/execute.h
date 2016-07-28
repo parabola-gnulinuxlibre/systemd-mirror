@@ -30,9 +30,9 @@ typedef struct ExecParameters ExecParameters;
 #include <stdio.h>
 #include <sys/capability.h>
 
-#include "fdset.h"
-#include "list.h"
-#include "missing.h"
+#include "basic/fdset.h"
+#include "basic/list.h"
+#include "basic/missing.h"
 #include "namespace.h"
 
 typedef enum ExecUtmpMode {
@@ -199,7 +199,7 @@ struct ExecContext {
         bool no_new_privileges_set:1;
 };
 
-#include "cgroup-util.h"
+#include "basic/cgroup-util.h"
 #include "cgroup.h"
 
 struct ExecParameters {

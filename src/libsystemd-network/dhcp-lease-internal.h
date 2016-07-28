@@ -26,8 +26,8 @@
 #include <systemd/sd-dhcp-client.h>
 
 #include "dhcp-protocol.h"
-#include "list.h"
-#include "util.h"
+#include "basic/list.h"
+#include "basic/util.h"
 
 struct sd_dhcp_route {
         struct in_addr dst_addr;

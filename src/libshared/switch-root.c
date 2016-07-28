@@ -27,17 +27,17 @@
 #include <unistd.h>
 
 #include "base-filesystem.h"
-#include "fd-util.h"
-#include "log.h"
-#include "missing.h"
-#include "mkdir.h"
-#include "path-util.h"
-#include "rm-rf.h"
-#include "stdio-util.h"
-#include "string-util.h"
+#include "basic/fd-util.h"
+#include "basic/log.h"
+#include "basic/missing.h"
+#include "basic/mkdir.h"
+#include "basic/path-util.h"
+#include "basic/rm-rf.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
 #include "switch-root.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 int switch_root(const char *new_root, const char *oldroot, bool detach_oldroot,  unsigned long mountflags) {
 

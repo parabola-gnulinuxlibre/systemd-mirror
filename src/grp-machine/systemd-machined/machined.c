@@ -23,18 +23,18 @@
 
 #include <systemd/sd-daemon.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-error.h"
 #include "bus-util.h"
-#include "cgroup-util.h"
-#include "dirent-util.h"
-#include "fd-util.h"
-#include "formats-util.h"
-#include "hostname-util.h"
-#include "label.h"
+#include "basic/cgroup-util.h"
+#include "basic/dirent-util.h"
+#include "basic/fd-util.h"
+#include "basic/formats-util.h"
+#include "basic/hostname-util.h"
+#include "basic/label.h"
 #include "machine-image.h"
 #include "machined.h"
-#include "signal-util.h"
+#include "basic/signal-util.h"
 
 Manager *manager_new(void) {
         Manager *m;

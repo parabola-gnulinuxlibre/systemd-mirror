@@ -17,12 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "fd-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
 #include "journal-remote-parse.h"
 #include "journald-native.h"
-#include "parse-util.h"
-#include "string-util.h"
+#include "basic/parse-util.h"
+#include "basic/string-util.h"
 
 #define LINE_CHUNK 8*1024u
 

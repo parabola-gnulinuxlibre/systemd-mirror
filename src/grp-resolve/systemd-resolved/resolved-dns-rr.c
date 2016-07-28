@@ -19,18 +19,18 @@
 
 #include <math.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dns-domain.h"
 #include "dns-type.h"
-#include "escape.h"
-#include "hexdecoct.h"
+#include "basic/escape.h"
+#include "basic/hexdecoct.h"
 #include "resolved-dns-dnssec.h"
 #include "resolved-dns-packet.h"
 #include "resolved-dns-rr.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "strv.h"
-#include "terminal-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/terminal-util.h"
 
 DnsResourceKey* dns_resource_key_new(uint16_t class, uint16_t type, const char *name) {
         DnsResourceKey *k;

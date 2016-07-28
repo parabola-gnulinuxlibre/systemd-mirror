@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 #define MODE_INVALID ((mode_t) -1)
 

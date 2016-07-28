@@ -23,10 +23,10 @@
 #include <unistd.h>
 
 #include "ask-password-api.h"
-#include "def.h"
-#include "log.h"
-#include "macro.h"
-#include "strv.h"
+#include "basic/def.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/strv.h"
 
 static const char *arg_icon = NULL;
 static const char *arg_id = NULL;

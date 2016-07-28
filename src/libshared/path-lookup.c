@@ -22,18 +22,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "install.h"
-#include "log.h"
-#include "macro.h"
-#include "mkdir.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/mkdir.h"
 #include "path-lookup.h"
-#include "path-util.h"
-#include "rm-rf.h"
-#include "stat-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/path-util.h"
+#include "basic/rm-rf.h"
+#include "basic/stat-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 static int user_runtime_dir(char **ret, const char *suffix) {
         const char *e;

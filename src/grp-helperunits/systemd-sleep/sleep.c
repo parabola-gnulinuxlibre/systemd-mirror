@@ -24,14 +24,14 @@
 
 #include <systemd/sd-messages.h>
 
-#include "def.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "log.h"
+#include "basic/def.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/log.h"
 #include "sleep-config.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 static char* arg_verb = NULL;
 

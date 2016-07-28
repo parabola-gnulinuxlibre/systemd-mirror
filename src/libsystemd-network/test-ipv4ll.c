@@ -28,9 +28,9 @@
 #include <systemd/sd-ipv4ll.h>
 
 #include "arp-util.h"
-#include "fd-util.h"
-#include "socket-util.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/socket-util.h"
+#include "basic/util.h"
 
 static bool verbose = false;
 static bool extended = false;

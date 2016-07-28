@@ -23,15 +23,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "fd-util.h"
-#include "io-util.h"
-#include "log.h"
-#include "macro.h"
-#include "process-util.h"
+#include "basic/fd-util.h"
+#include "basic/io-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/process-util.h"
 #include "spawn-polkit-agent.h"
-#include "stdio-util.h"
-#include "time-util.h"
-#include "util.h"
+#include "basic/stdio-util.h"
+#include "basic/time-util.h"
+#include "basic/util.h"
 
 #ifdef ENABLE_POLKIT
 static pid_t agent_pid = 0;

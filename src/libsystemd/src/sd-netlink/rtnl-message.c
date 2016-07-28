@@ -23,14 +23,14 @@
 
 #include <systemd/sd-netlink.h>
 
-#include "formats-util.h"
-#include "missing.h"
+#include "basic/formats-util.h"
+#include "basic/missing.h"
 #include "netlink-internal.h"
 #include "netlink-types.h"
 #include "netlink-util.h"
-#include "refcnt.h"
-#include "socket-util.h"
-#include "util.h"
+#include "basic/refcnt.h"
+#include "basic/socket-util.h"
+#include "basic/util.h"
 
 int sd_rtnl_message_route_set_dst_prefixlen(sd_netlink_message *m, unsigned char prefixlen) {
         struct rtmsg *rtm;

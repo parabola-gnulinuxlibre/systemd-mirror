@@ -21,8 +21,8 @@
 
 #include <stdbool.h>
 
-#include "time-util.h"
-#include "util.h"
+#include "basic/time-util.h"
+#include "basic/util.h"
 
 typedef struct RateLimit {
         usec_t interval;

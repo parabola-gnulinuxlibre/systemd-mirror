@@ -17,14 +17,14 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "audit-type.h"
-#include "fd-util.h"
-#include "hexdecoct.h"
-#include "io-util.h"
+#include "basic/fd-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/io-util.h"
 #include "journald-audit.h"
-#include "missing.h"
-#include "string-util.h"
+#include "basic/missing.h"
+#include "basic/string-util.h"
 
 typedef struct MapField {
         const char *audit_field;

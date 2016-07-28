@@ -23,13 +23,13 @@
 
 #include <systemd/sd-netlink.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "conf-parser.h"
-#include "extract-word.h"
-#include "missing.h"
+#include "basic/extract-word.h"
+#include "basic/missing.h"
 #include "networkd-netdev-bond.h"
-#include "string-table.h"
-#include "string-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
 
 /*
  * Number of seconds between instances where the bonding

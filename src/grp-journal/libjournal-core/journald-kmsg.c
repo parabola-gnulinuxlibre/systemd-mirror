@@ -26,17 +26,17 @@
 #include "libudev.h"
 #include <systemd/sd-messages.h>
 
-#include "escape.h"
-#include "fd-util.h"
-#include "formats-util.h"
-#include "io-util.h"
+#include "basic/escape.h"
+#include "basic/fd-util.h"
+#include "basic/formats-util.h"
+#include "basic/io-util.h"
 #include "journald-kmsg.h"
 #include "journald-server.h"
 #include "journald-syslog.h"
-#include "parse-util.h"
-#include "process-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
+#include "basic/parse-util.h"
+#include "basic/process-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
 
 void server_forward_kmsg(
         Server *s,

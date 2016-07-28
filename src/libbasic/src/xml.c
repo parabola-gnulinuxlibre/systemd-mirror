@@ -21,9 +21,9 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "macro.h"
-#include "string-util.h"
-#include "xml.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/xml.h"
 
 enum {
         STATE_NULL,

@@ -22,7 +22,7 @@
 
 #include <stddef.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 size_t strpcpy(char **dest, size_t size, const char *src);
 size_t strpcpyf(char **dest, size_t size, const char *src, ...) _printf_(3, 4);

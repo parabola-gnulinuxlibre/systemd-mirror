@@ -23,13 +23,13 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "io-util.h"
-#include "log.h"
-#include "mkdir.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/io-util.h"
+#include "basic/log.h"
+#include "basic/mkdir.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 #define POOL_SIZE_MIN 512
 

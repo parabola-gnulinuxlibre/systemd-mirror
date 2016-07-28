@@ -29,21 +29,21 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "cgroup-util.h"
-#include "def.h"
-#include "fileio.h"
+#include "basic/alloc-util.h"
+#include "basic/cgroup-util.h"
+#include "basic/def.h"
+#include "basic/fileio.h"
 #include "killall.h"
-#include "log.h"
-#include "missing.h"
-#include "parse-util.h"
-#include "process-util.h"
-#include "string-util.h"
+#include "basic/log.h"
+#include "basic/missing.h"
+#include "basic/parse-util.h"
+#include "basic/process-util.h"
+#include "basic/string-util.h"
 #include "switch-root.h"
-#include "terminal-util.h"
+#include "basic/terminal-util.h"
 #include "umount.h"
-#include "util.h"
-#include "virt.h"
+#include "basic/util.h"
+#include "basic/virt.h"
 #include "watchdog.h"
 
 #define FINALIZE_ATTEMPTS 50

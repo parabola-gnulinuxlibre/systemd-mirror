@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 /* See source file for an API description. */
 

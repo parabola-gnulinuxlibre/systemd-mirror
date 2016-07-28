@@ -25,9 +25,9 @@
 
 #include <systemd/sd-lldp.h>
 
-#include "hash-funcs.h"
+#include "basic/hash-funcs.h"
 #include "lldp-internal.h"
-#include "time-util.h"
+#include "basic/time-util.h"
 
 typedef struct LLDPNeighborID {
         /* The spec calls this an "MSAP identifier" */

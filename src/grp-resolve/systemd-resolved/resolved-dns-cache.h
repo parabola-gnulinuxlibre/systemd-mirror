@@ -19,10 +19,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "hashmap.h"
-#include "list.h"
-#include "prioq.h"
-#include "time-util.h"
+#include "basic/hashmap.h"
+#include "basic/list.h"
+#include "basic/prioq.h"
+#include "basic/time-util.h"
 
 typedef struct DnsCache {
         Hashmap *by_key;

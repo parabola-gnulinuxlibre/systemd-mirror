@@ -31,8 +31,8 @@ typedef struct UnitStatusMessageFormats UnitStatusMessageFormats;
 #include "condition.h"
 #include "failure-action.h"
 #include "install.h"
-#include "list.h"
-#include "unit-name.h"
+#include "basic/list.h"
+#include "basic/unit-name.h"
 
 typedef enum KillOperation {
         KILL_TERMINATE,

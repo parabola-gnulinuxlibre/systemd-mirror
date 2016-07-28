@@ -24,7 +24,7 @@
 
 #include "condition.h"
 #include "dhcp-identifier.h"
-#include "hashmap.h"
+#include "basic/hashmap.h"
 #include "resolve-util.h"
 
 #include "networkd-address.h"

@@ -21,17 +21,17 @@
 
 #include <systemd/sd-event.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fs-util.h"
-#include "hostname-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fs-util.h"
+#include "basic/hostname-util.h"
 #include "import-raw.h"
 #include "import-tar.h"
 #include "import-util.h"
 #include "machine-image.h"
-#include "signal-util.h"
-#include "string-util.h"
-#include "verbs.h"
+#include "basic/signal-util.h"
+#include "basic/string-util.h"
+#include "basic/verbs.h"
 
 static bool arg_force = false;
 static bool arg_read_only = false;

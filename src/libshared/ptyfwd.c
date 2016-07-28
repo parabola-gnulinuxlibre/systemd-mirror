@@ -32,12 +32,12 @@
 
 #include <systemd/sd-event.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "log.h"
-#include "macro.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
 #include "ptyfwd.h"
-#include "time-util.h"
+#include "basic/time-util.h"
 
 struct PTYForward {
         sd_event *event;

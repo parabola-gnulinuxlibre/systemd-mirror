@@ -32,14 +32,14 @@
 #include <systemd/sd-event.h>
 #include <systemd/sd-resolve.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "log.h"
-#include "path-util.h"
-#include "set.h"
-#include "socket-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/log.h"
+#include "basic/path-util.h"
+#include "basic/set.h"
+#include "basic/socket-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 #define BUFFER_SIZE (256 * 1024)
 #define CONNECTIONS_MAX 256

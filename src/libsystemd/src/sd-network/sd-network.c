@@ -25,16 +25,16 @@
 
 #include <systemd/sd-network.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "fs-util.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/fs-util.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 _public_ int sd_network_get_operational_state(char **state) {
         _cleanup_free_ char *s = NULL;

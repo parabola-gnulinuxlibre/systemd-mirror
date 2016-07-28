@@ -17,12 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "formats-util.h"
+#include "basic/alloc-util.h"
+#include "basic/formats-util.h"
 #include "journald-server.h"
 #include "journald-wall.h"
-#include "process-util.h"
-#include "string-util.h"
+#include "basic/process-util.h"
+#include "basic/string-util.h"
 #include "utmp-wtmp.h"
 
 void server_forward_wall(

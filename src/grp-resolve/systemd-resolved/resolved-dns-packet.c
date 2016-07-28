@@ -17,14 +17,14 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
  ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dns-domain.h"
 #include "resolved-dns-packet.h"
-#include "string-table.h"
-#include "strv.h"
-#include "unaligned.h"
-#include "utf8.h"
-#include "util.h"
+#include "basic/string-table.h"
+#include "basic/strv.h"
+#include "basic/unaligned.h"
+#include "basic/utf8.h"
+#include "basic/util.h"
 
 #define EDNS0_OPT_DO (1<<15)
 

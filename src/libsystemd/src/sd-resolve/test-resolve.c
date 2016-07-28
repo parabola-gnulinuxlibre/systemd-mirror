@@ -28,10 +28,10 @@
 
 #include <systemd/sd-resolve.h>
 
-#include "alloc-util.h"
-#include "macro.h"
-#include "socket-util.h"
-#include "string-util.h"
+#include "basic/alloc-util.h"
+#include "basic/macro.h"
+#include "basic/socket-util.h"
+#include "basic/string-util.h"
 
 static int getaddrinfo_handler(sd_resolve_query *q, int ret, const struct addrinfo *ai, void *userdata) {
         const struct addrinfo *i;

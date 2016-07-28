@@ -17,14 +17,14 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "io-util.h"
-#include "parse-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/io-util.h"
+#include "basic/parse-util.h"
 #include "show-status.h"
-#include "string-util.h"
-#include "terminal-util.h"
-#include "util.h"
+#include "basic/string-util.h"
+#include "basic/terminal-util.h"
+#include "basic/util.h"
 
 int parse_show_status(const char *v, ShowStatus *ret) {
         int r;

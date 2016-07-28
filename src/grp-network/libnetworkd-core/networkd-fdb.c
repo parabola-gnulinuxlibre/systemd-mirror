@@ -20,12 +20,12 @@
 #include <net/ethernet.h>
 #include <net/if.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "conf-parser.h"
 #include "netlink-util.h"
 #include "networkd-fdb.h"
 #include "networkd.h"
-#include "util.h"
+#include "basic/util.h"
 
 /* create a new FDB entry or get an existing one. */
 int fdb_entry_new_static(Network *const network,

@@ -28,9 +28,9 @@
 #include <unistd.h>
 #include <linux/if_packet.h>
 
-#include "fd-util.h"
+#include "basic/fd-util.h"
 #include "icmp6-util.h"
-#include "socket-util.h"
+#include "basic/socket-util.h"
 
 #define IN6ADDR_ALL_ROUTERS_MULTICAST_INIT \
         { { { 0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \

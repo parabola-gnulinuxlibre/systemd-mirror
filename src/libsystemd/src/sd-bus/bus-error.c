@@ -26,11 +26,11 @@
 
 #include <systemd/sd-bus.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-error.h"
-#include "errno-list.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/errno-list.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 BUS_ERROR_MAP_ELF_REGISTER const sd_bus_error_map bus_standard_errors[] = {
         SD_BUS_ERROR_MAP("org.freedesktop.DBus.Error.Failed",                           EACCES),

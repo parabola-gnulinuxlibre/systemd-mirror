@@ -23,8 +23,8 @@
 #include "journal-authenticate.h"
 #include "journal-file.h"
 #include "journal-vacuum.h"
-#include "log.h"
-#include "rm-rf.h"
+#include "basic/log.h"
+#include "basic/rm-rf.h"
 
 static bool arg_keep = false;
 

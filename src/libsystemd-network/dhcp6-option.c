@@ -23,14 +23,14 @@
 
 #include <systemd/sd-dhcp6-client.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dhcp6-internal.h"
 #include "dhcp6-protocol.h"
 #include "dns-domain.h"
-#include "sparse-endian.h"
-#include "strv.h"
-#include "unaligned.h"
-#include "util.h"
+#include "basic/sparse-endian.h"
+#include "basic/strv.h"
+#include "basic/unaligned.h"
+#include "basic/util.h"
 
 #define DHCP6_OPTION_IA_NA_LEN                  12
 #define DHCP6_OPTION_IA_TA_LEN                  4

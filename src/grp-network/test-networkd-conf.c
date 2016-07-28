@@ -17,11 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "hexdecoct.h"
-#include "log.h"
-#include "macro.h"
-#include "string-util.h"
-#include "ether-addr-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/ether-addr-util.h"
 
 #include "networkd-conf.h"
 #include "networkd-network.h"

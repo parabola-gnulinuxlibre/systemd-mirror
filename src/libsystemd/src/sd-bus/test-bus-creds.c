@@ -21,7 +21,7 @@
 
 #include "bus-dump.h"
 #include "bus-util.h"
-#include "cgroup-util.h"
+#include "basic/cgroup-util.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_(sd_bus_creds_unrefp) sd_bus_creds *creds = NULL;

@@ -20,9 +20,9 @@
 #include <netinet/ether.h>
 #include <linux/if.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dhcp-lease-internal.h"
-#include "hostname-util.h"
+#include "basic/hostname-util.h"
 #include "network-internal.h"
 #include "networkd.h"
 

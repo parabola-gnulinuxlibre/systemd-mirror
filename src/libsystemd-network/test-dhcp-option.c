@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dhcp-internal.h"
 #include "dhcp-protocol.h"
-#include "macro.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/util.h"
 
 struct option_desc {
         uint8_t sname[64];

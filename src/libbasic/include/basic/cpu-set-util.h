@@ -22,7 +22,7 @@
 
 #include <sched.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(cpu_set_t*, CPU_FREE);
 #define _cleanup_cpu_free_ _cleanup_(CPU_FREEp)

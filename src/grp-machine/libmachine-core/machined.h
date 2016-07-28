@@ -24,8 +24,8 @@
 #include <systemd/sd-bus.h>
 #include <systemd/sd-event.h>
 
-#include "hashmap.h"
-#include "list.h"
+#include "basic/hashmap.h"
+#include "basic/list.h"
 
 typedef struct Manager Manager;
 

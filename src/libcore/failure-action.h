@@ -32,7 +32,7 @@ typedef enum FailureAction {
         _FAILURE_ACTION_INVALID = -1
 } FailureAction;
 
-#include "macro.h"
+#include "basic/macro.h"
 #include "manager.h"
 
 int failure_action(Manager *m, FailureAction action, const char *reboot_arg);

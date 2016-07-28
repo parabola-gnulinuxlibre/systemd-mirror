@@ -22,15 +22,15 @@
 
 #include <systemd/sd-netlink.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "hashmap.h"
-#include "macro.h"
-#include "missing.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/hashmap.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
 #include "netlink-internal.h"
 #include "netlink-util.h"
-#include "socket-util.h"
-#include "util.h"
+#include "basic/socket-util.h"
+#include "basic/util.h"
 
 static int sd_netlink_new(sd_netlink **ret) {
         _cleanup_(sd_netlink_unrefp) sd_netlink *rtnl = NULL;

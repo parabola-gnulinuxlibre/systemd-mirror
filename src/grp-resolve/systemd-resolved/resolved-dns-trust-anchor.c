@@ -19,19 +19,19 @@
 
 #include <systemd/sd-messages.h>
 
-#include "alloc-util.h"
-#include "conf-files.h"
-#include "def.h"
+#include "basic/alloc-util.h"
+#include "basic/conf-files.h"
+#include "basic/def.h"
 #include "dns-domain.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "hexdecoct.h"
-#include "parse-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/hexdecoct.h"
+#include "basic/parse-util.h"
 #include "resolved-dns-trust-anchor.h"
 #include "resolved-dns-dnssec.h"
-#include "set.h"
-#include "string-util.h"
-#include "strv.h"
+#include "basic/set.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
 
 static const char trust_anchor_dirs[] = CONF_PATHS_NULSTR("dnssec-trust-anchors.d");
 

@@ -29,8 +29,8 @@
 #include <linux/netlink.h>
 #include <linux/if_packet.h>
 
-#include "macro.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/util.h"
 
 union sockaddr_union {
         struct sockaddr sa;

@@ -23,7 +23,7 @@
 #include <gcrypt.h>
 
 #include "gcrypt-util.h"
-#include "hexdecoct.h"
+#include "basic/hexdecoct.h"
 
 void initialize_libgcrypt(bool secmem) {
         const char *p;

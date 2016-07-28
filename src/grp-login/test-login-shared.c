@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "login-util.h"
-#include "macro.h"
+#include "basic/login-util.h"
+#include "basic/macro.h"
 
 static void test_session_id_valid(void) {
         assert_se(session_id_valid("c1"));

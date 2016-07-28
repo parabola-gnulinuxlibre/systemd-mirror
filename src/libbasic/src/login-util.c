@@ -19,8 +19,8 @@
 
 #include <string.h>
 
-#include "login-util.h"
-#include "string-util.h"
+#include "basic/login-util.h"
+#include "basic/string-util.h"
 
 bool session_id_valid(const char *id) {
 

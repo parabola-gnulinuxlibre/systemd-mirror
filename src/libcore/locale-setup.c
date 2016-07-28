@@ -20,14 +20,14 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include "env-util.h"
-#include "fileio.h"
+#include "basic/env-util.h"
+#include "basic/fileio.h"
 #include "locale-setup.h"
-#include "locale-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
-#include "virt.h"
+#include "basic/locale-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
+#include "basic/virt.h"
 
 int locale_setup(char ***environment) {
         char **add;

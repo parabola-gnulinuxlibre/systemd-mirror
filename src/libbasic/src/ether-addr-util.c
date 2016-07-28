@@ -21,9 +21,9 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#include "ether-addr-util.h"
-#include "macro.h"
-#include "string-util.h"
+#include "basic/ether-addr-util.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
 
 char* ether_addr_to_string(const struct ether_addr *addr, char buffer[ETHER_ADDR_TO_STRING_MAX]) {
         assert(addr);

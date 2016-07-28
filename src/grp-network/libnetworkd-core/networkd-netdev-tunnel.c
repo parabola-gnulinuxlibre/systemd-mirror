@@ -26,13 +26,13 @@
 #include <systemd/sd-netlink.h>
 
 #include "conf-parser.h"
-#include "missing.h"
+#include "basic/missing.h"
 #include "networkd-link.h"
 #include "networkd-netdev-tunnel.h"
-#include "parse-util.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/parse-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 #define DEFAULT_TNL_HOP_LIMIT   64
 #define IP6_FLOWINFO_FLOWLABEL  htonl(0x000FFFFF)

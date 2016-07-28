@@ -25,8 +25,8 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#include "macro.h"
-#include "time-util.h"
+#include "basic/macro.h"
+#include "basic/time-util.h"
 
 typedef enum {
         WRITE_STRING_FILE_CREATE = 1,

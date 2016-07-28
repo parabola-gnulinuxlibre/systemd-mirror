@@ -22,7 +22,7 @@
 #include <systemd/sd-ndisc.h>
 
 #include "icmp6-util.h"
-#include "socket-util.h"
+#include "basic/socket-util.h"
 
 static struct ether_addr mac_addr = {
         .ether_addr_octet = {'A', 'B', 'C', '1', '2', '3'}

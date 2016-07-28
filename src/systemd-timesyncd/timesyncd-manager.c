@@ -31,22 +31,22 @@
 
 #include <systemd/sd-daemon.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fs-util.h"
-#include "list.h"
-#include "log.h"
-#include "missing.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fs-util.h"
+#include "basic/list.h"
+#include "basic/log.h"
+#include "basic/missing.h"
 #include "sd-network/network-util.h"
-#include "ratelimit.h"
-#include "socket-util.h"
-#include "sparse-endian.h"
-#include "string-util.h"
-#include "strv.h"
-#include "time-util.h"
+#include "basic/ratelimit.h"
+#include "basic/socket-util.h"
+#include "basic/sparse-endian.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/time-util.h"
 #include "timesyncd-conf.h"
 #include "timesyncd-manager.h"
-#include "util.h"
+#include "basic/util.h"
 
 #ifndef ADJ_SETOFFSET
 #define ADJ_SETOFFSET                   0x0100  /* add 'time' to current time */

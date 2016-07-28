@@ -25,11 +25,11 @@
 #include "libudev.h"
 #include <systemd/sd-netlink.h>
 
-#include "label.h"
+#include "basic/label.h"
 #include "libudev-private.h"
-#include "macro.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 struct udev_event {
         struct udev *udev;

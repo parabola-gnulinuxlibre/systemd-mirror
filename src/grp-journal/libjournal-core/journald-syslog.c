@@ -23,21 +23,21 @@
 
 #include <systemd/sd-messages.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "formats-util.h"
-#include "io-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/formats-util.h"
+#include "basic/io-util.h"
 #include "journald-console.h"
 #include "journald-kmsg.h"
 #include "journald-server.h"
 #include "journald-syslog.h"
 #include "journald-wall.h"
-#include "process-util.h"
-#include "selinux-util.h"
-#include "socket-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "syslog-util.h"
+#include "basic/process-util.h"
+#include "basic/selinux-util.h"
+#include "basic/socket-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
+#include "basic/syslog-util.h"
 
 /* Warn once every 30s if we missed syslog message */
 #define WARN_FORWARD_SYSLOG_MISSED_USEC (30 * USEC_PER_SEC)

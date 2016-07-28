@@ -22,7 +22,7 @@
 #include <systemd/sd-event.h>
 
 #include "import-util.h"
-#include "macro.h"
+#include "basic/macro.h"
 
 typedef struct RawPull RawPull;
 

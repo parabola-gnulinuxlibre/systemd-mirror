@@ -25,12 +25,12 @@
 #include <selinux/selinux.h>
 #endif
 
-#include "log.h"
-#include "macro.h"
+#include "basic/log.h"
+#include "basic/macro.h"
 #include "selinux-setup.h"
-#include "selinux-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/selinux-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 #ifdef HAVE_SELINUX
 _printf_(2,3)

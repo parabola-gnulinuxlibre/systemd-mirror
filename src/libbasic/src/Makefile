@@ -245,5 +245,6 @@ $(outdir)/af-list.lo: $(call _inc,af-from-name.h af-to-name.h)
 $(outdir)/arphrd-list.lo: $(call _inc,arphrd-from-name.h arphrd-to-name.h)
 $(outdir)/cap-list.lo: $(call _inc,cap-from-name.h cap-to-name.h)
 $(outdir)/errno-list.lo: $(call _inc,errno-from-name.h errno-to-name.h)
+systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

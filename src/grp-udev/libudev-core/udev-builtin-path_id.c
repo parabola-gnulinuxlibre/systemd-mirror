@@ -30,8 +30,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "string-util.h"
+#include "basic/alloc-util.h"
+#include "basic/string-util.h"
 #include "udev.h"
 
 _printf_(2,3)

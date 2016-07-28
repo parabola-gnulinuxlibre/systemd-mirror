@@ -21,13 +21,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dev-setup.h"
-#include "label.h"
-#include "log.h"
-#include "path-util.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/label.h"
+#include "basic/log.h"
+#include "basic/path-util.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 int dev_setup(const char *prefix, uid_t uid, gid_t gid) {
         static const char symlinks[] =

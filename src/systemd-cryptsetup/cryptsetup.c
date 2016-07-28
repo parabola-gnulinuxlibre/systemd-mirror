@@ -25,18 +25,18 @@
 
 #include <systemd/sd-device.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "ask-password-api.h"
 #include "sd-device/device-util.h"
-#include "escape.h"
-#include "fileio.h"
-#include "log.h"
-#include "mount-util.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/escape.h"
+#include "basic/fileio.h"
+#include "basic/log.h"
+#include "basic/mount-util.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 static const char *arg_type = NULL; /* CRYPT_LUKS1, CRYPT_TCRYPT or CRYPT_PLAIN */
 static char *arg_cipher = NULL;

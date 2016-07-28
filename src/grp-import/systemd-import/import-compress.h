@@ -24,7 +24,7 @@
 #include <sys/types.h>
 #include <zlib.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 typedef enum ImportCompressType {
         IMPORT_COMPRESS_UNKNOWN,

@@ -20,11 +20,11 @@
 #include <ctype.h>
 
 #include "conf-parser.h"
-#include "def.h"
+#include "basic/def.h"
 #include "dhcp-identifier.h"
-#include "hexdecoct.h"
+#include "basic/hexdecoct.h"
 #include "networkd-conf.h"
-#include "string-table.h"
+#include "basic/string-table.h"
 
 int manager_parse_config_file(Manager *m) {
         assert(m);

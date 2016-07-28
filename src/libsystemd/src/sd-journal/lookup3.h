@@ -3,7 +3,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 uint32_t jenkins_hashword(const uint32_t *k, size_t length, uint32_t initval) _pure_;
 void jenkins_hashword2(const uint32_t *k, size_t length, uint32_t *pc, uint32_t *pb);

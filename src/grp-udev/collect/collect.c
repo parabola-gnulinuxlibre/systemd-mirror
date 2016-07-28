@@ -24,11 +24,11 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "libudev-private.h"
-#include "macro.h"
-#include "stdio-util.h"
-#include "string-util.h"
+#include "basic/macro.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
 
 #define BUFSIZE 16
 #define UDEV_ALARM_TIMEOUT 180

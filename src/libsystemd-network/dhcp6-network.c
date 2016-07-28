@@ -29,8 +29,8 @@
 
 #include "dhcp6-internal.h"
 #include "dhcp6-protocol.h"
-#include "fd-util.h"
-#include "socket-util.h"
+#include "basic/fd-util.h"
+#include "basic/socket-util.h"
 
 int dhcp6_network_bind_udp_socket(int index, struct in6_addr *local_address) {
         union sockaddr_union src = {

@@ -21,11 +21,11 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "resolved-dns-dnssec.h"
 #include "resolved-dns-rr.h"
-#include "string-util.h"
-#include "hexdecoct.h"
+#include "basic/string-util.h"
+#include "basic/hexdecoct.h"
 
 static void test_dnssec_canonicalize_one(const char *original, const char *canonical, int r) {
         char canonicalized[DNSSEC_CANONICAL_HOSTNAME_MAX];

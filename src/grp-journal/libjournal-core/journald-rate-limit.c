@@ -20,13 +20,13 @@
 #include <errno.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "hashmap.h"
+#include "basic/alloc-util.h"
+#include "basic/hashmap.h"
 #include "journald-rate-limit.h"
-#include "list.h"
-#include "random-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/list.h"
+#include "basic/random-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 #define POOLS_MAX 5
 #define BUCKETS_MAX 127

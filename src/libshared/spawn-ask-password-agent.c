@@ -21,10 +21,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "log.h"
-#include "process-util.h"
+#include "basic/log.h"
+#include "basic/process-util.h"
 #include "spawn-ask-password-agent.h"
-#include "util.h"
+#include "basic/util.h"
 
 static pid_t agent_pid = 0;
 

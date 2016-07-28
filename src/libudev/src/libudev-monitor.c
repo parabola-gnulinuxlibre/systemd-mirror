@@ -30,15 +30,15 @@
 
 #include "libudev.h"
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "formats-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/formats-util.h"
 #include "libudev-private.h"
-#include "missing.h"
-#include "mount-util.h"
-#include "socket-util.h"
-#include "string-util.h"
+#include "basic/missing.h"
+#include "basic/mount-util.h"
+#include "basic/socket-util.h"
+#include "basic/string-util.h"
 
 /**
  * SECTION:libudev-monitor

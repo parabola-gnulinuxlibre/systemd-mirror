@@ -23,7 +23,7 @@
 
 #include <systemd/sd-journal.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 int main(int argc, char *argv[]) {
         char huge[4096*1024];

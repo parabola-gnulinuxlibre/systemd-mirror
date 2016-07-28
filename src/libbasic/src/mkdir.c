@@ -22,12 +22,12 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "fs-util.h"
-#include "macro.h"
-#include "mkdir.h"
-#include "path-util.h"
-#include "stat-util.h"
-#include "user-util.h"
+#include "basic/fs-util.h"
+#include "basic/macro.h"
+#include "basic/mkdir.h"
+#include "basic/path-util.h"
+#include "basic/stat-util.h"
+#include "basic/user-util.h"
 
 int mkdir_safe_internal(const char *path, mode_t mode, uid_t uid, gid_t gid, mkdir_func_t _mkdir) {
         struct stat st;

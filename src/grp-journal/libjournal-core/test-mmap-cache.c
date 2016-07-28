@@ -22,11 +22,11 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "fd-util.h"
-#include "fileio.h"
-#include "macro.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/macro.h"
 #include "mmap-cache.h"
-#include "util.h"
+#include "basic/util.h"
 
 int main(int argc, char *argv[]) {
         int x, y, z, r;

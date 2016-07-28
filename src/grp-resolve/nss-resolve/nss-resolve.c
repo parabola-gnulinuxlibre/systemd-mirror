@@ -27,12 +27,12 @@
 #include <systemd/sd-bus.h>
 
 #include "sd-bus/bus-common-errors.h"
-#include "in-addr-util.h"
-#include "macro.h"
-#include "nss-util.h"
-#include "string-util.h"
-#include "util.h"
-#include "signal-util.h"
+#include "basic/in-addr-util.h"
+#include "basic/macro.h"
+#include "basic/nss-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
+#include "basic/signal-util.h"
 
 NSS_GETHOSTBYNAME_PROTOTYPES(resolve);
 NSS_GETHOSTBYADDR_PROTOTYPES(resolve);

@@ -37,7 +37,7 @@
 #include "libudev.h"
 
 #include "libudev-private.h"
-#include "random-util.h"
+#include "basic/random-util.h"
 
 /* device info */
 static unsigned int cd_cd_rom;

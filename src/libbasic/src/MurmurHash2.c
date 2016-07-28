@@ -13,7 +13,7 @@
 // 2. It will not produce the same results on little-endian and big-endian
 //    machines.
 
-#include "MurmurHash2.h"
+#include "basic/MurmurHash2.h"
 
 //-----------------------------------------------------------------------------
 // Platform-specific functions and macros

@@ -20,8 +20,8 @@
 ***/
 
 #include "sd-bus/kdbus.h"
-#include "list.h"
-#include "macro.h"
+#include "basic/list.h"
+#include "basic/macro.h"
 
 typedef struct BusNamePolicy BusNamePolicy;
 

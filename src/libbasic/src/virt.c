@@ -23,16 +23,16 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "dirent-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "macro.h"
-#include "process-util.h"
-#include "stat-util.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "virt.h"
+#include "basic/alloc-util.h"
+#include "basic/dirent-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/macro.h"
+#include "basic/process-util.h"
+#include "basic/stat-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/virt.h"
 
 static int detect_vm_cpuid(void) {
 

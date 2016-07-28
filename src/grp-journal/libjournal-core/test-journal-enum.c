@@ -22,8 +22,8 @@
 #include <systemd/sd-journal.h>
 
 #include "journal-internal.h"
-#include "log.h"
-#include "macro.h"
+#include "basic/log.h"
+#include "basic/macro.h"
 
 int main(int argc, char *argv[]) {
         unsigned n = 0;

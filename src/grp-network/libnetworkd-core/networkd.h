@@ -27,8 +27,8 @@
 #include "udev.h"
 
 #include "dhcp-identifier.h"
-#include "hashmap.h"
-#include "list.h"
+#include "basic/hashmap.h"
+#include "basic/list.h"
 
 #include "networkd-address-pool.h"
 #include "networkd-link.h"

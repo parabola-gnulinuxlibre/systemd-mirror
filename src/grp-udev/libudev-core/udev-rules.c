@@ -29,22 +29,22 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "conf-files.h"
-#include "escape.h"
-#include "fd-util.h"
-#include "fs-util.h"
-#include "glob-util.h"
-#include "path-util.h"
-#include "stat-util.h"
-#include "stdio-util.h"
-#include "strbuf.h"
-#include "string-util.h"
-#include "strv.h"
+#include "basic/alloc-util.h"
+#include "basic/conf-files.h"
+#include "basic/escape.h"
+#include "basic/fd-util.h"
+#include "basic/fs-util.h"
+#include "basic/glob-util.h"
+#include "basic/path-util.h"
+#include "basic/stat-util.h"
+#include "basic/stdio-util.h"
+#include "basic/strbuf.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
 #include "sysctl-util.h"
 #include "udev.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 #define PREALLOC_TOKEN          2048
 

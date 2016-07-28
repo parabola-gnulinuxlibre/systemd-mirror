@@ -19,10 +19,10 @@
 
 #include "conf-parser.h"
 #include "networkd-util.h"
-#include "parse-util.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/parse-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 const char *address_family_boolean_to_string(AddressFamilyBoolean b) {
         if (b == ADDRESS_FAMILY_YES ||

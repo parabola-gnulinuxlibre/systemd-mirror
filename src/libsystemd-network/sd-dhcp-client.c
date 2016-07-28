@@ -28,17 +28,17 @@
 
 #include <systemd/sd-dhcp-client.h>
 
-#include "alloc-util.h"
-#include "async.h"
+#include "basic/alloc-util.h"
+#include "basic/async.h"
 #include "dhcp-identifier.h"
 #include "dhcp-internal.h"
 #include "dhcp-lease-internal.h"
 #include "dhcp-protocol.h"
 #include "dns-domain.h"
-#include "hostname-util.h"
-#include "random-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/hostname-util.h"
+#include "basic/random-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 #define MAX_CLIENT_ID_LEN (sizeof(uint32_t) + MAX_DUID_LEN)  /* Arbitrary limit */
 #define MAX_MAC_ADDR_LEN CONST_MAX(INFINIBAND_ALEN, ETH_ALEN)

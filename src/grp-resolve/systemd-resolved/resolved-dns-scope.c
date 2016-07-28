@@ -19,18 +19,18 @@
 
 #include <netinet/tcp.h>
 
-#include "af-list.h"
-#include "alloc-util.h"
+#include "basic/af-list.h"
+#include "basic/alloc-util.h"
 #include "dns-domain.h"
-#include "fd-util.h"
-#include "hostname-util.h"
-#include "missing.h"
-#include "random-util.h"
+#include "basic/fd-util.h"
+#include "basic/hostname-util.h"
+#include "basic/missing.h"
+#include "basic/random-util.h"
 #include "resolved-dns-scope.h"
 #include "resolved-llmnr.h"
 #include "resolved-mdns.h"
-#include "socket-util.h"
-#include "strv.h"
+#include "basic/socket-util.h"
+#include "basic/strv.h"
 
 #define MULTICAST_RATELIMIT_INTERVAL_USEC (1*USEC_PER_SEC)
 #define MULTICAST_RATELIMIT_BURST 1000

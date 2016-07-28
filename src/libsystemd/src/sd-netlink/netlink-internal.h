@@ -23,10 +23,10 @@
 
 #include <systemd/sd-netlink.h>
 
-#include "list.h"
+#include "basic/list.h"
 #include "netlink-types.h"
-#include "prioq.h"
-#include "refcnt.h"
+#include "basic/prioq.h"
+#include "basic/refcnt.h"
 
 #define RTNL_DEFAULT_TIMEOUT ((usec_t) (25 * USEC_PER_SEC))
 

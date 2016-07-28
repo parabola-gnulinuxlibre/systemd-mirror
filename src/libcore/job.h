@@ -23,8 +23,8 @@
 
 #include <systemd/sd-event.h>
 
-#include "list.h"
-#include "unit-name.h"
+#include "basic/list.h"
+#include "basic/unit-name.h"
 
 typedef struct Job Job;
 typedef struct JobDependency JobDependency;

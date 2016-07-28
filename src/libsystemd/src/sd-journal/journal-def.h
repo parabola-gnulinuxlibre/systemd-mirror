@@ -21,8 +21,8 @@
 
 #include <systemd/sd-id128.h>
 
-#include "macro.h"
-#include "sparse-endian.h"
+#include "basic/macro.h"
+#include "basic/sparse-endian.h"
 
 /*
  * If you change this file you probably should also change its documentation:

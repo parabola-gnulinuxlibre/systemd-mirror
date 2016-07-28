@@ -20,9 +20,9 @@
 
 #include <systemd/sd-netlink.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "local-addresses.h"
-#include "macro.h"
+#include "basic/macro.h"
 
 static int address_compare(const void *_a, const void *_b) {
         const struct local_address *a = _a, *b = _b;

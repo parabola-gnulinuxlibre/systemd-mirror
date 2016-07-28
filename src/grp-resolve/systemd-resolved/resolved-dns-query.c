@@ -17,15 +17,15 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dns-domain.h"
 #include "dns-type.h"
-#include "hostname-util.h"
+#include "basic/hostname-util.h"
 #include "sd-netlink/local-addresses.h"
 #include "resolved-dns-query.h"
 #include "resolved-dns-synthesize.h"
 #include "resolved-etc-hosts.h"
-#include "string-util.h"
+#include "basic/string-util.h"
 
 /* How long to wait for the query in total */
 #define QUERY_TIMEOUT_USEC (30 * USEC_PER_SEC)

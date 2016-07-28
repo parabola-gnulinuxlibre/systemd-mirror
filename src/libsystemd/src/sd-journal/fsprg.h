@@ -26,8 +26,8 @@
 #include <inttypes.h>
 #include <sys/types.h>
 
-#include "macro.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/util.h"
 
 #ifdef __cplusplus
 extern "C" {

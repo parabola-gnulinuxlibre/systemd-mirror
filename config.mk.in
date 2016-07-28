@@ -101,8 +101,8 @@ rootlibexecdir=$(rootprefix)/lib/systemd
 rootlibdir=@rootlibdir@
 
 # Libraries we provide
-libbasic.CPPFLAGS                    = -I$(topsrcdir)/src/libbasic -I$(topoutdir)/src/libbasic
-libbasic.DEPENDS                     =   $(topoutdir)/src/libbasic/libbasic.la
+libbasic.CPPFLAGS                    = -I$(topsrcdir)/src/libbasic/include -I$(topoutdir)/src/libbasic/include
+libbasic.DEPENDS                     =   $(topoutdir)/src/libbasic/src/libbasic.la
 libcore.CPPFLAGS                     = -I$(topsrcdir)/src/libcore $(libshared.CPPFLAGS)
 libcore.DEPENDS                      =   $(topoutdir)/src/libcore/libcore.la
 libfirewall.CPPFLAGS                 = -I$(topsrcdir)/src/libfirewall -I$(topoutdir)/src/libfirewall

@@ -20,10 +20,10 @@
 #include <string.h>
 #include <syslog.h>
 
-#include "hexdecoct.h"
-#include "macro.h"
-#include "string-table.h"
-#include "syslog-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/macro.h"
+#include "basic/string-table.h"
+#include "basic/syslog-util.h"
 
 int syslog_parse_priority(const char **p, int *priority, bool with_facility) {
         int a = 0, b = 0, c = 0;

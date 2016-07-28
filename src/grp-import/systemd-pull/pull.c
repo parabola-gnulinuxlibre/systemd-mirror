@@ -21,17 +21,17 @@
 
 #include <systemd/sd-event.h>
 
-#include "alloc-util.h"
-#include "hostname-util.h"
+#include "basic/alloc-util.h"
+#include "basic/hostname-util.h"
 #include "import-util.h"
 #include "machine-image.h"
-#include "parse-util.h"
+#include "basic/parse-util.h"
 #include "pull-raw.h"
 #include "pull-tar.h"
-#include "signal-util.h"
-#include "string-util.h"
-#include "verbs.h"
-#include "web-util.h"
+#include "basic/signal-util.h"
+#include "basic/string-util.h"
+#include "basic/verbs.h"
+#include "basic/web-util.h"
 
 static bool arg_force = false;
 static const char *arg_image_root = "/var/lib/machines";

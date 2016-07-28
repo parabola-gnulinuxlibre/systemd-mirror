@@ -26,15 +26,15 @@
 
 #include <systemd/sd-ipv4acd.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "arp-util.h"
-#include "fd-util.h"
-#include "in-addr-util.h"
-#include "list.h"
-#include "random-util.h"
-#include "refcnt.h"
-#include "siphash24.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/in-addr-util.h"
+#include "basic/list.h"
+#include "basic/random-util.h"
+#include "basic/refcnt.h"
+#include "basic/siphash24.h"
+#include "basic/util.h"
 
 /* Constants from the RFC */
 #define PROBE_WAIT 1

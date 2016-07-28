@@ -23,8 +23,8 @@
 #include <systemd/sd-network.h>
 #include <systemd/sd-resolve.h>
 
-#include "list.h"
-#include "ratelimit.h"
+#include "basic/list.h"
+#include "basic/ratelimit.h"
 
 typedef struct Manager Manager;
 

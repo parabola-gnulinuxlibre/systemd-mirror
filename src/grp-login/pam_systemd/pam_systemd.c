@@ -28,23 +28,23 @@
 #include <security/pam_modutil.h>
 #include <sys/file.h>
 
-#include "alloc-util.h"
-#include "audit-util.h"
+#include "basic/alloc-util.h"
+#include "basic/audit-util.h"
 #include "bus-common-errors.h"
 #include "bus-error.h"
 #include "bus-util.h"
-#include "def.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "formats-util.h"
-#include "hostname-util.h"
-#include "login-util.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "socket-util.h"
-#include "strv.h"
-#include "terminal-util.h"
-#include "util.h"
+#include "basic/def.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/formats-util.h"
+#include "basic/hostname-util.h"
+#include "basic/login-util.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/socket-util.h"
+#include "basic/strv.h"
+#include "basic/terminal-util.h"
+#include "basic/util.h"
 
 static int parse_argv(
                 pam_handle_t *handle,

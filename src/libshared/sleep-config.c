@@ -25,18 +25,18 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "conf-parser.h"
-#include "def.h"
-#include "env-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "log.h"
-#include "macro.h"
-#include "parse-util.h"
+#include "basic/def.h"
+#include "basic/env-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
 #include "sleep-config.h"
-#include "string-util.h"
-#include "strv.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
 
 #define USE(x, y) do { (x) = (y); (y) = NULL; } while (0)
 

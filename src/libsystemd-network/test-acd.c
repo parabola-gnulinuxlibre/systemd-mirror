@@ -28,9 +28,9 @@
 #include <systemd/sd-ipv4acd.h>
 #include <systemd/sd-netlink.h>
 
-#include "in-addr-util.h"
+#include "basic/in-addr-util.h"
 #include "netlink-util.h"
-#include "util.h"
+#include "basic/util.h"
 
 static void acd_handler(sd_ipv4acd *acd, int event, void *userdata) {
         assert_se(acd);

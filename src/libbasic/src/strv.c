@@ -24,13 +24,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "escape.h"
-#include "extract-word.h"
-#include "fileio.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/escape.h"
+#include "basic/extract-word.h"
+#include "basic/fileio.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 char *strv_find(char **l, const char *name) {
         char **i;

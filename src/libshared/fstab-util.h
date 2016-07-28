@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 bool fstab_is_mount_point(const char *mount);
 

@@ -20,7 +20,7 @@
 #include "bus-util.h"
 #include "busname.h"
 #include "dbus-busname.h"
-#include "string-util.h"
+#include "basic/string-util.h"
 #include "unit.h"
 
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_result, busname_result, BusNameResult);

@@ -21,8 +21,8 @@
 
 #include <stdbool.h>
 
-#include "time-util.h"
-#include "util.h"
+#include "basic/time-util.h"
+#include "basic/util.h"
 
 int watchdog_set_timeout(usec_t *usec);
 int watchdog_ping(void);

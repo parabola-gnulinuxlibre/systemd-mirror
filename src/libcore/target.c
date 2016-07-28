@@ -18,10 +18,10 @@
 ***/
 
 #include "dbus-target.h"
-#include "log.h"
-#include "special.h"
-#include "string-util.h"
-#include "unit-name.h"
+#include "basic/log.h"
+#include "basic/special.h"
+#include "basic/string-util.h"
+#include "basic/unit-name.h"
 #include "unit.h"
 #include "target.h"
 

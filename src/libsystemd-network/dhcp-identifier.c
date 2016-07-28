@@ -23,10 +23,10 @@
 #include "dhcp-identifier.h"
 #include "dhcp6-protocol.h"
 #include "network-internal.h"
-#include "siphash24.h"
-#include "sparse-endian.h"
+#include "basic/siphash24.h"
+#include "basic/sparse-endian.h"
 #include "udev-util.h"
-#include "virt.h"
+#include "basic/virt.h"
 
 #define SYSTEMD_PEN 43793
 #define HASH_KEY SD_ID128_MAKE(80,11,8c,c2,fe,4a,03,ee,3e,d6,0c,6f,36,39,14,09)

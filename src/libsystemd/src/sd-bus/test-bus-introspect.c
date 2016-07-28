@@ -18,7 +18,7 @@
 ***/
 
 #include "bus-introspect.h"
-#include "log.h"
+#include "basic/log.h"
 
 static int prop_get(sd_bus *bus, const char *path, const char *interface, const char *property, sd_bus_message *reply, void *userdata, sd_bus_error *error) {
         return -EINVAL;

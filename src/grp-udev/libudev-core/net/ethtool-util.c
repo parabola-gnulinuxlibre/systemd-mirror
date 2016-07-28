@@ -24,10 +24,10 @@
 
 #include "conf-parser.h"
 #include "ethtool-util.h"
-#include "log.h"
-#include "string-table.h"
-#include "strxcpyx.h"
-#include "util.h"
+#include "basic/log.h"
+#include "basic/string-table.h"
+#include "basic/strxcpyx.h"
+#include "basic/util.h"
 
 static const char* const duplex_table[_DUP_MAX] = {
         [DUP_FULL] = "full",

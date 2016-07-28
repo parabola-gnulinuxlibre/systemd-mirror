@@ -26,11 +26,11 @@
 
 #include <systemd/sd-messages.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
 #include "logind-button.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 Button* button_new(Manager *m, const char *name) {
         Button *b;

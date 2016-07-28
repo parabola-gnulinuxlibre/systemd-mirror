@@ -27,8 +27,8 @@
 
 #include "bus-creds.h"
 #include "bus-protocol.h"
-#include "macro.h"
-#include "time-util.h"
+#include "basic/macro.h"
+#include "basic/time-util.h"
 
 struct bus_container {
         char enclosing;

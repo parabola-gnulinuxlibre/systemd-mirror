@@ -25,7 +25,7 @@
 #include <sys/signalfd.h>
 #include <unistd.h>
 
-#include "string-util.h"
+#include "basic/string-util.h"
 #include "udev-util.h"
 #include "udev.h"
 

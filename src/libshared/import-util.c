@@ -20,15 +20,15 @@
 #include <errno.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "btrfs-util.h"
+#include "basic/alloc-util.h"
+#include "basic/btrfs-util.h"
 #include "import-util.h"
-#include "log.h"
-#include "macro.h"
-#include "path-util.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/path-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 int import_url_last_component(const char *url, char **ret) {
         const char *e, *p;

@@ -19,7 +19,7 @@
 
 #include <systemd/sd-bus.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-internal.h"
 #include "bus-track.h"
 #include "bus-util.h"

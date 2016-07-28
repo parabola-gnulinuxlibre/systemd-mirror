@@ -28,11 +28,11 @@
 #include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "pager.h"
-#include "parse-util.h"
+#include "basic/parse-util.h"
 #include "spawn-polkit-agent.h"
-#include "strv.h"
-#include "terminal-util.h"
-#include "util.h"
+#include "basic/strv.h"
+#include "basic/terminal-util.h"
+#include "basic/util.h"
 
 static bool arg_no_pager = false;
 static bool arg_ask_password = true;

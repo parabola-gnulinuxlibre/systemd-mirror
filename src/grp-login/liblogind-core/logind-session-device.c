@@ -25,12 +25,12 @@
 
 #include "libudev.h"
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-util.h"
-#include "fd-util.h"
+#include "basic/fd-util.h"
 #include "logind-session-device.h"
-#include "missing.h"
-#include "util.h"
+#include "basic/missing.h"
+#include "basic/util.h"
 
 enum SessionDeviceNotifications {
         SESSION_DEVICE_RESUME,

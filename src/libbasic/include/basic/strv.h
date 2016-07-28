@@ -24,10 +24,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "alloc-util.h"
-#include "extract-word.h"
-#include "macro.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/extract-word.h"
+#include "basic/macro.h"
+#include "basic/util.h"
 
 char *strv_find(char **l, const char *name) _pure_;
 char *strv_find_prefix(char **l, const char *name) _pure_;

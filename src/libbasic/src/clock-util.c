@@ -27,11 +27,11 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 
-#include "clock-util.h"
-#include "fd-util.h"
-#include "macro.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/clock-util.h"
+#include "basic/fd-util.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 int clock_get_hwclock(struct tm *tm) {
         _cleanup_close_ int fd = -1;

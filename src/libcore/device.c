@@ -22,17 +22,17 @@
 
 #include "libudev.h"
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dbus-device.h"
 #include "device.h"
-#include "log.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "stat-util.h"
-#include "string-util.h"
+#include "basic/log.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/stat-util.h"
+#include "basic/string-util.h"
 #include "swap.h"
 #include "udev-util.h"
-#include "unit-name.h"
+#include "basic/unit-name.h"
 #include "unit.h"
 
 static const UnitActiveState state_translation_table[_DEVICE_STATE_MAX] = {

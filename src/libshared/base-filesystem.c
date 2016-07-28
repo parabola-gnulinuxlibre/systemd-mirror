@@ -25,15 +25,15 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "base-filesystem.h"
-#include "fd-util.h"
-#include "log.h"
-#include "macro.h"
-#include "string-util.h"
-#include "umask-util.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/umask-util.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 typedef struct BaseFilesystem {
         const char *dir;

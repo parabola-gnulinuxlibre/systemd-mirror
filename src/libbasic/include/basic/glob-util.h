@@ -22,8 +22,8 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "macro.h"
-#include "string-util.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
 
 int glob_exists(const char *path);
 int glob_extend(char ***strv, const char *path);

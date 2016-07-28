@@ -21,8 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "strbuf.h"
+#include "basic/alloc-util.h"
+#include "basic/strbuf.h"
 
 /*
  * Strbuf stores given strings in a single continuous allocated memory

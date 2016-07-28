@@ -19,16 +19,16 @@
 
 #include <sys/xattr.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "hexdecoct.h"
-#include "io-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/io-util.h"
 #include "machine-pool.h"
-#include "parse-util.h"
+#include "basic/parse-util.h"
 #include "pull-job.h"
-#include "string-util.h"
-#include "strv.h"
-#include "xattr-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/xattr-util.h"
 
 PullJob* pull_job_unref(PullJob *j) {
         if (!j)

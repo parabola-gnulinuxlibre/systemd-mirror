@@ -20,8 +20,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "selinux-util.h"
-#include "string-util.h"
+#include "basic/selinux-util.h"
+#include "basic/string-util.h"
 #include "udev.h"
 
 static int adm_version(struct udev *udev, int argc, char *argv[]) {

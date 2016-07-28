@@ -23,16 +23,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "bus-label.h"
-#include "glob-util.h"
-#include "hexdecoct.h"
-#include "macro.h"
-#include "path-util.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "strv.h"
-#include "unit-name.h"
+#include "basic/alloc-util.h"
+#include "basic/bus-label.h"
+#include "basic/glob-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/macro.h"
+#include "basic/path-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/unit-name.h"
 
 /* Characters valid in a unit name. */
 #define VALID_CHARS                             \

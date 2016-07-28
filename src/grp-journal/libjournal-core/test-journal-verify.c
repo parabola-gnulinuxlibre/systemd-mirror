@@ -21,13 +21,13 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "fd-util.h"
+#include "basic/fd-util.h"
 #include "journal-file.h"
 #include "journal-verify.h"
-#include "log.h"
-#include "rm-rf.h"
-#include "terminal-util.h"
-#include "util.h"
+#include "basic/log.h"
+#include "basic/rm-rf.h"
+#include "basic/terminal-util.h"
+#include "basic/util.h"
 
 #define N_ENTRIES 6000
 #define RANDOM_RANGE 77

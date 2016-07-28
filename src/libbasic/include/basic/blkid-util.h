@@ -23,7 +23,7 @@
 #include <blkid/blkid.h>
 #endif
 
-#include "util.h"
+#include "basic/util.h"
 
 #ifdef HAVE_BLKID
 DEFINE_TRIVIAL_CLEANUP_FUNC(blkid_probe, blkid_free_probe);

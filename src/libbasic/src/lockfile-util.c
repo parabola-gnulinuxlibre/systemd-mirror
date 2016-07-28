@@ -24,12 +24,12 @@
 #include <sys/file.h>
 #include <sys/stat.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fs-util.h"
-#include "lockfile-util.h"
-#include "macro.h"
-#include "path-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fs-util.h"
+#include "basic/lockfile-util.h"
+#include "basic/macro.h"
+#include "basic/path-util.h"
 
 int make_lock_file(const char *p, int operation, LockFile *ret) {
         _cleanup_close_ int fd = -1;

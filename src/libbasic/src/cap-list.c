@@ -20,16 +20,16 @@
 #include <errno.h>
 #include <string.h>
 
-#include "cap-list.h"
-#include "macro.h"
-#include "missing.h"
-#include "parse-util.h"
-#include "util.h"
+#include "basic/cap-list.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
+#include "basic/parse-util.h"
+#include "basic/util.h"
 
 static const struct capability_name* lookup_capability(register const char *str, register unsigned int len);
 
-#include "cap-from-name.h"
-#include "cap-to-name.h"
+#include "basic/cap-from-name.h"
+#include "basic/cap-to-name.h"
 
 const char *capability_to_name(int id) {
 

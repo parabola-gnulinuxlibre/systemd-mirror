@@ -21,9 +21,9 @@
 
 #include <systemd/sd-id128.h>
 
-#include "macro.h"
-#include "sparse-endian.h"
-#include "unaligned.h"
+#include "basic/macro.h"
+#include "basic/sparse-endian.h"
+#include "basic/unaligned.h"
 
 typedef enum DUIDType {
         DUID_TYPE_LLT       = 1,

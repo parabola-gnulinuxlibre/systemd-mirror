@@ -27,15 +27,15 @@
 #include <unistd.h>
 
 #include "acl-util.h"
-#include "dirent-util.h"
-#include "fd-util.h"
-#include "missing.h"
+#include "basic/dirent-util.h"
+#include "basic/fd-util.h"
+#include "basic/missing.h"
 #include "nspawn-patch-uid.h"
-#include "stat-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "user-util.h"
+#include "basic/stat-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/user-util.h"
 
 #ifdef HAVE_ACL
 

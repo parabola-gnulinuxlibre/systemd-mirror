@@ -24,9 +24,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "hash-funcs.h"
-#include "macro.h"
-#include "util.h"
+#include "basic/hash-funcs.h"
+#include "basic/macro.h"
+#include "basic/util.h"
 
 /*
  * A hash table implementation. As a minor optimization a NULL hashmap object

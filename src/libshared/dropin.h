@@ -19,10 +19,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "hashmap.h"
-#include "macro.h"
-#include "set.h"
-#include "unit-name.h"
+#include "basic/hashmap.h"
+#include "basic/macro.h"
+#include "basic/set.h"
+#include "basic/unit-name.h"
 
 int drop_in_file(const char *dir, const char *unit, unsigned level,
                  const char *name, char **_p, char **_q);

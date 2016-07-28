@@ -27,11 +27,11 @@
 #include <systemd/sd-event.h>
 #include <systemd/sd-lldp.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
 #include "lldp-network.h"
-#include "macro.h"
-#include "string-util.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
 
 #define TEST_LLDP_PORT "em1"
 #define TEST_LLDP_TYPE_SYSTEM_NAME "systemd-lldp"

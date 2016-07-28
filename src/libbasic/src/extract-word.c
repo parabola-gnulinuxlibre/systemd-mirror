@@ -26,13 +26,13 @@
 #include <string.h>
 #include <syslog.h>
 
-#include "alloc-util.h"
-#include "escape.h"
-#include "extract-word.h"
-#include "log.h"
-#include "macro.h"
-#include "string-util.h"
-#include "utf8.h"
+#include "basic/alloc-util.h"
+#include "basic/escape.h"
+#include "basic/extract-word.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/utf8.h"
 
 int extract_first_word(const char **p, char **ret, const char *separators, ExtractFlags flags) {
         _cleanup_free_ char *s = NULL;

@@ -26,13 +26,13 @@
 
 #include <systemd/sd-ndisc.h>
 
-#include "alloc-util.h"
-#include "async.h"
+#include "basic/alloc-util.h"
+#include "basic/async.h"
 #include "icmp6-util.h"
-#include "in-addr-util.h"
-#include "list.h"
-#include "socket-util.h"
-#include "string-util.h"
+#include "basic/in-addr-util.h"
+#include "basic/list.h"
+#include "basic/socket-util.h"
+#include "basic/string-util.h"
 
 #define NDISC_ROUTER_SOLICITATION_INTERVAL      4 * USEC_PER_SEC
 #define NDISC_MAX_ROUTER_SOLICITATIONS          3

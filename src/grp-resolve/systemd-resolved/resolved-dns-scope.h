@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "list.h"
+#include "basic/list.h"
 
 typedef struct DnsScope DnsScope;
 

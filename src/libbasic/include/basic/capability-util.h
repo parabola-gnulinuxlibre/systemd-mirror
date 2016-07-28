@@ -24,8 +24,8 @@
 #include <sys/capability.h>
 #include <sys/types.h>
 
-#include "macro.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/util.h"
 
 #define CAP_ALL (uint64_t) -1
 

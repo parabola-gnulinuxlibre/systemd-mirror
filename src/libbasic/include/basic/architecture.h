@@ -21,8 +21,8 @@
 
 #include <endian.h>
 
-#include "macro.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/util.h"
 
 /* A cleaned up architecture definition. We don't want to get lost in
  * processor features, models, generations or even ABIs. Hence we

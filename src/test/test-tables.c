@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "architecture.h"
+#include "basic/architecture.h"
 #include "automount.h"
 #include "busname.h"
 #include "cgroup.h"
@@ -30,24 +30,24 @@
 #include "journald-server.h"
 #include "kill.h"
 #include "link-config.h"
-#include "locale-util.h"
-#include "log.h"
+#include "basic/locale-util.h"
+#include "basic/log.h"
 #include "logs-show.h"
 #include "mount.h"
 #include "path.h"
-#include "rlimit-util.h"
+#include "basic/rlimit-util.h"
 #include "scope.h"
 #include "service.h"
 #include "slice.h"
-#include "socket-util.h"
+#include "basic/socket-util.h"
 #include "socket.h"
 #include "swap.h"
 #include "target.h"
 #include "test-tables.h"
 #include "timer.h"
-#include "unit-name.h"
+#include "basic/unit-name.h"
 #include "unit.h"
-#include "util.h"
+#include "basic/util.h"
 
 int main(int argc, char **argv) {
         test_table(architecture, ARCHITECTURE);

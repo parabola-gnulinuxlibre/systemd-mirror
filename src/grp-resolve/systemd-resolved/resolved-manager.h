@@ -23,9 +23,9 @@
 #include <systemd/sd-netlink.h>
 #include <systemd/sd-network.h>
 
-#include "hashmap.h"
-#include "list.h"
-#include "ordered-set.h"
+#include "basic/hashmap.h"
+#include "basic/list.h"
+#include "basic/ordered-set.h"
 #include "resolve-util.h"
 
 typedef struct Manager Manager;

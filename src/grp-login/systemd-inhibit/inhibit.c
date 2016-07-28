@@ -25,16 +25,16 @@
 
 #include <systemd/sd-bus.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-error.h"
 #include "bus-util.h"
-#include "fd-util.h"
-#include "formats-util.h"
-#include "process-util.h"
-#include "signal-util.h"
-#include "strv.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/formats-util.h"
+#include "basic/process-util.h"
+#include "basic/signal-util.h"
+#include "basic/strv.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 static const char* arg_what = "idle:sleep:shutdown";
 static const char* arg_who = NULL;

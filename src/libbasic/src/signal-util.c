@@ -21,12 +21,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "macro.h"
-#include "parse-util.h"
-#include "signal-util.h"
-#include "stdio-util.h"
-#include "string-table.h"
-#include "string-util.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/signal-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
 
 int reset_all_signal_handlers(void) {
         static const struct sigaction sa = {

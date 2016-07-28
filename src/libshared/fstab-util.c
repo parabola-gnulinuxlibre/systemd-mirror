@@ -23,16 +23,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "device-nodes.h"
+#include "basic/alloc-util.h"
+#include "basic/device-nodes.h"
 #include "fstab-util.h"
-#include "macro.h"
-#include "mount-util.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/mount-util.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 bool fstab_is_mount_point(const char *mount) {
         _cleanup_endmntent_ FILE *f = NULL;

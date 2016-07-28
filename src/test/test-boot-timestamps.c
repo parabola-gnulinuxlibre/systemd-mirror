@@ -21,8 +21,8 @@
 #include "acpi-fpdt.h"
 #include "boot-timestamps.h"
 #include "efivars.h"
-#include "log.h"
-#include "util.h"
+#include "basic/log.h"
+#include "basic/util.h"
 
 static int test_acpi_fpdt(void) {
         usec_t loader_start;

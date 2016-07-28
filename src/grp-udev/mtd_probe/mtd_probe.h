@@ -21,7 +21,7 @@
 
 #include <mtd/mtd-user.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 /* Full oob structure as written on the flash */
 struct sm_oob {

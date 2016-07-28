@@ -21,8 +21,8 @@
 
 #include <net/if.h>
 
-#include "in-addr-util.h"
-#include "ratelimit.h"
+#include "basic/in-addr-util.h"
+#include "basic/ratelimit.h"
 #include "resolve-util.h"
 
 typedef struct Link Link;

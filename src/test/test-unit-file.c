@@ -25,24 +25,24 @@
 #include <sys/capability.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "capability-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "hashmap.h"
-#include "hostname-util.h"
+#include "basic/alloc-util.h"
+#include "basic/capability-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/hashmap.h"
+#include "basic/hostname-util.h"
 #include "install-printf.h"
 #include "install.h"
 #include "load-fragment.h"
-#include "macro.h"
-#include "rm-rf.h"
+#include "basic/macro.h"
+#include "basic/rm-rf.h"
 #include "specifier.h"
-#include "string-util.h"
-#include "strv.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
 #include "test-helper.h"
 #include "tests.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 static int test_unit_file_get_set(void) {
         int r;

@@ -23,16 +23,16 @@
 #include <sys/types.h>
 #include <linux/vt.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-error.h"
 #include "bus-util.h"
-#include "cgroup-util.h"
-#include "fd-util.h"
+#include "basic/cgroup-util.h"
+#include "basic/fd-util.h"
 #include "logind.h"
-#include "strv.h"
-#include "terminal-util.h"
+#include "basic/strv.h"
+#include "basic/terminal-util.h"
 #include "udev-util.h"
-#include "user-util.h"
+#include "basic/user-util.h"
 
 int manager_add_device(Manager *m, const char *sysfs, bool master, Device **_device) {
         Device *d;

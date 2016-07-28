@@ -20,14 +20,14 @@
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-event.h>
 
-#include "capability-util.h"
-#include "mkdir.h"
+#include "basic/capability-util.h"
+#include "basic/mkdir.h"
 #include "resolved-conf.h"
 #include "resolved-manager.h"
 #include "resolved-resolv-conf.h"
-#include "selinux-util.h"
-#include "signal-util.h"
-#include "user-util.h"
+#include "basic/selinux-util.h"
+#include "basic/signal-util.h"
+#include "basic/user-util.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_(manager_freep) Manager *m = NULL;

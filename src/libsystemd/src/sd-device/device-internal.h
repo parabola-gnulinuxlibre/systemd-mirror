@@ -20,8 +20,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "hashmap.h"
-#include "set.h"
+#include "basic/hashmap.h"
+#include "basic/set.h"
 
 struct sd_device {
         uint64_t n_ref;

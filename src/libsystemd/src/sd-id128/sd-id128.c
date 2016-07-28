@@ -23,12 +23,12 @@
 
 #include <systemd/sd-id128.h>
 
-#include "fd-util.h"
-#include "hexdecoct.h"
-#include "io-util.h"
-#include "macro.h"
-#include "random-util.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/io-util.h"
+#include "basic/macro.h"
+#include "basic/random-util.h"
+#include "basic/util.h"
 
 _public_ char *sd_id128_to_string(sd_id128_t id, char s[SD_ID128_STRING_MAX]) {
         unsigned n;

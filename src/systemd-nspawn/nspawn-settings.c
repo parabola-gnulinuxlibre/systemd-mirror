@@ -17,18 +17,18 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "cap-list.h"
+#include "basic/alloc-util.h"
+#include "basic/cap-list.h"
 #include "conf-parser.h"
 #include "nspawn-network.h"
 #include "nspawn-settings.h"
-#include "parse-util.h"
-#include "process-util.h"
-#include "socket-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/parse-util.h"
+#include "basic/process-util.h"
+#include "basic/socket-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 int settings_load(FILE *f, const char *path, Settings **ret) {
         _cleanup_(settings_freep) Settings *s = NULL;

@@ -22,8 +22,8 @@
 #include <netinet/ip6.h>
 #include <netinet/udp.h>
 
-#include "macro.h"
-#include "sparse-endian.h"
+#include "basic/macro.h"
+#include "basic/sparse-endian.h"
 
 struct DHCP6Message {
         union {

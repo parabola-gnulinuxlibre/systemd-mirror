@@ -23,7 +23,7 @@
 #include <systemd/sd-netlink.h>
 #include <systemd/sd-network.h>
 
-#include "hashmap.h"
+#include "basic/hashmap.h"
 
 typedef struct Manager Manager;
 

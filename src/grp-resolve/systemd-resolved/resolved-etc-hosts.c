@@ -17,14 +17,14 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "fd-util.h"
-#include "fileio.h"
-#include "hostname-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/hostname-util.h"
 #include "resolved-etc-hosts.h"
 #include "resolved-dns-synthesize.h"
-#include "string-util.h"
-#include "strv.h"
-#include "time-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/time-util.h"
 
 /* Recheck /etc/hosts at most once every 2s */
 #define ETC_HOSTS_RECHECK_USEC (2*USEC_PER_SEC)

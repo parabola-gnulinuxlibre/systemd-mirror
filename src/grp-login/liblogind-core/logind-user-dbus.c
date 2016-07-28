@@ -20,14 +20,14 @@
 #include <errno.h>
 #include <string.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-util.h"
-#include "formats-util.h"
+#include "basic/formats-util.h"
 #include "logind-user.h"
 #include "logind.h"
-#include "signal-util.h"
-#include "strv.h"
-#include "user-util.h"
+#include "basic/signal-util.h"
+#include "basic/strv.h"
+#include "basic/user-util.h"
 
 static int property_get_display(
                 sd_bus *bus,

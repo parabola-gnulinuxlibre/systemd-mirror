@@ -22,11 +22,11 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "log.h"
-#include "macro.h"
-#include "string-util.h"
-#include "verbs.h"
-#include "virt.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/verbs.h"
+#include "basic/virt.h"
 
 int dispatch_verb(int argc, char *argv[], const Verb verbs[], void *userdata) {
         const Verb *verb;

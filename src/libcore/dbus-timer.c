@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-util.h"
 #include "dbus-timer.h"
-#include "strv.h"
+#include "basic/strv.h"
 #include "timer.h"
 #include "unit.h"
 

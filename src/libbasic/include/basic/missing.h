@@ -50,7 +50,7 @@
 #include <linux/btrfs.h>
 #endif
 
-#include "macro.h"
+#include "basic/macro.h"
 
 #ifndef RLIMIT_RTTIME
 #define RLIMIT_RTTIME 15
@@ -1013,4 +1013,4 @@ typedef int32_t key_serial_t;
 
 #endif
 
-#include "missing_syscall.h"
+#include "basic/missing_syscall.h"

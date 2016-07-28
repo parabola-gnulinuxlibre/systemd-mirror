@@ -24,17 +24,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "conf-files.h"
-#include "dirent-util.h"
-#include "fd-util.h"
-#include "hashmap.h"
-#include "log.h"
-#include "macro.h"
-#include "missing.h"
-#include "path-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/conf-files.h"
+#include "basic/dirent-util.h"
+#include "basic/fd-util.h"
+#include "basic/hashmap.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
+#include "basic/path-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 static int files_add(Hashmap *h, const char *root, const char *path, const char *suffix) {
         _cleanup_closedir_ DIR *dir = NULL;

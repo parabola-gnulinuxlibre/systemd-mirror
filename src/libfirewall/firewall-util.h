@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "in-addr-util.h"
+#include "basic/in-addr-util.h"
 
 #ifdef HAVE_LIBIPTC
 

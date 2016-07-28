@@ -27,9 +27,9 @@
 #include <systemd/sd-bus.h>
 #include <systemd/sd-event.h>
 
-#include "hashmap.h"
-#include "macro.h"
-#include "string-util.h"
+#include "basic/hashmap.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
 
 typedef enum BusTransport {
         BUS_TRANSPORT_LOCAL,

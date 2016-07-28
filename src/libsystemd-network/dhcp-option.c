@@ -22,8 +22,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "utf8.h"
+#include "basic/alloc-util.h"
+#include "basic/utf8.h"
 
 #include "dhcp-internal.h"
 

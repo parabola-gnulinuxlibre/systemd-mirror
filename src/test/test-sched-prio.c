@@ -19,9 +19,9 @@
 
 #include <sched.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 #include "manager.h"
-#include "rm-rf.h"
+#include "basic/rm-rf.h"
 #include "test-helper.h"
 #include "tests.h"
 

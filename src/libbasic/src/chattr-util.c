@@ -23,9 +23,9 @@
 #include <sys/stat.h>
 #include <linux/fs.h>
 
-#include "chattr-util.h"
-#include "fd-util.h"
-#include "macro.h"
+#include "basic/chattr-util.h"
+#include "basic/fd-util.h"
+#include "basic/macro.h"
 
 int chattr_fd(int fd, unsigned value, unsigned mask) {
         unsigned old_attr, new_attr;

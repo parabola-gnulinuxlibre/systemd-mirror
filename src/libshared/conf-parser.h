@@ -25,9 +25,9 @@
 #include <stdio.h>
 #include <syslog.h>
 
-#include "alloc-util.h"
-#include "log.h"
-#include "macro.h"
+#include "basic/alloc-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
 
 /* An abstract parser for simple, line based, shallow configuration
  * files consisting of variable assignments only. */

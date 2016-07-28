@@ -27,22 +27,22 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "btrfs-util.h"
-#include "chattr-util.h"
+#include "basic/alloc-util.h"
+#include "basic/btrfs-util.h"
+#include "basic/chattr-util.h"
 #include "compress.h"
-#include "fd-util.h"
+#include "basic/fd-util.h"
 #include "journal-authenticate.h"
 #include "journal-def.h"
 #include "journal-file.h"
 #include "lookup3.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "random-util.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/random-util.h"
 #include <systemd/sd-event.h>
-#include "set.h"
-#include "string-util.h"
-#include "xattr-util.h"
+#include "basic/set.h"
+#include "basic/string-util.h"
+#include "basic/xattr-util.h"
 
 #define DEFAULT_DATA_HASH_TABLE_SIZE (2047ULL*sizeof(HashItem))
 #define DEFAULT_FIELD_HASH_TABLE_SIZE (333ULL*sizeof(HashItem))

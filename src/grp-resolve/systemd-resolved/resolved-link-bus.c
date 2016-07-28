@@ -17,13 +17,13 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-util.h"
-#include "parse-util.h"
+#include "basic/parse-util.h"
 #include "resolve-util.h"
 #include "resolved-bus.h"
 #include "resolved-link-bus.h"
-#include "strv.h"
+#include "basic/strv.h"
 
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_resolve_support, resolve_support, ResolveSupport);
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_dnssec_mode, dnssec_mode, DnssecMode);

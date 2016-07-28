@@ -24,9 +24,9 @@
 #include <unistd.h>
 #include <linux/watchdog.h>
 
-#include "fd-util.h"
-#include "log.h"
-#include "time-util.h"
+#include "basic/fd-util.h"
+#include "basic/log.h"
+#include "basic/time-util.h"
 #include "watchdog.h"
 
 static int watchdog_fd = -1;

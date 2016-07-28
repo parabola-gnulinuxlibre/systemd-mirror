@@ -25,13 +25,13 @@
 #include <sys/prctl.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "capability-util.h"
-#include "fileio.h"
-#include "log.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/capability-util.h"
+#include "basic/fileio.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/util.h"
 
 int have_effective_cap(int value) {
         _cleanup_cap_free_ cap_t cap;

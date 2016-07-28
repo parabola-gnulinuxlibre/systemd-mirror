@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "ordered-set.h"
-#include "strv.h"
+#include "basic/ordered-set.h"
+#include "basic/strv.h"
 
 int ordered_set_consume(OrderedSet *s, void *p) {
         int r;

@@ -22,7 +22,7 @@
 typedef enum DeviceType DeviceType;
 typedef struct SessionDevice SessionDevice;
 
-#include "list.h"
+#include "basic/list.h"
 #include "logind.h"
 
 enum DeviceType {

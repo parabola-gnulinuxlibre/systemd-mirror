@@ -21,8 +21,8 @@
 
 #include <systemd/sd-netlink.h>
 
-#include "list.h"
-#include "time-util.h"
+#include "basic/list.h"
+#include "basic/time-util.h"
 
 typedef struct netdev_join_callback netdev_join_callback;
 typedef struct Link Link;

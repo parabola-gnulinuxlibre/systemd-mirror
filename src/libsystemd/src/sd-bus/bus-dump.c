@@ -17,21 +17,21 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-dump.h"
 #include "bus-internal.h"
 #include "bus-message.h"
 #include "bus-type.h"
-#include "cap-list.h"
-#include "capability-util.h"
-#include "fileio.h"
-#include "formats-util.h"
-#include "locale-util.h"
-#include "macro.h"
-#include "string-util.h"
-#include "strv.h"
-#include "terminal-util.h"
-#include "util.h"
+#include "basic/cap-list.h"
+#include "basic/capability-util.h"
+#include "basic/fileio.h"
+#include "basic/formats-util.h"
+#include "basic/locale-util.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/terminal-util.h"
+#include "basic/util.h"
 
 static char *indent(unsigned level, unsigned flags) {
         char *p;

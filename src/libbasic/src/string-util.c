@@ -23,12 +23,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "alloc-util.h"
-#include "gunicode.h"
-#include "macro.h"
-#include "string-util.h"
-#include "utf8.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/gunicode.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/utf8.h"
+#include "basic/util.h"
 
 int strcmp_ptr(const char *a, const char *b) {
 

@@ -18,9 +18,9 @@
 ***/
 
 #include "kill.h"
-#include "signal-util.h"
-#include "string-table.h"
-#include "util.h"
+#include "basic/signal-util.h"
+#include "basic/string-table.h"
+#include "basic/util.h"
 
 void kill_context_init(KillContext *c) {
         assert(c);

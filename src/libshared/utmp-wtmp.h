@@ -22,8 +22,8 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "time-util.h"
-#include "util.h"
+#include "basic/time-util.h"
+#include "basic/util.h"
 
 #ifdef HAVE_UTMP
 int utmp_get_runlevel(int *runlevel, int *previous);

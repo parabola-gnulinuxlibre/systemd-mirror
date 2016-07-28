@@ -25,12 +25,12 @@
 #include <systemd/sd-dhcp-client.h>
 #include <systemd/sd-event.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dhcp-identifier.h"
 #include "dhcp-internal.h"
 #include "dhcp-protocol.h"
-#include "fd-util.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/util.h"
 
 static uint8_t mac_addr[] = {'A', 'B', 'C', '1', '2', '3'};
 

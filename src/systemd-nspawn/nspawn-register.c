@@ -23,9 +23,9 @@
 #include "bus-unit-util.h"
 #include "bus-util.h"
 #include "nspawn-register.h"
-#include "stat-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/stat-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 int register_machine(
                 const char *machine_name,

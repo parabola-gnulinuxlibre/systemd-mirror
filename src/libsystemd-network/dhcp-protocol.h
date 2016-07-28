@@ -23,8 +23,8 @@
 #include <netinet/udp.h>
 #include <stdint.h>
 
-#include "macro.h"
-#include "sparse-endian.h"
+#include "basic/macro.h"
+#include "basic/sparse-endian.h"
 
 struct DHCPMessage {
         uint8_t op;

@@ -26,20 +26,20 @@
 
 #include <systemd/sd-dhcp-lease.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dhcp-lease-internal.h"
 #include "dhcp-protocol.h"
 #include "dns-domain.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "hexdecoct.h"
-#include "hostname-util.h"
-#include "in-addr-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/hexdecoct.h"
+#include "basic/hostname-util.h"
+#include "basic/in-addr-util.h"
 #include "network-internal.h"
-#include "parse-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "unaligned.h"
+#include "basic/parse-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
+#include "basic/unaligned.h"
 
 int sd_dhcp_lease_get_address(sd_dhcp_lease *lease, struct in_addr *addr) {
         assert_return(lease, -EINVAL);

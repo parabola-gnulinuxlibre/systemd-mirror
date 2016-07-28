@@ -17,11 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-internal.h"
 #include "bus-message.h"
-#include "hexdecoct.h"
-#include "string-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/string-util.h"
 
 bool object_path_is_valid(const char *p) {
         const char *q;

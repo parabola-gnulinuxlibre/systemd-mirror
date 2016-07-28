@@ -23,18 +23,18 @@
 #include "libudev.h"
 #include <systemd/sd-daemon.h>
 
-#include "alloc-util.h"
-#include "escape.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "io-util.h"
-#include "mkdir.h"
-#include "parse-util.h"
-#include "proc-cmdline.h"
-#include "string-table.h"
-#include "string-util.h"
+#include "basic/alloc-util.h"
+#include "basic/escape.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/io-util.h"
+#include "basic/mkdir.h"
+#include "basic/parse-util.h"
+#include "basic/proc-cmdline.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
 #include "udev-util.h"
-#include "util.h"
+#include "basic/util.h"
 
 #define EXIT_USEC (5 * USEC_PER_SEC)
 

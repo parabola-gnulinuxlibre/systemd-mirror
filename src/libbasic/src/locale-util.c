@@ -30,16 +30,16 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 
-#include "dirent-util.h"
-#include "fd-util.h"
-#include "hashmap.h"
-#include "locale-util.h"
-#include "path-util.h"
-#include "set.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "strv.h"
-#include "utf8.h"
+#include "basic/dirent-util.h"
+#include "basic/fd-util.h"
+#include "basic/hashmap.h"
+#include "basic/locale-util.h"
+#include "basic/path-util.h"
+#include "basic/set.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/utf8.h"
 
 static int add_locales_from_archive(Set *locales) {
         /* Stolen from glibc... */

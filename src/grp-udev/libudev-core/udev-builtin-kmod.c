@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "string-util.h"
+#include "basic/string-util.h"
 #include "udev.h"
 
 static struct kmod_ctx *ctx = NULL;

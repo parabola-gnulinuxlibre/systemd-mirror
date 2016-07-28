@@ -25,12 +25,12 @@
 #include <string.h>
 #include <time.h>
 
-#include "alloc-util.h"
-#include "calendarspec.h"
-#include "fileio.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "string-util.h"
+#include "basic/alloc-util.h"
+#include "basic/calendarspec.h"
+#include "basic/fileio.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/string-util.h"
 
 #define BITS_WEEKDAYS   127
 

@@ -21,9 +21,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "macro.h"
-#include "mempool.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/mempool.h"
+#include "basic/util.h"
 
 struct pool {
         struct pool *next;

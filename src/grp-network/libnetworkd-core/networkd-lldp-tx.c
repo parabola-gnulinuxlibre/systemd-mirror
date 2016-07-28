@@ -21,17 +21,17 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "hostname-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/hostname-util.h"
 #include "networkd-lldp-tx.h"
 #include "networkd.h"
-#include "parse-util.h"
-#include "random-util.h"
-#include "socket-util.h"
-#include "string-util.h"
-#include "unaligned.h"
+#include "basic/parse-util.h"
+#include "basic/random-util.h"
+#include "basic/socket-util.h"
+#include "basic/string-util.h"
+#include "basic/unaligned.h"
 
 /* The LLDP spec calls this "txFastInit", see 9.2.5.19 */
 #define LLDP_TX_FAST_INIT 4U

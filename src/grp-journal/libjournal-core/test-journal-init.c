@@ -19,10 +19,10 @@
 
 #include <systemd/sd-journal.h>
 
-#include "log.h"
-#include "parse-util.h"
-#include "rm-rf.h"
-#include "util.h"
+#include "basic/log.h"
+#include "basic/parse-util.h"
+#include "basic/rm-rf.h"
+#include "basic/util.h"
 
 int main(int argc, char *argv[]) {
         sd_journal *j;

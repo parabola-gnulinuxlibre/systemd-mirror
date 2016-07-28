@@ -17,16 +17,16 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "bus-label.h"
+#include "basic/alloc-util.h"
+#include "basic/bus-label.h"
 #include "bus-util.h"
-#include "fd-util.h"
+#include "basic/fd-util.h"
 #include "image-dbus.h"
-#include "io-util.h"
+#include "basic/io-util.h"
 #include "machine-image.h"
-#include "process-util.h"
-#include "strv.h"
-#include "user-util.h"
+#include "basic/process-util.h"
+#include "basic/strv.h"
+#include "basic/user-util.h"
 
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_type, image_type, ImageType);
 

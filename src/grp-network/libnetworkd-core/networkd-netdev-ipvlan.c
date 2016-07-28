@@ -21,7 +21,7 @@
 
 #include "conf-parser.h"
 #include "networkd-netdev-ipvlan.h"
-#include "string-table.h"
+#include "basic/string-table.h"
 
 static const char* const ipvlan_mode_table[_NETDEV_IPVLAN_MODE_MAX] = {
         [NETDEV_IPVLAN_MODE_L2] = "L2",

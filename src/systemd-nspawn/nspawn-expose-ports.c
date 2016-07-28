@@ -19,16 +19,16 @@
 
 #include <systemd/sd-netlink.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
 #include "firewall-util.h"
-#include "in-addr-util.h"
+#include "basic/in-addr-util.h"
 #include "sd-netlink/local-addresses.h"
 #include "nspawn-expose-ports.h"
-#include "parse-util.h"
-#include "socket-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/parse-util.h"
+#include "basic/socket-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 int expose_port_parse(ExposePort **l, const char *s) {
 

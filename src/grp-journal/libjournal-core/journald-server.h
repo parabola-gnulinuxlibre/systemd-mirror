@@ -26,11 +26,11 @@
 
 typedef struct Server Server;
 
-#include "hashmap.h"
+#include "basic/hashmap.h"
 #include "sd-journal/journal-file.h"
 #include "journald-rate-limit.h"
 #include "journald-stream.h"
-#include "list.h"
+#include "basic/list.h"
 
 typedef enum Storage {
         STORAGE_AUTO,

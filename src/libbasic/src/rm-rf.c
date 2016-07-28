@@ -26,15 +26,15 @@
 #include <sys/statfs.h>
 #include <unistd.h>
 
-#include "btrfs-util.h"
-#include "fd-util.h"
-#include "log.h"
-#include "macro.h"
-#include "mount-util.h"
-#include "path-util.h"
-#include "rm-rf.h"
-#include "stat-util.h"
-#include "string-util.h"
+#include "basic/btrfs-util.h"
+#include "basic/fd-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/mount-util.h"
+#include "basic/path-util.h"
+#include "basic/rm-rf.h"
+#include "basic/stat-util.h"
+#include "basic/string-util.h"
 
 int rm_rf_children(int fd, RemoveFlags flags, struct stat *root_dev) {
         _cleanup_closedir_ DIR *d = NULL;

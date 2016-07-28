@@ -23,7 +23,7 @@
 
 #include <systemd/sd-event.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 typedef struct PTYForward PTYForward;
 

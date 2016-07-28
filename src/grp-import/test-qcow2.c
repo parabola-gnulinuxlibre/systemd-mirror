@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "fd-util.h"
-#include "log.h"
+#include "basic/fd-util.h"
+#include "basic/log.h"
 #include "qcow2-util.h"
-#include "util.h"
+#include "basic/util.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_close_ int sfd = -1, dfd = -1;

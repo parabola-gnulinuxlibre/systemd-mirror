@@ -21,15 +21,15 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "mkdir.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/mkdir.h"
 #include "nspawn-setuid.h"
-#include "process-util.h"
-#include "signal-util.h"
-#include "string-util.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/process-util.h"
+#include "basic/signal-util.h"
+#include "basic/string-util.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 static int spawn_getent(const char *database, const char *key, pid_t *rpid) {
         int pipe_fds[2];

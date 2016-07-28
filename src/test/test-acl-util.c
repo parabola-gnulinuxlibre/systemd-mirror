@@ -23,10 +23,10 @@
 #include <unistd.h>
 
 #include "acl-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "string-util.h"
-#include "user-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/string-util.h"
+#include "basic/user-util.h"
 
 static void test_add_acls_for_user(void) {
         char fn[] = "/tmp/test-empty.XXXXXX";

@@ -19,14 +19,14 @@
 
 #include <errno.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dbus-slice.h"
-#include "log.h"
+#include "basic/log.h"
 #include "slice.h"
-#include "special.h"
-#include "string-util.h"
-#include "strv.h"
-#include "unit-name.h"
+#include "basic/special.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/unit-name.h"
 #include "unit.h"
 
 static const UnitActiveState state_translation_table[_SLICE_STATE_MAX] = {

@@ -21,17 +21,17 @@
 
 #include <systemd/sd-event.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "export-raw.h"
 #include "export-tar.h"
-#include "fd-util.h"
-#include "fs-util.h"
-#include "hostname-util.h"
+#include "basic/fd-util.h"
+#include "basic/fs-util.h"
+#include "basic/hostname-util.h"
 #include "import-util.h"
 #include "machine-image.h"
-#include "signal-util.h"
-#include "string-util.h"
-#include "verbs.h"
+#include "basic/signal-util.h"
+#include "basic/string-util.h"
+#include "basic/verbs.h"
 
 static ImportCompressType arg_compress = IMPORT_COMPRESS_UNKNOWN;
 

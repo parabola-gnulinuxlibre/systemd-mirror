@@ -21,17 +21,17 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "extract-word.h"
-#include "fileio.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "proc-cmdline.h"
-#include "process-util.h"
-#include "special.h"
-#include "string-util.h"
-#include "util.h"
-#include "virt.h"
+#include "basic/alloc-util.h"
+#include "basic/extract-word.h"
+#include "basic/fileio.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/proc-cmdline.h"
+#include "basic/process-util.h"
+#include "basic/special.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
+#include "basic/virt.h"
 
 int proc_cmdline(char **ret) {
         assert(ret);

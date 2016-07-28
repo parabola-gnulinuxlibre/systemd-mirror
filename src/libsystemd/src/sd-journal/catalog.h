@@ -23,8 +23,8 @@
 
 #include <systemd/sd-id128.h>
 
-#include "hashmap.h"
-#include "strbuf.h"
+#include "basic/hashmap.h"
+#include "basic/strbuf.h"
 
 int catalog_import_file(Hashmap *h, const char *path);
 int catalog_update(const char* database, const char* root, const char* const* dirs);

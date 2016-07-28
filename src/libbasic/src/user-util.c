@@ -30,15 +30,15 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "missing.h"
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "formats-util.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "string-util.h"
-#include "user-util.h"
+#include "basic/missing.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/formats-util.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/string-util.h"
+#include "basic/user-util.h"
 
 bool uid_is_valid(uid_t uid) {
 

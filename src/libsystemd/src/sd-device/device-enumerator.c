@@ -20,16 +20,16 @@
 
 #include <systemd/sd-device.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "device-enumerator-private.h"
 #include "device-util.h"
-#include "dirent-util.h"
-#include "fd-util.h"
-#include "prioq.h"
-#include "set.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/dirent-util.h"
+#include "basic/fd-util.h"
+#include "basic/prioq.h"
+#include "basic/set.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 #define DEVICE_ENUMERATE_MAX_DEPTH 256
 

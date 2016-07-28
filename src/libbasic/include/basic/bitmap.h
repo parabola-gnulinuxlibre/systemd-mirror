@@ -21,8 +21,8 @@
 
 #include <stdbool.h>
 
-#include "hashmap.h"
-#include "macro.h"
+#include "basic/hashmap.h"
+#include "basic/macro.h"
 
 typedef struct Bitmap Bitmap;
 

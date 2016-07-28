@@ -31,13 +31,13 @@
 
 #include <systemd/sd-resolve.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "io-util.h"
-#include "list.h"
-#include "missing.h"
-#include "socket-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/io-util.h"
+#include "basic/list.h"
+#include "basic/missing.h"
+#include "basic/socket-util.h"
+#include "basic/util.h"
 
 #define WORKERS_MIN 1U
 #define WORKERS_MAX 16U

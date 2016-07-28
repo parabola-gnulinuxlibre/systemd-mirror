@@ -20,21 +20,21 @@
 #include <ctype.h>
 #include <net/if.h>
 
-#include "alloc-util.h"
-#include "conf-files.h"
+#include "basic/alloc-util.h"
+#include "basic/conf-files.h"
 #include "conf-parser.h"
 #include "dns-domain.h"
-#include "fd-util.h"
-#include "hostname-util.h"
+#include "basic/fd-util.h"
+#include "basic/hostname-util.h"
 #include "network-internal.h"
 #include "networkd-network.h"
 #include "networkd.h"
-#include "parse-util.h"
-#include "set.h"
-#include "stat-util.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/parse-util.h"
+#include "basic/set.h"
+#include "basic/stat-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 static int network_load_one(Manager *manager, const char *filename) {
         _cleanup_network_free_ Network *network = NULL;

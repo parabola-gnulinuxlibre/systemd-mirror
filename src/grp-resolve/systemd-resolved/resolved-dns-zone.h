@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "hashmap.h"
+#include "basic/hashmap.h"
 
 typedef struct DnsZone {
         Hashmap *by_key;

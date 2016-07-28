@@ -24,7 +24,7 @@
 typedef struct LookupPaths LookupPaths;
 
 #include "install.h"
-#include "macro.h"
+#include "basic/macro.h"
 
 typedef enum LookupPathsFlags {
         LOOKUP_PATHS_EXCLUDE_GENERATED = 1,

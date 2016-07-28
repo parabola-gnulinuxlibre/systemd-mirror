@@ -20,7 +20,7 @@
 ***/
 
 #include "udev.h"
-#include "util.h"
+#include "basic/util.h"
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(struct udev*, udev_unref);
 DEFINE_TRIVIAL_CLEANUP_FUNC(struct udev_device*, udev_device_unref);

@@ -25,18 +25,18 @@
 
 #include <systemd/sd-bus.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "sd-bus/bus-error.h"
 #include "bus-util.h"
 #include "cgroup-show.h"
-#include "cgroup-util.h"
-#include "fileio.h"
-#include "log.h"
+#include "basic/cgroup-util.h"
+#include "basic/fileio.h"
+#include "basic/log.h"
 #include "output-mode.h"
 #include "pager.h"
-#include "path-util.h"
-#include "unit-name.h"
-#include "util.h"
+#include "basic/path-util.h"
+#include "basic/unit-name.h"
+#include "basic/util.h"
 
 static bool arg_no_pager = false;
 static bool arg_kernel_threads = false;

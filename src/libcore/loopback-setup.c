@@ -23,7 +23,7 @@
 #include <systemd/sd-netlink.h>
 
 #include "loopback-setup.h"
-#include "missing.h"
+#include "basic/missing.h"
 
 static int start_loopback(sd_netlink *rtnl) {
         _cleanup_(sd_netlink_message_unrefp) sd_netlink_message *req = NULL;

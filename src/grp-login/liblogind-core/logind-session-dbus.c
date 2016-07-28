@@ -20,17 +20,17 @@
 #include <errno.h>
 #include <string.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-common-errors.h"
-#include "bus-label.h"
+#include "basic/bus-label.h"
 #include "bus-util.h"
-#include "fd-util.h"
+#include "basic/fd-util.h"
 #include "logind-session-device.h"
 #include "logind-session.h"
 #include "logind.h"
-#include "signal-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/signal-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 static int property_get_user(
                 sd_bus *bus,

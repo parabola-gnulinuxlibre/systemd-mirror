@@ -17,13 +17,13 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "compress.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "random-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/random-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 typedef int (compress_t)(const void *src, uint64_t src_size, void *dst,
                          size_t dst_alloc_size, size_t *dst_size);

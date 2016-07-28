@@ -22,10 +22,10 @@
 #include <systemd/sd-netlink.h>
 
 #include "conf-parser.h"
-#include "alloc-util.h"
-#include "extract-word.h"
-#include "parse-util.h"
-#include "missing.h"
+#include "basic/alloc-util.h"
+#include "basic/extract-word.h"
+#include "basic/parse-util.h"
+#include "basic/missing.h"
 
 #include "networkd-link.h"
 #include "networkd-netdev-vxlan.h"

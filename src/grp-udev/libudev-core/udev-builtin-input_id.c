@@ -30,11 +30,11 @@
 #include <linux/limits.h>
 #include <linux/input.h>
 
-#include "fd-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
+#include "basic/fd-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
 #include "udev.h"
-#include "util.h"
+#include "basic/util.h"
 
 /* we must use this kernel-compatible implementation */
 #define BITS_PER_LONG (sizeof(unsigned long) * 8)

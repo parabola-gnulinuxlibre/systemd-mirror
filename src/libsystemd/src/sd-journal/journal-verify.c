@@ -22,18 +22,18 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "compress.h"
-#include "fd-util.h"
-#include "fileio.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
 #include "journal-authenticate.h"
 #include "journal-def.h"
 #include "journal-file.h"
 #include "journal-verify.h"
 #include "lookup3.h"
-#include "macro.h"
-#include "terminal-util.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/terminal-util.h"
+#include "basic/util.h"
 
 static void draw_progress(uint64_t p, usec_t *last_usec) {
         unsigned n, i, j, k;

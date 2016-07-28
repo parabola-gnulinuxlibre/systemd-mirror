@@ -19,7 +19,7 @@
 
 #include <unistd.h>
 
-#include "log.h"
+#include "basic/log.h"
 #include "watchdog.h"
 
 int main(int argc, char *argv[]) {

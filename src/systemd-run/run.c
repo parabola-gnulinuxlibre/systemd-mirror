@@ -23,23 +23,23 @@
 #include <systemd/sd-bus.h>
 #include <systemd/sd-event.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "sd-bus/bus-error.h"
 #include "bus-unit-util.h"
 #include "bus-util.h"
-#include "calendarspec.h"
-#include "env-util.h"
-#include "fd-util.h"
-#include "formats-util.h"
-#include "parse-util.h"
-#include "path-util.h"
+#include "basic/calendarspec.h"
+#include "basic/env-util.h"
+#include "basic/fd-util.h"
+#include "basic/formats-util.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
 #include "ptyfwd.h"
-#include "signal-util.h"
+#include "basic/signal-util.h"
 #include "spawn-polkit-agent.h"
-#include "strv.h"
-#include "terminal-util.h"
-#include "unit-name.h"
-#include "user-util.h"
+#include "basic/strv.h"
+#include "basic/terminal-util.h"
+#include "basic/unit-name.h"
+#include "basic/user-util.h"
 
 static bool arg_ask_password = true;
 static bool arg_scope = false;

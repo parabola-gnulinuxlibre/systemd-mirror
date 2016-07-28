@@ -17,12 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dns-domain.h"
-#include "list.h"
+#include "basic/list.h"
 #include "resolved-dns-packet.h"
 #include "resolved-dns-zone.h"
-#include "string-util.h"
+#include "basic/string-util.h"
 
 /* Never allow more than 1K entries */
 #define ZONE_MAX 1024

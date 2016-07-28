@@ -24,14 +24,14 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "env-util.h"
-#include "extract-word.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "utf8.h"
+#include "basic/alloc-util.h"
+#include "basic/env-util.h"
+#include "basic/extract-word.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/utf8.h"
 
 #define VALID_CHARS_ENV_NAME                    \
         DIGITS LETTERS                          \

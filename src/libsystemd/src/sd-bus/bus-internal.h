@@ -27,13 +27,13 @@
 #include "bus-error.h"
 #include "bus-kernel.h"
 #include "bus-match.h"
-#include "hashmap.h"
+#include "basic/hashmap.h"
 #include "kdbus.h"
-#include "list.h"
-#include "prioq.h"
-#include "refcnt.h"
-#include "socket-util.h"
-#include "util.h"
+#include "basic/list.h"
+#include "basic/prioq.h"
+#include "basic/refcnt.h"
+#include "basic/socket-util.h"
+#include "basic/util.h"
 
 struct reply_callback {
         sd_bus_message_handler_t callback;

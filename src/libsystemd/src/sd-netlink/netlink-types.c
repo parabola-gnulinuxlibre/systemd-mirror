@@ -30,11 +30,11 @@
 #include <linux/if_link.h>
 #include <linux/if_tunnel.h>
 
-#include "macro.h"
-#include "missing.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
 #include "netlink-types.h"
-#include "string-table.h"
-#include "util.h"
+#include "basic/string-table.h"
+#include "basic/util.h"
 
 /* Maximum ARP IP target defined in kernel */
 #define BOND_MAX_ARP_TARGETS    16

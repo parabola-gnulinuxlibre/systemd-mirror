@@ -19,10 +19,10 @@
 
 #include <stdio.h>
 
-#include "log.h"
+#include "basic/log.h"
 #include "sleep-config.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 static void test_sleep(void) {
         _cleanup_strv_free_ char

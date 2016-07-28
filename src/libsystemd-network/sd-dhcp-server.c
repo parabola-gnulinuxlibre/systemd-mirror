@@ -22,13 +22,13 @@
 
 #include <systemd/sd-dhcp-server.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dhcp-internal.h"
 #include "dhcp-server-internal.h"
-#include "fd-util.h"
-#include "in-addr-util.h"
-#include "siphash24.h"
-#include "string-util.h"
+#include "basic/fd-util.h"
+#include "basic/in-addr-util.h"
+#include "basic/siphash24.h"
+#include "basic/string-util.h"
 
 #define DHCP_DEFAULT_LEASE_TIME_USEC USEC_PER_HOUR
 #define DHCP_MAX_LEASE_TIME_USEC (USEC_PER_HOUR*12)

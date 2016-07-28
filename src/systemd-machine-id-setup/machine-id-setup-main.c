@@ -22,10 +22,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "log.h"
+#include "basic/log.h"
 #include "machine-id-setup.h"
-#include "path-util.h"
-#include "util.h"
+#include "basic/path-util.h"
+#include "basic/util.h"
 
 static char *arg_root = NULL;
 static bool arg_commit = false;

@@ -23,20 +23,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "hashmap.h"
-#include "macro.h"
-#include "mempool.h"
-#include "process-util.h"
-#include "random-util.h"
-#include "set.h"
-#include "siphash24.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/hashmap.h"
+#include "basic/macro.h"
+#include "basic/mempool.h"
+#include "basic/process-util.h"
+#include "basic/random-util.h"
+#include "basic/set.h"
+#include "basic/siphash24.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 #ifdef ENABLE_DEBUG_HASHMAP
 #include <pthread.h>
-#include "list.h"
+#include "basic/list.h"
 #endif
 
 /*

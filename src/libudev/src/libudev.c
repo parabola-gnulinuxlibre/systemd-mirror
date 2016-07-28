@@ -26,11 +26,11 @@
 
 #include "libudev.h"
 
-#include "alloc-util.h"
-#include "fd-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
 #include "libudev-private.h"
-#include "missing.h"
-#include "string-util.h"
+#include "basic/missing.h"
+#include "basic/string-util.h"
 
 /**
  * SECTION:libudev

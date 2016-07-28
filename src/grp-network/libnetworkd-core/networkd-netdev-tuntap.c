@@ -25,10 +25,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
 #include "networkd-netdev-tuntap.h"
-#include "user-util.h"
+#include "basic/user-util.h"
 
 #define TUN_DEV "/dev/net/tun"
 

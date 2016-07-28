@@ -26,8 +26,8 @@
 #include <unistd.h>
 #include <linux/videodev2.h>
 
-#include "fd-util.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/util.h"
 
 int main(int argc, char *argv[]) {
         static const struct option options[] = {

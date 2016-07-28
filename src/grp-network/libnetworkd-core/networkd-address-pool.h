@@ -21,8 +21,8 @@
 
 typedef struct AddressPool AddressPool;
 
-#include "in-addr-util.h"
-#include "list.h"
+#include "basic/in-addr-util.h"
+#include "basic/list.h"
 
 typedef struct Manager Manager;
 

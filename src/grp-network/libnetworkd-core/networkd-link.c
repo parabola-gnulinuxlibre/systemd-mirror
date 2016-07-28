@@ -21,22 +21,22 @@
 #include <linux/if.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-util.h"
 #include "dhcp-lease-internal.h"
-#include "fd-util.h"
-#include "fileio.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
 #include "netlink-util.h"
 #include "network-internal.h"
 #include "networkd.h"
 #include "networkd-lldp-tx.h"
-#include "set.h"
-#include "socket-util.h"
-#include "stdio-util.h"
-#include "string-table.h"
+#include "basic/set.h"
+#include "basic/socket-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-table.h"
 #include "udev-util.h"
-#include "util.h"
-#include "virt.h"
+#include "basic/util.h"
+#include "basic/virt.h"
 
 static bool link_dhcp6_enabled(Link *link) {
         assert(link);

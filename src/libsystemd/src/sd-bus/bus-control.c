@@ -26,17 +26,17 @@
 
 #include <systemd/sd-bus.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-bloom.h"
 #include "bus-control.h"
 #include "bus-internal.h"
 #include "bus-message.h"
 #include "bus-util.h"
-#include "capability-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "user-util.h"
+#include "basic/capability-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/user-util.h"
 
 _public_ int sd_bus_get_unique_name(sd_bus *bus, const char **unique) {
         int r;

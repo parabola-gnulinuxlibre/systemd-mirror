@@ -19,10 +19,10 @@
 
 #include <sys/utsname.h>
 
-#include "architecture.h"
-#include "macro.h"
-#include "string-table.h"
-#include "string-util.h"
+#include "basic/architecture.h"
+#include "basic/macro.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
 
 int uname_architecture(void) {
 

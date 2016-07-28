@@ -22,11 +22,11 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "fd-util.h"
-#include "fileio.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
 #include "ima-setup.h"
-#include "log.h"
-#include "util.h"
+#include "basic/log.h"
+#include "basic/util.h"
 
 #define IMA_SECFS_DIR "/sys/kernel/security/ima"
 #define IMA_SECFS_POLICY IMA_SECFS_DIR "/policy"

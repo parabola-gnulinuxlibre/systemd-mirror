@@ -29,11 +29,11 @@
 
 #include <systemd/sd-id128.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "efivars.h"
-#include "fd-util.h"
+#include "basic/fd-util.h"
 #include "gpt.h"
-#include "string-util.h"
+#include "basic/string-util.h"
 #include "udev.h"
 
 static void print_property(struct udev_device *dev, bool test, const char *name, const char *value) {

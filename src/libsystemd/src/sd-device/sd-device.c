@@ -24,23 +24,23 @@
 
 #include <systemd/sd-device.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "device-internal.h"
 #include "device-private.h"
 #include "device-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "fs-util.h"
-#include "hashmap.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "set.h"
-#include "stat-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "strxcpyx.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/fs-util.h"
+#include "basic/hashmap.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/set.h"
+#include "basic/stat-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/strxcpyx.h"
+#include "basic/util.h"
 
 int device_new_aux(sd_device **ret) {
         _cleanup_(sd_device_unrefp) sd_device *device = NULL;

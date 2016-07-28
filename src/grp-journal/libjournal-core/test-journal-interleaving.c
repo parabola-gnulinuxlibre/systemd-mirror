@@ -23,13 +23,13 @@
 
 #include <systemd/sd-journal.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "journal-file.h"
 #include "journal-vacuum.h"
-#include "log.h"
-#include "parse-util.h"
-#include "rm-rf.h"
-#include "util.h"
+#include "basic/log.h"
+#include "basic/parse-util.h"
+#include "basic/rm-rf.h"
+#include "basic/util.h"
 
 /* This program tests skipping around in a multi-file journal.
  */

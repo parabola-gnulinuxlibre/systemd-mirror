@@ -26,23 +26,23 @@
 #include <unistd.h>
 #include <linux/fs.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dev-setup.h"
-#include "fd-util.h"
+#include "basic/fd-util.h"
 #include "loopback-setup.h"
-#include "missing.h"
-#include "mkdir.h"
-#include "mount-util.h"
+#include "basic/missing.h"
+#include "basic/mkdir.h"
+#include "basic/mount-util.h"
 #include "namespace.h"
-#include "path-util.h"
-#include "selinux-util.h"
-#include "socket-util.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "strv.h"
-#include "umask-util.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/path-util.h"
+#include "basic/selinux-util.h"
+#include "basic/socket-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/umask-util.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 
 #define DEV_MOUNT_OPTIONS (MS_NOSUID|MS_STRICTATIME|MS_NOEXEC)
 

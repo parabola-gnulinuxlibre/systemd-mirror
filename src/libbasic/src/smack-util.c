@@ -25,15 +25,15 @@
 #include <sys/xattr.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fileio.h"
-#include "log.h"
-#include "macro.h"
-#include "path-util.h"
-#include "process-util.h"
-#include "smack-util.h"
-#include "string-table.h"
-#include "xattr-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fileio.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/path-util.h"
+#include "basic/process-util.h"
+#include "basic/smack-util.h"
+#include "basic/string-table.h"
+#include "basic/xattr-util.h"
 
 #ifdef HAVE_SMACK
 bool mac_smack_use(void) {

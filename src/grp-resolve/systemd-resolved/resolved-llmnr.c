@@ -20,7 +20,7 @@
 #include <netinet/in.h>
 #include <resolv.h>
 
-#include "fd-util.h"
+#include "basic/fd-util.h"
 #include "resolved-llmnr.h"
 #include "resolved-manager.h"
 

@@ -26,12 +26,12 @@
 #include <sys/statvfs.h>
 #include <unistd.h>
 
-#include "dirent-util.h"
-#include "fd-util.h"
-#include "macro.h"
-#include "missing.h"
-#include "stat-util.h"
-#include "string-util.h"
+#include "basic/dirent-util.h"
+#include "basic/fd-util.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
+#include "basic/stat-util.h"
+#include "basic/string-util.h"
 
 int is_symlink(const char *path) {
         struct stat info;

@@ -29,13 +29,13 @@
 
 #include <systemd/sd-hwdb.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "hashmap.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/hashmap.h"
 #include "hwdb-internal.h"
 #include "hwdb-util.h"
-#include "refcnt.h"
-#include "string-util.h"
+#include "basic/refcnt.h"
+#include "basic/string-util.h"
 
 struct sd_hwdb {
         RefCount n_ref;

@@ -25,17 +25,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "conf-files.h"
-#include "def.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "hashmap.h"
-#include "log.h"
-#include "path-util.h"
-#include "string-util.h"
-#include "strv.h"
+#include "basic/conf-files.h"
+#include "basic/def.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/hashmap.h"
+#include "basic/log.h"
+#include "basic/path-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
 #include "sysctl-util.h"
-#include "util.h"
+#include "basic/util.h"
 
 static char **arg_prefixes = NULL;
 

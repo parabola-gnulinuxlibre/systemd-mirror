@@ -20,9 +20,9 @@
 #include <errno.h>
 #include <glob.h>
 
-#include "glob-util.h"
-#include "macro.h"
-#include "strv.h"
+#include "basic/glob-util.h"
+#include "basic/macro.h"
+#include "basic/strv.h"
 
 int glob_exists(const char *path) {
         _cleanup_globfree_ glob_t g = {};

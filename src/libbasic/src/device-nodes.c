@@ -21,8 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "device-nodes.h"
-#include "utf8.h"
+#include "basic/device-nodes.h"
+#include "basic/utf8.h"
 
 int whitelisted_char_for_devnode(char c, const char *white) {
 

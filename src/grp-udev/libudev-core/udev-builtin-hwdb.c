@@ -24,9 +24,9 @@
 
 #include <systemd/sd-hwdb.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "sd-hwdb/hwdb-util.h"
-#include "string-util.h"
+#include "basic/string-util.h"
 #include "udev-util.h"
 #include "udev.h"
 

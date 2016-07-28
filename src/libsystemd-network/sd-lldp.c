@@ -22,13 +22,13 @@
 
 #include <systemd/sd-lldp.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
 #include "lldp-internal.h"
 #include "lldp-neighbor.h"
 #include "lldp-network.h"
-#include "socket-util.h"
-#include "ether-addr-util.h"
+#include "basic/socket-util.h"
+#include "basic/ether-addr-util.h"
 
 #define LLDP_DEFAULT_NEIGHBORS_MAX 128U
 

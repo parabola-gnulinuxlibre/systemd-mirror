@@ -23,8 +23,8 @@
 #include <systemd/sd-daemon.h>
 
 #include "networkd-wait-online.h"
-#include "signal-util.h"
-#include "strv.h"
+#include "basic/signal-util.h"
+#include "basic/strv.h"
 
 static bool arg_quiet = false;
 static usec_t arg_timeout = 120 * USEC_PER_SEC;

@@ -20,8 +20,8 @@
 #include <sys/socket.h>
 
 #include "dns-type.h"
-#include "parse-util.h"
-#include "string-util.h"
+#include "basic/parse-util.h"
+#include "basic/string-util.h"
 
 typedef const struct {
         uint16_t type;

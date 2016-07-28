@@ -24,8 +24,8 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#include "macro.h"
-#include "time-util.h"
+#include "basic/macro.h"
+#include "basic/time-util.h"
 
 #define ANSI_RED "\x1B[0;31m"
 #define ANSI_GREEN "\x1B[0;32m"

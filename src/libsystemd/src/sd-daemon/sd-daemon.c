@@ -33,14 +33,14 @@
 
 #include <systemd/sd-daemon.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fs-util.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "socket-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fs-util.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/socket-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 #define SNDBUF_SIZE (8*1024*1024)
 

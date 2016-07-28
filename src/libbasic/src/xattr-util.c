@@ -25,13 +25,13 @@
 #include <sys/time.h>
 #include <sys/xattr.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "macro.h"
-#include "sparse-endian.h"
-#include "stdio-util.h"
-#include "time-util.h"
-#include "xattr-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/macro.h"
+#include "basic/sparse-endian.h"
+#include "basic/stdio-util.h"
+#include "basic/time-util.h"
+#include "basic/xattr-util.h"
 
 int getxattr_malloc(const char *path, const char *name, char **value, bool allow_symlink) {
         char *v;

@@ -22,8 +22,8 @@
 typedef struct Session Session;
 typedef enum KillWho KillWho;
 
-#include "list.h"
-#include "login-util.h"
+#include "basic/list.h"
+#include "basic/login-util.h"
 #include "logind-user.h"
 
 typedef enum SessionState {

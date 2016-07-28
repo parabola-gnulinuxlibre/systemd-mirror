@@ -21,7 +21,7 @@
 
 #include <systemd/sd-bus.h>
 
-#include "hashmap.h"
+#include "basic/hashmap.h"
 
 enum bus_match_node_type {
         BUS_MATCH_ROOT,

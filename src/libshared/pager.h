@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 int pager_open(bool no_pager, bool jump_to_end);
 void pager_close(void);

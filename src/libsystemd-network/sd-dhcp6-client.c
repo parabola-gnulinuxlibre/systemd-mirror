@@ -24,18 +24,18 @@
 
 #include <systemd/sd-dhcp6-client.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "dhcp-identifier.h"
 #include "dhcp6-internal.h"
 #include "dhcp6-lease-internal.h"
 #include "dhcp6-protocol.h"
-#include "fd-util.h"
-#include "in-addr-util.h"
+#include "basic/fd-util.h"
+#include "basic/in-addr-util.h"
 #include "network-internal.h"
-#include "random-util.h"
-#include "socket-util.h"
-#include "string-table.h"
-#include "util.h"
+#include "basic/random-util.h"
+#include "basic/socket-util.h"
+#include "basic/string-table.h"
+#include "basic/util.h"
 
 #define MAX_MAC_ADDR_LEN INFINIBAND_ALEN
 

@@ -28,7 +28,7 @@
 #include <systemd/sd-dhcp-client.h>
 
 #include "dhcp-protocol.h"
-#include "socket-util.h"
+#include "basic/socket-util.h"
 
 int dhcp_network_bind_raw_socket(int index, union sockaddr_union *link,
                                  uint32_t xid, const uint8_t *mac_addr,

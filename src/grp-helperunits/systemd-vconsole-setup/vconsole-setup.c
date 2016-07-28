@@ -29,19 +29,19 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "io-util.h"
-#include "locale-util.h"
-#include "log.h"
-#include "process-util.h"
-#include "signal-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "terminal-util.h"
-#include "util.h"
-#include "virt.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/io-util.h"
+#include "basic/locale-util.h"
+#include "basic/log.h"
+#include "basic/process-util.h"
+#include "basic/signal-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
+#include "basic/terminal-util.h"
+#include "basic/util.h"
+#include "basic/virt.h"
 
 static bool is_vconsole(int fd) {
         unsigned char data[1];

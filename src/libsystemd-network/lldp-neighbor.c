@@ -17,14 +17,14 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "escape.h"
-#include "ether-addr-util.h"
-#include "hexdecoct.h"
-#include "in-addr-util.h"
+#include "basic/alloc-util.h"
+#include "basic/escape.h"
+#include "basic/ether-addr-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/in-addr-util.h"
 #include "lldp-internal.h"
 #include "lldp-neighbor.h"
-#include "unaligned.h"
+#include "basic/unaligned.h"
 
 static void lldp_neighbor_id_hash_func(const void *p, struct siphash *state) {
         const LLDPNeighborID *id = p;

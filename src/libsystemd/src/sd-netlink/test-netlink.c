@@ -22,13 +22,13 @@
 
 #include <systemd/sd-netlink.h>
 
-#include "ether-addr-util.h"
-#include "macro.h"
-#include "missing.h"
+#include "basic/ether-addr-util.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
 #include "netlink-util.h"
-#include "socket-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/socket-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 static void test_message_link_bridge(sd_netlink *rtnl) {
         _cleanup_(sd_netlink_message_unrefp) sd_netlink_message *message = NULL;

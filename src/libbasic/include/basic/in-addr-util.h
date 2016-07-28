@@ -23,8 +23,8 @@
 #include <stddef.h>
 #include <sys/socket.h>
 
-#include "macro.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/util.h"
 
 union in_addr_union {
         struct in_addr in;

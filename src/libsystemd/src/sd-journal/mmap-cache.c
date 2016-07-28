@@ -21,15 +21,15 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "hashmap.h"
-#include "list.h"
-#include "log.h"
-#include "macro.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/hashmap.h"
+#include "basic/list.h"
+#include "basic/log.h"
+#include "basic/macro.h"
 #include "mmap-cache.h"
-#include "sigbus.h"
-#include "util.h"
+#include "basic/sigbus.h"
+#include "basic/util.h"
 
 typedef struct Window Window;
 typedef struct Context Context;

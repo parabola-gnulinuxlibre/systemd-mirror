@@ -30,9 +30,9 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include "alloc-util.h"
-#include "hashmap.h"
-#include "prioq.h"
+#include "basic/alloc-util.h"
+#include "basic/hashmap.h"
+#include "basic/prioq.h"
 
 struct prioq_item {
         void *data;

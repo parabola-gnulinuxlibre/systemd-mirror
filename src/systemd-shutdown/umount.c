@@ -27,18 +27,18 @@
 
 #include "libudev.h"
 
-#include "alloc-util.h"
-#include "escape.h"
-#include "fd-util.h"
+#include "basic/alloc-util.h"
+#include "basic/escape.h"
+#include "basic/fd-util.h"
 #include "fstab-util.h"
-#include "list.h"
+#include "basic/list.h"
 #include "mount-setup.h"
-#include "path-util.h"
-#include "string-util.h"
+#include "basic/path-util.h"
+#include "basic/string-util.h"
 #include "udev-util.h"
 #include "umount.h"
-#include "util.h"
-#include "virt.h"
+#include "basic/util.h"
+#include "basic/virt.h"
 
 typedef struct MountPoint {
         char *path;

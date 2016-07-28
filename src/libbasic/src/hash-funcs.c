@@ -18,7 +18,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "hash-funcs.h"
+#include "basic/hash-funcs.h"
 
 void string_hash_func(const void *p, struct siphash *state) {
         siphash24_compress(p, strlen(p) + 1, state);

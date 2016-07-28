@@ -31,7 +31,7 @@
 #include "libudev.h"
 #include <systemd/sd-device.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "sd-device/device-enumerator-private.h"
 #include "sd-device/device-util.h"
 #include "libudev-device-internal.h"

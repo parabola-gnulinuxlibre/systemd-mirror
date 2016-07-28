@@ -20,10 +20,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "fileio.h"
-#include "log.h"
-#include "macro.h"
-#include "string-util.h"
+#include "basic/fileio.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
 #include "sysctl-util.h"
 
 char *sysctl_normalize(char *s) {

@@ -29,16 +29,16 @@
 #include <unistd.h>
 #include <utmpx.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "hostname-util.h"
-#include "macro.h"
-#include "path-util.h"
-#include "string-util.h"
-#include "terminal-util.h"
-#include "time-util.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/hostname-util.h"
+#include "basic/macro.h"
+#include "basic/path-util.h"
+#include "basic/string-util.h"
+#include "basic/terminal-util.h"
+#include "basic/time-util.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
 #include "utmp-wtmp.h"
 
 int utmp_get_runlevel(int *runlevel, int *previous) {

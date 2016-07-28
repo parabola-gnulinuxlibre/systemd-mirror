@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "curl-util.h"
-#include "fd-util.h"
-#include "string-util.h"
+#include "basic/fd-util.h"
+#include "basic/string-util.h"
 
 static void curl_glue_check_finished(CurlGlue *g) {
         CURLMsg *msg;

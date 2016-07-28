@@ -20,15 +20,15 @@
 #include <net/if.h>
 #include <glob.h>
 
-#include "alloc-util.h"
-#include "fileio.h"
-#include "glob-util.h"
-#include "log.h"
-#include "macro.h"
+#include "basic/alloc-util.h"
+#include "basic/fileio.h"
+#include "basic/glob-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
 #include "resolved-dns-packet.h"
 #include "resolved-dns-rr.h"
-#include "string-util.h"
-#include "strv.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
 
 #define HASH_KEY SD_ID128_MAKE(d3,1e,48,90,4b,fa,4c,fe,af,9d,d5,a1,d7,2e,8a,b1)
 

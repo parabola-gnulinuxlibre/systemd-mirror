@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 #define SMACK_FLOOR_LABEL "_"
 #define SMACK_STAR_LABEL  "*"

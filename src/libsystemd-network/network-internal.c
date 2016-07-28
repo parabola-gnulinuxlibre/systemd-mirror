@@ -23,21 +23,21 @@
 
 #include <systemd/sd-ndisc.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "condition.h"
 #include "conf-parser.h"
 #include "dhcp-lease-internal.h"
-#include "ether-addr-util.c"
-#include "hexdecoct.h"
-#include "log.h"
+#include "basic/ether-addr-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/log.h"
 #include "network-internal.h"
-#include "parse-util.h"
-#include "siphash24.h"
-#include "socket-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "utf8.h"
-#include "util.h"
+#include "basic/parse-util.h"
+#include "basic/siphash24.h"
+#include "basic/socket-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/utf8.h"
+#include "basic/util.h"
 
 const char *net_get_name(struct udev_device *device) {
         const char *name, *field;

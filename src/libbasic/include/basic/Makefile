@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-$(outdir)/errno-list.txt:
+$(outdir)/errno-list.txt: | $(outdir)/.deps
 	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM -include errno.h - </dev/null | $(AWK) '/^#define[ \t]+E[^ _]+[ \t]+/ { print $$2; }' >$@
 
 $(outdir)/errno-to-name.h: $(outdir)/errno-list.txt
@@ -58,5 +58,7 @@ $(outdir)/cap-from-name.gperf: $(outdir)/cap-list.txt
 
 $(outdir)/cap-from-name.h: $(outdir)/cap-from-name.gperf
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_capability -H hash_capability_name -p -C <$< >$@
+
+systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

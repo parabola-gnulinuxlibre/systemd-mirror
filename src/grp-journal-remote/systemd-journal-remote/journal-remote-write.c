@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "journal-remote.h"
 
 int iovw_put(struct iovec_wrapper *iovw, void* data, size_t len) {

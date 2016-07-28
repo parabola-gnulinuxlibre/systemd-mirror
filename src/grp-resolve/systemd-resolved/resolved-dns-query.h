@@ -22,7 +22,7 @@
 
 #include <systemd/sd-bus.h>
 
-#include "set.h"
+#include "basic/set.h"
 
 typedef struct DnsQueryCandidate DnsQueryCandidate;
 typedef struct DnsQuery DnsQuery;

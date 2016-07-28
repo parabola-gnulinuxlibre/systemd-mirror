@@ -22,17 +22,17 @@
 
 #include <systemd/sd-bus.h>
 
-#include "af-list.h"
-#include "alloc-util.h"
+#include "basic/af-list.h"
+#include "basic/alloc-util.h"
 #include "sd-bus/bus-error.h"
 #include "bus-util.h"
-#include "escape.h"
-#include "in-addr-util.h"
+#include "basic/escape.h"
+#include "basic/in-addr-util.h"
 #include "gcrypt-util.h"
-#include "parse-util.h"
+#include "basic/parse-util.h"
 #include "resolved-def.h"
 #include "resolved-dns-packet.h"
-#include "terminal-util.h"
+#include "basic/terminal-util.h"
 
 #define DNS_CALL_TIMEOUT_USEC (45*USEC_PER_SEC)
 

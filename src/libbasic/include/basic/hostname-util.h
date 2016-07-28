@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-#include "macro.h"
+#include "basic/macro.h"
 
 bool hostname_is_set(void);
 

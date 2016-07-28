@@ -21,13 +21,13 @@
 
 #include <systemd/sd-bus.h>
 
-#include "af-list.h"
-#include "alloc-util.h"
+#include "basic/af-list.h"
+#include "basic/alloc-util.h"
 #include "bus-common-errors.h"
 #include "dns-type.h"
-#include "random-util.h"
-#include "string-util.h"
-#include "time-util.h"
+#include "basic/random-util.h"
+#include "basic/string-util.h"
+#include "basic/time-util.h"
 
 #define DNS_CALL_TIMEOUT_USEC (45*USEC_PER_SEC)
 

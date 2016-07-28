@@ -1,7 +1,7 @@
 #pragma once
 
-#include "macro.h"
-#include "sparse-endian.h"
+#include "basic/macro.h"
+#include "basic/sparse-endian.h"
 
 /* Stolen from btrfs' ctree.h */
 

@@ -18,10 +18,10 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "formats-util.h"
-#include "socket-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/formats-util.h"
+#include "basic/socket-util.h"
 #include "udev.h"
 
 /* wire protocol magic must match */

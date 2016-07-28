@@ -17,16 +17,16 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
 #include "bus-internal.h"
 #include "bus-match.h"
 #include "bus-message.h"
 #include "bus-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "hexdecoct.h"
-#include "string-util.h"
-#include "strv.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/hexdecoct.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
 
 /* Example:
  *

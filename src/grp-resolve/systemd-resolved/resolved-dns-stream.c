@@ -19,10 +19,10 @@
 
 #include <netinet/tcp.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "io-util.h"
-#include "missing.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/io-util.h"
+#include "basic/missing.h"
 #include "resolved-dns-stream.h"
 
 #define DNS_STREAM_TIMEOUT_USEC (10 * USEC_PER_SEC)

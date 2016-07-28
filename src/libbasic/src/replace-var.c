@@ -22,10 +22,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "macro.h"
-#include "replace-var.h"
-#include "string-util.h"
+#include "basic/alloc-util.h"
+#include "basic/macro.h"
+#include "basic/replace-var.h"
+#include "basic/string-util.h"
 
 /*
  * Generic infrastructure for replacing @FOO@ style variables in
