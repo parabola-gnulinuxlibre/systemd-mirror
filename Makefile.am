@@ -1413,7 +1413,7 @@ src/basic/cap-from-name.h: src/basic/cap-from-name.gperf
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_capability -H hash_capability_name -p -C <$< >$@
 
-#@src/libsystemd/src/Makefile
+#@src/libsystemd/src/sd-journal/Makefile
 audit_list_includes = -include linux/audit.h -include missing.h
 if HAVE_AUDIT
 audit_list_includes += -include libaudit.h
@@ -3465,14 +3465,12 @@ test_netlink_SOURCES = \
 test_netlink_LDADD = \
 	libshared.la
 
-#@src/libshared/Makefile
 test_local_addresses_SOURCES = \
 	src/libsystemd/sd-netlink/test-local-addresses.c
 
 test_local_addresses_LDADD = \
 	libshared.la
 
-#@src/libsystemd/src/Makefile
 test_resolve_SOURCES = \
 	src/libsystemd/sd-resolve/test-resolve.c
 
