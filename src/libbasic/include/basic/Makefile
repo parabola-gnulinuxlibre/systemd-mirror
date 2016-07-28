@@ -23,7 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-at.subdirs += basic
 $(outdir)/errno-list.txt:
 	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM -include errno.h - </dev/null | $(AWK) '/^#define[ \t]+E[^ _]+[ \t]+/ { print $$2; }' >$@
 

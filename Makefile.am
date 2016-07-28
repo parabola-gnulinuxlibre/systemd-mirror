@@ -1367,7 +1367,7 @@ CLEANFILES += \
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 
-#@src/libbasic/include/basic/Makefile
+#@src/libbasic/include/Makefile
 at.subdirs += basic
 #@src/libbasic/include/basic/Makefile
 src/basic/errno-list.txt:
