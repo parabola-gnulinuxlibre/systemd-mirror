@@ -22,8 +22,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "sd-dhcp-client.h"
-#include "sd-event.h"
+#include <systemd/sd-dhcp-client.h>
+#include <systemd/sd-event.h>
 
 #include "alloc-util.h"
 #include "dhcp-identifier.h"
