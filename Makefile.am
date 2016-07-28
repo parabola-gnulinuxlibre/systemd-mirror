@@ -1041,6 +1041,8 @@ libbasic_la_LIBADD = \
 	-lm
 
 #@src/libshared/Makefile -------------------------------------------------------
+at.subdirs += src
+#@src/libshared/src/Makefile
 noinst_LTLIBRARIES += \
 	libshared.la
 
