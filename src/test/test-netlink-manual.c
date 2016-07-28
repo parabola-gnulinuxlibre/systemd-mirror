@@ -23,7 +23,7 @@
 #include <net/if.h>
 #include <linux/if_tunnel.h>
 
-#include "sd-netlink.h"
+#include <systemd/sd-netlink.h>
 
 #include "macro.h"
 #include "util.h"

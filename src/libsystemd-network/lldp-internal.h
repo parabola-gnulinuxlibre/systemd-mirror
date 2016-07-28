@@ -20,8 +20,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-event.h"
-#include "sd-lldp.h"
+#include <systemd/sd-event.h>
+#include <systemd/sd-lldp.h>
 
 #include "hashmap.h"
 #include "log.h"
