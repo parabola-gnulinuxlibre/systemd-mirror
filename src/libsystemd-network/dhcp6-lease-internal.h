@@ -22,7 +22,7 @@
 
 #include <stdint.h>
 
-#include "sd-dhcp6-lease.h"
+#include <systemd/sd-dhcp6-lease.h>
 
 #include "dhcp6-internal.h"
 

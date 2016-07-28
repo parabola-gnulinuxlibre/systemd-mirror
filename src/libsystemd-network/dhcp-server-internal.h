@@ -20,8 +20,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-dhcp-server.h"
-#include "sd-event.h"
+#include <systemd/sd-dhcp-server.h>
+#include <systemd/sd-event.h>
 
 #include "dhcp-internal.h"
 #include "hashmap.h"

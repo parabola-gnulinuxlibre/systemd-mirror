@@ -24,7 +24,7 @@
 #include <string.h>
 #include <sys/ioctl.h>
 
-#include "sd-ndisc.h"
+#include <systemd/sd-ndisc.h>
 
 #include "alloc-util.h"
 #include "async.h"
