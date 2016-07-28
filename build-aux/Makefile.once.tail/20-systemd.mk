@@ -21,7 +21,9 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
-$(topsrcdir)/configure: $(topsrcdir)/configure.ac
+autogen_files = aclocal.m4 automake.mk.in config.h.in configure po/Makefile.in.in
+# $*=% had better be $(topsrcdir), but we can't enforce that
+$(addprefix %/,$(autogen_files)): %/configure.ac %/autogen.sh
 	cd $(topsrcdir) && ./autogen.sh
 
 config_files = config.mk automake.mk autoconf.mk gnustandards.mk po/Makefile.in
