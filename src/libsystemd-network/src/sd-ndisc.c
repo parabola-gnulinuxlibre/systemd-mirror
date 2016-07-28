@@ -28,7 +28,7 @@
 
 #include "basic/alloc-util.h"
 #include "basic/async.h"
-#include "icmp6-util.h"
+#include "systemd-network/icmp6-util.h"
 #include "basic/in-addr-util.h"
 #include "basic/list.h"
 #include "basic/socket-util.h"

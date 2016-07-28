@@ -26,7 +26,7 @@
 #include <systemd/sd-netlink.h>
 #include "udev.h"
 
-#include "dhcp-identifier.h"
+#include "systemd-network/dhcp-identifier.h"
 #include "basic/hashmap.h"
 #include "basic/list.h"
 

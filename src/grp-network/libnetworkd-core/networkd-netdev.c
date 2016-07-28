@@ -25,7 +25,7 @@
 #include "basic/fd-util.h"
 #include "basic/list.h"
 #include "netlink-util.h"
-#include "network-internal.h"
+#include "systemd-network/network-internal.h"
 #include "networkd-netdev.h"
 #include "networkd.h"
 #include "basic/siphash24.h"

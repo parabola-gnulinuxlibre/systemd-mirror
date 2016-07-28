@@ -27,15 +27,15 @@
 #include <systemd/sd-dhcp-lease.h>
 
 #include "basic/alloc-util.h"
-#include "dhcp-lease-internal.h"
-#include "dhcp-protocol.h"
+#include "systemd-network/dhcp-lease-internal.h"
+#include "systemd-network/dhcp-protocol.h"
 #include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/hexdecoct.h"
 #include "basic/hostname-util.h"
 #include "basic/in-addr-util.h"
-#include "network-internal.h"
+#include "systemd-network/network-internal.h"
 #include "basic/parse-util.h"
 #include "basic/stdio-util.h"
 #include "basic/string-util.h"

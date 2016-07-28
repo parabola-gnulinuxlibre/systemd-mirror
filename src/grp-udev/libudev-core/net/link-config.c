@@ -31,7 +31,7 @@
 #include "basic/log.h"
 #include "basic/missing.h"
 #include "sd-netlink/netlink-util.h"
-#include "network-internal.h"
+#include "systemd-network/network-internal.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/proc-cmdline.h"

@@ -21,7 +21,7 @@
 
 #include "shared/conf-parser.h"
 #include "basic/def.h"
-#include "dhcp-identifier.h"
+#include "systemd-network/dhcp-identifier.h"
 #include "basic/hexdecoct.h"
 #include "networkd-conf.h"
 #include "basic/string-table.h"

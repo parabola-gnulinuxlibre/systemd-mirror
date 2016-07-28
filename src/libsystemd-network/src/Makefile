@@ -78,6 +78,7 @@ libsystemd_network_la_SOURCES = \
 libsystemd_network_la_LIBADD = \
 	$(KMOD_LIBS)
 
+systemd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
 systemd.CPPFLAGS += $(libshared.CPPFLAGS)
 systemd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
 

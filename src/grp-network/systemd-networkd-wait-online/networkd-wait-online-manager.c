@@ -23,7 +23,7 @@
 
 #include "basic/alloc-util.h"
 #include "netlink-util.h"
-#include "network-internal.h"
+#include "systemd-network/network-internal.h"
 #include "networkd-wait-online-link.h"
 #include "networkd-wait-online.h"
 #include "basic/time-util.h"

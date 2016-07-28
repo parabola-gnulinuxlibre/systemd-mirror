@@ -21,7 +21,7 @@
 
 #include <systemd/sd-ndisc.h>
 
-#include "icmp6-util.h"
+#include "systemd-network/icmp6-util.h"
 #include "basic/socket-util.h"
 
 static struct ether_addr mac_addr = {

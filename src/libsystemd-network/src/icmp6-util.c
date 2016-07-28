@@ -29,7 +29,7 @@
 #include <linux/if_packet.h>
 
 #include "basic/fd-util.h"
-#include "icmp6-util.h"
+#include "systemd-network/icmp6-util.h"
 #include "basic/socket-util.h"
 
 #define IN6ADDR_ALL_ROUTERS_MULTICAST_INIT \

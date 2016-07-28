@@ -20,9 +20,9 @@
 #include "libudev.h"
 #include <systemd/sd-id128.h>
 
-#include "dhcp-identifier.h"
-#include "dhcp6-protocol.h"
-#include "network-internal.h"
+#include "systemd-network/dhcp-identifier.h"
+#include "systemd-network/dhcp6-protocol.h"
+#include "systemd-network/network-internal.h"
 #include "basic/siphash24.h"
 #include "basic/sparse-endian.h"
 #include "shared/udev-util.h"

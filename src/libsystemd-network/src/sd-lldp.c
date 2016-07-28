@@ -24,9 +24,9 @@
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
-#include "lldp-internal.h"
-#include "lldp-neighbor.h"
-#include "lldp-network.h"
+#include "systemd-network/lldp-internal.h"
+#include "systemd-network/lldp-neighbor.h"
+#include "systemd-network/lldp-network.h"
 #include "basic/socket-util.h"
 #include "basic/ether-addr-util.h"
 

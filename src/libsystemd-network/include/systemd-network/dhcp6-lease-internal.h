@@ -24,7 +24,7 @@
 
 #include <systemd/sd-dhcp6-lease.h>
 
-#include "dhcp6-internal.h"
+#include "systemd-network/dhcp6-internal.h"
 
 struct sd_dhcp6_lease {
         unsigned n_ref;

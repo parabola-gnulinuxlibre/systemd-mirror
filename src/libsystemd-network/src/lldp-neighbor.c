@@ -22,8 +22,8 @@
 #include "basic/ether-addr-util.h"
 #include "basic/hexdecoct.h"
 #include "basic/in-addr-util.h"
-#include "lldp-internal.h"
-#include "lldp-neighbor.h"
+#include "systemd-network/lldp-internal.h"
+#include "systemd-network/lldp-neighbor.h"
 #include "basic/unaligned.h"
 
 static void lldp_neighbor_id_hash_func(const void *p, struct siphash *state) {

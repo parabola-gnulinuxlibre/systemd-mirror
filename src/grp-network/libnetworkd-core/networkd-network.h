@@ -23,7 +23,7 @@
 #include "udev.h"
 
 #include "shared/condition.h"
-#include "dhcp-identifier.h"
+#include "systemd-network/dhcp-identifier.h"
 #include "basic/hashmap.h"
 #include "shared/resolve-util.h"
 

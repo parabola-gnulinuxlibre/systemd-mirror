@@ -23,8 +23,8 @@
 #include <systemd/sd-dhcp-server.h>
 
 #include "basic/alloc-util.h"
-#include "dhcp-internal.h"
-#include "dhcp-server-internal.h"
+#include "systemd-network/dhcp-internal.h"
+#include "systemd-network/dhcp-server-internal.h"
 #include "basic/fd-util.h"
 #include "basic/in-addr-util.h"
 #include "basic/siphash24.h"

@@ -21,8 +21,8 @@
 #include <errno.h>
 
 #include "basic/alloc-util.h"
-#include "dhcp6-lease-internal.h"
-#include "dhcp6-protocol.h"
+#include "systemd-network/dhcp6-lease-internal.h"
+#include "systemd-network/dhcp6-protocol.h"
 #include "basic/strv.h"
 #include "basic/util.h"
 

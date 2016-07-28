@@ -27,7 +27,7 @@
 
 #include <systemd/sd-dhcp-client.h>
 
-#include "dhcp-protocol.h"
+#include "systemd-network/dhcp-protocol.h"
 #include "basic/socket-util.h"
 
 int dhcp_network_bind_raw_socket(int index, union sockaddr_union *link,

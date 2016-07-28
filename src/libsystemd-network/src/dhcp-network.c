@@ -27,7 +27,7 @@
 #include <linux/if_infiniband.h>
 #include <linux/if_packet.h>
 
-#include "dhcp-internal.h"
+#include "systemd-network/dhcp-internal.h"
 #include "basic/fd-util.h"
 #include "basic/socket-util.h"
 

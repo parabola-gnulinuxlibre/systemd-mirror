@@ -23,8 +23,8 @@
 #include <net/if_arp.h>
 #include <string.h>
 
-#include "dhcp-internal.h"
-#include "dhcp-protocol.h"
+#include "systemd-network/dhcp-internal.h"
+#include "systemd-network/dhcp-protocol.h"
 
 #define DHCP_CLIENT_MIN_OPTIONS_SIZE            312
 

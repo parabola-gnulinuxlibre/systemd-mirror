@@ -24,8 +24,8 @@
 #include <systemd/sd-dhcp6-client.h>
 
 #include "basic/alloc-util.h"
-#include "dhcp6-internal.h"
-#include "dhcp6-protocol.h"
+#include "systemd-network/dhcp6-internal.h"
+#include "systemd-network/dhcp6-protocol.h"
 #include "shared/dns-domain.h"
 #include "basic/sparse-endian.h"
 #include "basic/strv.h"

@@ -20,7 +20,7 @@
 #include <netinet/ether.h>
 #include <linux/if.h>
 
-#include "network-internal.h"
+#include "systemd-network/network-internal.h"
 #include "networkd.h"
 
 static int ipv4ll_address_lost(Link *link) {

@@ -1,5 +1,5 @@
-#include "dhcp6-internal.h"
-#include "dhcp6-protocol.h"
+#include "systemd-network/dhcp6-internal.h"
+#include "systemd-network/dhcp6-protocol.h"
 #include "ethtool-util.h"
 #include "netlink-internal.h"
 #include "networkd-netdev-bond.h"

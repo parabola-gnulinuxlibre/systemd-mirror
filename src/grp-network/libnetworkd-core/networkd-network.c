@@ -26,7 +26,7 @@
 #include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/hostname-util.h"
-#include "network-internal.h"
+#include "systemd-network/network-internal.h"
 #include "networkd-network.h"
 #include "networkd.h"
 #include "basic/parse-util.h"

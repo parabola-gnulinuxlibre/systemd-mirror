@@ -25,7 +25,7 @@
 
 #include <systemd/sd-dhcp-client.h>
 
-#include "dhcp-protocol.h"
+#include "systemd-network/dhcp-protocol.h"
 #include "basic/list.h"
 #include "basic/util.h"
 

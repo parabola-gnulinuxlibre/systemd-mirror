@@ -23,7 +23,7 @@
 #include <systemd/sd-dhcp-server.h>
 #include <systemd/sd-event.h>
 
-#include "dhcp-server-internal.h"
+#include "systemd-network/dhcp-server-internal.h"
 
 static void test_pool(struct in_addr *address, unsigned size, int ret) {
         _cleanup_(sd_dhcp_server_unrefp) sd_dhcp_server *server = NULL;

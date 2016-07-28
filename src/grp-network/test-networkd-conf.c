@@ -25,7 +25,7 @@
 
 #include "networkd-conf.h"
 #include "networkd-network.h"
-#include "network-internal.h"
+#include "systemd-network/network-internal.h"
 
 static void test_config_parse_duid_type_one(const char *rvalue, int ret, DUIDType expected) {
         DUIDType actual = 0;

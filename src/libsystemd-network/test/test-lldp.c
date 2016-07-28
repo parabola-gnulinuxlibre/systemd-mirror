@@ -29,7 +29,7 @@
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
-#include "lldp-network.h"
+#include "systemd-network/lldp-network.h"
 #include "basic/macro.h"
 #include "basic/string-util.h"
 

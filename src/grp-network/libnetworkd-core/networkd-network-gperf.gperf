@@ -3,7 +3,7 @@
 #include "shared/conf-parser.h"
 #include "networkd.h"
 #include "networkd-conf.h"
-#include "network-internal.h"
+#include "systemd-network/network-internal.h"
 %}
 struct ConfigPerfItem;
 %null_strings

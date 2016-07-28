@@ -27,9 +27,9 @@
 #include <systemd/sd-dhcp6-client.h>
 #include <systemd/sd-event.h>
 
-#include "dhcp6-internal.h"
-#include "dhcp6-lease-internal.h"
-#include "dhcp6-protocol.h"
+#include "systemd-network/dhcp6-internal.h"
+#include "systemd-network/dhcp6-lease-internal.h"
+#include "systemd-network/dhcp6-protocol.h"
 #include "basic/fd-util.h"
 #include "basic/macro.h"
 #include "basic/socket-util.h"

@@ -23,11 +23,11 @@
 
 #include "basic/alloc-util.h"
 #include "shared/bus-util.h"
-#include "dhcp-lease-internal.h"
+#include "systemd-network/dhcp-lease-internal.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "netlink-util.h"
-#include "network-internal.h"
+#include "systemd-network/network-internal.h"
 #include "networkd.h"
 #include "networkd-lldp-tx.h"
 #include "basic/set.h"

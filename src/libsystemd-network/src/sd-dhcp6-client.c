@@ -25,13 +25,13 @@
 #include <systemd/sd-dhcp6-client.h>
 
 #include "basic/alloc-util.h"
-#include "dhcp-identifier.h"
-#include "dhcp6-internal.h"
-#include "dhcp6-lease-internal.h"
-#include "dhcp6-protocol.h"
+#include "systemd-network/dhcp-identifier.h"
+#include "systemd-network/dhcp6-internal.h"
+#include "systemd-network/dhcp6-lease-internal.h"
+#include "systemd-network/dhcp6-protocol.h"
 #include "basic/fd-util.h"
 #include "basic/in-addr-util.h"
-#include "network-internal.h"
+#include "systemd-network/network-internal.h"
 #include "basic/random-util.h"
 #include "basic/socket-util.h"
 #include "basic/string-table.h"

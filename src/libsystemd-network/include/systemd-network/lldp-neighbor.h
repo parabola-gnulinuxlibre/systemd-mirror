@@ -26,7 +26,7 @@
 #include <systemd/sd-lldp.h>
 
 #include "basic/hash-funcs.h"
-#include "lldp-internal.h"
+#include "systemd-network/lldp-internal.h"
 #include "basic/time-util.h"
 
 typedef struct LLDPNeighborID {

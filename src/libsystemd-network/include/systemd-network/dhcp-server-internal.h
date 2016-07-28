@@ -23,7 +23,7 @@
 #include <systemd/sd-dhcp-server.h>
 #include <systemd/sd-event.h>
 
-#include "dhcp-internal.h"
+#include "systemd-network/dhcp-internal.h"
 #include "basic/hashmap.h"
 #include "basic/log.h"
 #include "basic/util.h"

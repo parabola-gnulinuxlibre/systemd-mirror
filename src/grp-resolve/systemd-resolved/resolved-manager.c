@@ -28,7 +28,7 @@
 #include "basic/fileio-label.h"
 #include "basic/hostname-util.h"
 #include "basic/io-util.h"
-#include "network-internal.h"
+#include "systemd-network/network-internal.h"
 #include "basic/ordered-set.h"
 #include "basic/parse-util.h"
 #include "basic/random-util.h"

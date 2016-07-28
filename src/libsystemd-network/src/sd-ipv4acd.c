@@ -27,7 +27,7 @@
 #include <systemd/sd-ipv4acd.h>
 
 #include "basic/alloc-util.h"
-#include "arp-util.h"
+#include "systemd-network/arp-util.h"
 #include "basic/fd-util.h"
 #include "basic/in-addr-util.h"
 #include "basic/list.h"

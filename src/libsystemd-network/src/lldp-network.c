@@ -22,7 +22,7 @@
 #include <netinet/if_ether.h>
 
 #include "basic/fd-util.h"
-#include "lldp-network.h"
+#include "systemd-network/lldp-network.h"
 #include "basic/socket-util.h"
 
 int lldp_network_bind_raw_socket(int ifindex) {
