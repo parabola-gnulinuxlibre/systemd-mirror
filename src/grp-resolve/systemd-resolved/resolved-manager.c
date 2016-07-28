@@ -23,7 +23,7 @@
 
 #include "basic/af-list.h"
 #include "basic/alloc-util.h"
-#include "dns-domain.h"
+#include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/fileio-label.h"
 #include "basic/hostname-util.h"

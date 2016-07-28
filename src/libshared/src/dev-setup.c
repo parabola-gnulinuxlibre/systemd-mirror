@@ -22,7 +22,7 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "dev-setup.h"
+#include "shared/dev-setup.h"
 #include "basic/label.h"
 #include "basic/log.h"
 #include "basic/path-util.h"

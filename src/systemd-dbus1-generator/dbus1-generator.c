@@ -19,9 +19,9 @@
 
 #include "basic/alloc-util.h"
 #include "sd-bus/bus-internal.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"

@@ -28,7 +28,7 @@
 
 #include "basic/fd-util.h"
 #include "basic/string-util.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 #include "udev.h"
 #include "udevadm-util.h"
 

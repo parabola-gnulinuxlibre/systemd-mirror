@@ -28,9 +28,9 @@ typedef struct UnitVTable UnitVTable;
 typedef struct UnitRef UnitRef;
 typedef struct UnitStatusMessageFormats UnitStatusMessageFormats;
 
-#include "condition.h"
+#include "shared/condition.h"
 #include "failure-action.h"
-#include "install.h"
+#include "shared/install.h"
 #include "basic/list.h"
 #include "basic/unit-name.h"
 

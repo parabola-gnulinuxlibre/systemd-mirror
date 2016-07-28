@@ -24,7 +24,7 @@
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/string-util.h"
-#include "sysctl-util.h"
+#include "shared/sysctl-util.h"
 
 char *sysctl_normalize(char *s) {
         char *n;

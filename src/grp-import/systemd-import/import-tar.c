@@ -33,7 +33,7 @@
 #include "import-compress.h"
 #include "import-tar.h"
 #include "basic/io-util.h"
-#include "machine-pool.h"
+#include "shared/machine-pool.h"
 #include "basic/mkdir.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"

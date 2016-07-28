@@ -24,7 +24,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "acpi-fpdt.h"
+#include "shared/acpi-fpdt.h"
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"

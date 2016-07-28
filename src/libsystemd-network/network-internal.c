@@ -24,8 +24,8 @@
 #include <systemd/sd-ndisc.h>
 
 #include "basic/alloc-util.h"
-#include "condition.h"
-#include "conf-parser.h"
+#include "shared/condition.h"
+#include "shared/conf-parser.h"
 #include "dhcp-lease-internal.h"
 #include "basic/ether-addr-util.h"
 #include "basic/hexdecoct.h"

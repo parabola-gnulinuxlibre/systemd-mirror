@@ -21,7 +21,7 @@
 #include "bus-internal.h"
 #include "bus-match.h"
 #include "bus-message.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/hexdecoct.h"

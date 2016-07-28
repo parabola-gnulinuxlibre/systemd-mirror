@@ -33,7 +33,7 @@
 #include "sd-journal/journal-internal.h"
 #include "basic/log.h"
 #include "basic/macro.h"
-#include "pager.h"
+#include "shared/pager.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"

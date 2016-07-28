@@ -23,7 +23,7 @@
 
 #include "bus-internal.h"
 #include "bus-message.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/refcnt.h"
 
 static void test_bus_new(void) {

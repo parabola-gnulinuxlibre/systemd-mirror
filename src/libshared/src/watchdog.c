@@ -27,7 +27,7 @@
 #include "basic/fd-util.h"
 #include "basic/log.h"
 #include "basic/time-util.h"
-#include "watchdog.h"
+#include "shared/watchdog.h"
 
 static int watchdog_fd = -1;
 static usec_t watchdog_timeout = USEC_INFINITY;

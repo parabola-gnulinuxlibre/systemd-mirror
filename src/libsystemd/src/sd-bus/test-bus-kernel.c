@@ -24,7 +24,7 @@
 #include "basic/alloc-util.h"
 #include "bus-dump.h"
 #include "bus-kernel.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/fd-util.h"
 #include "basic/log.h"
 #include "basic/util.h"

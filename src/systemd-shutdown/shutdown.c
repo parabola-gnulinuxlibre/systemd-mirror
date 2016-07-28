@@ -39,12 +39,12 @@
 #include "basic/parse-util.h"
 #include "basic/process-util.h"
 #include "basic/string-util.h"
-#include "switch-root.h"
+#include "shared/switch-root.h"
 #include "basic/terminal-util.h"
 #include "umount.h"
 #include "basic/util.h"
 #include "basic/virt.h"
-#include "watchdog.h"
+#include "shared/watchdog.h"
 
 #define FINALIZE_ATTEMPTS 50
 

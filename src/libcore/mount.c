@@ -29,7 +29,7 @@
 #include "basic/escape.h"
 #include "basic/exit-status.h"
 #include "basic/formats-util.h"
-#include "fstab-util.h"
+#include "shared/fstab-util.h"
 #include "basic/log.h"
 #include "manager.h"
 #include "basic/mkdir.h"

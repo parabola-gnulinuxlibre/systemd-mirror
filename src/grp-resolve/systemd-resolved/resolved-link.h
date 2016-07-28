@@ -23,7 +23,7 @@
 
 #include "basic/in-addr-util.h"
 #include "basic/ratelimit.h"
-#include "resolve-util.h"
+#include "shared/resolve-util.h"
 
 typedef struct Link Link;
 typedef struct LinkAddress LinkAddress;

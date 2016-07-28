@@ -39,7 +39,7 @@
 #include "basic/time-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
-#include "utmp-wtmp.h"
+#include "shared/utmp-wtmp.h"
 
 int utmp_get_runlevel(int *runlevel, int *previous) {
         struct utmpx *found, lookup = { .ut_type = RUN_LVL };

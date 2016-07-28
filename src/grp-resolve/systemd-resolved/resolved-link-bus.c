@@ -18,9 +18,9 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/parse-util.h"
-#include "resolve-util.h"
+#include "shared/resolve-util.h"
 #include "resolved-bus.h"
 #include "resolved-link-bus.h"
 #include "basic/strv.h"

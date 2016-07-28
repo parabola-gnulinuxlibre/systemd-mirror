@@ -34,7 +34,7 @@
 #include "bus-dump.h"
 #include "basic/bus-label.h"
 #include "bus-message.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/fd-util.h"
 #include "basic/hexdecoct.h"
 #include "basic/log.h"

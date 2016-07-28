@@ -32,12 +32,12 @@
 #include <systemd/sd-login.h>
 #include <systemd/sd-daemon.h>
 
-#include "acl-util.h"
+#include "shared/acl-util.h"
 #include "basic/alloc-util.h"
 #include "basic/capability-util.h"
 #include "basic/cgroup-util.h"
 #include "sd-journal/compress.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "basic/copy.h"
 #include "coredump-vacuum.h"
 #include "basic/dirent-util.h"

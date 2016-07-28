@@ -31,8 +31,8 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "ask-password-api.h"
-#include "conf-parser.h"
+#include "shared/ask-password-api.h"
+#include "shared/conf-parser.h"
 #include "basic/def.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
@@ -46,7 +46,7 @@
 #include "basic/strv.h"
 #include "basic/terminal-util.h"
 #include "basic/util.h"
-#include "utmp-wtmp.h"
+#include "shared/utmp-wtmp.h"
 
 static enum {
         ACTION_LIST,

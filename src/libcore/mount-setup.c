@@ -24,10 +24,10 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
-#include "dev-setup.h"
-#include "efivars.h"
+#include "shared/dev-setup.h"
+#include "shared/efivars.h"
 #include "basic/label.h"
 #include "basic/log.h"
 #include "basic/macro.h"

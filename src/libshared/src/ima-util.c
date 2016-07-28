@@ -19,7 +19,7 @@
 
 #include <unistd.h>
 
-#include "ima-util.h"
+#include "shared/ima-util.h"
 
 static int use_ima_cached = -1;
 

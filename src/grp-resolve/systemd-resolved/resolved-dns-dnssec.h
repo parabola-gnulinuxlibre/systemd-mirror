@@ -22,7 +22,7 @@
 typedef enum DnssecResult DnssecResult;
 typedef enum DnssecVerdict DnssecVerdict;
 
-#include "dns-domain.h"
+#include "shared/dns-domain.h"
 #include "resolved-dns-answer.h"
 #include "resolved-dns-rr.h"
 

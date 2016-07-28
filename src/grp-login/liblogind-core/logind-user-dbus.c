@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include "basic/alloc-util.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/formats-util.h"
 #include "logind-user.h"
 #include "logind.h"

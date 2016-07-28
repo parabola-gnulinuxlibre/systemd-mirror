@@ -35,7 +35,7 @@
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/formats-util.h"
-#include "install.h"
+#include "shared/install.h"
 #include "basic/log.h"
 #include "basic/path-util.h"
 #include "selinux-access.h"
@@ -44,7 +44,7 @@
 #include "basic/strv.h"
 #include "basic/syslog-util.h"
 #include "basic/virt.h"
-#include "watchdog.h"
+#include "shared/watchdog.h"
 
 static int property_get_version(
                 sd_bus *bus,

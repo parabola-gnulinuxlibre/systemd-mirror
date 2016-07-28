@@ -23,7 +23,7 @@
 #include "basic/alloc-util.h"
 #include "bus-common-errors.h"
 #include "basic/bus-label.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "logind-seat.h"
 #include "logind.h"
 #include "basic/strv.h"

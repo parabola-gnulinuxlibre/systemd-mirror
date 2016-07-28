@@ -23,7 +23,7 @@
 
 #include "basic/log.h"
 #include "basic/process-util.h"
-#include "spawn-ask-password-agent.h"
+#include "shared/spawn-ask-password-agent.h"
 #include "basic/util.h"
 
 static pid_t agent_pid = 0;

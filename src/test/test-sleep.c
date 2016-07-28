@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 #include "basic/log.h"
-#include "sleep-config.h"
+#include "shared/sleep-config.h"
 #include "basic/strv.h"
 #include "basic/util.h"
 

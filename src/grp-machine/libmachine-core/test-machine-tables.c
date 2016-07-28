@@ -18,7 +18,7 @@
 ***/
 
 #include "machine.h"
-#include "test-tables.h"
+#include "shared/test-tables.h"
 
 int main(int argc, char **argv) {
         test_table(machine_class, MACHINE_CLASS);

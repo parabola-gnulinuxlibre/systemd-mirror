@@ -1,6 +1,6 @@
 %{
 #include <stddef.h>
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "load-fragment.h"
 #include "basic/missing.h"
 %}

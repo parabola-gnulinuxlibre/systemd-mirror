@@ -21,7 +21,7 @@
 
 #include <systemd/sd-event.h>
 
-#include "import-util.h"
+#include "shared/import-util.h"
 #include "basic/macro.h"
 
 typedef struct RawImport RawImport;

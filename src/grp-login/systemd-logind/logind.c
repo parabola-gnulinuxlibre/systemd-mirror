@@ -27,8 +27,8 @@
 
 #include "basic/alloc-util.h"
 #include "bus-error.h"
-#include "bus-util.h"
-#include "conf-parser.h"
+#include "shared/bus-util.h"
+#include "shared/conf-parser.h"
 #include "basic/def.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
@@ -37,7 +37,7 @@
 #include "basic/selinux-util.h"
 #include "basic/signal-util.h"
 #include "basic/strv.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 
 static void manager_free(Manager *m);
 

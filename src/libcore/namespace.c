@@ -27,7 +27,7 @@
 #include <linux/fs.h>
 
 #include "basic/alloc-util.h"
-#include "dev-setup.h"
+#include "shared/dev-setup.h"
 #include "basic/fd-util.h"
 #include "loopback-setup.h"
 #include "basic/missing.h"

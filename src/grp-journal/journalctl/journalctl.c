@@ -36,10 +36,10 @@
 #include <systemd/sd-bus.h>
 #include <systemd/sd-journal.h>
 
-#include "acl-util.h"
+#include "shared/acl-util.h"
 #include "basic/alloc-util.h"
 #include "bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "catalog.h"
 #include "basic/chattr-util.h"
 #include "basic/fd-util.h"
@@ -56,9 +56,9 @@
 #include "journal-verify.h"
 #include "basic/locale-util.h"
 #include "basic/log.h"
-#include "logs-show.h"
+#include "shared/logs-show.h"
 #include "basic/mkdir.h"
-#include "pager.h"
+#include "shared/pager.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/rlimit-util.h"
@@ -68,7 +68,7 @@
 #include "basic/syslog-util.h"
 #include "basic/terminal-util.h"
 #include "udev.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 #include "basic/unit-name.h"
 #include "basic/user-util.h"
 

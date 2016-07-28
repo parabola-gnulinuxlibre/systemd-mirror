@@ -25,7 +25,7 @@
 
 #include <systemd/sd-netlink.h>
 
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "basic/missing.h"
 #include "networkd-link.h"
 #include "networkd-netdev-tunnel.h"

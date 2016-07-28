@@ -28,7 +28,7 @@
 #include "basic/alloc-util.h"
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/clock-util.h"
 #include "basic/def.h"
 #include "basic/fileio-label.h"

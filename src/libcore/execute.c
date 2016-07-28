@@ -54,7 +54,7 @@
 #include "basic/af-list.h"
 #include "basic/alloc-util.h"
 #ifdef HAVE_APPARMOR
-#include "apparmor-util.h"
+#include "shared/apparmor-util.h"
 #endif
 #include "basic/async.h"
 #include "basic/barrier.h"
@@ -83,7 +83,7 @@
 #include "basic/rlimit-util.h"
 #include "basic/rm-rf.h"
 #ifdef HAVE_SECCOMP
-#include "seccomp-util.h"
+#include "shared/seccomp-util.h"
 #endif
 #include "basic/securebits.h"
 #include "basic/selinux-util.h"
@@ -97,7 +97,7 @@
 #include "unit.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
-#include "utmp-wtmp.h"
+#include "shared/utmp-wtmp.h"
 
 #define IDLE_TIMEOUT_USEC (5*USEC_PER_SEC)
 #define IDLE_TIMEOUT2_USEC (1*USEC_PER_SEC)

@@ -18,7 +18,7 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "dns-domain.h"
+#include "shared/dns-domain.h"
 #include "dns-type.h"
 #include "basic/hostname-util.h"
 #include "sd-netlink/local-addresses.h"

@@ -28,11 +28,11 @@
 
 #include "basic/alloc-util.h"
 #include "sd-bus/bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/def.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
-#include "initreq.h"
+#include "shared/initreq.h"
 #include "basic/list.h"
 #include "basic/log.h"
 #include "basic/special.h"

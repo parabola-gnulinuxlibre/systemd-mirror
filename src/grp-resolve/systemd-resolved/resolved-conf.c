@@ -18,7 +18,7 @@
  ***/
 
 #include "basic/alloc-util.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "basic/def.h"
 #include "basic/extract-word.h"
 #include "basic/parse-util.h"

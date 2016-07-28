@@ -20,7 +20,7 @@
 #include <net/if.h>
 
 #include "basic/alloc-util.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "firewall-util.h"
 #include "netlink-util.h"
 #include "networkd-address.h"

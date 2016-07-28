@@ -27,7 +27,7 @@
 #include "basic/alloc-util.h"
 #include "sd-hwdb/hwdb-util.h"
 #include "basic/string-util.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 #include "udev.h"
 
 static sd_hwdb *hwdb;

@@ -22,7 +22,7 @@
 #include <linux/ethtool.h>
 #include <linux/sockios.h>
 
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "ethtool-util.h"
 #include "basic/log.h"
 #include "basic/string-table.h"

@@ -23,7 +23,7 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "ask-password-api.h"
+#include "shared/ask-password-api.h"
 #include "basic/copy.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"

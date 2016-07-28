@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #include "basic/alloc-util.h"
-#include "fstab-util.h"
+#include "shared/fstab-util.h"
 #include "basic/log.h"
 #include "basic/mkdir.h"
 #include "basic/proc-cmdline.h"

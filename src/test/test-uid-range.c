@@ -20,7 +20,7 @@
 #include <stddef.h>
 
 #include "basic/alloc-util.h"
-#include "uid-range.h"
+#include "shared/uid-range.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
 

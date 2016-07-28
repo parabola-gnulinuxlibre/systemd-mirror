@@ -31,7 +31,7 @@
 #include "basic/async.h"
 #include "automount.h"
 #include "sd-bus/bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "dbus-automount.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"

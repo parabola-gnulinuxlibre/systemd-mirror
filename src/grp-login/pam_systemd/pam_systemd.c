@@ -32,7 +32,7 @@
 #include "basic/audit-util.h"
 #include "bus-common-errors.h"
 #include "bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/def.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"

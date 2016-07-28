@@ -21,7 +21,7 @@
 #include <sys/stat.h>
 
 #include "basic/log.h"
-#include "path-lookup.h"
+#include "shared/path-lookup.h"
 #include "basic/rm-rf.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"

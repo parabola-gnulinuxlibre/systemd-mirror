@@ -22,7 +22,7 @@
 #include "basic/alloc-util.h"
 #include "basic/conf-files.h"
 #include "basic/def.h"
-#include "dns-domain.h"
+#include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/hexdecoct.h"

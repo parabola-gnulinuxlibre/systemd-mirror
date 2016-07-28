@@ -19,11 +19,11 @@
 
 #include "basic/alloc-util.h"
 #include "basic/bus-label.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/fd-util.h"
 #include "image-dbus.h"
 #include "basic/io-util.h"
-#include "machine-image.h"
+#include "shared/machine-image.h"
 #include "basic/process-util.h"
 #include "basic/strv.h"
 #include "basic/user-util.h"

@@ -18,7 +18,7 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "dns-domain.h"
+#include "shared/dns-domain.h"
 #include "resolved-dns-search-domain.h"
 
 int dns_search_domain_new(

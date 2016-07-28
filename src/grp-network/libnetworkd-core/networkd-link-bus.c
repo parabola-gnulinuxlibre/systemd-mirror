@@ -18,7 +18,7 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "networkd-link.h"
 #include "networkd.h"
 #include "basic/parse-util.h"

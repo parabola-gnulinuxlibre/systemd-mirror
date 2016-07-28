@@ -25,7 +25,7 @@
 
 #include "basic/alloc-util.h"
 #include "basic/device-nodes.h"
-#include "fstab-util.h"
+#include "shared/fstab-util.h"
 #include "basic/macro.h"
 #include "basic/mount-util.h"
 #include "basic/parse-util.h"

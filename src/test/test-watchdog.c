@@ -20,7 +20,7 @@
 #include <unistd.h>
 
 #include "basic/log.h"
-#include "watchdog.h"
+#include "shared/watchdog.h"
 
 int main(int argc, char *argv[]) {
         usec_t t = 10 * USEC_PER_SEC;

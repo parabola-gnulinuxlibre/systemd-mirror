@@ -31,11 +31,11 @@
 #include <systemd/sd-journal.h>
 #include <systemd/sd-messages.h>
 
-#include "acl-util.h"
+#include "shared/acl-util.h"
 #include "basic/alloc-util.h"
 #include "basic/audit-util.h"
 #include "basic/cgroup-util.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "basic/dirent-util.h"
 #include "basic/extract-word.h"
 #include "basic/fd-util.h"

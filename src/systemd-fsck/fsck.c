@@ -33,7 +33,7 @@
 #include "basic/alloc-util.h"
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "sd-device/device-util.h"
 #include "basic/fd-util.h"
 #include "basic/fs-util.h"

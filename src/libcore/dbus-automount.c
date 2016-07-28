@@ -18,7 +18,7 @@
 ***/
 
 #include "automount.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "dbus-automount.h"
 #include "basic/string-util.h"
 

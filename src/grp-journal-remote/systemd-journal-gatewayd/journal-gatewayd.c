@@ -32,12 +32,12 @@
 #include <systemd/sd-journal.h>
 
 #include "basic/alloc-util.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/hostname-util.h"
 #include "basic/log.h"
-#include "logs-show.h"
+#include "shared/logs-show.h"
 #include "microhttpd-util.h"
 #include "basic/parse-util.h"
 #include "basic/sigbus.h"

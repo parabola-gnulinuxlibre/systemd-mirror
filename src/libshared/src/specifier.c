@@ -29,7 +29,7 @@
 #include "basic/alloc-util.h"
 #include "basic/hostname-util.h"
 #include "basic/macro.h"
-#include "specifier.h"
+#include "shared/specifier.h"
 #include "basic/string-util.h"
 
 /*

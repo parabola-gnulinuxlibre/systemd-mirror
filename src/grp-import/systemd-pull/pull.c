@@ -23,8 +23,8 @@
 
 #include "basic/alloc-util.h"
 #include "basic/hostname-util.h"
-#include "import-util.h"
-#include "machine-image.h"
+#include "shared/import-util.h"
+#include "shared/machine-image.h"
 #include "basic/parse-util.h"
 #include "pull-raw.h"
 #include "pull-tar.h"

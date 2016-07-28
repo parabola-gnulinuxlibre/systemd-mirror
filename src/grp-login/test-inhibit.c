@@ -21,7 +21,7 @@
 
 #include <systemd/sd-bus.h>
 
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/fd-util.h"
 #include "basic/macro.h"
 #include "basic/util.h"

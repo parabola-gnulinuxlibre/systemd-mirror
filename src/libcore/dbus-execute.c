@@ -25,7 +25,7 @@
 
 #include "basic/af-list.h"
 #include "basic/alloc-util.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/capability-util.h"
 #include "dbus-execute.h"
 #include "basic/env-util.h"
@@ -40,7 +40,7 @@
 #include "basic/process-util.h"
 #include "basic/rlimit-util.h"
 #ifdef HAVE_SECCOMP
-#include "seccomp-util.h"
+#include "shared/seccomp-util.h"
 #endif
 #include "basic/strv.h"
 #include "basic/syslog-util.h"

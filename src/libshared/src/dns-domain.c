@@ -29,7 +29,7 @@
 #include <sys/socket.h>
 
 #include "basic/alloc-util.h"
-#include "dns-domain.h"
+#include "shared/dns-domain.h"
 #include "basic/hashmap.h"
 #include "basic/hexdecoct.h"
 #include "basic/in-addr-util.h"

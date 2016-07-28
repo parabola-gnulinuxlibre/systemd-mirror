@@ -36,7 +36,7 @@
 #include "basic/fd-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
-#include "ptyfwd.h"
+#include "shared/ptyfwd.h"
 #include "basic/time-util.h"
 
 struct PTYForward {

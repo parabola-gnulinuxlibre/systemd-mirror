@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "clean-ipc.h"
+#include "shared/clean-ipc.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
 

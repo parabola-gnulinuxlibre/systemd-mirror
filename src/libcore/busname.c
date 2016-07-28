@@ -23,7 +23,7 @@
 #include "sd-bus/bus-internal.h"
 #include "sd-bus/bus-kernel.h"
 #include "bus-policy.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "busname.h"
 #include "dbus-busname.h"
 #include "basic/fd-util.h"

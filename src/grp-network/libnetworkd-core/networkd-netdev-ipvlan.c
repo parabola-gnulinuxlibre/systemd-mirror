@@ -19,7 +19,7 @@
 
 #include <net/if.h>
 
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "networkd-netdev-ipvlan.h"
 #include "basic/string-table.h"
 

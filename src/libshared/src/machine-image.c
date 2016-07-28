@@ -38,7 +38,7 @@
 #include "basic/lockfile-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
-#include "machine-image.h"
+#include "shared/machine-image.h"
 #include "basic/mkdir.h"
 #include "basic/path-util.h"
 #include "basic/rm-rf.h"

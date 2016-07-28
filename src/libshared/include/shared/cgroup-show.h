@@ -22,8 +22,8 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "logs-show.h"
-#include "output-mode.h"
+#include "shared/logs-show.h"
+#include "shared/output-mode.h"
 
 int show_cgroup_by_path(const char *path, const char *prefix, unsigned columns, OutputFlags flags);
 int show_cgroup(const char *controller, const char *path, const char *prefix, unsigned columns, OutputFlags flags);

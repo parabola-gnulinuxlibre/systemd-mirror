@@ -32,7 +32,7 @@ typedef struct UnitFileInstallInfo UnitFileInstallInfo;
 
 #include "basic/hashmap.h"
 #include "basic/macro.h"
-#include "path-lookup.h"
+#include "shared/path-lookup.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
 

@@ -25,7 +25,7 @@
 #include "basic/async.h"
 #include "sd-bus/bus-error.h"
 #include "sd-bus/bus-kernel.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "dbus-service.h"
 #include "basic/def.h"
 #include "basic/env-util.h"

@@ -23,7 +23,7 @@
 #include <systemd/sd-bus.h>
 
 #include "bus-internal.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/util.h"

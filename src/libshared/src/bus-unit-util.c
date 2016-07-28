@@ -19,8 +19,8 @@
 
 #include "basic/alloc-util.h"
 #include "sd-bus/bus-internal.h"
-#include "bus-unit-util.h"
-#include "bus-util.h"
+#include "shared/bus-unit-util.h"
+#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
 #include "basic/env-util.h"
 #include "basic/escape.h"

@@ -28,7 +28,7 @@
 #include "basic/string-util.h"
 #include "sysfs-show.h"
 #include "basic/terminal-util.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 #include "basic/util.h"
 
 static int show_sysfs_one(

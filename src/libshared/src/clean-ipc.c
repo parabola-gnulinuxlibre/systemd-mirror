@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "clean-ipc.h"
+#include "shared/clean-ipc.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"

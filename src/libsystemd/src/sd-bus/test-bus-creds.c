@@ -20,7 +20,7 @@
 #include <systemd/sd-bus.h>
 
 #include "bus-dump.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
 
 int main(int argc, char *argv[]) {

@@ -33,7 +33,7 @@
 
 #include "basic/alloc-util.h"
 #include "audit-fd.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/log.h"
 #include "basic/path-util.h"
 #include "basic/selinux-util.h"

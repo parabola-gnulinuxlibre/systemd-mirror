@@ -25,13 +25,13 @@
 #include <string.h>
 
 #include "basic/alloc-util.h"
-#include "cgroup-show.h"
+#include "shared/cgroup-show.h"
 #include "basic/cgroup-util.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
 #include "basic/locale-util.h"
 #include "basic/macro.h"
-#include "output-mode.h"
+#include "shared/output-mode.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
 #include "basic/string-util.h"

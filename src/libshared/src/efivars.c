@@ -31,7 +31,7 @@
 
 #include "basic/alloc-util.h"
 #include "basic/dirent-util.h"
-#include "efivars.h"
+#include "shared/efivars.h"
 #include "basic/fd-util.h"
 #include "basic/io-util.h"
 #include "basic/macro.h"

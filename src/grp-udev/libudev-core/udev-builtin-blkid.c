@@ -30,9 +30,9 @@
 #include <systemd/sd-id128.h>
 
 #include "basic/alloc-util.h"
-#include "efivars.h"
+#include "shared/efivars.h"
 #include "basic/fd-util.h"
-#include "gpt.h"
+#include "shared/gpt.h"
 #include "basic/string-util.h"
 #include "udev.h"
 

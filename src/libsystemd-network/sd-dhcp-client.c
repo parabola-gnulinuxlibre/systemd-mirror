@@ -34,7 +34,7 @@
 #include "dhcp-internal.h"
 #include "dhcp-lease-internal.h"
 #include "dhcp-protocol.h"
-#include "dns-domain.h"
+#include "shared/dns-domain.h"
 #include "basic/hostname-util.h"
 #include "basic/random-util.h"
 #include "basic/string-util.h"

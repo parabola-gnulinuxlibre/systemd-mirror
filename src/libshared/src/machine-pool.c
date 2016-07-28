@@ -43,7 +43,7 @@
 #include "basic/fs-util.h"
 #include "basic/lockfile-util.h"
 #include "basic/log.h"
-#include "machine-pool.h"
+#include "shared/machine-pool.h"
 #include "basic/macro.h"
 #include "basic/missing.h"
 #include "basic/mkdir.h"

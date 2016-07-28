@@ -22,8 +22,8 @@
 #endif
 
 #include "basic/alloc-util.h"
-#include "dns-domain.h"
-#include "gcrypt-util.h"
+#include "shared/dns-domain.h"
+#include "shared/gcrypt-util.h"
 #include "basic/hexdecoct.h"
 #include "resolved-dns-dnssec.h"
 #include "resolved-dns-packet.h"

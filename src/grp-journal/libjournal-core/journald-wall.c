@@ -23,7 +23,7 @@
 #include "journald-wall.h"
 #include "basic/process-util.h"
 #include "basic/string-util.h"
-#include "utmp-wtmp.h"
+#include "shared/utmp-wtmp.h"
 
 void server_forward_wall(
                 Server *s,

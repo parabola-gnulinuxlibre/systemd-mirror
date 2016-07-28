@@ -19,7 +19,7 @@
 
 #include "basic/alloc-util.h"
 #include "basic/cap-list.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "nspawn-network.h"
 #include "nspawn-settings.h"
 #include "basic/parse-util.h"

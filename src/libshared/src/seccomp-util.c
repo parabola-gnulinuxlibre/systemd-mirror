@@ -22,7 +22,7 @@
 #include <stddef.h>
 
 #include "basic/macro.h"
-#include "seccomp-util.h"
+#include "shared/seccomp-util.h"
 #include "basic/string-util.h"
 
 const char* seccomp_arch_to_string(uint32_t c) {

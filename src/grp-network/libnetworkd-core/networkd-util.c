@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "networkd-util.h"
 #include "basic/parse-util.h"
 #include "basic/string-table.h"

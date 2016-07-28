@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include "basic/alloc-util.h"
-#include "specifier.h"
+#include "shared/specifier.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"

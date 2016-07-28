@@ -28,7 +28,7 @@
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/process-util.h"
-#include "spawn-polkit-agent.h"
+#include "shared/spawn-polkit-agent.h"
 #include "basic/stdio-util.h"
 #include "basic/time-util.h"
 #include "basic/util.h"

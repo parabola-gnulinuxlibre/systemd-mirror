@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "dropin.h"
+#include "shared/dropin.h"
 #include "unit.h"
 
 /* Read service data supplementary drop-in directories */

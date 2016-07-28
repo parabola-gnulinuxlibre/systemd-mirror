@@ -28,7 +28,7 @@
 #include "basic/log.h"
 #include "basic/stdio-util.h"
 #include "basic/string-util.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 #include "basic/util.h"
 
 static void print_device(struct udev_device *device) {

@@ -23,7 +23,7 @@
 #include "basic/fd-util.h"
 #include "basic/hexdecoct.h"
 #include "basic/io-util.h"
-#include "machine-pool.h"
+#include "shared/machine-pool.h"
 #include "basic/parse-util.h"
 #include "pull-job.h"
 #include "basic/string-util.h"

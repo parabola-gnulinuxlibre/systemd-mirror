@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "conf-parser.h"
-#include "resolve-util.h"
+#include "shared/conf-parser.h"
+#include "shared/resolve-util.h"
 #include "basic/string-table.h"
 
 DEFINE_CONFIG_PARSE_ENUM(config_parse_resolve_support, resolve_support, ResolveSupport, "Failed to parse resolve support setting");

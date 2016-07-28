@@ -5,7 +5,7 @@
 #include "networkd-netdev-bond.h"
 #include "networkd-netdev-macvlan.h"
 #include "networkd.h"
-#include "test-tables.h"
+#include "shared/test-tables.h"
 
 int main(int argc, char **argv) {
         test_table(bond_mode, NETDEV_BOND_MODE);

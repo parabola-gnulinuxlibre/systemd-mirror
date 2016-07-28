@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include "basic/util.h"
-#include "tests.h"
+#include "shared/tests.h"
 
 char* setup_fake_runtime_dir(void) {
         char t[] = "/tmp/fake-xdg-runtime-XXXXXX", *p;

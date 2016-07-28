@@ -36,7 +36,7 @@
 #include "local-addresses.h"
 #include "basic/locale-util.h"
 #include "netlink-util.h"
-#include "pager.h"
+#include "shared/pager.h"
 #include "basic/parse-util.h"
 #include "basic/socket-util.h"
 #include "basic/sparse-endian.h"

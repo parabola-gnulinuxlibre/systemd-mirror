@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "timesyncd-manager.h"
 
 const struct ConfigPerfItem* timesyncd_gperf_lookup(const char *key, unsigned length);

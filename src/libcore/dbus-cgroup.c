@@ -18,7 +18,7 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
 #include "cgroup.h"
 #include "dbus-cgroup.h"

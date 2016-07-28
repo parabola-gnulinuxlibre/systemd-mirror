@@ -20,7 +20,7 @@
 #include <stddef.h>
 
 #include "basic/alloc-util.h"
-#include "apparmor-util.h"
+#include "shared/apparmor-util.h"
 #include "basic/fileio.h"
 #include "basic/parse-util.h"
 

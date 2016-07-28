@@ -29,9 +29,9 @@
 #include "basic/alloc-util.h"
 #include "basic/architecture.h"
 #include "bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/hostname-util.h"
-#include "spawn-polkit-agent.h"
+#include "shared/spawn-polkit-agent.h"
 #include "basic/util.h"
 
 static bool arg_ask_password = true;

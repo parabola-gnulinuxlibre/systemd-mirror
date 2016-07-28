@@ -34,11 +34,11 @@
 #include "basic/alloc-util.h"
 #include "sd-bus/bus-error.h"
 #include "sd-bus/bus-internal.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/cap-list.h"
 #include "basic/capability-util.h"
 #include "cgroup.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "basic/cpu-set-util.h"
 #include "basic/env-util.h"
 #include "basic/errno-list.h"
@@ -54,7 +54,7 @@
 #include "basic/process-util.h"
 #include "basic/rlimit-util.h"
 #ifdef HAVE_SECCOMP
-#include "seccomp-util.h"
+#include "shared/seccomp-util.h"
 #endif
 #include "basic/securebits.h"
 #include "basic/signal-util.h"

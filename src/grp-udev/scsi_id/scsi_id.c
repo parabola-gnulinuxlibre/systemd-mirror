@@ -35,7 +35,7 @@
 #include "libudev-private.h"
 #include "scsi_id.h"
 #include "basic/string-util.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 
 static const struct option options[] = {
         { "device",             required_argument, NULL, 'd' },

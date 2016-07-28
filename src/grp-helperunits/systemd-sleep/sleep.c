@@ -28,7 +28,7 @@
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/log.h"
-#include "sleep-config.h"
+#include "shared/sleep-config.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"

@@ -23,7 +23,7 @@
 #include "manager.h"
 #include "basic/rm-rf.h"
 #include "test-helper.h"
-#include "tests.h"
+#include "shared/tests.h"
 #include "unit.h"
 
 static int test_cgroup_mask(void) {

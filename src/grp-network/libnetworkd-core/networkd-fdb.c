@@ -21,7 +21,7 @@
 #include <net/if.h>
 
 #include "basic/alloc-util.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "netlink-util.h"
 #include "networkd-fdb.h"
 #include "networkd.h"

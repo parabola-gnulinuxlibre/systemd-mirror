@@ -23,7 +23,7 @@
 
 #include <systemd/sd-dhcp-lease.h>
 
-#include "condition.h"
+#include "shared/condition.h"
 #include "udev.h"
 
 bool net_match_config(const struct ether_addr *match_mac,

@@ -21,7 +21,7 @@
 
 #include "libudev.h"
 
-#include "condition.h"
+#include "shared/condition.h"
 #include "ethtool-util.h"
 #include "basic/list.h"
 

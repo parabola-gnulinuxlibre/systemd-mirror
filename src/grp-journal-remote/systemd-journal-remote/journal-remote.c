@@ -34,7 +34,7 @@
 #include <systemd/sd-daemon.h>
 
 #include "basic/alloc-util.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "basic/def.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"

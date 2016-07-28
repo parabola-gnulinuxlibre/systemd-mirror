@@ -30,7 +30,7 @@
 #include "basic/macro.h"
 #include "manager.h"
 #include "basic/path-util.h"
-#include "specifier.h"
+#include "shared/specifier.h"
 #include "basic/string-util.h"
 #include "test-helper.h"
 #include "basic/unit-name.h"

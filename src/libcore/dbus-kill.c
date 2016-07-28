@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "dbus-kill.h"
 #include "kill.h"
 #include "basic/signal-util.h"

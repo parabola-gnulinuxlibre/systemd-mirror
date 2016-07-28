@@ -19,8 +19,8 @@
 
 #include "basic/alloc-util.h"
 #include "sd-bus/bus-common-errors.h"
-#include "bus-util.h"
-#include "dns-domain.h"
+#include "shared/bus-util.h"
+#include "shared/dns-domain.h"
 #include "resolved-bus.h"
 #include "resolved-def.h"
 #include "resolved-dns-synthesize.h"

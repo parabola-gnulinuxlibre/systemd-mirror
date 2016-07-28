@@ -22,7 +22,7 @@
 #include <string.h>
 
 #include "basic/macro.h"
-#include "uid-range.h"
+#include "shared/uid-range.h"
 #include "basic/user-util.h"
 
 static bool uid_range_intersect(UidRange *range, uid_t start, uid_t nr) {

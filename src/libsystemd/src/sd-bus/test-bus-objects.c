@@ -26,7 +26,7 @@
 #include "bus-dump.h"
 #include "bus-internal.h"
 #include "bus-message.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/strv.h"

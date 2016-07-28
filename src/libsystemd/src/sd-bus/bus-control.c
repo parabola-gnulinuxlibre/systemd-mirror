@@ -31,7 +31,7 @@
 #include "bus-control.h"
 #include "bus-internal.h"
 #include "bus-message.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/capability-util.h"
 #include "basic/stdio-util.h"
 #include "basic/string-util.h"

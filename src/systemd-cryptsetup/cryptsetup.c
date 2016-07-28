@@ -26,7 +26,7 @@
 #include <systemd/sd-device.h>
 
 #include "basic/alloc-util.h"
-#include "ask-password-api.h"
+#include "shared/ask-password-api.h"
 #include "sd-device/device-util.h"
 #include "basic/escape.h"
 #include "basic/fileio.h"

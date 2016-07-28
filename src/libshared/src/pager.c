@@ -32,7 +32,7 @@
 #include "basic/locale-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
-#include "pager.h"
+#include "shared/pager.h"
 #include "basic/process-util.h"
 #include "basic/signal-util.h"
 #include "basic/string-util.h"

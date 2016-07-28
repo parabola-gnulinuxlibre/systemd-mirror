@@ -18,7 +18,7 @@
 ***/
 
 
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "load-dropin.h"
 #include "load-fragment.h"
 #include "basic/log.h"

@@ -20,7 +20,7 @@
 #include <errno.h>
 #include <string.h>
 
-#include "acl-util.h"
+#include "shared/acl-util.h"
 #include "basic/alloc-util.h"
 #include "basic/dirent-util.h"
 #include "basic/escape.h"
@@ -29,7 +29,7 @@
 #include "logind-acl.h"
 #include "basic/set.h"
 #include "basic/string-util.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 #include "basic/util.h"
 
 static int flush_acl(acl_t acl) {

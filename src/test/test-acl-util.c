@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "acl-util.h"
+#include "shared/acl-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/string-util.h"

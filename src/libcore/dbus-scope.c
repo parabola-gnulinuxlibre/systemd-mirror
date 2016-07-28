@@ -20,7 +20,7 @@
 #include "basic/alloc-util.h"
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-internal.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "dbus-cgroup.h"
 #include "dbus-kill.h"
 #include "dbus-scope.h"

@@ -25,7 +25,7 @@
 #include "network-internal.h"
 #include "basic/siphash24.h"
 #include "basic/sparse-endian.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 #include "basic/virt.h"
 
 #define SYSTEMD_PEN 43793

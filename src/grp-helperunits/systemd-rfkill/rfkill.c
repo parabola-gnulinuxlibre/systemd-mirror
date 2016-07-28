@@ -33,7 +33,7 @@
 #include "basic/proc-cmdline.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 #include "basic/util.h"
 
 #define EXIT_USEC (5 * USEC_PER_SEC)

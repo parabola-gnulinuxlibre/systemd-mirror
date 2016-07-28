@@ -22,7 +22,7 @@
 #include <linux/reboot.h>
 
 #include "sd-bus/bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "failure-action.h"
 #include "basic/special.h"
 #include "basic/string-table.h"

@@ -20,7 +20,7 @@
 #include <math.h>
 
 #include "basic/alloc-util.h"
-#include "dns-domain.h"
+#include "shared/dns-domain.h"
 #include "dns-type.h"
 #include "basic/escape.h"
 #include "basic/hexdecoct.h"

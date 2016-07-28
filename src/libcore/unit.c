@@ -28,11 +28,11 @@
 
 #include "basic/alloc-util.h"
 #include "sd-bus/bus-common-errors.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
 #include "dbus-unit.h"
 #include "dbus.h"
-#include "dropin.h"
+#include "shared/dropin.h"
 #include "basic/escape.h"
 #include "execute.h"
 #include "basic/fileio-label.h"

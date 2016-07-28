@@ -22,8 +22,8 @@
 
 #include "basic/alloc-util.h"
 #include "basic/conf-files.h"
-#include "conf-parser.h"
-#include "dns-domain.h"
+#include "shared/conf-parser.h"
+#include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/hostname-util.h"
 #include "network-internal.h"

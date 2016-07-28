@@ -30,7 +30,7 @@
 
 #include "basic/alloc-util.h"
 #include "sd-bus/bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"

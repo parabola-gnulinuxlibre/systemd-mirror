@@ -19,7 +19,7 @@
 
 #include "logind-action.h"
 #include "logind-session.h"
-#include "test-tables.h"
+#include "shared/test-tables.h"
 
 int main(int argc, char **argv) {
         test_table(handle_action, HANDLE_ACTION);

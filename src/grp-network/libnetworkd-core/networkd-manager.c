@@ -24,10 +24,10 @@
 #include <systemd/sd-netlink.h>
 
 #include "basic/alloc-util.h"
-#include "bus-util.h"
-#include "conf-parser.h"
+#include "shared/bus-util.h"
+#include "shared/conf-parser.h"
 #include "basic/def.h"
-#include "dns-domain.h"
+#include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "libudev-private.h"
@@ -37,7 +37,7 @@
 #include "basic/ordered-set.h"
 #include "basic/path-util.h"
 #include "basic/set.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 #include "basic/virt.h"
 
 /* use 8 MB for receive socket kernel queue. */

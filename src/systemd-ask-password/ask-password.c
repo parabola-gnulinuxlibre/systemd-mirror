@@ -22,7 +22,7 @@
 #include <stddef.h>
 #include <unistd.h>
 
-#include "ask-password-api.h"
+#include "shared/ask-password-api.h"
 #include "basic/def.h"
 #include "basic/log.h"
 #include "basic/macro.h"

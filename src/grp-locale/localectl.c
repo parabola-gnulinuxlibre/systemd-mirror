@@ -28,14 +28,14 @@
 #include <systemd/sd-bus.h>
 
 #include "bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/def.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/locale-util.h"
-#include "pager.h"
+#include "shared/pager.h"
 #include "basic/set.h"
-#include "spawn-polkit-agent.h"
+#include "shared/spawn-polkit-agent.h"
 #include "basic/strv.h"
 #include "basic/util.h"
 #include "basic/virt.h"

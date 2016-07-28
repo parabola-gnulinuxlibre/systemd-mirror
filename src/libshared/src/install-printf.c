@@ -23,10 +23,10 @@
 #include <unistd.h>
 
 #include "basic/formats-util.h"
-#include "install-printf.h"
-#include "install.h"
+#include "shared/install-printf.h"
+#include "shared/install.h"
 #include "basic/macro.h"
-#include "specifier.h"
+#include "shared/specifier.h"
 #include "basic/unit-name.h"
 #include "basic/user-util.h"
 

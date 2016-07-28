@@ -22,7 +22,7 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "dhcp-lease-internal.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
@@ -34,7 +34,7 @@
 #include "basic/socket-util.h"
 #include "basic/stdio-util.h"
 #include "basic/string-table.h"
-#include "udev-util.h"
+#include "shared/udev-util.h"
 #include "basic/util.h"
 #include "basic/virt.h"
 

@@ -26,10 +26,10 @@
 #include <systemd/sd-bus.h>
 
 #include "sd-bus/bus-error.h"
-#include "bus-util.h"
-#include "pager.h"
+#include "shared/bus-util.h"
+#include "shared/pager.h"
 #include "basic/parse-util.h"
-#include "spawn-polkit-agent.h"
+#include "shared/spawn-polkit-agent.h"
 #include "basic/strv.h"
 #include "basic/terminal-util.h"
 #include "basic/util.h"

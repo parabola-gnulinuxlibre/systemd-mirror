@@ -30,7 +30,7 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "test-helper.h"
-#include "tests.h"
+#include "shared/tests.h"
 #include "unit.h"
 #include "basic/util.h"
 

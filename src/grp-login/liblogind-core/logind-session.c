@@ -31,7 +31,7 @@
 #include "basic/alloc-util.h"
 #include "basic/audit-util.h"
 #include "bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"

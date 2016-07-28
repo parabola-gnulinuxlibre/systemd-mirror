@@ -32,7 +32,7 @@
 #include "basic/alloc-util.h"
 #include "bus-error.h"
 #include "bus-message.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/def.h"
 #include "basic/env-util.h"
 #include "basic/fd-util.h"

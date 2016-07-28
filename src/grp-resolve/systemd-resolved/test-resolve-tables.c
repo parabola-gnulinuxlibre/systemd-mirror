@@ -18,7 +18,7 @@
 ***/
 
 #include "dns-type.h"
-#include "test-tables.h"
+#include "shared/test-tables.h"
 
 int main(int argc, char **argv) {
         uint16_t i;

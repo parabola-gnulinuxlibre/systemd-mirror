@@ -24,7 +24,7 @@
 #include <systemd/sd-netlink.h>
 
 #include "basic/alloc-util.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "basic/extract-word.h"
 #include "basic/missing.h"
 #include "networkd-netdev-bond.h"

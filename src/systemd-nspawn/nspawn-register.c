@@ -20,8 +20,8 @@
 #include <systemd/sd-bus.h>
 
 #include "sd-bus/bus-error.h" /* for bus_error_message */
-#include "bus-unit-util.h"
-#include "bus-util.h"
+#include "shared/bus-unit-util.h"
+#include "shared/bus-util.h"
 #include "nspawn-register.h"
 #include "basic/stat-util.h"
 #include "basic/strv.h"

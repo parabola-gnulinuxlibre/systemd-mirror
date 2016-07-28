@@ -28,14 +28,14 @@
 #include "basic/audit-util.h"
 #include "bus-common-errors.h"
 #include "bus-error.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/formats-util.h"
 #include "logind.h"
 #include "basic/special.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
 #include "basic/user-util.h"
-#include "utmp-wtmp.h"
+#include "shared/utmp-wtmp.h"
 
 _const_ static usec_t when_wall(usec_t n, usec_t elapse) {
 

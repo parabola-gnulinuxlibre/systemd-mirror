@@ -20,11 +20,11 @@
 #include <errno.h>
 
 #include "basic/alloc-util.h"
-#include "dropin.h"
+#include "shared/dropin.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
-#include "fstab-util.h"
-#include "generator.h"
+#include "shared/fstab-util.h"
+#include "shared/generator.h"
 #include "basic/hashmap.h"
 #include "basic/log.h"
 #include "basic/mkdir.h"

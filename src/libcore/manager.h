@@ -70,7 +70,7 @@ typedef enum StatusType {
 
 #include "execute.h"
 #include "job.h"
-#include "path-lookup.h"
+#include "shared/path-lookup.h"
 #include "show-status.h"
 #include "basic/unit-name.h"
 

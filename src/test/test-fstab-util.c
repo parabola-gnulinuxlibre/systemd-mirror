@@ -18,7 +18,7 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "fstab-util.h"
+#include "shared/fstab-util.h"
 #include "basic/log.h"
 #include "basic/string-util.h"
 #include "basic/util.h"

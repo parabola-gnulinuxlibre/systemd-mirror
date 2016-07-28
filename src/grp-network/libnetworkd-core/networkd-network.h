@@ -22,10 +22,10 @@
 #include <systemd/sd-bus.h>
 #include "udev.h"
 
-#include "condition.h"
+#include "shared/condition.h"
 #include "dhcp-identifier.h"
 #include "basic/hashmap.h"
-#include "resolve-util.h"
+#include "shared/resolve-util.h"
 
 #include "networkd-address.h"
 #include "networkd-fdb.h"

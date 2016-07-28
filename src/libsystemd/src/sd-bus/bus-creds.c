@@ -25,7 +25,7 @@
 #include "bus-creds.h"
 #include "basic/bus-label.h"
 #include "bus-message.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/capability-util.h"
 #include "basic/cgroup-util.h"
 #include "basic/fd-util.h"

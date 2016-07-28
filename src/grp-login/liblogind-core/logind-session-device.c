@@ -26,7 +26,7 @@
 #include "libudev.h"
 
 #include "basic/alloc-util.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/fd-util.h"
 #include "logind-session-device.h"
 #include "basic/missing.h"

@@ -23,11 +23,11 @@
 #include <string.h>
 
 #include "basic/alloc-util.h"
-#include "install.h"
+#include "shared/install.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/mkdir.h"
-#include "path-lookup.h"
+#include "shared/path-lookup.h"
 #include "basic/path-util.h"
 #include "basic/rm-rf.h"
 #include "basic/stat-util.h"

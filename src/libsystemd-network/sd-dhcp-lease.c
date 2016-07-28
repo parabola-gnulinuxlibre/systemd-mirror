@@ -29,7 +29,7 @@
 #include "basic/alloc-util.h"
 #include "dhcp-lease-internal.h"
 #include "dhcp-protocol.h"
-#include "dns-domain.h"
+#include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/hexdecoct.h"

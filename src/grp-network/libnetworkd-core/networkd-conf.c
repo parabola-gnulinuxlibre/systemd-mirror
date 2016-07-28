@@ -19,7 +19,7 @@
 
 #include <ctype.h>
 
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "basic/def.h"
 #include "dhcp-identifier.h"
 #include "basic/hexdecoct.h"

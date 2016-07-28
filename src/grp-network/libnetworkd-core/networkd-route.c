@@ -18,7 +18,7 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "basic/in-addr-util.h"
 #include "netlink-util.h"
 #include "networkd-route.h"

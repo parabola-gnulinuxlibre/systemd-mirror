@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "base-filesystem.h"
+#include "shared/base-filesystem.h"
 #include "basic/fd-util.h"
 #include "basic/log.h"
 #include "basic/missing.h"
@@ -35,7 +35,7 @@
 #include "basic/rm-rf.h"
 #include "basic/stdio-util.h"
 #include "basic/string-util.h"
-#include "switch-root.h"
+#include "shared/switch-root.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
 

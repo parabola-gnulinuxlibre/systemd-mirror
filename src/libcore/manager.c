@@ -40,11 +40,11 @@
 
 #include "basic/alloc-util.h"
 #include "audit-fd.h"
-#include "boot-timestamps.h"
+#include "shared/boot-timestamps.h"
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-error.h"
 #include "sd-bus/bus-kernel.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "dbus-job.h"
 #include "dbus-manager.h"
 #include "dbus-unit.h"
@@ -66,7 +66,7 @@
 #include "basic/mkdir.h"
 #include "basic/mkdir.h"
 #include "basic/parse-util.h"
-#include "path-lookup.h"
+#include "shared/path-lookup.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
 #include "basic/ratelimit.h"
@@ -84,7 +84,7 @@
 #include "basic/unit-name.h"
 #include "basic/util.h"
 #include "basic/virt.h"
-#include "watchdog.h"
+#include "shared/watchdog.h"
 
 #define NOTIFY_RCVBUF_SIZE (8*1024*1024)
 #define CGROUPS_AGENT_RCVBUF_SIZE (8*1024*1024)

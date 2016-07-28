@@ -38,7 +38,7 @@
 #include "sd-bus/bus-internal.h"
 #include "basic/bus-label.h"
 #include "sd-bus/bus-message.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/def.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"

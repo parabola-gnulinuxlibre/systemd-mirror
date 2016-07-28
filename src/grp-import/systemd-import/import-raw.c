@@ -34,7 +34,7 @@
 #include "import-compress.h"
 #include "import-raw.h"
 #include "basic/io-util.h"
-#include "machine-pool.h"
+#include "shared/machine-pool.h"
 #include "basic/mkdir.h"
 #include "basic/path-util.h"
 #include "qcow2-util.h"

@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "conf-parser.h"
+#include "shared/conf-parser.h"
 #include "basic/def.h"
 #include "basic/env-util.h"
 #include "basic/fd-util.h"
@@ -34,7 +34,7 @@
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/parse-util.h"
-#include "sleep-config.h"
+#include "shared/sleep-config.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 

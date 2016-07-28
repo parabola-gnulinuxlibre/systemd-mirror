@@ -19,7 +19,7 @@
 
 #include "basic/alloc-util.h"
 #include "basic/fileio.h"
-#include "install.h"
+#include "shared/install.h"
 #include "basic/mkdir.h"
 #include "basic/rm-rf.h"
 #include "basic/string-util.h"

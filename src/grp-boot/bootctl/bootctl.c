@@ -38,7 +38,7 @@
 #include "basic/alloc-util.h"
 #include "basic/blkid-util.h"
 #include "basic/dirent-util.h"
-#include "efivars.h"
+#include "shared/efivars.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/locale-util.h"

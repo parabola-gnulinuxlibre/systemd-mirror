@@ -26,7 +26,7 @@
 #include "basic/hashmap.h"
 #include "basic/list.h"
 #include "basic/ordered-set.h"
-#include "resolve-util.h"
+#include "shared/resolve-util.h"
 
 typedef struct Manager Manager;
 

@@ -26,7 +26,7 @@
 #include <sys/vfs.h>
 #include <unistd.h>
 
-#include "acl-util.h"
+#include "shared/acl-util.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
 #include "basic/missing.h"

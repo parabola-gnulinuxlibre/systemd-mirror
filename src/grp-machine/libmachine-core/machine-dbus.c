@@ -32,7 +32,7 @@
 #include "bus-common-errors.h"
 #include "bus-internal.h"
 #include "basic/bus-label.h"
-#include "bus-util.h"
+#include "shared/bus-util.h"
 #include "basic/copy.h"
 #include "basic/env-util.h"
 #include "basic/fd-util.h"
