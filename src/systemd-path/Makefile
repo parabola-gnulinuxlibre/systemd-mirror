@@ -26,9 +26,13 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 bin_PROGRAMS += systemd-path
 
 systemd_path_SOURCES = \
+	sd-path.c \
 	src/path/path.c
 
 systemd_path_LDADD = \
-	libshared.la
+	libbasic.la
+
+systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
+systemd.CPPFLAGS += -DROOTLIBDIR=\"$(rootlibdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

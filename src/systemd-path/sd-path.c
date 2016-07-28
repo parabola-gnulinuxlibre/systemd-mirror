@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <systemd/sd-path.h>
+#include "sd-path.h"
 
 #include "basic/alloc-util.h"
 #include "basic/architecture.h"

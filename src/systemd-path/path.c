@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <systemd/sd-path.h>
+#include "sd-path.h"
 
 #include "basic/alloc-util.h"
 #include "basic/log.h"

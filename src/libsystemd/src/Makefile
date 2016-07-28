@@ -27,14 +27,12 @@ _libsystemd_internal_la_SOURCES = \
 	src/systemd/sd-bus.h \
 	src/systemd/sd-bus-protocol.h \
 	src/systemd/sd-bus-vtable.h \
-	src/systemd/sd-utf8.h \
 	src/systemd/sd-event.h \
 	src/systemd/sd-netlink.h \
 	src/systemd/sd-resolve.h \
 	src/systemd/sd-login.h \
 	src/systemd/sd-id128.h \
 	src/systemd/sd-daemon.h \
-	src/systemd/sd-path.h \
 	src/systemd/sd-network.h \
 	src/systemd/sd-hwdb.h \
 	src/systemd/sd-device.h \
@@ -81,7 +79,6 @@ _libsystemd_internal_la_SOURCES = \
 	src/libsystemd/sd-bus/kdbus.h \
 	src/libsystemd/sd-bus/bus-dump.c \
 	src/libsystemd/sd-bus/bus-dump.h \
-	src/libsystemd/sd-utf8/sd-utf8.c \
 	src/libsystemd/sd-event/sd-event.c \
 	src/libsystemd/sd-netlink/sd-netlink.c \
 	src/libsystemd/sd-netlink/netlink-internal.h \
@@ -97,7 +94,6 @@ _libsystemd_internal_la_SOURCES = \
 	src/libsystemd/sd-id128/sd-id128.c \
 	src/libsystemd/sd-daemon/sd-daemon.c \
 	src/libsystemd/sd-login/sd-login.c \
-	src/libsystemd/sd-path/sd-path.c \
 	src/libsystemd/sd-network/sd-network.c \
 	src/libsystemd/sd-network/network-util.h \
 	src/libsystemd/sd-network/network-util.c \
