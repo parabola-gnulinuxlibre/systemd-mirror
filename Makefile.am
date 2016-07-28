@@ -822,6 +822,8 @@ EXTRA_DIST += \
 	man/glib-event-glue.c
 
 #@src/libbasic/Makefile --------------------------------------------------------
+at.subdirs += src include
+#@src/libbasic/src/Makefile
 noinst_LTLIBRARIES += \
 	libbasic.la
 
@@ -1410,7 +1412,9 @@ CLEANFILES += \
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 
-#@src/libbasic/Makefile
+#@src/libbasic/include/Makefile
+at.subdirs += basic
+#@src/libbasic/include/basic/Makefile
 src/basic/errno-list.txt:
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM -include errno.h - </dev/null | $(AWK) '/^#define[ \t]+E[^ _]+[ \t]+/ { print $$2; }' >$@
