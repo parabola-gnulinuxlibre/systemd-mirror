@@ -18,7 +18,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <systemd/sd-device.h>
+#include "sd-device.h"
 
 #include "basic/alloc-util.h"
 #include "device-enumerator-private.h"

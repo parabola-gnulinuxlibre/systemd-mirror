@@ -29,7 +29,7 @@
 #include <sys/prctl.h>
 #include <unistd.h>
 
-#include <systemd/sd-resolve.h>
+#include "sd-resolve.h"
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"

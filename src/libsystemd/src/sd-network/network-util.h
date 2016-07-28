@@ -19,6 +19,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <systemd/sd-network.h>
+#include "sd-network.h"
 
 bool network_is_online(void);

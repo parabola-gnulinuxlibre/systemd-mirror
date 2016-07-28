@@ -20,7 +20,7 @@
 #include <poll.h>
 #include <sys/socket.h>
 
-#include <systemd/sd-netlink.h>
+#include "sd-netlink.h"
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"

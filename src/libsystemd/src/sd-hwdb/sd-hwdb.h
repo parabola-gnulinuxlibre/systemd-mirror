@@ -21,7 +21,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "_sd-common.h"
+#include <systemd/_sd-common.h>
 
 _SD_BEGIN_DECLARATIONS;
 

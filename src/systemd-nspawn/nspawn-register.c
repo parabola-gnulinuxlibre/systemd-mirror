@@ -19,13 +19,14 @@
 
 #include <systemd/sd-bus.h>
 
-#include "sd-bus/bus-error.h" /* for bus_error_message */
-#include "shared/bus-unit-util.h"
-#include "shared/bus-util.h"
-#include "nspawn-register.h"
 #include "basic/stat-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "sd-bus/bus-error.h" /* for bus_error_message */
+#include "shared/bus-unit-util.h"
+#include "shared/bus-util.h"
+
+#include "nspawn-register.h"
 
 int register_machine(
                 const char *machine_name,

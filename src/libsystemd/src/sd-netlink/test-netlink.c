@@ -20,7 +20,7 @@
 #include <net/if.h>
 #include <netinet/ether.h>
 
-#include <systemd/sd-netlink.h>
+#include "sd-netlink.h"
 
 #include "basic/ether-addr-util.h"
 #include "basic/macro.h"

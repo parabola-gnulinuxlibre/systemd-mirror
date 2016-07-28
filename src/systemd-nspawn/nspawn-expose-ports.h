@@ -22,10 +22,10 @@
 #include <inttypes.h>
 
 #include <systemd/sd-event.h>
-#include <systemd/sd-netlink.h>
 
 #include "basic/in-addr-util.h"
 #include "basic/list.h"
+#include "sd-netlink/sd-netlink.h"
 
 typedef struct ExposePort {
         int protocol;

@@ -21,15 +21,15 @@
 #include <netinet/ether.h>
 #include <linux/if_bonding.h>
 
-#include <systemd/sd-netlink.h>
-
 #include "basic/alloc-util.h"
-#include "shared/conf-parser.h"
 #include "basic/extract-word.h"
 #include "basic/missing.h"
-#include "networkd-netdev-bond.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
+#include "sd-netlink/sd-netlink.h"
+#include "shared/conf-parser.h"
+
+#include "networkd-netdev-bond.h"
 
 /*
  * Number of seconds between instances where the bonding

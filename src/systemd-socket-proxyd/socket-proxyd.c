@@ -30,7 +30,6 @@
 
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-event.h>
-#include <systemd/sd-resolve.h>
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
@@ -40,6 +39,7 @@
 #include "basic/socket-util.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "sd-resolve/sd-resolve.h"
 
 #define BUFFER_SIZE (256 * 1024)
 #define CONNECTIONS_MAX 256

@@ -28,13 +28,8 @@
 #include <unistd.h>
 
 #include <systemd/sd-bus.h>
-#include <systemd/sd-device.h>
 
 #include "basic/alloc-util.h"
-#include "sd-bus/bus-common-errors.h"
-#include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "sd-device/device-util.h"
 #include "basic/fd-util.h"
 #include "basic/fs-util.h"
 #include "basic/parse-util.h"
@@ -46,6 +41,11 @@
 #include "basic/special.h"
 #include "basic/stdio-util.h"
 #include "basic/util.h"
+#include "sd-bus/bus-common-errors.h"
+#include "sd-bus/bus-error.h"
+#include "sd-device/device-util.h"
+#include "sd-device/sd-device.h"
+#include "shared/bus-util.h"
 
 /* exit codes as defined in fsck(8) */
 enum {

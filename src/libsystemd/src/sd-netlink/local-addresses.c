@@ -18,7 +18,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <systemd/sd-netlink.h>
+#include "sd-netlink.h"
 
 #include "basic/alloc-util.h"
 #include "local-addresses.h"

@@ -27,7 +27,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#include <systemd/sd-hwdb.h>
+#include "sd-hwdb.h"
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"

@@ -25,7 +25,7 @@
 #include <sys/sysmacros.h>
 #include <sys/types.h>
 
-#include "_sd-common.h"
+#include <systemd/_sd-common.h>
 
 _SD_BEGIN_DECLARATIONS;
 

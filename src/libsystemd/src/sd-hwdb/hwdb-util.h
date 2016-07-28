@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <systemd/sd-hwdb.h>
+#include "sd-hwdb.h"
 
 #include "basic/util.h"
 

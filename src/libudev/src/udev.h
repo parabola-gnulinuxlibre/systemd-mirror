@@ -23,12 +23,12 @@
 #include <sys/types.h>
 
 #include <libudev.h>
-#include <systemd/sd-netlink.h>
 
 #include "basic/label.h"
 #include "basic/macro.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "sd-netlink/sd-netlink.h"
 
 #include "libudev-private.h"
 

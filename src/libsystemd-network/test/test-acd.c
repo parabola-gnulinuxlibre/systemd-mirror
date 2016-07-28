@@ -25,12 +25,12 @@
 #include <net/if.h>
 
 #include <systemd/sd-event.h>
-#include "systemd-network/sd-ipv4acd.h"
-#include <systemd/sd-netlink.h>
 
 #include "basic/in-addr-util.h"
-#include "netlink-util.h"
 #include "basic/util.h"
+#include "sd-netlink/netlink-util.h"
+#include "sd-netlink/sd-netlink.h"
+#include "systemd-network/sd-ipv4acd.h"
 
 static void acd_handler(sd_ipv4acd *acd, int event, void *userdata) {
         assert_se(acd);

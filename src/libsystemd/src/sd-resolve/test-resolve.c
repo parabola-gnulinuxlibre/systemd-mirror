@@ -26,7 +26,7 @@
 #include <string.h>
 #include <sys/socket.h>
 
-#include <systemd/sd-resolve.h>
+#include "sd-resolve.h"
 
 #include "basic/alloc-util.h"
 #include "basic/macro.h"

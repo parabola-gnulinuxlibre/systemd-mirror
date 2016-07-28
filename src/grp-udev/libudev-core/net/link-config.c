@@ -19,19 +19,11 @@
 
 #include <netinet/ether.h>
 
-#include <systemd/sd-netlink.h>
-
 #include "basic/alloc-util.h"
 #include "basic/conf-files.h"
-#include "shared/conf-parser.h"
-#include "ethtool-util.h"
 #include "basic/fd-util.h"
-#include "libudev-private.h"
-#include "link-config.h"
 #include "basic/log.h"
 #include "basic/missing.h"
-#include "sd-netlink/netlink-util.h"
-#include "systemd-network/network-internal.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/proc-cmdline.h"
@@ -41,6 +33,14 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "sd-netlink/netlink-util.h"
+#include "sd-netlink/sd-netlink.h"
+#include "shared/conf-parser.h"
+#include "systemd-network/network-internal.h"
+#include "libudev-private.h"
+
+#include "ethtool-util.h"
+#include "link-config.h"
 
 struct link_config_ctx {
         LIST_HEAD(link_config, links);

@@ -22,7 +22,7 @@
 #include <net/if.h>
 #include <sys/types.h>
 
-#include <systemd/sd-device.h>
+#include "sd-device.h"
 
 #include "basic/alloc-util.h"
 #include "device-internal.h"

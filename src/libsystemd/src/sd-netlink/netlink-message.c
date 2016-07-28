@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#include <systemd/sd-netlink.h>
+#include "sd-netlink.h"
 
 #include "basic/alloc-util.h"
 #include "basic/formats-util.h"

@@ -21,24 +21,25 @@
 #include <linux/if.h>
 
 #include <systemd/sd-daemon.h>
-#include <systemd/sd-netlink.h>
 
 #include "basic/alloc-util.h"
-#include "shared/bus-util.h"
-#include "shared/conf-parser.h"
 #include "basic/def.h"
-#include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
+#include "basic/ordered-set.h"
+#include "basic/path-util.h"
+#include "basic/set.h"
+#include "basic/virt.h"
+#include "sd-netlink/sd-netlink.h"
+#include "shared/bus-util.h"
+#include "shared/conf-parser.h"
+#include "shared/dns-domain.h"
+#include "shared/udev-util.h"
+
 #include "libudev-private.h"
 #include "local-addresses.h"
 #include "netlink-util.h"
 #include "networkd.h"
-#include "basic/ordered-set.h"
-#include "basic/path-util.h"
-#include "basic/set.h"
-#include "shared/udev-util.h"
-#include "basic/virt.h"
 
 /* use 8 MB for receive socket kernel queue. */
 #define RCVBUF_SIZE    (8*1024*1024)

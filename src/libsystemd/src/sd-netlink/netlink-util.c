@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <systemd/sd-netlink.h>
+#include "sd-netlink.h"
 
 #include "netlink-internal.h"
 #include "netlink-util.h"

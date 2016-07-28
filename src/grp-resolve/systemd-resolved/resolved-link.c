@@ -19,14 +19,14 @@
 
 #include <net/if.h>
 
-#include <systemd/sd-network.h>
-
 #include "basic/alloc-util.h"
 #include "basic/missing.h"
 #include "basic/parse-util.h"
-#include "resolved-link.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
+#include "sd-network/sd-network.h"
+
+#include "resolved-link.h"
 
 int link_new(Manager *m, Link **ret, int ifindex) {
         _cleanup_(link_freep) Link *l = NULL;

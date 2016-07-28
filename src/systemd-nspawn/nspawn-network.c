@@ -22,18 +22,19 @@
 
 #include "libudev.h"
 #include <systemd/sd-id128.h>
-#include <systemd/sd-netlink.h>
 
 #include "basic/alloc-util.h"
 #include "basic/ether-addr-util.h"
 #include "basic/lockfile-util.h"
-#include "nspawn-network.h"
 #include "basic/siphash24.h"
 #include "basic/socket-util.h"
 #include "basic/stat-util.h"
 #include "basic/string-util.h"
-#include "shared/udev-util.h"
 #include "basic/util.h"
+#include "sd-netlink/sd-netlink.h"
+#include "shared/udev-util.h"
+
+#include "nspawn-network.h"
 
 #define HOST_HASH_KEY SD_ID128_MAKE(1a,37,6f,c7,46,ec,45,0b,ad,a3,d5,31,06,60,5d,b1)
 #define CONTAINER_HASH_KEY SD_ID128_MAKE(c3,c4,f9,19,b5,57,b2,1c,e6,cf,14,27,03,9c,ee,a2)

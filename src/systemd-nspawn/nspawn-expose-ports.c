@@ -17,18 +17,18 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <systemd/sd-netlink.h>
-
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
-#include "firewall-util.h"
 #include "basic/in-addr-util.h"
-#include "sd-netlink/local-addresses.h"
-#include "nspawn-expose-ports.h"
 #include "basic/parse-util.h"
 #include "basic/socket-util.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "firewall-util.h"
+#include "sd-netlink/local-addresses.h"
+#include "sd-netlink/sd-netlink.h"
+
+#include "nspawn-expose-ports.h"
 
 int expose_port_parse(ExposePort **l, const char *s) {
 

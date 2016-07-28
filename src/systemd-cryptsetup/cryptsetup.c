@@ -23,11 +23,7 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#include <systemd/sd-device.h>
-
 #include "basic/alloc-util.h"
-#include "shared/ask-password-api.h"
-#include "sd-device/device-util.h"
 #include "basic/escape.h"
 #include "basic/fileio.h"
 #include "basic/log.h"
@@ -37,6 +33,9 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "sd-device/device-util.h"
+#include "sd-device/sd-device.h"
+#include "shared/ask-password-api.h"
 
 static const char *arg_type = NULL; /* CRYPT_LUKS1, CRYPT_TCRYPT or CRYPT_PLAIN */
 static char *arg_cipher = NULL;

@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <systemd/sd-hwdb.h>
-
 #include "basic/alloc-util.h"
 #include "sd-hwdb/hwdb-util.h"
+#include "sd-hwdb/sd-hwdb.h"
+
 #include "libudev-private.h"
 
 /**

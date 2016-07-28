@@ -23,20 +23,14 @@
 
 #include <systemd/sd-device.h>
 #include <systemd/sd-hwdb.h>
-#include "systemd-network/sd-lldp.h"
 #include <systemd/sd-netlink.h>
 #include <systemd/sd-network.h>
 
 #include "basic/alloc-util.h"
 #include "basic/arphrd-list.h"
-#include "device-util.h"
 #include "basic/ether-addr-util.h"
 #include "basic/fd-util.h"
-#include "hwdb-util.h"
-#include "local-addresses.h"
 #include "basic/locale-util.h"
-#include "netlink-util.h"
-#include "shared/pager.h"
 #include "basic/parse-util.h"
 #include "basic/socket-util.h"
 #include "basic/sparse-endian.h"
@@ -48,6 +42,13 @@
 #include "basic/terminal-util.h"
 #include "basic/util.h"
 #include "basic/verbs.h"
+#include "shared/pager.h"
+#include "systemd-network/sd-lldp.h"
+
+#include "device-util.h"
+#include "hwdb-util.h"
+#include "local-addresses.h"
+#include "netlink-util.h"
 
 static bool arg_no_pager = false;
 static bool arg_legend = true;

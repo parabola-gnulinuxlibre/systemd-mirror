@@ -20,7 +20,7 @@
 ***/
 
 
-#include <systemd/sd-netlink.h>
+#include "sd-netlink.h"
 
 #include "basic/in-addr-util.h"
 

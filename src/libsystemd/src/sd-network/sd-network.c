@@ -23,7 +23,7 @@
 #include <string.h>
 #include <sys/inotify.h>
 
-#include <systemd/sd-network.h>
+#include "sd-network.h"
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"

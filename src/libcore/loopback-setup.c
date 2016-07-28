@@ -20,10 +20,10 @@
 #include <net/if.h>
 #include <stdlib.h>
 
-#include <systemd/sd-netlink.h>
+#include "basic/missing.h"
+#include "sd-netlink/sd-netlink.h"
 
 #include "loopback-setup.h"
-#include "basic/missing.h"
 
 static int start_loopback(sd_netlink *rtnl) {
         _cleanup_(sd_netlink_message_unrefp) sd_netlink_message *req = NULL;
