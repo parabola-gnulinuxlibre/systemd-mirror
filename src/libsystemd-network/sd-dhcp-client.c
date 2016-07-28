@@ -26,7 +26,7 @@
 #include <sys/ioctl.h>
 #include <linux/if_infiniband.h>
 
-#include "sd-dhcp-client.h"
+#include <systemd/sd-dhcp-client.h>
 
 #include "alloc-util.h"
 #include "async.h"

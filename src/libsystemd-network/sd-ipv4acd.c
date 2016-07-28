@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sd-ipv4acd.h"
+#include <systemd/sd-ipv4acd.h>
 
 #include "alloc-util.h"
 #include "arp-util.h"
