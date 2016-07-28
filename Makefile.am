@@ -3493,6 +3493,8 @@ busctl_LDADD = \
 	libshared.la
 
 #@src/libsystemd-network/Makefile ----------------------------------------------
+at.subdirs += src test
+#@src/libsystemd-network/src/Makefile
 noinst_LTLIBRARIES += \
 	libsystemd-network.la
 
@@ -3548,6 +3550,7 @@ libsystemd_network_la_SOURCES = \
 libsystemd_network_la_LIBADD = \
 	$(KMOD_LIBS)
 
+#@src/libsystemd-network/test/Makefile
 test_dhcp_option_SOURCES = \
 	src/libsystemd-network/dhcp-protocol.h \
 	src/libsystemd-network/dhcp-internal.h \
