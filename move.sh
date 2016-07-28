@@ -325,7 +325,7 @@ fixup_makefiles() (
 	    -e 's/ \$\(CPPFLAGS\) / /g' \
 	    -e 's/ \$\(AM_CPPFLAGS\) / $(ALL_CPPFLAGS) /g' \
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
-	    src/libbasic/Makefile \
+	    src/libbasic/include/Makefile \
 	    src/libsystemd/src/Makefile \
 	    src/libsystemd/src/sd-journal/Makefile \
 	    src/grp-udev/libudev-core/Makefile
