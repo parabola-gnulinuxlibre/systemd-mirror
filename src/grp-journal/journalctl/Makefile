@@ -23,6 +23,9 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+rootbin_PROGRAMS += \
+	journalctl
+
 # using _CFLAGS = in the conditional below would suppress AM_CFLAGS
 journalctl_CFLAGS = \
 	$(AM_CFLAGS)
@@ -45,5 +48,7 @@ journalctl_CFLAGS += \
 journalctl_LDADD += \
 	$(QRENCODE_LIBS)
 endif # HAVE_QRENCODE
+
+systemd.CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

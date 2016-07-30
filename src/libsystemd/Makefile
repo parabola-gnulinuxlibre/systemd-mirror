@@ -64,7 +64,7 @@ pkginclude_HEADERS += \
 	src/systemd/sd-id128.h \
 	src/systemd/sd-daemon.h
 
-lib_LTLIBRARIES += \
+rootlib_LTLIBRARIES += \
 	libsystemd.la
 
 # ------------------------------------------------------------------------------

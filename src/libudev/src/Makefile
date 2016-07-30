@@ -30,7 +30,7 @@ LIBUDEV_AGE=6
 include_HEADERS += \
 	src/libudev/libudev.h
 
-lib_LTLIBRARIES += \
+rootlib_LTLIBRARIES += \
 	libudev.la
 
 libudev_la_SOURCES =\

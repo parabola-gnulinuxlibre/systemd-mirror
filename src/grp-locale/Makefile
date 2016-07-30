@@ -87,4 +87,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-localed.service.in
 
+systemd.CPPFLAGS += -DSYSTEMD_KBD_MODEL_MAP=\"$(pkgdatadir)/kbd-model-map\"
+systemd.CPPFLAGS += -DSYSTEMD_LANGUAGE_FALLBACK_MAP=\"$(pkgdatadir)/language-fallback-map\"
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -28,11 +28,11 @@
 
 #include "basic/alloc-util.h"
 #include "basic/architecture.h"
-#include "bus-error.h"
-#include "shared/bus-util.h"
 #include "basic/hostname-util.h"
-#include "shared/spawn-polkit-agent.h"
 #include "basic/util.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+#include "shared/spawn-polkit-agent.h"
 
 static bool arg_ask_password = true;
 static BusTransport arg_transport = BUS_TRANSPORT_LOCAL;

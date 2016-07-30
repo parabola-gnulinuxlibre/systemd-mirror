@@ -1,1 +1,1 @@
-../libcore/killall.h
+../grp-system/libcore/killall.h

@@ -18,7 +18,7 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "audit-type.h"
+#include "sd-journal/audit-type.h"
 #include "basic/fd-util.h"
 #include "basic/hexdecoct.h"
 #include "basic/io-util.h"

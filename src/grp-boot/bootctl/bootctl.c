@@ -38,13 +38,13 @@
 #include "basic/alloc-util.h"
 #include "basic/blkid-util.h"
 #include "basic/dirent-util.h"
-#include "shared/efivars.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/locale-util.h"
 #include "basic/rm-rf.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "shared/efivars.h"
 
 static int verify_esp(const char *p, uint32_t *part, uint64_t *pstart, uint64_t *psize, sd_id128_t *uuid) {
         struct statfs sfs;

@@ -23,11 +23,12 @@
 #include <systemd/sd-messages.h>
 
 #include "basic/formats-util.h"
-#include "journal-authenticate.h"
+#include "basic/sigbus.h"
+#include "sd-journal/journal-authenticate.h"
+
 #include "journald-kmsg.h"
 #include "journald-server.h"
 #include "journald-syslog.h"
-#include "basic/sigbus.h"
 
 int main(int argc, char *argv[]) {
         Server server;

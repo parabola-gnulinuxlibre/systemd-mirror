@@ -103,8 +103,6 @@ rootlibdir=@rootlibdir@
 # Libraries we provide
 libbasic.CPPFLAGS                    = -I$(topsrcdir)/src/libbasic/include -I$(topoutdir)/src/libbasic/include
 libbasic.DEPENDS                     =   $(topoutdir)/src/libbasic/src/libbasic.la
-libcore.CPPFLAGS                     = -I$(topsrcdir)/src/libcore $(libshared.CPPFLAGS)
-libcore.DEPENDS                      =   $(topoutdir)/src/libcore/libcore.la
 libfirewall.CPPFLAGS                 = -I$(topsrcdir)/src/libfirewall
 libfirewall.DEPENDS                  =   $(topoutdir)/src/libfirewall/libfirewall.la
 libshared.CPPFLAGS                   = -I$(topsrcdir)/src/libshared/include $(libsystemd-internal.CPPFLAGS) -I$(topsrcdir)/src/libudev/src
@@ -122,10 +120,12 @@ libudev.DEPENDS                      =   $(topoutdir)/src/libudev/src/libudev.la
 libudev-internal.CPPFLAGS            = $(libudev.CPPFLAGS) $(libbasic.CPPFLAGS)
 libudev-internal.DEPENDS             =   $(topoutdir)/src/libudev/src/libudev-internal.la
 # -core libs
+libcore.CPPFLAGS                     = -I$(topsrcdir)/src/grp-system/libcore $(libshared.CPPFLAGS)
+libcore.DEPENDS                      =   $(topoutdir)/src/grp-system/libcore/libcore.la
 #libbus-proxy-core.CPPFLAGS =
 #libbus-proxy-core.DEPENDS  =
-#libjournal-core.CPPFLAGS   =
-#libjournal-core.DEPENDS    =
+libjournal-core.CPPFLAGS   = -I$(topsrcdir)/src/grp-journal/libjournal-core $(libsystemd-internal.CPPFLAGS) $(libbasic.CPPFLAGS)
+libjournal-core.DEPENDS    =   $(topoutdir)/src/grp-journal/libjournal-core/libjournal-core.la
 #liblogind-core.CPPFLAGS    =
 #liblogind-core.DEPENDS     =
 #libmachine-core.CPPFLAGS   =
@@ -135,12 +135,12 @@ libudev-internal.DEPENDS             =   $(topoutdir)/src/libudev/src/libudev-in
 libudev-core.CPPFLAGS      = -I$(topoutdir)/src/grp-udev/libudev-core $(libsystemd-network.CPPFLAGS) $(libshared.CPPFLAGS)
 libudev-core.DEPENDS       =   $(topoutdir)/src/grp-udev/libudev-core/libudev-core.la
 # NSS modules
-#libnss_myhostname.CPPFLAGS =
-#libnss_myhostname.DEPENDS  =
-#libnss_mymachines.CPPFLAGS =
-#libnss_mymachines.DEPENDS  =
-#libnss_resolve.CPPFLAGS    =
-#libnss_resolve.DEPENDS     =
+libnss_myhostname.CPPFLAGS =
+libnss_myhostname.DEPENDS  =
+libnss_mymachines.CPPFLAGS =
+libnss_mymachines.DEPENDS  =
+libnss_resolve.CPPFLAGS    =
+libnss_resolve.DEPENDS     =
 
 # Libraries we use
 HAVE_ACL        = @HAVE_ACL_TRUE@1

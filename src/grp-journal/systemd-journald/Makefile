@@ -31,21 +31,8 @@ systemd_journald_LDADD = \
 	libjournal-core.la \
 	libshared.la
 
-systemd_cat_SOURCES = \
-	src/journal/cat.c
-
-systemd_cat_LDADD = \
-	libjournal-core.la
-
-
 rootlibexec_PROGRAMS += \
 	systemd-journald
-
-rootbin_PROGRAMS += \
-	journalctl
-
-bin_PROGRAMS += \
-	systemd-cat
 
 dist_systemunit_DATA += \
 	units/systemd-journald.socket \

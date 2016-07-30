@@ -30,9 +30,6 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "bus-error.h"
-#include "bus-message.h"
-#include "shared/bus-util.h"
 #include "basic/def.h"
 #include "basic/env-util.h"
 #include "basic/fd-util.h"
@@ -45,6 +42,9 @@
 #include "basic/strv.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "sd-bus/bus-error.h"
+#include "sd-bus/bus-message.h"
+#include "shared/bus-util.h"
 
 enum {
         /* We don't list LC_ALL here on purpose. People should be

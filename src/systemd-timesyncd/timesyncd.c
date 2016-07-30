@@ -24,11 +24,12 @@
 #include "basic/clock-util.h"
 #include "basic/fd-util.h"
 #include "basic/fs-util.h"
-#include "sd-network/network-util.h"
 #include "basic/signal-util.h"
+#include "basic/user-util.h"
+#include "sd-network/network-util.h"
+
 #include "timesyncd-conf.h"
 #include "timesyncd-manager.h"
-#include "basic/user-util.h"
 
 static int load_clock_timestamp(uid_t uid, gid_t gid) {
         _cleanup_close_ int fd = -1;

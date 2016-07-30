@@ -26,5 +26,6 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 at.subdirs += machinectl systemd-machined
 at.subdirs += libmachine-core
 at.subdirs += nss-mymachines
+at.subdirs += grp-import
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
