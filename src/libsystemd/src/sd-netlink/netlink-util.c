@@ -17,10 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-netlink.h"
-
 #include "netlink-internal.h"
 #include "netlink-util.h"
+#include "sd-netlink.h"
 
 int rtnl_set_link_name(sd_netlink **rtnl, int ifindex, const char *name) {
         _cleanup_(sd_netlink_message_unrefp) sd_netlink_message *message = NULL;

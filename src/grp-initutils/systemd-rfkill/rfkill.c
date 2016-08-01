@@ -20,7 +20,7 @@
 #include <linux/rfkill.h>
 #include <poll.h>
 
-#include "libudev.h"
+#include <libudev.h>
 #include <systemd/sd-daemon.h>
 
 #include "basic/alloc-util.h"
@@ -33,8 +33,8 @@
 #include "basic/proc-cmdline.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
-#include "shared/udev-util.h"
 #include "basic/util.h"
+#include "shared/udev-util.h"
 
 #define EXIT_USEC (5 * USEC_PER_SEC)
 

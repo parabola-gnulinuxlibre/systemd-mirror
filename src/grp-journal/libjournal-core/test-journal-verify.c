@@ -22,12 +22,12 @@
 #include <unistd.h>
 
 #include "basic/fd-util.h"
-#include "journal-file.h"
-#include "journal-verify.h"
 #include "basic/log.h"
 #include "basic/rm-rf.h"
 #include "basic/terminal-util.h"
 #include "basic/util.h"
+#include "sd-journal/journal-file.h"
+#include "sd-journal/journal-verify.h"
 
 #define N_ENTRIES 6000
 #define RANDOM_RANGE 77

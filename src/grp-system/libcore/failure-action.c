@@ -18,15 +18,16 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <sys/reboot.h>
 #include <linux/reboot.h>
+#include <sys/reboot.h>
 
-#include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "failure-action.h"
 #include "basic/special.h"
 #include "basic/string-table.h"
 #include "basic/terminal-util.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+
+#include "failure-action.h"
 
 static void log_and_status(Manager *m, const char *message) {
         log_warning("%s", message);

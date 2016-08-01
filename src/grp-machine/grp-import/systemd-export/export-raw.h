@@ -21,8 +21,8 @@
 
 #include <systemd/sd-event.h>
 
-#include "import-compress.h"
 #include "basic/macro.h"
+#include "import-compress.h"
 
 typedef struct RawExport RawExport;
 

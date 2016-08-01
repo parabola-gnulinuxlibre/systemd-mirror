@@ -21,11 +21,12 @@
 #include <net/if.h>
 
 #include "basic/alloc-util.h"
+#include "basic/util.h"
+#include "sd-netlink/netlink-util.h"
 #include "shared/conf-parser.h"
-#include "netlink-util.h"
+
 #include "networkd-fdb.h"
 #include "networkd.h"
-#include "basic/util.h"
 
 /* create a new FDB entry or get an existing one. */
 int fdb_entry_new_static(Network *const network,

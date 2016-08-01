@@ -21,17 +21,18 @@
 
 #include "basic/alloc-util.h"
 #include "basic/conf-files.h"
-#include "shared/conf-parser.h"
 #include "basic/fd-util.h"
 #include "basic/list.h"
-#include "netlink-util.h"
-#include "systemd-network/network-internal.h"
-#include "networkd-netdev.h"
-#include "networkd.h"
 #include "basic/siphash24.h"
 #include "basic/stat-util.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
+#include "sd-netlink/netlink-util.h"
+#include "shared/conf-parser.h"
+#include "systemd-network/network-internal.h"
+
+#include "networkd-netdev.h"
+#include "networkd.h"
 
 const NetDevVTable * const netdev_vtable[_NETDEV_KIND_MAX] = {
 

@@ -30,16 +30,13 @@
 #include <systemd/sd-id128.h>
 
 #include "basic/alloc-util.h"
-#include "shared/apparmor-util.h"
 #include "basic/architecture.h"
 #include "basic/audit-util.h"
 #include "basic/cap-list.h"
-#include "shared/condition.h"
 #include "basic/extract-word.h"
 #include "basic/fd-util.h"
 #include "basic/glob-util.h"
 #include "basic/hostname-util.h"
-#include "shared/ima-util.h"
 #include "basic/list.h"
 #include "basic/macro.h"
 #include "basic/mount-util.h"
@@ -53,6 +50,9 @@
 #include "basic/string-util.h"
 #include "basic/util.h"
 #include "basic/virt.h"
+#include "shared/apparmor-util.h"
+#include "shared/condition.h"
+#include "shared/ima-util.h"
 
 Condition* condition_new(ConditionType type, const char *parameter, bool trigger, bool negate) {
         Condition *c;

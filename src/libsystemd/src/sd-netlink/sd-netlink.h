@@ -21,14 +21,13 @@
 ***/
 
 #include <inttypes.h>
+#include <linux/neighbour.h>
+#include <linux/rtnetlink.h>
 #include <netinet/ether.h>
 #include <netinet/in.h>
-#include <linux/rtnetlink.h>
-#include <linux/neighbour.h>
-
-#include <systemd/sd-event.h>
 
 #include <systemd/_sd-common.h>
+#include <systemd/sd-event.h>
 
 _SD_BEGIN_DECLARATIONS;
 

@@ -25,17 +25,12 @@
 #include <systemd/sd-messages.h>
 
 #include "basic/alloc-util.h"
-#include "dbus-mount.h"
 #include "basic/escape.h"
 #include "basic/exit-status.h"
 #include "basic/formats-util.h"
-#include "shared/fstab-util.h"
 #include "basic/log.h"
-#include "manager.h"
 #include "basic/mkdir.h"
-#include "mount-setup.h"
 #include "basic/mount-util.h"
-#include "mount.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
@@ -44,6 +39,12 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
+#include "shared/fstab-util.h"
+
+#include "dbus-mount.h"
+#include "manager.h"
+#include "mount-setup.h"
+#include "mount.h"
 #include "unit.h"
 
 #define RETRY_UMOUNT_MAX 32

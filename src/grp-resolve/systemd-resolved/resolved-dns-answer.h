@@ -23,6 +23,7 @@ typedef struct DnsAnswer DnsAnswer;
 typedef struct DnsAnswerItem DnsAnswerItem;
 
 #include "basic/macro.h"
+
 #include "resolved-dns-rr.h"
 
 /* A simple array of resource records. We keep track of the

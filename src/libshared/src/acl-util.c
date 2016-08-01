@@ -20,12 +20,12 @@
 #include <errno.h>
 #include <stdbool.h>
 
-#include "shared/acl-util.h"
 #include "basic/alloc-util.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "shared/acl-util.h"
 
 int acl_find_uid(acl_t acl, uid_t uid, acl_entry_t *entry) {
         acl_entry_t i;

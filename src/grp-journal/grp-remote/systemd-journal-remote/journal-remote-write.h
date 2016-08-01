@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "journal-file.h"
+#include "sd-journal/journal-file.h"
 
 typedef struct RemoteServer RemoteServer;
 

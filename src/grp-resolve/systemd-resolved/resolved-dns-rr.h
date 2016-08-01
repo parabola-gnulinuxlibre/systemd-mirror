@@ -22,11 +22,12 @@
 #include <netinet/in.h>
 
 #include "basic/bitmap.h"
-#include "dns-type.h"
 #include "basic/hashmap.h"
 #include "basic/in-addr-util.h"
 #include "basic/list.h"
 #include "basic/string-util.h"
+
+#include "dns-type.h"
 
 typedef struct DnsResourceKey DnsResourceKey;
 typedef struct DnsResourceRecord DnsResourceRecord;

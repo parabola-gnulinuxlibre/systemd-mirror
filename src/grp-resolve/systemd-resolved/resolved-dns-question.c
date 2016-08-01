@@ -19,6 +19,7 @@
 
 #include "basic/alloc-util.h"
 #include "shared/dns-domain.h"
+
 #include "dns-type.h"
 #include "resolved-dns-question.h"
 

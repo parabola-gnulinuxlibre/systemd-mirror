@@ -26,7 +26,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "shared/base-filesystem.h"
 #include "basic/fd-util.h"
 #include "basic/log.h"
 #include "basic/missing.h"
@@ -35,9 +34,10 @@
 #include "basic/rm-rf.h"
 #include "basic/stdio-util.h"
 #include "basic/string-util.h"
-#include "shared/switch-root.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "shared/base-filesystem.h"
+#include "shared/switch-root.h"
 
 int switch_root(const char *new_root, const char *oldroot, bool detach_oldroot,  unsigned long mountflags) {
 

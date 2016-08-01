@@ -20,13 +20,13 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "systemd-network/sd-dhcp-server.h"
 #include <systemd/sd-event.h>
 
-#include "systemd-network/dhcp-internal.h"
 #include "basic/hashmap.h"
 #include "basic/log.h"
 #include "basic/util.h"
+#include "systemd-network/dhcp-internal.h"
+#include "systemd-network/sd-dhcp-server.h"
 
 typedef struct DHCPClientId {
         size_t length;

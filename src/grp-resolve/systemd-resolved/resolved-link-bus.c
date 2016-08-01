@@ -18,12 +18,13 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "shared/bus-util.h"
 #include "basic/parse-util.h"
+#include "basic/strv.h"
+#include "shared/bus-util.h"
 #include "shared/resolve-util.h"
+
 #include "resolved-bus.h"
 #include "resolved-link-bus.h"
-#include "basic/strv.h"
 
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_resolve_support, resolve_support, ResolveSupport);
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_dnssec_mode, dnssec_mode, DnssecMode);

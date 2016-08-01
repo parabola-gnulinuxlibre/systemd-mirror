@@ -27,18 +27,10 @@
 #include <systemd/sd-messages.h>
 
 #include "basic/alloc-util.h"
-#include "sd-bus/bus-common-errors.h"
-#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
-#include "dbus-unit.h"
-#include "dbus.h"
-#include "shared/dropin.h"
 #include "basic/escape.h"
-#include "execute.h"
 #include "basic/fileio-label.h"
 #include "basic/formats-util.h"
-#include "load-dropin.h"
-#include "load-fragment.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/missing.h"
@@ -55,9 +47,18 @@
 #include "basic/strv.h"
 #include "basic/umask-util.h"
 #include "basic/unit-name.h"
-#include "unit.h"
 #include "basic/user-util.h"
 #include "basic/virt.h"
+#include "sd-bus/bus-common-errors.h"
+#include "shared/bus-util.h"
+#include "shared/dropin.h"
+
+#include "dbus-unit.h"
+#include "dbus.h"
+#include "execute.h"
+#include "load-dropin.h"
+#include "load-fragment.h"
+#include "unit.h"
 
 const UnitVTable * const unit_vtable[_UNIT_TYPE_MAX] = {
         [UNIT_SERVICE] = &service_vtable,

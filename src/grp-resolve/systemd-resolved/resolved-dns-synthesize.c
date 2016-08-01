@@ -20,6 +20,7 @@
 #include "basic/alloc-util.h"
 #include "basic/hostname-util.h"
 #include "sd-netlink/local-addresses.h"
+
 #include "resolved-dns-synthesize.h"
 
 int dns_synthesize_ifindex(int ifindex) {

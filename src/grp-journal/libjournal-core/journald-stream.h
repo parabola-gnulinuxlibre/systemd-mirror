@@ -22,6 +22,7 @@
 typedef struct StdoutStream StdoutStream;
 
 #include "basic/fdset.h"
+
 #include "journald-server.h"
 
 int server_open_stdout_socket(Server *s);

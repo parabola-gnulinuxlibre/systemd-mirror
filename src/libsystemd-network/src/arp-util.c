@@ -18,12 +18,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/filter.h>
 #include <arpa/inet.h>
+#include <linux/filter.h>
 
-#include "systemd-network/arp-util.h"
 #include "basic/fd-util.h"
 #include "basic/util.h"
+#include "systemd-network/arp-util.h"
 
 int arp_network_bind_raw_socket(int ifindex, be32_t address, const struct ether_addr *eth_mac) {
         struct sock_filter filter[] = {

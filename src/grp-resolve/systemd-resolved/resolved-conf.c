@@ -18,12 +18,13 @@
  ***/
 
 #include "basic/alloc-util.h"
-#include "shared/conf-parser.h"
 #include "basic/def.h"
 #include "basic/extract-word.h"
 #include "basic/parse-util.h"
-#include "resolved-conf.h"
 #include "basic/string-util.h"
+#include "shared/conf-parser.h"
+
+#include "resolved-conf.h"
 
 int manager_add_dns_server_by_string(Manager *m, DnsServerType type, const char *word) {
         union in_addr_union address;

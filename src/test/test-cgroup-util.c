@@ -25,9 +25,10 @@
 #include "basic/parse-util.h"
 #include "basic/process-util.h"
 #include "basic/string-util.h"
-#include "test-helper.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+
+#include "test-helper.h"
 
 static void check_p_d_u(const char *path, int code, const char *result) {
         _cleanup_free_ char *unit = NULL;

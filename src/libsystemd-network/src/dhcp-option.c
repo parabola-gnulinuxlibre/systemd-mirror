@@ -24,7 +24,6 @@
 
 #include "basic/alloc-util.h"
 #include "basic/utf8.h"
-
 #include "systemd-network/dhcp-internal.h"
 
 static int option_append(uint8_t options[], size_t size, size_t *offset,

@@ -21,16 +21,15 @@
 #include <netinet/in.h>
 #include <string.h>
 
-#include "systemd-network/sd-dhcp6-client.h"
-
 #include "basic/alloc-util.h"
-#include "systemd-network/dhcp6-internal.h"
-#include "systemd-network/dhcp6-protocol.h"
-#include "shared/dns-domain.h"
 #include "basic/sparse-endian.h"
 #include "basic/strv.h"
 #include "basic/unaligned.h"
 #include "basic/util.h"
+#include "shared/dns-domain.h"
+#include "systemd-network/dhcp6-internal.h"
+#include "systemd-network/dhcp6-protocol.h"
+#include "systemd-network/sd-dhcp6-client.h"
 
 #define DHCP6_OPTION_IA_NA_LEN                  12
 #define DHCP6_OPTION_IA_TA_LEN                  4

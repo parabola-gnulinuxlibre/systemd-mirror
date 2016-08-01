@@ -30,10 +30,10 @@
 #include <systemd/sd-id128.h>
 
 #include "basic/alloc-util.h"
-#include "shared/efivars.h"
 #include "basic/fd-util.h"
-#include "shared/gpt.h"
 #include "basic/string-util.h"
+#include "shared/efivars.h"
+#include "shared/gpt.h"
 #include "udev.h"
 
 static void print_property(struct udev_device *dev, bool test, const char *name, const char *value) {

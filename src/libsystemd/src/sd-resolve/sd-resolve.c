@@ -29,8 +29,6 @@
 #include <sys/prctl.h>
 #include <unistd.h>
 
-#include "sd-resolve.h"
-
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
 #include "basic/io-util.h"
@@ -38,6 +36,8 @@
 #include "basic/missing.h"
 #include "basic/socket-util.h"
 #include "basic/util.h"
+
+#include "sd-resolve.h"
 
 #define WORKERS_MIN 1U
 #define WORKERS_MAX 16U

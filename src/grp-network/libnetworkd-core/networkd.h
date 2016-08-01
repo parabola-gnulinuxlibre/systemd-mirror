@@ -23,12 +23,12 @@
 
 #include <systemd/sd-bus.h>
 #include <systemd/sd-event.h>
-#include <systemd/sd-netlink.h>
-#include "udev.h"
 
-#include "systemd-network/dhcp-identifier.h"
 #include "basic/hashmap.h"
 #include "basic/list.h"
+#include "sd-netlink/sd-netlink.h"
+#include "systemd-network/dhcp-identifier.h"
+#include "udev.h"
 
 #include "networkd-address-pool.h"
 #include "networkd-link.h"

@@ -24,13 +24,14 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "libudev.h"
+#include <libudev.h>
 
 #include "basic/MurmurHash2.h"
 #include "basic/device-nodes.h"
-#include "libudev-private.h"
 #include "basic/syslog-util.h"
 #include "basic/utf8.h"
+
+#include "libudev-private.h"
 
 /**
  * SECTION:libudev-util

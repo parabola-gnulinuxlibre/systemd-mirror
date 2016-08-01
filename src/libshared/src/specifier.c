@@ -29,8 +29,8 @@
 #include "basic/alloc-util.h"
 #include "basic/hostname-util.h"
 #include "basic/macro.h"
-#include "shared/specifier.h"
 #include "basic/string-util.h"
+#include "shared/specifier.h"
 
 /*
  * Generic infrastructure for replacing %x style specifiers in

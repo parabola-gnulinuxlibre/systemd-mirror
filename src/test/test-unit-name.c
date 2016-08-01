@@ -28,16 +28,17 @@
 #include "basic/glob-util.h"
 #include "basic/hostname-util.h"
 #include "basic/macro.h"
-#include "manager.h"
 #include "basic/path-util.h"
-#include "shared/specifier.h"
 #include "basic/string-util.h"
-#include "test-helper.h"
 #include "basic/unit-name.h"
-#include "unit-printf.h"
-#include "unit.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "manager.h"
+#include "shared/specifier.h"
+#include "unit-printf.h"
+#include "unit.h"
+
+#include "test-helper.h"
 
 static void test_unit_name_is_valid(void) {
         assert_se(unit_name_is_valid("foo.service", UNIT_NAME_ANY));

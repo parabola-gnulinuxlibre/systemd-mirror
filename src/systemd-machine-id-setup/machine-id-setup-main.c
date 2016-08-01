@@ -23,9 +23,10 @@
 #include <stdlib.h>
 
 #include "basic/log.h"
-#include "machine-id-setup.h"
 #include "basic/path-util.h"
 #include "basic/util.h"
+
+#include "machine-id-setup.h"
 
 static char *arg_root = NULL;
 static bool arg_commit = false;

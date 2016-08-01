@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "shared/output-mode.h"
 #include "basic/string-table.h"
+#include "shared/output-mode.h"
 
 static const char *const output_mode_table[_OUTPUT_MODE_MAX] = {
         [OUTPUT_SHORT] = "short",

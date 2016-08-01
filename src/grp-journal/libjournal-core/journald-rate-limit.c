@@ -22,11 +22,12 @@
 
 #include "basic/alloc-util.h"
 #include "basic/hashmap.h"
-#include "journald-rate-limit.h"
 #include "basic/list.h"
 #include "basic/random-util.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+
+#include "journald-rate-limit.h"
 
 #define POOLS_MAX 5
 #define BUCKETS_MAX 127

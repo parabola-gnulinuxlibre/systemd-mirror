@@ -4,10 +4,10 @@
 #include <string.h>
 
 #include "basic/alloc-util.h"
-#include "systemd-network/dhcp-internal.h"
-#include "systemd-network/dhcp-protocol.h"
 #include "basic/macro.h"
 #include "basic/util.h"
+#include "systemd-network/dhcp-internal.h"
+#include "systemd-network/dhcp-protocol.h"
 
 struct option_desc {
         uint8_t sname[64];

@@ -21,16 +21,10 @@
 #include <linux/if.h>
 #include <netinet/ether.h>
 
-#include "systemd-network/sd-ndisc.h"
-
 #include "basic/alloc-util.h"
-#include "shared/condition.h"
-#include "shared/conf-parser.h"
-#include "systemd-network/dhcp-lease-internal.h"
 #include "basic/ether-addr-util.h"
 #include "basic/hexdecoct.h"
 #include "basic/log.h"
-#include "systemd-network/network-internal.h"
 #include "basic/parse-util.h"
 #include "basic/siphash24.h"
 #include "basic/socket-util.h"
@@ -38,6 +32,11 @@
 #include "basic/strv.h"
 #include "basic/utf8.h"
 #include "basic/util.h"
+#include "shared/condition.h"
+#include "shared/conf-parser.h"
+#include "systemd-network/dhcp-lease-internal.h"
+#include "systemd-network/network-internal.h"
+#include "systemd-network/sd-ndisc.h"
 
 const char *net_get_name(struct udev_device *device) {
         const char *name, *field;

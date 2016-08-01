@@ -27,16 +27,16 @@
 #include <systemd/sd-daemon.h>
 
 #include "basic/alloc-util.h"
-#include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
 #include "basic/def.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
-#include "shared/initreq.h"
 #include "basic/list.h"
 #include "basic/log.h"
 #include "basic/special.h"
 #include "basic/util.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+#include "shared/initreq.h"
 
 #define SERVER_FD_MAX 16
 #define TIMEOUT_MSEC ((int) (DEFAULT_EXIT_USEC/USEC_PER_MSEC))

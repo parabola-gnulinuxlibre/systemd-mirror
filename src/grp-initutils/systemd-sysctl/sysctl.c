@@ -34,8 +34,8 @@
 #include "basic/path-util.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
-#include "shared/sysctl-util.h"
 #include "basic/util.h"
+#include "shared/sysctl-util.h"
 
 static char **arg_prefixes = NULL;
 

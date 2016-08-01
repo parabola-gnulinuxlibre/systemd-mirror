@@ -28,17 +28,18 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "libudev.h"
+#include <libudev.h>
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/formats-util.h"
-#include "libudev-private.h"
 #include "basic/missing.h"
 #include "basic/mount-util.h"
 #include "basic/socket-util.h"
 #include "basic/string-util.h"
+
+#include "libudev-private.h"
 
 /**
  * SECTION:libudev-monitor

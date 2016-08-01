@@ -20,6 +20,7 @@
 ***/
 
 #include "basic/missing.h"
+
 #include "networkd-netdev.h"
 
 typedef enum IPVlanMode {

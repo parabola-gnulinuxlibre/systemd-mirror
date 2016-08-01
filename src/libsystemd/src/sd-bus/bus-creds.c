@@ -22,10 +22,7 @@
 
 #include "basic/alloc-util.h"
 #include "basic/audit-util.h"
-#include "bus-creds.h"
 #include "basic/bus-label.h"
-#include "bus-message.h"
-#include "shared/bus-util.h"
 #include "basic/capability-util.h"
 #include "basic/cgroup-util.h"
 #include "basic/fd-util.h"
@@ -39,6 +36,10 @@
 #include "basic/terminal-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "shared/bus-util.h"
+
+#include "bus-creds.h"
+#include "bus-message.h"
 
 enum {
         CAP_OFFSET_INHERITABLE = 0,

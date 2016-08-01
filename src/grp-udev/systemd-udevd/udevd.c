@@ -46,7 +46,6 @@
 #include "basic/alloc-util.h"
 #include "basic/cgroup-util.h"
 #include "basic/cpu-set-util.h"
-#include "shared/dev-setup.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/formats-util.h"
@@ -61,9 +60,10 @@
 #include "basic/socket-util.h"
 #include "basic/string-util.h"
 #include "basic/terminal-util.h"
+#include "basic/user-util.h"
+#include "shared/dev-setup.h"
 #include "shared/udev-util.h"
 #include "udev.h"
-#include "basic/user-util.h"
 
 static bool arg_debug = false;
 static int arg_daemonize = false;

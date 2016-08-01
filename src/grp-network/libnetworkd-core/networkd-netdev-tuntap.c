@@ -27,8 +27,9 @@
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
-#include "networkd-netdev-tuntap.h"
 #include "basic/user-util.h"
+
+#include "networkd-netdev-tuntap.h"
 
 #define TUN_DEV "/dev/net/tun"
 

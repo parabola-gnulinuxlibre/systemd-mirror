@@ -18,22 +18,19 @@
 ***/
 
 #include <errno.h>
+#include <linux/fs.h>
 #include <sched.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <linux/fs.h>
 
 #include "basic/alloc-util.h"
-#include "shared/dev-setup.h"
 #include "basic/fd-util.h"
-#include "loopback-setup.h"
 #include "basic/missing.h"
 #include "basic/mkdir.h"
 #include "basic/mount-util.h"
-#include "namespace.h"
 #include "basic/path-util.h"
 #include "basic/selinux-util.h"
 #include "basic/socket-util.h"
@@ -43,6 +40,10 @@
 #include "basic/umask-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "shared/dev-setup.h"
+
+#include "loopback-setup.h"
+#include "namespace.h"
 
 #define DEV_MOUNT_OPTIONS (MS_NOSUID|MS_STRICTATIME|MS_NOEXEC)
 

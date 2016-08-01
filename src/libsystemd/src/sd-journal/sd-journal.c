@@ -30,8 +30,6 @@
 #include <systemd/sd-journal.h>
 
 #include "basic/alloc-util.h"
-#include "catalog.h"
-#include "compress.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
@@ -40,11 +38,7 @@
 #include "basic/hashmap.h"
 #include "basic/hostname-util.h"
 #include "basic/io-util.h"
-#include "journal-def.h"
-#include "journal-file.h"
-#include "journal-internal.h"
 #include "basic/list.h"
-#include "lookup3.h"
 #include "basic/missing.h"
 #include "basic/path-util.h"
 #include "basic/replace-var.h"
@@ -52,6 +46,13 @@
 #include "basic/stdio-util.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
+
+#include "catalog.h"
+#include "compress.h"
+#include "journal-def.h"
+#include "journal-file.h"
+#include "journal-internal.h"
+#include "lookup3.h"
 
 #define JOURNAL_FILES_MAX 7168
 

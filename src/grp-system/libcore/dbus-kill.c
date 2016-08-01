@@ -17,10 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include "basic/signal-util.h"
 #include "shared/bus-util.h"
+
 #include "dbus-kill.h"
 #include "kill.h"
-#include "basic/signal-util.h"
 
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_kill_mode, kill_mode, KillMode);
 

@@ -18,6 +18,7 @@
 ***/
 
 #include <errno.h>
+#include <linux/if_packet.h>
 #include <netinet/in.h>
 #include <netinet/ip6.h>
 #include <stdio.h>
@@ -25,12 +26,11 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <linux/if_packet.h>
 
-#include "systemd-network/dhcp6-internal.h"
-#include "systemd-network/dhcp6-protocol.h"
 #include "basic/fd-util.h"
 #include "basic/socket-util.h"
+#include "systemd-network/dhcp6-internal.h"
+#include "systemd-network/dhcp6-protocol.h"
 
 int dhcp6_network_bind_udp_socket(int index, struct in6_addr *local_address) {
         union sockaddr_union src = {

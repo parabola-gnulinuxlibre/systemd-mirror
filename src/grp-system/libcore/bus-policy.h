@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-bus/kdbus.h"
 #include "basic/list.h"
 #include "basic/macro.h"
+#include "sd-bus/kdbus.h"
 
 typedef struct BusNamePolicy BusNamePolicy;
 

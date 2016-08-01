@@ -18,6 +18,7 @@
 ***/
 
 #include <errno.h>
+#include <linux/if_packet.h>
 #include <netinet/icmp6.h>
 #include <netinet/in.h>
 #include <netinet/ip6.h>
@@ -26,11 +27,10 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <linux/if_packet.h>
 
 #include "basic/fd-util.h"
-#include "systemd-network/icmp6-util.h"
 #include "basic/socket-util.h"
+#include "systemd-network/icmp6-util.h"
 
 #define IN6ADDR_ALL_ROUTERS_MULTICAST_INIT \
         { { { 0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \

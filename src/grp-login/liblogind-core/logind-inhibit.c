@@ -27,13 +27,14 @@
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/formats-util.h"
-#include "logind-inhibit.h"
 #include "basic/mkdir.h"
 #include "basic/parse-util.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+
+#include "logind-inhibit.h"
 
 Inhibitor* inhibitor_new(Manager *m, const char* id) {
         Inhibitor *i;

@@ -18,10 +18,11 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "bus-internal.h"
-#include "bus-message.h"
 #include "basic/hexdecoct.h"
 #include "basic/string-util.h"
+
+#include "bus-internal.h"
+#include "bus-message.h"
 
 bool object_path_is_valid(const char *p) {
         const char *q;

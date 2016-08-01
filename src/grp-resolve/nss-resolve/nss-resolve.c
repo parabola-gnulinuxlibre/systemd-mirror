@@ -26,13 +26,13 @@
 
 #include <systemd/sd-bus.h>
 
-#include "sd-bus/bus-common-errors.h"
 #include "basic/in-addr-util.h"
 #include "basic/macro.h"
 #include "basic/nss-util.h"
+#include "basic/signal-util.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
-#include "basic/signal-util.h"
+#include "sd-bus/bus-common-errors.h"
 
 NSS_GETHOSTBYNAME_PROTOTYPES(resolve);
 NSS_GETHOSTBYADDR_PROTOTYPES(resolve);

@@ -19,14 +19,15 @@
 
 #include "basic/alloc-util.h"
 #include "basic/bus-label.h"
-#include "shared/bus-util.h"
 #include "basic/fd-util.h"
-#include "image-dbus.h"
 #include "basic/io-util.h"
-#include "shared/machine-image.h"
 #include "basic/process-util.h"
 #include "basic/strv.h"
 #include "basic/user-util.h"
+#include "shared/bus-util.h"
+#include "shared/machine-image.h"
+
+#include "image-dbus.h"
 
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_type, image_type, ImageType);
 

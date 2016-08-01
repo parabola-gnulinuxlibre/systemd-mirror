@@ -21,9 +21,10 @@
 #include <sys/mman.h>
 
 #include "basic/fd-util.h"
+#include "basic/hexdecoct.h"
+
 #include "fsprg.h"
 #include "gcrypt-util.h"
-#include "basic/hexdecoct.h"
 #include "journal-authenticate.h"
 #include "journal-def.h"
 #include "journal-file.h"

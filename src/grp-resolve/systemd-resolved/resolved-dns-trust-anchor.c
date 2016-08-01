@@ -22,16 +22,17 @@
 #include "basic/alloc-util.h"
 #include "basic/conf-files.h"
 #include "basic/def.h"
-#include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/hexdecoct.h"
 #include "basic/parse-util.h"
-#include "resolved-dns-trust-anchor.h"
-#include "resolved-dns-dnssec.h"
 #include "basic/set.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
+#include "shared/dns-domain.h"
+
+#include "resolved-dns-dnssec.h"
+#include "resolved-dns-trust-anchor.h"
 
 static const char trust_anchor_dirs[] = CONF_PATHS_NULSTR("dnssec-trust-anchors.d");
 

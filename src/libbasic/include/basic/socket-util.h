@@ -19,6 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <linux/if_packet.h>
+#include <linux/netlink.h>
 #include <netinet/ether.h>
 #include <netinet/in.h>
 #include <stdbool.h>
@@ -26,8 +28,6 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/un.h>
-#include <linux/netlink.h>
-#include <linux/if_packet.h>
 
 #include "basic/macro.h"
 #include "basic/util.h"

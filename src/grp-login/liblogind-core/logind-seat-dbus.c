@@ -21,14 +21,15 @@
 #include <string.h>
 
 #include "basic/alloc-util.h"
-#include "bus-common-errors.h"
 #include "basic/bus-label.h"
-#include "shared/bus-util.h"
-#include "logind-seat.h"
-#include "logind.h"
 #include "basic/strv.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "logind.h"
+#include "sd-bus/bus-common-errors.h"
+#include "shared/bus-util.h"
+
+#include "logind-seat.h"
 
 static int property_get_active_session(
                 sd_bus *bus,

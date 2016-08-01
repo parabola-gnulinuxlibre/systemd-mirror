@@ -19,9 +19,10 @@
 
 #include <systemd/sd-bus.h>
 
-#include "bus-dump.h"
-#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
+#include "shared/bus-util.h"
+
+#include "bus-dump.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_(sd_bus_creds_unrefp) sd_bus_creds *creds = NULL;

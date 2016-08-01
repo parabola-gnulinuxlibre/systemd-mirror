@@ -20,9 +20,9 @@
 ***/
 
 
-#include "sd-netlink.h"
-
 #include "basic/in-addr-util.h"
+
+#include "sd-netlink.h"
 
 struct local_address {
         int family, ifindex;

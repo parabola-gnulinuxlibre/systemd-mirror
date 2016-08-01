@@ -20,9 +20,10 @@
 #include <stdlib.h>
 
 #include "basic/log.h"
-#include "nspawn-patch-uid.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+
+#include "nspawn-patch-uid.h"
 
 int main(int argc, char *argv[]) {
         uid_t shift, range;

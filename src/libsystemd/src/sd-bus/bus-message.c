@@ -24,12 +24,6 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "bus-gvariant.h"
-#include "bus-internal.h"
-#include "bus-message.h"
-#include "bus-signature.h"
-#include "bus-type.h"
-#include "shared/bus-util.h"
 #include "basic/fd-util.h"
 #include "basic/io-util.h"
 #include "basic/memfd-util.h"
@@ -38,6 +32,13 @@
 #include "basic/time-util.h"
 #include "basic/utf8.h"
 #include "basic/util.h"
+#include "shared/bus-util.h"
+
+#include "bus-gvariant.h"
+#include "bus-internal.h"
+#include "bus-message.h"
+#include "bus-signature.h"
+#include "bus-type.h"
 
 static int message_append_basic(sd_bus_message *m, char type, const void *p, const void **stored);
 

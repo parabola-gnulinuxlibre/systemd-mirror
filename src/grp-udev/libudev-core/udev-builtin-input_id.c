@@ -22,19 +22,19 @@
  */
 
 #include <errno.h>
+#include <linux/input.h>
+#include <linux/limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <linux/limits.h>
-#include <linux/input.h>
 
 #include "basic/fd-util.h"
 #include "basic/stdio-util.h"
 #include "basic/string-util.h"
-#include "udev.h"
 #include "basic/util.h"
+#include "udev.h"
 
 /* we must use this kernel-compatible implementation */
 #define BITS_PER_LONG (sizeof(unsigned long) * 8)

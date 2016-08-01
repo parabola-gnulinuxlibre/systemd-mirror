@@ -23,17 +23,17 @@
 #include <string.h>
 
 #include "basic/alloc-util.h"
-#include "shared/install.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/mkdir.h"
-#include "shared/path-lookup.h"
 #include "basic/path-util.h"
 #include "basic/rm-rf.h"
 #include "basic/stat-util.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "shared/install.h"
+#include "shared/path-lookup.h"
 
 static int user_runtime_dir(char **ret, const char *suffix) {
         const char *e;

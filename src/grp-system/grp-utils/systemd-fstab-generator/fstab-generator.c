@@ -26,11 +26,8 @@
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
-#include "shared/fstab-util.h"
-#include "shared/generator.h"
 #include "basic/log.h"
 #include "basic/mkdir.h"
-#include "mount-setup.h"
 #include "basic/mount-util.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
@@ -42,6 +39,10 @@
 #include "basic/unit-name.h"
 #include "basic/util.h"
 #include "basic/virt.h"
+#include "shared/fstab-util.h"
+#include "shared/generator.h"
+
+#include "mount-setup.h"
 
 static const char *arg_dest = "/tmp";
 static bool arg_fstab_enabled = true;

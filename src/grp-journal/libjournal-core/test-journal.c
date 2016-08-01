@@ -20,11 +20,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "journal-authenticate.h"
-#include "journal-file.h"
-#include "journal-vacuum.h"
 #include "basic/log.h"
 #include "basic/rm-rf.h"
+#include "sd-journal/journal-authenticate.h"
+#include "sd-journal/journal-file.h"
+#include "sd-journal/journal-vacuum.h"
 
 static bool arg_keep = false;
 

@@ -34,10 +34,10 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "libudev.h"
+#include <libudev.h>
 
-#include "libudev-private.h"
 #include "basic/random-util.h"
+#include "libudev-private.h"
 
 /* device info */
 static unsigned int cd_cd_rom;

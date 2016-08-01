@@ -18,9 +18,10 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "shared/bus-util.h"
-#include "dbus-timer.h"
 #include "basic/strv.h"
+#include "shared/bus-util.h"
+
+#include "dbus-timer.h"
 #include "timer.h"
 #include "unit.h"
 

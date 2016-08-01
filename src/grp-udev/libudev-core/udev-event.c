@@ -33,10 +33,10 @@
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
-#include "sd-netlink/netlink-util.h"
 #include "basic/process-util.h"
 #include "basic/signal-util.h"
 #include "basic/string-util.h"
+#include "sd-netlink/netlink-util.h"
 #include "udev.h"
 
 typedef struct Spawn {

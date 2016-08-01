@@ -21,16 +21,17 @@
 
 #include "basic/af-list.h"
 #include "basic/alloc-util.h"
-#include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/hostname-util.h"
 #include "basic/missing.h"
 #include "basic/random-util.h"
+#include "basic/socket-util.h"
+#include "basic/strv.h"
+#include "shared/dns-domain.h"
+
 #include "resolved-dns-scope.h"
 #include "resolved-llmnr.h"
 #include "resolved-mdns.h"
-#include "basic/socket-util.h"
-#include "basic/strv.h"
 
 #define MULTICAST_RATELIMIT_INTERVAL_USEC (1*USEC_PER_SEC)
 #define MULTICAST_RATELIMIT_BURST 1000

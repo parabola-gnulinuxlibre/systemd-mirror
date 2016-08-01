@@ -17,11 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <netinet/ether.h>
 #include <linux/if.h>
+#include <netinet/ether.h>
 
-#include "systemd-network/sd-dhcp6-client.h"
 #include "systemd-network/network-internal.h"
+#include "systemd-network/sd-dhcp6-client.h"
+
 #include "networkd.h"
 
 static int dhcp6_lease_address_acquired(sd_dhcp6_client *client, Link *link);

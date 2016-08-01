@@ -25,17 +25,17 @@
 #include <string.h>
 
 #include "basic/alloc-util.h"
-#include "shared/cgroup-show.h"
 #include "basic/cgroup-util.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
 #include "basic/locale-util.h"
 #include "basic/macro.h"
-#include "shared/output-mode.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
 #include "basic/string-util.h"
 #include "basic/terminal-util.h"
+#include "shared/cgroup-show.h"
+#include "shared/output-mode.h"
 
 static void show_pid_array(
                 pid_t pids[],

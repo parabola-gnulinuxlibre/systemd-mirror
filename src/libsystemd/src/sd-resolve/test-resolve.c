@@ -26,12 +26,12 @@
 #include <string.h>
 #include <sys/socket.h>
 
-#include "sd-resolve.h"
-
 #include "basic/alloc-util.h"
 #include "basic/macro.h"
 #include "basic/socket-util.h"
 #include "basic/string-util.h"
+
+#include "sd-resolve.h"
 
 static int getaddrinfo_handler(sd_resolve_query *q, int ret, const struct addrinfo *ai, void *userdata) {
         const struct addrinfo *i;

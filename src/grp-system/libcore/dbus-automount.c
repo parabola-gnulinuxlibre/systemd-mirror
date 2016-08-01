@@ -17,10 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "automount.h"
-#include "shared/bus-util.h"
-#include "dbus-automount.h"
 #include "basic/string-util.h"
+#include "shared/bus-util.h"
+
+#include "automount.h"
+#include "dbus-automount.h"
 
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_result, automount_result, AutomountResult);
 

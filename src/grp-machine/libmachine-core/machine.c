@@ -24,16 +24,12 @@
 #include <systemd/sd-messages.h>
 
 #include "basic/alloc-util.h"
-#include "bus-error.h"
-#include "shared/bus-util.h"
 #include "basic/escape.h"
 #include "basic/extract-word.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/formats-util.h"
 #include "basic/hashmap.h"
-#include "machine-dbus.h"
-#include "machine.h"
 #include "basic/mkdir.h"
 #include "basic/parse-util.h"
 #include "basic/process-util.h"
@@ -42,6 +38,11 @@
 #include "basic/terminal-util.h"
 #include "basic/unit-name.h"
 #include "basic/util.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+
+#include "machine-dbus.h"
+#include "machine.h"
 
 Machine* machine_new(Manager *manager, MachineClass class, const char *name) {
         Machine *m;

@@ -21,15 +21,16 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "dbus-scope.h"
-#include "load-dropin.h"
 #include "basic/log.h"
-#include "scope.h"
 #include "basic/special.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
+
+#include "dbus-scope.h"
+#include "load-dropin.h"
+#include "scope.h"
 #include "unit.h"
 
 static const UnitActiveState state_translation_table[_SCOPE_STATE_MAX] = {

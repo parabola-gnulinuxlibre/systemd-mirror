@@ -34,7 +34,6 @@
 #include "basic/hexdecoct.h"
 #include "basic/io-util.h"
 #include "basic/log.h"
-#include "machine-id-setup.h"
 #include "basic/macro.h"
 #include "basic/mkdir.h"
 #include "basic/mount-util.h"
@@ -45,6 +44,8 @@
 #include "basic/umask-util.h"
 #include "basic/util.h"
 #include "basic/virt.h"
+
+#include "machine-id-setup.h"
 
 static int shorten_uuid(char destination[34], const char source[36]) {
         unsigned i, j;

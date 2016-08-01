@@ -20,12 +20,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "bus-container.h"
-#include "bus-internal.h"
-#include "bus-socket.h"
 #include "basic/fd-util.h"
 #include "basic/process-util.h"
 #include "basic/util.h"
+
+#include "bus-container.h"
+#include "bus-internal.h"
+#include "bus-socket.h"
 
 int bus_container_connect_socket(sd_bus *b) {
         _cleanup_close_pair_ int pair[2] = { -1, -1 };

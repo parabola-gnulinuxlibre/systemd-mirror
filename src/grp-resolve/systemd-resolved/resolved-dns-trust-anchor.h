@@ -22,6 +22,7 @@
 typedef struct DnsTrustAnchor DnsTrustAnchor;
 
 #include "basic/hashmap.h"
+
 #include "resolved-dns-answer.h"
 #include "resolved-dns-rr.h"
 

@@ -23,7 +23,6 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "shared/bus-util.h"
 #include "basic/def.h"
 #include "basic/env-util.h"
 #include "basic/fileio-label.h"
@@ -35,6 +34,7 @@
 #include "basic/user-util.h"
 #include "basic/util.h"
 #include "basic/virt.h"
+#include "shared/bus-util.h"
 
 #define VALID_DEPLOYMENT_CHARS (DIGITS LETTERS "-.:")
 

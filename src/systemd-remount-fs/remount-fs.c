@@ -27,13 +27,14 @@
 
 #include "basic/exit-status.h"
 #include "basic/log.h"
-#include "mount-setup.h"
 #include "basic/mount-util.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
 #include "basic/signal-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+
+#include "mount-setup.h"
 
 /* Goes through /etc/fstab and remounts all API file systems, applying
  * options that are in /etc/fstab that systemd might not have

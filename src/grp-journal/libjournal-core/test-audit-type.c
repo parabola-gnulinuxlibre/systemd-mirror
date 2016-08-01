@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <stdio.h>
 #include <linux/audit.h>
+#include <stdio.h>
 
-#include "audit-type.h"
+#include "sd-journal/audit-type.h"
 
 static void print_audit_label(int i) {
         const char *name;

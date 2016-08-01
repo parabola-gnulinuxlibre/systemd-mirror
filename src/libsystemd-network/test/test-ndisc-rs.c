@@ -19,10 +19,9 @@
 
 #include <netinet/icmp6.h>
 
-#include "systemd-network/sd-ndisc.h"
-
-#include "systemd-network/icmp6-util.h"
 #include "basic/socket-util.h"
+#include "systemd-network/icmp6-util.h"
+#include "systemd-network/sd-ndisc.h"
 
 static struct ether_addr mac_addr = {
         .ether_addr_octet = {'A', 'B', 'C', '1', '2', '3'}

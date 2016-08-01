@@ -21,10 +21,11 @@
 
 #include <systemd/sd-bus.h>
 
+#include "basic/refcnt.h"
+#include "shared/bus-util.h"
+
 #include "bus-internal.h"
 #include "bus-message.h"
-#include "shared/bus-util.h"
-#include "basic/refcnt.h"
 
 static void test_bus_new(void) {
         _cleanup_(sd_bus_unrefp) sd_bus *bus = NULL;

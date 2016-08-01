@@ -27,7 +27,6 @@
 
 #include "basic/alloc-util.h"
 #include "basic/conf-files.h"
-#include "shared/conf-parser.h"
 #include "basic/extract-word.h"
 #include "basic/fd-util.h"
 #include "basic/fs-util.h"
@@ -43,6 +42,7 @@
 #include "basic/syslog-util.h"
 #include "basic/time-util.h"
 #include "basic/utf8.h"
+#include "shared/conf-parser.h"
 
 int config_item_table_lookup(
                 const void *table,

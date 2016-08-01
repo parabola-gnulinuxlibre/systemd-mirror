@@ -24,15 +24,16 @@
 #include "basic/fd-util.h"
 #include "basic/fs-util.h"
 #include "basic/macro.h"
-#include "manager.h"
 #include "basic/mkdir.h"
 #include "basic/rm-rf.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
-#include "test-helper.h"
+#include "basic/util.h"
+#include "manager.h"
 #include "shared/tests.h"
 #include "unit.h"
-#include "basic/util.h"
+
+#include "test-helper.h"
 
 typedef void (*test_function_t)(Manager *m);
 

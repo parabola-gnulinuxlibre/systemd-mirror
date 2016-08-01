@@ -17,12 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <ctype.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "ctype.h"
 #include "basic/def.h"
 #include "basic/env-util.h"
 #include "basic/fd-util.h"

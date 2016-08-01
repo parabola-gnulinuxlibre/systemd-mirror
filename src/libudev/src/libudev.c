@@ -24,13 +24,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libudev.h"
+#include <libudev.h>
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
-#include "libudev-private.h"
 #include "basic/missing.h"
 #include "basic/string-util.h"
+
+#include "libudev-private.h"
 
 /**
  * SECTION:libudev

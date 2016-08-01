@@ -36,8 +36,8 @@
 #include "basic/fd-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
-#include "shared/ptyfwd.h"
 #include "basic/time-util.h"
+#include "shared/ptyfwd.h"
 
 struct PTYForward {
         sd_event *event;

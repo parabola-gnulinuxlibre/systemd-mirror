@@ -21,11 +21,12 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
+#include "basic/terminal-util.h"
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-error.h"
-#include "basic/terminal-util.h"
-#include "transaction.h"
+
 #include "dbus-unit.h"
+#include "transaction.h"
 
 static void transaction_unlink_job(Transaction *tr, Job *j, bool delete_dependencies);
 

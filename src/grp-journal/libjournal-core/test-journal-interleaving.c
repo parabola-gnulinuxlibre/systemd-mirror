@@ -24,12 +24,12 @@
 #include <systemd/sd-journal.h>
 
 #include "basic/alloc-util.h"
-#include "journal-file.h"
-#include "journal-vacuum.h"
 #include "basic/log.h"
 #include "basic/parse-util.h"
 #include "basic/rm-rf.h"
 #include "basic/util.h"
+#include "sd-journal/journal-file.h"
+#include "sd-journal/journal-vacuum.h"
 
 /* This program tests skipping around in a multi-file journal.
  */

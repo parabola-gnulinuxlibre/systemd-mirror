@@ -20,10 +20,10 @@
 ***/
 
 #include <systemd/sd-event.h>
-#include <systemd/sd-netlink.h>
-#include <systemd/sd-network.h>
 
 #include "basic/hashmap.h"
+#include "sd-netlink/sd-netlink.h"
+#include "sd-network/sd-network.h"
 
 typedef struct Manager Manager;
 

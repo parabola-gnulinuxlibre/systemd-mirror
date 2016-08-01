@@ -18,9 +18,10 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "journald-syslog.h"
 #include "basic/macro.h"
 #include "basic/string-util.h"
+
+#include "journald-syslog.h"
 
 static void test_syslog_parse_identifier(const char* str,
                                          const char *ident, const char*pid, int ret) {

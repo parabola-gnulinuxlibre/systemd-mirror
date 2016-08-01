@@ -21,10 +21,10 @@
 #include <sys/stat.h>
 
 #include "basic/log.h"
-#include "shared/path-lookup.h"
 #include "basic/rm-rf.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
+#include "shared/path-lookup.h"
 
 static void test_paths(UnitFileScope scope) {
         char template[] = "/tmp/test-path-lookup.XXXXXXX";

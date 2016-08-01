@@ -35,10 +35,7 @@
 #include <systemd/sd-id128.h>
 
 #include "basic/alloc-util.h"
-#include "sd-bus/bus-internal.h"
 #include "basic/bus-label.h"
-#include "sd-bus/bus-message.h"
-#include "shared/bus-util.h"
 #include "basic/def.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"
@@ -49,6 +46,9 @@
 #include "basic/stdio-util.h"
 #include "basic/strv.h"
 #include "basic/user-util.h"
+#include "sd-bus/bus-internal.h"
+#include "sd-bus/bus-message.h"
+#include "shared/bus-util.h"
 
 static int name_owner_change_callback(sd_bus_message *m, void *userdata, sd_bus_error *ret_error) {
         sd_event *e = userdata;

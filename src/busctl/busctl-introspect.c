@@ -20,10 +20,11 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "busctl-introspect.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
 #include "basic/xml.h"
+
+#include "busctl-introspect.h"
 
 #define NODE_DEPTH_MAX 16
 

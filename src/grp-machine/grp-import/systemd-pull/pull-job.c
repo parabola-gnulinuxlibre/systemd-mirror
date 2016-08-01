@@ -23,12 +23,13 @@
 #include "basic/fd-util.h"
 #include "basic/hexdecoct.h"
 #include "basic/io-util.h"
-#include "shared/machine-pool.h"
 #include "basic/parse-util.h"
-#include "pull-job.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/xattr-util.h"
+#include "shared/machine-pool.h"
+
+#include "pull-job.h"
 
 PullJob* pull_job_unref(PullJob *j) {
         if (!j)

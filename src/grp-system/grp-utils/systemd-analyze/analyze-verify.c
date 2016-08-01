@@ -20,15 +20,16 @@
 #include <stdlib.h>
 
 #include "basic/alloc-util.h"
-#include "analyze-verify.h"
-#include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
 #include "basic/log.h"
-#include "manager.h"
-#include "shared/pager.h"
 #include "basic/path-util.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
+#include "manager.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+#include "shared/pager.h"
+
+#include "analyze-verify.h"
 
 static int prepare_filename(const char *filename, char **ret) {
         int r;

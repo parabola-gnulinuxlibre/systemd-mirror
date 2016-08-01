@@ -22,20 +22,21 @@
 #include <sys/inotify.h>
 #include <unistd.h>
 
-#include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "dbus-path.h"
 #include "basic/fd-util.h"
 #include "basic/fs-util.h"
 #include "basic/glob-util.h"
 #include "basic/macro.h"
 #include "basic/mkdir.h"
-#include "path.h"
 #include "basic/special.h"
 #include "basic/stat-util.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
 #include "basic/unit-name.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+
+#include "dbus-path.h"
+#include "path.h"
 #include "unit.h"
 
 static const UnitActiveState state_translation_table[_PATH_STATE_MAX] = {

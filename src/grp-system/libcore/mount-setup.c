@@ -24,16 +24,12 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
-#include "shared/dev-setup.h"
-#include "shared/efivars.h"
 #include "basic/label.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/missing.h"
 #include "basic/mkdir.h"
-#include "mount-setup.h"
 #include "basic/mount-util.h"
 #include "basic/path-util.h"
 #include "basic/set.h"
@@ -42,6 +38,11 @@
 #include "basic/user-util.h"
 #include "basic/util.h"
 #include "basic/virt.h"
+#include "shared/bus-util.h"
+#include "shared/dev-setup.h"
+#include "shared/efivars.h"
+
+#include "mount-setup.h"
 
 typedef enum MountMode {
         MNT_NONE  =        0,

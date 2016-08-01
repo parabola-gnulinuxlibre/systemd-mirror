@@ -24,11 +24,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "shared/acpi-fpdt.h"
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/time-util.h"
+#include "shared/acpi-fpdt.h"
 
 struct acpi_table_header {
         char signature[4];

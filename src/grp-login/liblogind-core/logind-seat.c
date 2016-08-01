@@ -28,14 +28,15 @@
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/formats-util.h"
-#include "logind-acl.h"
-#include "logind-seat.h"
 #include "basic/mkdir.h"
 #include "basic/parse-util.h"
 #include "basic/stdio-util.h"
 #include "basic/string-util.h"
 #include "basic/terminal-util.h"
 #include "basic/util.h"
+
+#include "logind-acl.h"
+#include "logind-seat.h"
 
 Seat *seat_new(Manager *m, const char *id) {
         Seat *s;

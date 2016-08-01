@@ -22,6 +22,7 @@
 typedef struct Transaction Transaction;
 
 #include "basic/hashmap.h"
+
 #include "job.h"
 #include "manager.h"
 #include "unit.h"

@@ -21,17 +21,17 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#include "sd-netlink.h"
-
 #include "basic/alloc-util.h"
 #include "basic/formats-util.h"
 #include "basic/missing.h"
-#include "netlink-internal.h"
-#include "netlink-types.h"
-#include "netlink-util.h"
 #include "basic/refcnt.h"
 #include "basic/socket-util.h"
 #include "basic/util.h"
+
+#include "netlink-internal.h"
+#include "netlink-types.h"
+#include "netlink-util.h"
+#include "sd-netlink.h"
 
 #define GET_CONTAINER(m, i) ((i) < (m)->n_containers ? (struct rtattr*)((uint8_t*)(m)->hdr + (m)->containers[i].offset) : NULL)
 #define PUSH_CONTAINER(m, new) (m)->container_offsets[(m)->n_containers++] = (uint8_t*)(new) - (uint8_t*)(m)->hdr;

@@ -18,11 +18,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include "basic/string-util.h"
 #include "shared/bus-util.h"
+
 #include "dbus-cgroup.h"
 #include "dbus-execute.h"
 #include "dbus-swap.h"
-#include "basic/string-util.h"
 #include "swap.h"
 #include "unit.h"
 

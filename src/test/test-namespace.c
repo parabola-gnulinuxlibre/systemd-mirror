@@ -21,10 +21,10 @@
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
-#include "namespace.h"
 #include "basic/process-util.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "namespace.h"
 
 static void test_tmpdir(const char *id, const char *A, const char *B) {
         _cleanup_free_ char *a, *b;

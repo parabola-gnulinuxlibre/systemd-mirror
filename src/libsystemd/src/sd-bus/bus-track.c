@@ -20,9 +20,10 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
+#include "shared/bus-util.h"
+
 #include "bus-internal.h"
 #include "bus-track.h"
-#include "shared/bus-util.h"
 
 struct sd_bus_track {
         unsigned n_ref;

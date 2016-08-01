@@ -26,13 +26,13 @@
 #include <systemd/sd-messages.h>
 
 #include "basic/alloc-util.h"
-#include "catalog.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "sd-journal/catalog.h"
 
 static const char *catalog_dirs[] = {
         CATALOG_DIR,

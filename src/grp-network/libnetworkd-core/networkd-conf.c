@@ -19,12 +19,13 @@
 
 #include <ctype.h>
 
-#include "shared/conf-parser.h"
 #include "basic/def.h"
-#include "systemd-network/dhcp-identifier.h"
 #include "basic/hexdecoct.h"
-#include "networkd-conf.h"
 #include "basic/string-table.h"
+#include "shared/conf-parser.h"
+#include "systemd-network/dhcp-identifier.h"
+
+#include "networkd-conf.h"
 
 int manager_parse_config_file(Manager *m) {
         assert(m);

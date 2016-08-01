@@ -17,8 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "machine.h"
 #include "shared/test-tables.h"
+
+#include "machine.h"
 
 int main(int argc, char **argv) {
         test_table(machine_class, MACHINE_CLASS);

@@ -21,10 +21,10 @@
 #include <errno.h>
 
 #include "basic/alloc-util.h"
-#include "systemd-network/dhcp6-lease-internal.h"
-#include "systemd-network/dhcp6-protocol.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "systemd-network/dhcp6-lease-internal.h"
+#include "systemd-network/dhcp6-protocol.h"
 
 int dhcp6_lease_clear_timers(DHCP6IA *ia) {
         assert_return(ia, -EINVAL);

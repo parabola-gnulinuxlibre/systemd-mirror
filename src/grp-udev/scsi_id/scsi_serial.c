@@ -33,13 +33,14 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "libudev.h"
+#include <libudev.h>
 
-#include "libudev-private.h"
 #include "basic/random-util.h"
+#include "basic/string-util.h"
+#include "libudev-private.h"
+
 #include "scsi.h"
 #include "scsi_id.h"
-#include "basic/string-util.h"
 
 /*
  * A priority based list of id, naa, and binary/ascii for the identifier

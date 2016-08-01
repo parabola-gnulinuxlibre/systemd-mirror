@@ -17,13 +17,14 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <netinet/ether.h>
 #include <linux/if.h>
+#include <netinet/ether.h>
 
 #include "basic/alloc-util.h"
-#include "systemd-network/dhcp-lease-internal.h"
 #include "basic/hostname-util.h"
+#include "systemd-network/dhcp-lease-internal.h"
 #include "systemd-network/network-internal.h"
+
 #include "networkd.h"
 
 static int dhcp4_route_handler(sd_netlink *rtnl, sd_netlink_message *m,

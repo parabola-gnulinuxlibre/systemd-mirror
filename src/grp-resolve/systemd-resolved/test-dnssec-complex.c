@@ -23,11 +23,12 @@
 
 #include "basic/af-list.h"
 #include "basic/alloc-util.h"
-#include "bus-common-errors.h"
-#include "dns-type.h"
 #include "basic/random-util.h"
 #include "basic/string-util.h"
 #include "basic/time-util.h"
+#include "sd-bus/bus-common-errors.h"
+
+#include "dns-type.h"
 
 #define DNS_CALL_TIMEOUT_USEC (45*USEC_PER_SEC)
 

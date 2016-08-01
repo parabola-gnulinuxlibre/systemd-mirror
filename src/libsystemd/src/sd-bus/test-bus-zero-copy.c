@@ -22,14 +22,15 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "bus-dump.h"
-#include "bus-kernel.h"
-#include "bus-message.h"
 #include "basic/fd-util.h"
 #include "basic/log.h"
 #include "basic/memfd-util.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+
+#include "bus-dump.h"
+#include "bus-kernel.h"
+#include "bus-message.h"
 
 #define FIRST_ARRAY 17
 #define SECOND_ARRAY 33

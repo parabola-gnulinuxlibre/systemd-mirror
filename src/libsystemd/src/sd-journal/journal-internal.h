@@ -27,10 +27,11 @@
 #include <systemd/sd-journal.h>
 
 #include "basic/hashmap.h"
-#include "journal-def.h"
-#include "journal-file.h"
 #include "basic/list.h"
 #include "basic/set.h"
+
+#include "journal-def.h"
+#include "journal-file.h"
 
 typedef struct Match Match;
 typedef struct Location Location;

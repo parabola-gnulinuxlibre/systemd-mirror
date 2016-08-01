@@ -28,19 +28,7 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "bus-container.h"
-#include "bus-control.h"
-#include "bus-internal.h"
-#include "bus-kernel.h"
 #include "basic/bus-label.h"
-#include "bus-message.h"
-#include "bus-objects.h"
-#include "bus-protocol.h"
-#include "bus-slot.h"
-#include "bus-socket.h"
-#include "bus-track.h"
-#include "bus-type.h"
-#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
 #include "basic/def.h"
 #include "basic/fd-util.h"
@@ -52,6 +40,19 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "shared/bus-util.h"
+
+#include "bus-container.h"
+#include "bus-control.h"
+#include "bus-internal.h"
+#include "bus-kernel.h"
+#include "bus-message.h"
+#include "bus-objects.h"
+#include "bus-protocol.h"
+#include "bus-slot.h"
+#include "bus-socket.h"
+#include "bus-track.h"
+#include "bus-type.h"
 
 #define log_debug_bus_message(m)                                         \
         do {                                                             \

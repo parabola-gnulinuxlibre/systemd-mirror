@@ -26,9 +26,6 @@
 #include <systemd/sd-daemon.h>
 
 #include "basic/alloc-util.h"
-#include "bus-internal.h"
-#include "bus-message.h"
-#include "bus-socket.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
 #include "basic/hexdecoct.h"
@@ -41,6 +38,10 @@
 #include "basic/user-util.h"
 #include "basic/utf8.h"
 #include "basic/util.h"
+
+#include "bus-internal.h"
+#include "bus-message.h"
+#include "bus-socket.h"
 
 #define SNDBUF_SIZE (8*1024*1024)
 

@@ -21,17 +21,17 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#include "sd-netlink.h"
-
 #include "basic/alloc-util.h"
 #include "basic/formats-util.h"
 #include "basic/missing.h"
-#include "netlink-internal.h"
-#include "netlink-types.h"
-#include "netlink-util.h"
 #include "basic/refcnt.h"
 #include "basic/socket-util.h"
 #include "basic/util.h"
+
+#include "netlink-internal.h"
+#include "netlink-types.h"
+#include "netlink-util.h"
+#include "sd-netlink.h"
 
 int socket_open(int family) {
         int fd;

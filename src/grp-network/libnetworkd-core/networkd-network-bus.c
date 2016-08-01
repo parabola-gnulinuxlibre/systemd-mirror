@@ -18,9 +18,10 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "networkd.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
+
+#include "networkd.h"
 
 static int property_get_ether_addrs(
                 sd_bus *bus,

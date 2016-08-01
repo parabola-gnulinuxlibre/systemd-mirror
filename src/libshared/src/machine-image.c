@@ -20,13 +20,14 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/fs.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/file.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <linux/fs.h>
+
 #include "basic/alloc-util.h"
 #include "basic/btrfs-util.h"
 #include "basic/chattr-util.h"
@@ -38,7 +39,6 @@
 #include "basic/lockfile-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
-#include "shared/machine-image.h"
 #include "basic/mkdir.h"
 #include "basic/path-util.h"
 #include "basic/rm-rf.h"
@@ -49,6 +49,7 @@
 #include "basic/utf8.h"
 #include "basic/util.h"
 #include "basic/xattr-util.h"
+#include "shared/machine-image.h"
 
 static const char image_search_path[] =
         "/var/lib/machines\0"

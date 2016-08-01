@@ -24,16 +24,17 @@
 
 #include <systemd/sd-bus.h>
 
-#include "bus-error.h"
-#include "bus-kernel.h"
-#include "bus-match.h"
 #include "basic/hashmap.h"
-#include "kdbus.h"
 #include "basic/list.h"
 #include "basic/prioq.h"
 #include "basic/refcnt.h"
 #include "basic/socket-util.h"
 #include "basic/util.h"
+
+#include "bus-error.h"
+#include "bus-kernel.h"
+#include "bus-match.h"
+#include "kdbus.h"
 
 struct reply_callback {
         sd_bus_message_handler_t callback;

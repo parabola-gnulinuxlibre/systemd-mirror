@@ -21,6 +21,7 @@
 #include "sd-bus/bus-common-errors.h"
 #include "shared/bus-util.h"
 #include "shared/dns-domain.h"
+
 #include "resolved-bus.h"
 #include "resolved-def.h"
 #include "resolved-dns-synthesize.h"

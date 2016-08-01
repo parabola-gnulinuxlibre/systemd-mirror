@@ -22,10 +22,10 @@
 #include <systemd/sd-journal.h>
 
 #include "basic/alloc-util.h"
-#include "journal-file.h"
-#include "journal-internal.h"
 #include "basic/macro.h"
 #include "basic/string-util.h"
+#include "sd-journal/journal-file.h"
+#include "sd-journal/journal-internal.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_free_ char *fn = NULL;

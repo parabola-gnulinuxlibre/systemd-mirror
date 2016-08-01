@@ -19,10 +19,11 @@
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
-#include "journal-remote-parse.h"
-#include "journald-native.h"
 #include "basic/parse-util.h"
 #include "basic/string-util.h"
+#include "journald-native.h"
+
+#include "journal-remote-parse.h"
 
 #define LINE_CHUNK 8*1024u
 

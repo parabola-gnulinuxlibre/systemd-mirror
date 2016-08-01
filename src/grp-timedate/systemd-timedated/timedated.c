@@ -26,9 +26,6 @@
 #include <systemd/sd-messages.h>
 
 #include "basic/alloc-util.h"
-#include "sd-bus/bus-common-errors.h"
-#include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
 #include "basic/clock-util.h"
 #include "basic/def.h"
 #include "basic/fileio-label.h"
@@ -38,6 +35,9 @@
 #include "basic/strv.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "sd-bus/bus-common-errors.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
 
 #define NULL_ADJTIME_UTC "0.0 0 0\n0\nUTC\n"
 #define NULL_ADJTIME_LOCAL "0.0 0 0\n0\nLOCAL\n"

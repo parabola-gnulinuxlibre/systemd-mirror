@@ -19,10 +19,11 @@
 
 #include <systemd/sd-bus.h>
 
+#include "basic/errno-list.h"
+#include "shared/bus-util.h"
+
 #include "bus-common-errors.h"
 #include "bus-error.h"
-#include "shared/bus-util.h"
-#include "basic/errno-list.h"
 
 static void test_error(void) {
         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL, second = SD_BUS_ERROR_NULL;

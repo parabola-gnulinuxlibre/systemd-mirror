@@ -30,14 +30,11 @@
 
 #include "basic/alloc-util.h"
 #include "basic/audit-util.h"
-#include "bus-error.h"
-#include "shared/bus-util.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/formats-util.h"
 #include "basic/io-util.h"
-#include "logind-session.h"
 #include "basic/mkdir.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
@@ -45,6 +42,10 @@
 #include "basic/terminal-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+
+#include "logind-session.h"
 
 #define RELEASE_USEC (20*USEC_PER_SEC)
 

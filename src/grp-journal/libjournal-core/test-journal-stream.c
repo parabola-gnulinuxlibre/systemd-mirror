@@ -23,13 +23,13 @@
 #include <systemd/sd-journal.h>
 
 #include "basic/alloc-util.h"
-#include "journal-file.h"
-#include "journal-internal.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/parse-util.h"
 #include "basic/rm-rf.h"
 #include "basic/util.h"
+#include "sd-journal/journal-file.h"
+#include "sd-journal/journal-internal.h"
 
 #define N_ENTRIES 200
 

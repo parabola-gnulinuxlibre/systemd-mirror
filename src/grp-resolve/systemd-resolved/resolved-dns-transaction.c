@@ -21,14 +21,15 @@
 
 #include "basic/af-list.h"
 #include "basic/alloc-util.h"
-#include "shared/dns-domain.h"
 #include "basic/errno-list.h"
 #include "basic/fd-util.h"
 #include "basic/random-util.h"
+#include "basic/string-table.h"
+#include "shared/dns-domain.h"
+
 #include "resolved-dns-cache.h"
 #include "resolved-dns-transaction.h"
 #include "resolved-llmnr.h"
-#include "basic/string-table.h"
 
 #define TRANSACTIONS_MAX 4096
 

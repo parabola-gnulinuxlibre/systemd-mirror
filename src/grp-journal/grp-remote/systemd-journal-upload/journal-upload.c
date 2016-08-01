@@ -26,13 +26,11 @@
 #include <systemd/sd-daemon.h>
 
 #include "basic/alloc-util.h"
-#include "shared/conf-parser.h"
 #include "basic/def.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/formats-util.h"
 #include "basic/glob-util.h"
-#include "journal-upload.h"
 #include "basic/log.h"
 #include "basic/mkdir.h"
 #include "basic/parse-util.h"
@@ -40,6 +38,9 @@
 #include "basic/signal-util.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "shared/conf-parser.h"
+
+#include "journal-upload.h"
 
 #define PRIV_KEY_FILE CERTIFICATE_ROOT "/private/journal-upload.pem"
 #define CERT_FILE     CERTIFICATE_ROOT "/certs/journal-upload.pem"

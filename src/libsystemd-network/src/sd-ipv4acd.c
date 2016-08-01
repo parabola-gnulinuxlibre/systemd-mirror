@@ -24,10 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "systemd-network/sd-ipv4acd.h"
-
 #include "basic/alloc-util.h"
-#include "systemd-network/arp-util.h"
 #include "basic/fd-util.h"
 #include "basic/in-addr-util.h"
 #include "basic/list.h"
@@ -35,6 +32,8 @@
 #include "basic/refcnt.h"
 #include "basic/siphash24.h"
 #include "basic/util.h"
+#include "systemd-network/arp-util.h"
+#include "systemd-network/sd-ipv4acd.h"
 
 /* Constants from the RFC */
 #define PROBE_WAIT 1

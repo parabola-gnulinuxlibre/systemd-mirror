@@ -18,9 +18,6 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "sd-bus/bus-internal.h"
-#include "shared/bus-unit-util.h"
-#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
 #include "basic/env-util.h"
 #include "basic/escape.h"
@@ -37,6 +34,9 @@
 #include "basic/terminal-util.h"
 #include "basic/utf8.h"
 #include "basic/util.h"
+#include "sd-bus/bus-internal.h"
+#include "shared/bus-unit-util.h"
+#include "shared/bus-util.h"
 
 int bus_parse_unit_info(sd_bus_message *message, UnitInfo *u) {
         assert(message);

@@ -19,9 +19,9 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/fs.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
-#include <linux/fs.h>
 
 #include "basic/chattr-util.h"
 #include "basic/fd-util.h"

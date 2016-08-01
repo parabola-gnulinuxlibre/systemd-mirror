@@ -21,6 +21,7 @@
 #include <resolv.h>
 
 #include "basic/fd-util.h"
+
 #include "resolved-llmnr.h"
 #include "resolved-manager.h"
 

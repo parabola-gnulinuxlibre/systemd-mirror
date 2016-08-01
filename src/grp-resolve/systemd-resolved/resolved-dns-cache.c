@@ -21,11 +21,12 @@
 
 #include "basic/af-list.h"
 #include "basic/alloc-util.h"
+#include "basic/string-util.h"
 #include "shared/dns-domain.h"
+
 #include "resolved-dns-answer.h"
 #include "resolved-dns-cache.h"
 #include "resolved-dns-packet.h"
-#include "basic/string-util.h"
 
 /* Never cache more than 4K entries. RFC 1536, Section 5 suggests to
  * leave DNS caches unbounded, but that's crazy. */

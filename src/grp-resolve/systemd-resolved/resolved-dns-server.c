@@ -20,11 +20,12 @@
 #include <systemd/sd-messages.h>
 
 #include "basic/alloc-util.h"
-#include "resolved-dns-server.h"
-#include "resolved-resolv-conf.h"
 #include "basic/siphash24.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
+
+#include "resolved-dns-server.h"
+#include "resolved-resolv-conf.h"
 
 /* After how much time to repeat classic DNS requests */
 #define DNS_TIMEOUT_MIN_USEC (500 * USEC_PER_MSEC)

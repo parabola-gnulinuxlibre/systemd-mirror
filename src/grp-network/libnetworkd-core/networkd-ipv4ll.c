@@ -17,10 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <netinet/ether.h>
 #include <linux/if.h>
+#include <netinet/ether.h>
 
 #include "systemd-network/network-internal.h"
+
 #include "networkd.h"
 
 static int ipv4ll_address_lost(Link *link) {

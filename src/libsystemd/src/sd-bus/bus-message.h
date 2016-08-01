@@ -25,10 +25,11 @@
 
 #include <systemd/sd-bus.h>
 
-#include "bus-creds.h"
-#include "bus-protocol.h"
 #include "basic/macro.h"
 #include "basic/time-util.h"
+
+#include "bus-creds.h"
+#include "bus-protocol.h"
 
 struct bus_container {
         char enclosing;

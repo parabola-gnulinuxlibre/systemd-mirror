@@ -22,6 +22,7 @@
 typedef struct Seat Seat;
 
 #include "basic/list.h"
+
 #include "logind-session.h"
 
 struct Seat {

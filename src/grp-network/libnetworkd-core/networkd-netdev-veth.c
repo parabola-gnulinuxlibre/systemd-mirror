@@ -17,10 +17,10 @@
     along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <net/if.h>
 #include <linux/veth.h>
+#include <net/if.h>
 
-#include <systemd/sd-netlink.h>
+#include "sd-netlink/sd-netlink.h"
 
 #include "networkd-netdev-veth.h"
 

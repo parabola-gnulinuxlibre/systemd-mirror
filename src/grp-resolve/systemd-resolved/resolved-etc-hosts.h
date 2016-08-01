@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "resolved-manager.h"
-#include "resolved-dns-question.h"
 #include "resolved-dns-answer.h"
+#include "resolved-dns-question.h"
+#include "resolved-manager.h"
 
 void manager_etc_hosts_flush(Manager *m);
 int manager_etc_hosts_read(Manager *m);

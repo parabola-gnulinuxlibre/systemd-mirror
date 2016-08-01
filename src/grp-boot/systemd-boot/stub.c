@@ -17,10 +17,10 @@
 #include "disk.h"
 #include "graphics.h"
 #include "linux.h"
+#include "measure.h"
 #include "pefile.h"
 #include "splash.h"
 #include "util.h"
-#include "measure.h"
 
 /* magic string to find in the binary image */
 static const char __attribute__((used)) magic[] = "#### LoaderInfo: systemd-stub " VERSION " ####";

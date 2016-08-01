@@ -20,15 +20,16 @@
 #include <resolv.h>
 
 #include "basic/alloc-util.h"
-#include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/fileio-label.h"
 #include "basic/fileio.h"
 #include "basic/ordered-set.h"
-#include "resolved-conf.h"
-#include "resolved-resolv-conf.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
+#include "shared/dns-domain.h"
+
+#include "resolved-conf.h"
+#include "resolved-resolv-conf.h"
 
 int manager_read_resolv_conf(Manager *m) {
         _cleanup_fclose_ FILE *f = NULL;

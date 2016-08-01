@@ -17,10 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "bus-internal.h"
-#include "bus-signature.h"
 #include "basic/log.h"
 #include "basic/string-util.h"
+
+#include "bus-internal.h"
+#include "bus-signature.h"
 
 int main(int argc, char *argv[]) {
         char prefix[256];

@@ -20,10 +20,10 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <linux/magic.h>
+#include <sys/stat.h>
 #include <sys/statvfs.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "basic/dirent-util.h"

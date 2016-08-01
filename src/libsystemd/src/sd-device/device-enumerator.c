@@ -18,11 +18,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-device.h"
-
 #include "basic/alloc-util.h"
-#include "device-enumerator-private.h"
-#include "device-util.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
 #include "basic/prioq.h"
@@ -30,6 +26,10 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+
+#include "device-enumerator-private.h"
+#include "device-util.h"
+#include "sd-device.h"
 
 #define DEVICE_ENUMERATE_MAX_DEPTH 256
 

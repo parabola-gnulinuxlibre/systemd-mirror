@@ -18,11 +18,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <systemd/sd-network.h>
-
 #include "basic/alloc-util.h"
-#include "networkd-wait-online-link.h"
 #include "basic/string-util.h"
+#include "sd-network/sd-network.h"
+
+#include "networkd-wait-online-link.h"
 
 int link_new(Manager *m, Link **ret, int ifindex, const char *ifname) {
         _cleanup_(link_freep) Link *l = NULL;

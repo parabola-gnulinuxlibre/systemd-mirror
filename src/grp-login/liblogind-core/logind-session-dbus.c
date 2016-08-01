@@ -21,16 +21,17 @@
 #include <string.h>
 
 #include "basic/alloc-util.h"
-#include "bus-common-errors.h"
 #include "basic/bus-label.h"
-#include "shared/bus-util.h"
 #include "basic/fd-util.h"
-#include "logind-session-device.h"
-#include "logind-session.h"
-#include "logind.h"
 #include "basic/signal-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "logind.h"
+#include "sd-bus/bus-common-errors.h"
+#include "shared/bus-util.h"
+
+#include "logind-session-device.h"
+#include "logind-session.h"
 
 static int property_get_user(
                 sd_bus *bus,

@@ -32,9 +32,9 @@ typedef struct UnitFileInstallInfo UnitFileInstallInfo;
 
 #include "basic/hashmap.h"
 #include "basic/macro.h"
-#include "shared/path-lookup.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
+#include "shared/path-lookup.h"
 
 enum UnitFileScope {
         UNIT_FILE_SYSTEM,

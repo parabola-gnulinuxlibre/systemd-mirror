@@ -21,9 +21,10 @@
 
 #include "basic/alloc-util.h"
 #include "basic/btrfs-util.h"
-#include "qcow2-util.h"
 #include "basic/sparse-endian.h"
 #include "basic/util.h"
+
+#include "qcow2-util.h"
 
 #define QCOW2_MAGIC 0x514649fb
 

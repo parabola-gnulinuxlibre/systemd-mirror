@@ -20,9 +20,9 @@
 #include <stddef.h>
 
 #include "basic/alloc-util.h"
-#include "shared/apparmor-util.h"
 #include "basic/fileio.h"
 #include "basic/parse-util.h"
+#include "shared/apparmor-util.h"
 
 bool mac_apparmor_use(void) {
         static int cached_use = -1;

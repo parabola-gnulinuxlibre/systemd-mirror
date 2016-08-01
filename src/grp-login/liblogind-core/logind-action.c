@@ -20,17 +20,18 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "bus-error.h"
-#include "shared/bus-util.h"
-#include "shared/conf-parser.h"
 #include "basic/formats-util.h"
-#include "logind-action.h"
 #include "basic/process-util.h"
-#include "shared/sleep-config.h"
 #include "basic/special.h"
 #include "basic/string-table.h"
 #include "basic/terminal-util.h"
 #include "basic/user-util.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+#include "shared/conf-parser.h"
+#include "shared/sleep-config.h"
+
+#include "logind-action.h"
 
 int manager_handle_action(
                 Manager *m,

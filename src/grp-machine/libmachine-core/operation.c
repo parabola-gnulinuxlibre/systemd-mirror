@@ -19,8 +19,9 @@
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
-#include "operation.h"
 #include "basic/process-util.h"
+
+#include "operation.h"
 
 static int operation_done(sd_event_source *s, const siginfo_t *si, void *userdata) {
         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;

@@ -17,12 +17,13 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "shared/conf-parser.h"
-#include "networkd-util.h"
 #include "basic/parse-util.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "shared/conf-parser.h"
+
+#include "networkd-util.h"
 
 const char *address_family_boolean_to_string(AddressFamilyBoolean b) {
         if (b == ADDRESS_FAMILY_YES ||

@@ -33,11 +33,11 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "libudev-private.h"
 #include "sd-netlink/netlink-util.h"
 #include "sd-netlink/sd-netlink.h"
 #include "shared/conf-parser.h"
 #include "systemd-network/network-internal.h"
-#include "libudev-private.h"
 
 #include "ethtool-util.h"
 #include "link-config.h"

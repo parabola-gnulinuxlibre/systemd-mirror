@@ -18,10 +18,11 @@
 ***/
 
 #include "basic/alloc-util.h"
+#include "basic/string-util.h"
 #include "shared/dns-domain.h"
+
 #include "resolved-dns-answer.h"
 #include "resolved-dns-dnssec.h"
-#include "basic/string-util.h"
 
 DnsAnswer *dns_answer_new(unsigned n) {
         DnsAnswer *a;

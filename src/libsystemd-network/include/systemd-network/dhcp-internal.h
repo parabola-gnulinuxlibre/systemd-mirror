@@ -25,10 +25,9 @@
 #include <net/if_arp.h>
 #include <stdint.h>
 
-#include "systemd-network/sd-dhcp-client.h"
-
-#include "systemd-network/dhcp-protocol.h"
 #include "basic/socket-util.h"
+#include "systemd-network/dhcp-protocol.h"
+#include "systemd-network/sd-dhcp-client.h"
 
 int dhcp_network_bind_raw_socket(int index, union sockaddr_union *link,
                                  uint32_t xid, const uint8_t *mac_addr,

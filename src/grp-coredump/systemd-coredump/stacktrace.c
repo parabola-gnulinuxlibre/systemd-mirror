@@ -24,9 +24,10 @@
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
 #include "basic/macro.h"
-#include "stacktrace.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+
+#include "stacktrace.h"
 
 #define FRAMES_MAX 64
 #define THREADS_MAX 64

@@ -22,6 +22,7 @@
 #include <stdio.h>
 
 #include "basic/macro.h"
+
 #include "nspawn-expose-ports.h"
 #include "nspawn-mount.h"
 

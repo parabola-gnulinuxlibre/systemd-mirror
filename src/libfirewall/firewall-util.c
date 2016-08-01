@@ -25,10 +25,10 @@
 #include <arpa/inet.h>
 #include <endian.h>
 #include <errno.h>
+#include <net/if.h>
 #include <stddef.h>
 #include <string.h>
 #include <sys/socket.h>
-#include <net/if.h>
 #ifndef IFNAMSIZ
 #define IFNAMSIZ 16
 #endif

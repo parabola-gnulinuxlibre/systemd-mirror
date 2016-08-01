@@ -26,12 +26,12 @@
 
 #include "basic/alloc-util.h"
 #include "basic/hostname-util.h"
-#include "sd-netlink/local-addresses.h"
 #include "basic/macro.h"
 #include "basic/nss-util.h"
 #include "basic/signal-util.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "sd-netlink/local-addresses.h"
 
 /* We use 127.0.0.2 as IPv4 address. This has the advantage over
  * 127.0.0.1 that it can be translated back to the local hostname. For

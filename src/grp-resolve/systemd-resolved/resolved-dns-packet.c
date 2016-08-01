@@ -18,13 +18,14 @@
  ***/
 
 #include "basic/alloc-util.h"
-#include "shared/dns-domain.h"
-#include "resolved-dns-packet.h"
 #include "basic/string-table.h"
 #include "basic/strv.h"
 #include "basic/unaligned.h"
 #include "basic/utf8.h"
 #include "basic/util.h"
+#include "shared/dns-domain.h"
+
+#include "resolved-dns-packet.h"
 
 #define EDNS0_OPT_DO (1<<15)
 

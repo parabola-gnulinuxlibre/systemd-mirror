@@ -21,9 +21,10 @@
 #include <net/if.h>
 
 #include "basic/missing.h"
-#include "netlink-util.h"
-#include "networkd.h"
+#include "sd-netlink/netlink-util.h"
+
 #include "networkd-netdev-bridge.h"
+#include "networkd.h"
 
 /* callback for brige netdev's parameter set */
 static int netdev_bridge_set_handler(sd_netlink *rtnl, sd_netlink_message *m, void *userdata) {

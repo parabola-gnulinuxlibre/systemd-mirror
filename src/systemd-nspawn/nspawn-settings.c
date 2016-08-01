@@ -19,9 +19,6 @@
 
 #include "basic/alloc-util.h"
 #include "basic/cap-list.h"
-#include "shared/conf-parser.h"
-#include "nspawn-network.h"
-#include "nspawn-settings.h"
 #include "basic/parse-util.h"
 #include "basic/process-util.h"
 #include "basic/socket-util.h"
@@ -29,6 +26,10 @@
 #include "basic/strv.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "shared/conf-parser.h"
+
+#include "nspawn-network.h"
+#include "nspawn-settings.h"
 
 int settings_load(FILE *f, const char *path, Settings **ret) {
         _cleanup_(settings_freep) Settings *s = NULL;

@@ -24,11 +24,10 @@
 
 #include "basic/formats-util.h"
 #include "basic/sigbus.h"
-#include "sd-journal/journal-authenticate.h"
-
 #include "journald-kmsg.h"
 #include "journald-server.h"
 #include "journald-syslog.h"
+#include "sd-journal/journal-authenticate.h"
 
 int main(int argc, char *argv[]) {
         Server server;

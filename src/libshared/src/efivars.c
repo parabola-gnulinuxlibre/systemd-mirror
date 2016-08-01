@@ -31,7 +31,6 @@
 
 #include "basic/alloc-util.h"
 #include "basic/dirent-util.h"
-#include "shared/efivars.h"
 #include "basic/fd-util.h"
 #include "basic/io-util.h"
 #include "basic/macro.h"
@@ -41,6 +40,7 @@
 #include "basic/utf8.h"
 #include "basic/util.h"
 #include "basic/virt.h"
+#include "shared/efivars.h"
 
 #ifdef ENABLE_EFI
 

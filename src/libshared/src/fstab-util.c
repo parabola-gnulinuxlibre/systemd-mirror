@@ -25,7 +25,6 @@
 
 #include "basic/alloc-util.h"
 #include "basic/device-nodes.h"
-#include "shared/fstab-util.h"
 #include "basic/macro.h"
 #include "basic/mount-util.h"
 #include "basic/parse-util.h"
@@ -33,6 +32,7 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "shared/fstab-util.h"
 
 bool fstab_is_mount_point(const char *mount) {
         _cleanup_endmntent_ FILE *f = NULL;

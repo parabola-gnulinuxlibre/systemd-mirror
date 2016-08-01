@@ -20,8 +20,9 @@
 #include <string.h>
 
 #include "basic/alloc-util.h"
-#include "logind-device.h"
 #include "basic/util.h"
+
+#include "logind-device.h"
 
 Device* device_new(Manager *m, const char *sysfs, bool master) {
         Device *d;

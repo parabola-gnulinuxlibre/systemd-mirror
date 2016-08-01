@@ -17,12 +17,13 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "shared/bus-util.h"
+
 #include "bus-match.h"
 #include "bus-message.h"
 #include "bus-slot.h"
-#include "shared/bus-util.h"
-#include "basic/log.h"
-#include "basic/macro.h"
 
 static bool mask[32];
 

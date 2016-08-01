@@ -20,11 +20,8 @@
 #include <errno.h>
 
 #include "basic/alloc-util.h"
-#include "shared/dropin.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
-#include "shared/fstab-util.h"
-#include "shared/generator.h"
 #include "basic/hashmap.h"
 #include "basic/log.h"
 #include "basic/mkdir.h"
@@ -35,6 +32,9 @@
 #include "basic/strv.h"
 #include "basic/unit-name.h"
 #include "basic/util.h"
+#include "shared/dropin.h"
+#include "shared/fstab-util.h"
+#include "shared/generator.h"
 
 typedef struct crypto_device {
         char *uuid;

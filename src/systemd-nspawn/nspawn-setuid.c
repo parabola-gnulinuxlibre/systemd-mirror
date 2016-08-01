@@ -24,12 +24,13 @@
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
 #include "basic/mkdir.h"
-#include "nspawn-setuid.h"
 #include "basic/process-util.h"
 #include "basic/signal-util.h"
 #include "basic/string-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+
+#include "nspawn-setuid.h"
 
 static int spawn_getent(const char *database, const char *key, pid_t *rpid) {
         int pipe_fds[2];

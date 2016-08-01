@@ -28,7 +28,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "libudev.h"
+#include <libudev.h>
 
 #include "basic/alloc-util.h"
 #include "sd-device/device-enumerator-private.h"

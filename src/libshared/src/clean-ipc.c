@@ -32,7 +32,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "shared/clean-ipc.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
@@ -41,6 +40,7 @@
 #include "basic/macro.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
+#include "shared/clean-ipc.h"
 
 static int clean_sysvipc_shm(uid_t delete_uid) {
         _cleanup_fclose_ FILE *f = NULL;

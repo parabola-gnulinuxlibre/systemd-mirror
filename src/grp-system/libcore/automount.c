@@ -20,7 +20,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <linux/auto_dev-ioctl.h>
 #include <linux/auto_fs4.h>
 #include <sys/epoll.h>
 #include <sys/mount.h>
@@ -29,17 +28,12 @@
 
 #include "basic/alloc-util.h"
 #include "basic/async.h"
-#include "automount.h"
-#include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "dbus-automount.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
 #include "basic/io-util.h"
 #include "basic/label.h"
 #include "basic/mkdir.h"
 #include "basic/mount-util.h"
-#include "mount.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
@@ -48,6 +42,13 @@
 #include "basic/string-table.h"
 #include "basic/string-util.h"
 #include "basic/unit-name.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+
+#include "automount.h"
+#include "dbus-automount.h"
+#include "linux/auto_dev-ioctl.h"
+#include "mount.h"
 #include "unit.h"
 
 static const UnitActiveState state_translation_table[_AUTOMOUNT_STATE_MAX] = {

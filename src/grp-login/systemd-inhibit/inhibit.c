@@ -26,8 +26,6 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "bus-error.h"
-#include "shared/bus-util.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
 #include "basic/process-util.h"
@@ -35,6 +33,8 @@
 #include "basic/strv.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
 
 static const char* arg_what = "idle:sleep:shutdown";
 static const char* arg_who = NULL;

@@ -23,15 +23,16 @@
 
 #include "basic/alloc-util.h"
 #include "basic/hostname-util.h"
-#include "shared/import-util.h"
-#include "shared/machine-image.h"
 #include "basic/parse-util.h"
-#include "pull-raw.h"
-#include "pull-tar.h"
 #include "basic/signal-util.h"
 #include "basic/string-util.h"
 #include "basic/verbs.h"
 #include "basic/web-util.h"
+#include "shared/import-util.h"
+#include "shared/machine-image.h"
+
+#include "pull-raw.h"
+#include "pull-tar.h"
 
 static bool arg_force = false;
 static const char *arg_image_root = "/var/lib/machines";

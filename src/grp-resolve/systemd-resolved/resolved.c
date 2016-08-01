@@ -22,12 +22,13 @@
 
 #include "basic/capability-util.h"
 #include "basic/mkdir.h"
-#include "resolved-conf.h"
-#include "resolved-manager.h"
-#include "resolved-resolv-conf.h"
 #include "basic/selinux-util.h"
 #include "basic/signal-util.h"
 #include "basic/user-util.h"
+
+#include "resolved-conf.h"
+#include "resolved-manager.h"
+#include "resolved-resolv-conf.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_(manager_freep) Manager *m = NULL;

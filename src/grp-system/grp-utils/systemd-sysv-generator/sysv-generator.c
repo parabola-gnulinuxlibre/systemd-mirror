@@ -29,10 +29,8 @@
 #include "basic/fileio.h"
 #include "basic/hashmap.h"
 #include "basic/hexdecoct.h"
-#include "shared/install.h"
 #include "basic/log.h"
 #include "basic/mkdir.h"
-#include "shared/path-lookup.h"
 #include "basic/path-util.h"
 #include "basic/set.h"
 #include "basic/special.h"
@@ -41,6 +39,8 @@
 #include "basic/strv.h"
 #include "basic/unit-name.h"
 #include "basic/util.h"
+#include "shared/install.h"
+#include "shared/path-lookup.h"
 
 typedef enum RunlevelType {
         RUNLEVEL_UP,

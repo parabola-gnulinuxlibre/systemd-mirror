@@ -21,11 +21,6 @@
 #include <net/if.h>
 #include <stdbool.h>
 
-#include <systemd/sd-device.h>
-#include <systemd/sd-hwdb.h>
-#include <systemd/sd-netlink.h>
-#include <systemd/sd-network.h>
-
 #include "basic/alloc-util.h"
 #include "basic/arphrd-list.h"
 #include "basic/ether-addr-util.h"
@@ -42,13 +37,16 @@
 #include "basic/terminal-util.h"
 #include "basic/util.h"
 #include "basic/verbs.h"
+#include "sd-device/device-util.h"
+#include "sd-device/sd-device.h"
+#include "sd-hwdb/hwdb-util.h"
+#include "sd-hwdb/sd-hwdb.h"
+#include "sd-netlink/local-addresses.h"
+#include "sd-netlink/netlink-util.h"
+#include "sd-netlink/sd-netlink.h"
+#include "sd-network/sd-network.h"
 #include "shared/pager.h"
 #include "systemd-network/sd-lldp.h"
-
-#include "device-util.h"
-#include "hwdb-util.h"
-#include "local-addresses.h"
-#include "netlink-util.h"
 
 static bool arg_no_pager = false;
 static bool arg_legend = true;

@@ -20,6 +20,7 @@
 #include "basic/af-list.h"
 #include "basic/alloc-util.h"
 #include "basic/in-addr-util.h"
+
 #include "local-addresses.h"
 
 static void print_local_addresses(struct local_address *a, unsigned n) {

@@ -89,6 +89,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/pci_regs.h>
 #include <net/if.h>
 #include <net/if_arp.h>
 #include <stdarg.h>
@@ -96,7 +97,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <linux/pci_regs.h>
 
 #include "basic/fd-util.h"
 #include "basic/fileio.h"

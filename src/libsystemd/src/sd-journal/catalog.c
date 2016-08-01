@@ -28,7 +28,6 @@
 #include <systemd/sd-id128.h>
 
 #include "basic/alloc-util.h"
-#include "catalog.h"
 #include "basic/conf-files.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
@@ -42,6 +41,8 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+
+#include "catalog.h"
 
 const char * const catalog_file_dirs[] = {
         "/usr/local/lib/systemd/catalog/",

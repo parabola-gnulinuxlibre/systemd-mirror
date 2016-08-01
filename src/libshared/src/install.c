@@ -31,20 +31,16 @@
 
 #include "basic/alloc-util.h"
 #include "basic/conf-files.h"
-#include "shared/conf-parser.h"
 #include "basic/dirent-util.h"
 #include "basic/extract-word.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/fs-util.h"
 #include "basic/hashmap.h"
-#include "shared/install-printf.h"
-#include "shared/install.h"
 #include "basic/locale-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/mkdir.h"
-#include "shared/path-lookup.h"
 #include "basic/path-util.h"
 #include "basic/rm-rf.h"
 #include "basic/set.h"
@@ -54,6 +50,10 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
+#include "shared/conf-parser.h"
+#include "shared/install-printf.h"
+#include "shared/install.h"
+#include "shared/path-lookup.h"
 
 #define UNIT_FILE_FOLLOW_SYMLINK_MAX 64
 

@@ -19,11 +19,12 @@
 
 #include "basic/alloc-util.h"
 #include "basic/formats-util.h"
-#include "journald-server.h"
-#include "journald-wall.h"
 #include "basic/process-util.h"
 #include "basic/string-util.h"
 #include "shared/utmp-wtmp.h"
+
+#include "journald-server.h"
+#include "journald-wall.h"
 
 void server_forward_wall(
                 Server *s,

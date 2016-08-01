@@ -17,26 +17,27 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <netinet/ether.h>
 #include <linux/if.h>
+#include <netinet/ether.h>
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "shared/bus-util.h"
-#include "systemd-network/dhcp-lease-internal.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
-#include "netlink-util.h"
-#include "systemd-network/network-internal.h"
-#include "networkd.h"
-#include "networkd-lldp-tx.h"
 #include "basic/set.h"
 #include "basic/socket-util.h"
 #include "basic/stdio-util.h"
 #include "basic/string-table.h"
-#include "shared/udev-util.h"
 #include "basic/util.h"
 #include "basic/virt.h"
+#include "sd-netlink/netlink-util.h"
+#include "shared/bus-util.h"
+#include "shared/udev-util.h"
+#include "systemd-network/dhcp-lease-internal.h"
+#include "systemd-network/network-internal.h"
+
+#include "networkd-lldp-tx.h"
+#include "networkd.h"
 
 static bool link_dhcp6_enabled(Link *link) {
         assert(link);

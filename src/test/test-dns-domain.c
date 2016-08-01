@@ -18,9 +18,9 @@
  ***/
 
 #include "basic/alloc-util.h"
-#include "shared/dns-domain.h"
 #include "basic/macro.h"
 #include "basic/string-util.h"
+#include "shared/dns-domain.h"
 
 static void test_dns_label_unescape_one(const char *what, const char *expect, size_t buffer_sz, int ret) {
         char buffer[buffer_sz];

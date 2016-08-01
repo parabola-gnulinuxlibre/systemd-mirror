@@ -17,10 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "kill.h"
 #include "basic/signal-util.h"
 #include "basic/string-table.h"
 #include "basic/util.h"
+
+#include "kill.h"
 
 void kill_context_init(KillContext *c) {
         assert(c);

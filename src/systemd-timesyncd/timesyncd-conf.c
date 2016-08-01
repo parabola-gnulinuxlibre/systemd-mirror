@@ -21,6 +21,7 @@
 #include "basic/def.h"
 #include "basic/extract-word.h"
 #include "basic/string-util.h"
+
 #include "timesyncd-conf.h"
 #include "timesyncd-manager.h"
 #include "timesyncd-server.h"

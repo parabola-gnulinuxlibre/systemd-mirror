@@ -20,7 +20,6 @@
 #include <sys/statvfs.h>
 
 #include "basic/alloc-util.h"
-#include "coredump-vacuum.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
 #include "basic/hashmap.h"
@@ -29,6 +28,8 @@
 #include "basic/time-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+
+#include "coredump-vacuum.h"
 
 #define DEFAULT_MAX_USE_LOWER (uint64_t) (1ULL*1024ULL*1024ULL)           /* 1 MiB */
 #define DEFAULT_MAX_USE_UPPER (uint64_t) (4ULL*1024ULL*1024ULL*1024ULL)   /* 4 GiB */

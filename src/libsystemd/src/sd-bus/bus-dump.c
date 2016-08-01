@@ -18,10 +18,6 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "bus-dump.h"
-#include "bus-internal.h"
-#include "bus-message.h"
-#include "bus-type.h"
 #include "basic/cap-list.h"
 #include "basic/capability-util.h"
 #include "basic/fileio.h"
@@ -32,6 +28,11 @@
 #include "basic/strv.h"
 #include "basic/terminal-util.h"
 #include "basic/util.h"
+
+#include "bus-dump.h"
+#include "bus-internal.h"
+#include "bus-message.h"
+#include "bus-type.h"
 
 static char *indent(unsigned level, unsigned flags) {
         char *p;

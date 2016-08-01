@@ -22,7 +22,6 @@
 
 #include "basic/alloc-util.h"
 #include "basic/cgroup-util.h"
-#include "cgroup.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/fs-util.h"
@@ -30,9 +29,11 @@
 #include "basic/path-util.h"
 #include "basic/process-util.h"
 #include "basic/special.h"
+#include "basic/stdio-util.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
-#include "basic/stdio-util.h"
+
+#include "cgroup.h"
 
 #define CGROUP_CPU_QUOTA_PERIOD_USEC ((usec_t) 100 * USEC_PER_MSEC)
 

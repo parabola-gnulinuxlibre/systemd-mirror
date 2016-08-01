@@ -18,8 +18,8 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "shared/ask-password-api.h"
 #include "basic/log.h"
+#include "shared/ask-password-api.h"
 
 static void ask_password(void) {
         int r;

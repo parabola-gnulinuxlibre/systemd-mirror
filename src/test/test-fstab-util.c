@@ -18,10 +18,10 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "shared/fstab-util.h"
 #include "basic/log.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "shared/fstab-util.h"
 
 /*
 int fstab_filter_options(const char *opts, const char *names,

@@ -17,14 +17,15 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "bus-internal.h"
-#include "bus-introspect.h"
-#include "bus-protocol.h"
-#include "bus-signature.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+
+#include "bus-internal.h"
+#include "bus-introspect.h"
+#include "bus-protocol.h"
+#include "bus-signature.h"
 
 int introspect_begin(struct introspect *i, bool trusted) {
         assert(i);

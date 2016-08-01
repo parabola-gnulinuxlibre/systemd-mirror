@@ -17,8 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "bus-introspect.h"
 #include "basic/log.h"
+
+#include "bus-introspect.h"
 
 static int prop_get(sd_bus *bus, const char *path, const char *interface, const char *property, sd_bus_message *reply, void *userdata, sd_bus_error *error) {
         return -EINVAL;

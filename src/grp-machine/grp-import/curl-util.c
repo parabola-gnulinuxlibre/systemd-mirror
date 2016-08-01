@@ -18,9 +18,10 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "curl-util.h"
 #include "basic/fd-util.h"
 #include "basic/string-util.h"
+
+#include "curl-util.h"
 
 static void curl_glue_check_finished(CurlGlue *g) {
         CURLMsg *msg;

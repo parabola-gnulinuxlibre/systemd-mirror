@@ -18,10 +18,11 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "networkd-address-pool.h"
-#include "networkd.h"
 #include "basic/set.h"
 #include "basic/string-util.h"
+
+#include "networkd-address-pool.h"
+#include "networkd.h"
 
 int address_pool_new(
                 Manager *m,

@@ -17,11 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
  ***/
 
-#include <resolv.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
+#include <resolv.h>
 
 #include "basic/fd-util.h"
+
 #include "resolved-manager.h"
 #include "resolved-mdns.h"
 

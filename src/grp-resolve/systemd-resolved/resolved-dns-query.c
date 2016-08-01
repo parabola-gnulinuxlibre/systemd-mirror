@@ -18,14 +18,15 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "shared/dns-domain.h"
-#include "dns-type.h"
 #include "basic/hostname-util.h"
+#include "basic/string-util.h"
 #include "sd-netlink/local-addresses.h"
+#include "shared/dns-domain.h"
+
+#include "dns-type.h"
 #include "resolved-dns-query.h"
 #include "resolved-dns-synthesize.h"
 #include "resolved-etc-hosts.h"
-#include "basic/string-util.h"
 
 /* How long to wait for the query in total */
 #define QUERY_TIMEOUT_USEC (30 * USEC_PER_SEC)

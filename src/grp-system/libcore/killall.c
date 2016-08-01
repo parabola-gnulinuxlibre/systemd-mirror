@@ -25,13 +25,14 @@
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
-#include "killall.h"
 #include "basic/parse-util.h"
 #include "basic/process-util.h"
 #include "basic/set.h"
 #include "basic/string-util.h"
 #include "basic/terminal-util.h"
 #include "basic/util.h"
+
+#include "killall.h"
 
 #define TIMEOUT_USEC (10 * USEC_PER_SEC)
 

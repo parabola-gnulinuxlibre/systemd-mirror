@@ -24,10 +24,11 @@
 #include <unistd.h>
 
 #include "basic/string-util.h"
+#include "basic/util.h"
 #include "shared/udev-util.h"
 #include "udev.h"
+
 #include "udevadm-util.h"
-#include "basic/util.h"
 
 static int verbose;
 static int dry_run;

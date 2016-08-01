@@ -21,8 +21,8 @@
 
 #include <systemd/sd-event.h>
 
-#include "shared/import-util.h"
 #include "basic/macro.h"
+#include "shared/import-util.h"
 
 typedef struct TarImport TarImport;
 

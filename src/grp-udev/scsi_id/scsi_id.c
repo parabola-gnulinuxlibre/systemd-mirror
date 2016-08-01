@@ -29,13 +29,14 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "libudev.h"
+#include <libudev.h>
 
 #include "basic/fd-util.h"
-#include "libudev-private.h"
-#include "scsi_id.h"
 #include "basic/string-util.h"
+#include "libudev-private.h"
 #include "shared/udev-util.h"
+
+#include "scsi_id.h"
 
 static const struct option options[] = {
         { "device",             required_argument, NULL, 'd' },

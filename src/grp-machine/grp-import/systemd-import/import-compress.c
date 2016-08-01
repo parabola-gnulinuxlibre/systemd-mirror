@@ -17,9 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "import-compress.h"
 #include "basic/string-table.h"
 #include "basic/util.h"
+
+#include "import-compress.h"
 
 void import_compress_free(ImportCompress *c) {
         assert(c);

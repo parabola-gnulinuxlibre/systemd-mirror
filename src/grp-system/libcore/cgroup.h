@@ -21,9 +21,9 @@
 
 #include <stdbool.h>
 
+#include "basic/cgroup-util.h"
 #include "basic/list.h"
 #include "basic/time-util.h"
-#include "basic/cgroup-util.h"
 
 typedef struct CGroupContext CGroupContext;
 typedef struct CGroupDeviceAllow CGroupDeviceAllow;

@@ -21,12 +21,9 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "shared/dropin.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
-#include "shared/fstab-util.h"
-#include "shared/generator.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/mkdir.h"
@@ -36,6 +33,9 @@
 #include "basic/time-util.h"
 #include "basic/unit-name.h"
 #include "basic/util.h"
+#include "shared/dropin.h"
+#include "shared/fstab-util.h"
+#include "shared/generator.h"
 
 static int write_fsck_sysroot_service(const char *dir, const char *what) {
         _cleanup_free_ char *device = NULL, *escaped = NULL;

@@ -26,7 +26,6 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "shared/conf-parser.h"
 #include "basic/def.h"
 #include "basic/env-util.h"
 #include "basic/fd-util.h"
@@ -34,9 +33,10 @@
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/parse-util.h"
-#include "shared/sleep-config.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
+#include "shared/conf-parser.h"
+#include "shared/sleep-config.h"
 
 #define USE(x, y) do { (x) = (y); (y) = NULL; } while (0)
 

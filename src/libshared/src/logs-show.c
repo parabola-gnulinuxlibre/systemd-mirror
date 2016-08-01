@@ -37,11 +37,8 @@
 #include "basic/hashmap.h"
 #include "basic/hostname-util.h"
 #include "basic/io-util.h"
-#include "sd-journal/journal-internal.h"
 #include "basic/log.h"
-#include "shared/logs-show.h"
 #include "basic/macro.h"
-#include "shared/output-mode.h"
 #include "basic/parse-util.h"
 #include "basic/process-util.h"
 #include "basic/sparse-endian.h"
@@ -51,6 +48,9 @@
 #include "basic/time-util.h"
 #include "basic/utf8.h"
 #include "basic/util.h"
+#include "sd-journal/journal-internal.h"
+#include "shared/logs-show.h"
+#include "shared/output-mode.h"
 
 /* up to three lines (each up to 100 characters) or 300 characters, whichever is less */
 #define PRINT_LINE_THRESHOLD 3

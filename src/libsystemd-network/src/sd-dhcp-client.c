@@ -18,27 +18,26 @@
 ***/
 
 #include <errno.h>
+#include <linux/if_infiniband.h>
 #include <net/ethernet.h>
 #include <net/if_arp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include <linux/if_infiniband.h>
-
-#include "systemd-network/sd-dhcp-client.h"
 
 #include "basic/alloc-util.h"
 #include "basic/async.h"
-#include "systemd-network/dhcp-identifier.h"
-#include "systemd-network/dhcp-internal.h"
-#include "systemd-network/dhcp-lease-internal.h"
-#include "systemd-network/dhcp-protocol.h"
-#include "shared/dns-domain.h"
 #include "basic/hostname-util.h"
 #include "basic/random-util.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "shared/dns-domain.h"
+#include "systemd-network/dhcp-identifier.h"
+#include "systemd-network/dhcp-internal.h"
+#include "systemd-network/dhcp-lease-internal.h"
+#include "systemd-network/dhcp-protocol.h"
+#include "systemd-network/sd-dhcp-client.h"
 
 #define MAX_CLIENT_ID_LEN (sizeof(uint32_t) + MAX_DUID_LEN)  /* Arbitrary limit */
 #define MAX_MAC_ADDR_LEN CONST_MAX(INFINIBAND_ALEN, ETH_ALEN)

@@ -19,9 +19,10 @@
 
 #include <sys/socket.h>
 
-#include "dns-type.h"
 #include "basic/parse-util.h"
 #include "basic/string-util.h"
+
+#include "dns-type.h"
 
 typedef const struct {
         uint16_t type;

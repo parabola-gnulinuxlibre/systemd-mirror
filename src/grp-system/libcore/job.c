@@ -24,10 +24,7 @@
 
 #include "basic/alloc-util.h"
 #include "basic/async.h"
-#include "dbus-job.h"
-#include "dbus.h"
 #include "basic/escape.h"
-#include "job.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/parse-util.h"
@@ -38,8 +35,12 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/terminal-util.h"
-#include "unit.h"
 #include "basic/virt.h"
+
+#include "dbus-job.h"
+#include "dbus.h"
+#include "job.h"
+#include "unit.h"
 
 Job* job_new_raw(Unit *unit) {
         Job *j;

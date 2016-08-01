@@ -20,6 +20,7 @@
 ***/
 
 #include "shared/dropin.h"
+
 #include "unit.h"
 
 /* Read service data supplementary drop-in directories */

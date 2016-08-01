@@ -23,15 +23,20 @@
 
 #include "basic/af-list.h"
 #include "basic/alloc-util.h"
-#include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/fileio-label.h"
 #include "basic/hostname-util.h"
 #include "basic/io-util.h"
-#include "systemd-network/network-internal.h"
 #include "basic/ordered-set.h"
 #include "basic/parse-util.h"
 #include "basic/random-util.h"
+#include "basic/socket-util.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/utf8.h"
+#include "shared/dns-domain.h"
+#include "systemd-network/network-internal.h"
+
 #include "resolved-bus.h"
 #include "resolved-conf.h"
 #include "resolved-etc-hosts.h"
@@ -39,10 +44,6 @@
 #include "resolved-manager.h"
 #include "resolved-mdns.h"
 #include "resolved-resolv-conf.h"
-#include "basic/socket-util.h"
-#include "basic/string-table.h"
-#include "basic/string-util.h"
-#include "basic/utf8.h"
 
 #define SEND_TIMEOUT_USEC (200 * USEC_PER_MSEC)
 

@@ -16,6 +16,7 @@
  */
 
 #include "basic/string-util.h"
+
 #include "udevadm-util.h"
 
 struct udev_device *find_device(struct udev *udev,

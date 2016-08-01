@@ -22,6 +22,7 @@
 typedef struct DnsQuestion DnsQuestion;
 
 #include "basic/macro.h"
+
 #include "resolved-dns-rr.h"
 
 /* A simple array of resource keys */

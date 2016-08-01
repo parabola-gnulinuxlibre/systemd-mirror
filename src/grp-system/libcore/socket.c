@@ -20,19 +20,16 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/sctp.h>
 #include <mqueue.h>
 #include <netinet/tcp.h>
 #include <signal.h>
 #include <sys/epoll.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <linux/sctp.h>
 
 #include "basic/alloc-util.h"
-#include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
 #include "basic/copy.h"
-#include "dbus-socket.h"
 #include "basic/def.h"
 #include "basic/exit-status.h"
 #include "basic/fd-util.h"
@@ -48,15 +45,19 @@
 #include "basic/selinux-util.h"
 #include "basic/signal-util.h"
 #include "basic/smack-util.h"
-#include "socket.h"
 #include "basic/special.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
+#include "basic/user-util.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+
+#include "dbus-socket.h"
+#include "socket.h"
 #include "unit-printf.h"
 #include "unit.h"
-#include "basic/user-util.h"
 
 static const UnitActiveState state_translation_table[_SOCKET_STATE_MAX] = {
         [SOCKET_DEAD] = UNIT_INACTIVE,

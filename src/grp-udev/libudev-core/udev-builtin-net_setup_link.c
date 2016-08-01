@@ -18,9 +18,10 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "net/link-config.h"
 #include "basic/log.h"
 #include "udev.h"
+
+#include "net/link-config.h"
 
 static link_config_ctx *ctx = NULL;
 

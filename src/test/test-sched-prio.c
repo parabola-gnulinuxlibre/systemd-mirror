@@ -20,10 +20,11 @@
 #include <sched.h>
 
 #include "basic/macro.h"
-#include "manager.h"
 #include "basic/rm-rf.h"
-#include "test-helper.h"
+#include "manager.h"
 #include "shared/tests.h"
+
+#include "test-helper.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_(rm_rf_physical_and_freep) char *runtime_dir = NULL;

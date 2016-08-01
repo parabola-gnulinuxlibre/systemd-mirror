@@ -17,6 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -29,7 +30,6 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "ctype.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"

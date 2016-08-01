@@ -21,9 +21,9 @@
 
 #include <gcrypt.h>
 
+#include "basic/macro.h"
 #include "curl-util.h"
 #include "import-compress.h"
-#include "basic/macro.h"
 
 typedef struct PullJob PullJob;
 

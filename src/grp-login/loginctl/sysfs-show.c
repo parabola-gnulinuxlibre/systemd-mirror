@@ -20,16 +20,17 @@
 #include <errno.h>
 #include <string.h>
 
-#include "libudev.h"
+#include <libudev.h>
 
 #include "basic/alloc-util.h"
 #include "basic/locale-util.h"
 #include "basic/path-util.h"
 #include "basic/string-util.h"
-#include "sysfs-show.h"
 #include "basic/terminal-util.h"
-#include "shared/udev-util.h"
 #include "basic/util.h"
+#include "shared/udev-util.h"
+
+#include "sysfs-show.h"
 
 static int show_sysfs_one(
                 struct udev *udev,

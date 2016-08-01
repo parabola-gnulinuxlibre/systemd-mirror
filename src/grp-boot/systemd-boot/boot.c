@@ -20,9 +20,9 @@
 #include "disk.h"
 #include "graphics.h"
 #include "linux.h"
+#include "measure.h"
 #include "pefile.h"
 #include "util.h"
-#include "measure.h"
 
 #ifndef EFI_OS_INDICATIONS_BOOT_TO_FW_UI
 #define EFI_OS_INDICATIONS_BOOT_TO_FW_UI 0x0000000000000001ULL

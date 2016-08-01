@@ -20,12 +20,14 @@
 #include <curl/curl.h>
 #include <stdbool.h>
 
+#include <systemd/sd-daemon.h>
+
 #include "basic/alloc-util.h"
-#include "journal-upload.h"
 #include "basic/log.h"
 #include "basic/utf8.h"
 #include "basic/util.h"
-#include <systemd/sd-daemon.h>
+
+#include "journal-upload.h"
 
 /**
  * Write up to size bytes to buf. Return negative on error, and number of

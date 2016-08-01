@@ -28,10 +28,10 @@
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/process-util.h"
-#include "shared/spawn-polkit-agent.h"
 #include "basic/stdio-util.h"
 #include "basic/time-util.h"
 #include "basic/util.h"
+#include "shared/spawn-polkit-agent.h"
 
 #ifdef ENABLE_POLKIT
 static pid_t agent_pid = 0;

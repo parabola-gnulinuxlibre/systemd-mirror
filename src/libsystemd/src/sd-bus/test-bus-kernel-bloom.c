@@ -20,11 +20,12 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "bus-kernel.h"
-#include "shared/bus-util.h"
 #include "basic/fd-util.h"
 #include "basic/log.h"
 #include "basic/util.h"
+#include "shared/bus-util.h"
+
+#include "bus-kernel.h"
 
 static int test_match(sd_bus_message *m, void *userdata, sd_bus_error *ret_error) {
         int *found = userdata;

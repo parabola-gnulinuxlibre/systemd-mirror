@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "libudev.h"
+#include <libudev.h>
 
 #ifdef HAVE_ACL
 

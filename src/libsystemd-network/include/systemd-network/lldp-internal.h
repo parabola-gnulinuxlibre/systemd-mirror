@@ -21,11 +21,11 @@
 ***/
 
 #include <systemd/sd-event.h>
-#include "systemd-network/sd-lldp.h"
 
 #include "basic/hashmap.h"
 #include "basic/log.h"
 #include "basic/prioq.h"
+#include "systemd-network/sd-lldp.h"
 
 struct sd_lldp {
         int ifindex;

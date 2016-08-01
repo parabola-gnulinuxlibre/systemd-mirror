@@ -20,11 +20,12 @@
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/hostname-util.h"
-#include "resolved-etc-hosts.h"
-#include "resolved-dns-synthesize.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/time-util.h"
+
+#include "resolved-dns-synthesize.h"
+#include "resolved-etc-hosts.h"
 
 /* Recheck /etc/hosts at most once every 2s */
 #define ETC_HOSTS_RECHECK_USEC (2*USEC_PER_SEC)

@@ -22,6 +22,7 @@
 #include <stdbool.h>
 
 #include "shared/import-util.h"
+
 #include "pull-job.h"
 
 int pull_make_local_copy(const char *final, const char *root, const char *local, bool force_local);

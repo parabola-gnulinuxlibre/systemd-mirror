@@ -18,24 +18,23 @@
 ***/
 
 #include <errno.h>
+#include <linux/if_infiniband.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include <linux/if_infiniband.h>
-
-#include "systemd-network/sd-dhcp6-client.h"
 
 #include "basic/alloc-util.h"
-#include "systemd-network/dhcp-identifier.h"
-#include "systemd-network/dhcp6-internal.h"
-#include "systemd-network/dhcp6-lease-internal.h"
-#include "systemd-network/dhcp6-protocol.h"
 #include "basic/fd-util.h"
 #include "basic/in-addr-util.h"
-#include "systemd-network/network-internal.h"
 #include "basic/random-util.h"
 #include "basic/socket-util.h"
 #include "basic/string-table.h"
 #include "basic/util.h"
+#include "systemd-network/dhcp-identifier.h"
+#include "systemd-network/dhcp6-internal.h"
+#include "systemd-network/dhcp6-lease-internal.h"
+#include "systemd-network/dhcp6-protocol.h"
+#include "systemd-network/network-internal.h"
+#include "systemd-network/sd-dhcp6-client.h"
 
 #define MAX_MAC_ADDR_LEN INFINIBAND_ALEN
 

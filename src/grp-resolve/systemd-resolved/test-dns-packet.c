@@ -17,18 +17,19 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <net/if.h>
 #include <glob.h>
+#include <net/if.h>
 
 #include "basic/alloc-util.h"
 #include "basic/fileio.h"
 #include "basic/glob-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
-#include "resolved-dns-packet.h"
-#include "resolved-dns-rr.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
+
+#include "resolved-dns-packet.h"
+#include "resolved-dns-rr.h"
 
 #define HASH_KEY SD_ID128_MAKE(d3,1e,48,90,4b,fa,4c,fe,af,9d,d5,a1,d7,2e,8a,b1)
 

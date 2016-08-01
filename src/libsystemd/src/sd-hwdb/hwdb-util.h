@@ -19,8 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-hwdb.h"
-
 #include "basic/util.h"
+
+#include "sd-hwdb.h"
 
 bool hwdb_validate(sd_hwdb *hwdb);

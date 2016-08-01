@@ -17,10 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include "basic/string-util.h"
 #include "shared/bus-util.h"
+
 #include "dbus-path.h"
 #include "path.h"
-#include "basic/string-util.h"
 #include "unit.h"
 
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_result, path_result, PathResult);

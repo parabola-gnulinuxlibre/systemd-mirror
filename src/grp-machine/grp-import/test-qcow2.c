@@ -19,8 +19,9 @@
 
 #include "basic/fd-util.h"
 #include "basic/log.h"
-#include "qcow2-util.h"
 #include "basic/util.h"
+
+#include "qcow2-util.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_close_ int sfd = -1, dfd = -1;

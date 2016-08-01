@@ -21,13 +21,14 @@
 #include "basic/cgroup-util.h"
 #include "basic/formats-util.h"
 #include "basic/macro.h"
-#include "shared/specifier.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
+#include "basic/user-util.h"
+#include "shared/specifier.h"
+
 #include "unit-printf.h"
 #include "unit.h"
-#include "basic/user-util.h"
 
 static int specifier_prefix_and_instance(char specifier, void *data, void *userdata, char **ret) {
         Unit *u = userdata;

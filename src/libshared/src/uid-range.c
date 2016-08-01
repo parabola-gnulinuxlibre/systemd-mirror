@@ -22,8 +22,8 @@
 #include <string.h>
 
 #include "basic/macro.h"
-#include "shared/uid-range.h"
 #include "basic/user-util.h"
+#include "shared/uid-range.h"
 
 static bool uid_range_intersect(UidRange *range, uid_t start, uid_t nr) {
         assert(range);

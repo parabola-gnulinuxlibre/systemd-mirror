@@ -27,13 +27,10 @@
 #include <systemd/sd-journal.h>
 
 #include "basic/alloc-util.h"
-#include "sd-journal/compress.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
-#include "sd-journal/journal-internal.h"
 #include "basic/log.h"
 #include "basic/macro.h"
-#include "shared/pager.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
@@ -44,6 +41,9 @@
 #include "basic/terminal-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "sd-journal/compress.h"
+#include "sd-journal/journal-internal.h"
+#include "shared/pager.h"
 
 static enum {
         ACTION_NONE,

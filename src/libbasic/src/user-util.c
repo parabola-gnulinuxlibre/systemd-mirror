@@ -30,11 +30,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "basic/missing.h"
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
 #include "basic/macro.h"
+#include "basic/missing.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/string-util.h"

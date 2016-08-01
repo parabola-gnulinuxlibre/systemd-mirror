@@ -26,7 +26,6 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "shared/base-filesystem.h"
 #include "basic/fd-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
@@ -34,6 +33,7 @@
 #include "basic/umask-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "shared/base-filesystem.h"
 
 typedef struct BaseFilesystem {
         const char *dir;

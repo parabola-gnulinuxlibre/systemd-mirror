@@ -21,10 +21,11 @@
 #include "basic/fd-util.h"
 #include "basic/io-util.h"
 #include "basic/parse-util.h"
-#include "show-status.h"
 #include "basic/string-util.h"
 #include "basic/terminal-util.h"
 #include "basic/util.h"
+
+#include "show-status.h"
 
 int parse_show_status(const char *v, ShowStatus *ret) {
         int r;

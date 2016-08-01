@@ -31,7 +31,6 @@
 #include "basic/hashmap.h"
 #include "basic/locale-util.h"
 #include "basic/log.h"
-#include "shared/pager.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
@@ -41,6 +40,7 @@
 #include "basic/strv.h"
 #include "basic/terminal-util.h"
 #include "basic/util.h"
+#include "shared/pager.h"
 
 static const char prefixes[] =
         "/etc\0"

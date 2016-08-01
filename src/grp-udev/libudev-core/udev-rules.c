@@ -41,10 +41,10 @@
 #include "basic/strbuf.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
-#include "shared/sysctl-util.h"
-#include "udev.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "shared/sysctl-util.h"
+#include "udev.h"
 
 #define PREALLOC_TOKEN          2048
 

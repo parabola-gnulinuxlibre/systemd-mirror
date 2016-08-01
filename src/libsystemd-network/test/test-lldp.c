@@ -25,13 +25,13 @@
 #include <unistd.h>
 
 #include <systemd/sd-event.h>
-#include "systemd-network/sd-lldp.h"
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
-#include "systemd-network/lldp-network.h"
 #include "basic/macro.h"
 #include "basic/string-util.h"
+#include "systemd-network/lldp-network.h"
+#include "systemd-network/sd-lldp.h"
 
 #define TEST_LLDP_PORT "em1"
 #define TEST_LLDP_TYPE_SYSTEM_NAME "systemd-lldp"

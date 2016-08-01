@@ -20,17 +20,18 @@
 #include <net/if.h>
 
 #include "basic/alloc-util.h"
-#include "shared/conf-parser.h"
-#include "firewall-util.h"
-#include "netlink-util.h"
-#include "networkd-address.h"
-#include "networkd.h"
 #include "basic/parse-util.h"
 #include "basic/set.h"
 #include "basic/socket-util.h"
 #include "basic/string-util.h"
 #include "basic/utf8.h"
 #include "basic/util.h"
+#include "firewall-util.h"
+#include "sd-netlink/netlink-util.h"
+#include "shared/conf-parser.h"
+
+#include "networkd-address.h"
+#include "networkd.h"
 
 int address_new(Address **ret) {
         _cleanup_address_free_ Address *address = NULL;

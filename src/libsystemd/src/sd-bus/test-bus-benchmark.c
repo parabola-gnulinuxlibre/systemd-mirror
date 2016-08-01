@@ -22,13 +22,14 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "bus-internal.h"
-#include "bus-kernel.h"
-#include "shared/bus-util.h"
 #include "basic/def.h"
 #include "basic/fd-util.h"
 #include "basic/time-util.h"
 #include "basic/util.h"
+#include "shared/bus-util.h"
+
+#include "bus-internal.h"
+#include "bus-kernel.h"
 
 #define MAX_SIZE (2*1024*1024)
 

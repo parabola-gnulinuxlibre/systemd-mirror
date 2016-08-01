@@ -18,8 +18,8 @@
     along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <netinet/ether.h>
 #include <linux/if_bonding.h>
+#include <netinet/ether.h>
 
 #include "basic/alloc-util.h"
 #include "basic/extract-word.h"

@@ -23,11 +23,6 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "bus-common-errors.h"
-#include "bus-error.h"
-#include "shared/bus-util.h"
-#include "shared/clean-ipc.h"
-#include "shared/conf-parser.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
@@ -35,7 +30,6 @@
 #include "basic/fs-util.h"
 #include "basic/hashmap.h"
 #include "basic/label.h"
-#include "logind-user.h"
 #include "basic/mkdir.h"
 #include "basic/mount-util.h"
 #include "basic/parse-util.h"
@@ -48,6 +42,13 @@
 #include "basic/unit-name.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "sd-bus/bus-common-errors.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+#include "shared/clean-ipc.h"
+#include "shared/conf-parser.h"
+
+#include "logind-user.h"
 
 int user_new(User **out, Manager *m, uid_t uid, gid_t gid, const char *name) {
         _cleanup_(user_freep) User *u = NULL;

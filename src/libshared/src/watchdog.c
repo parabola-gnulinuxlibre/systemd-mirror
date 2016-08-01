@@ -19,10 +19,10 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/watchdog.h>
 #include <sys/ioctl.h>
 #include <syslog.h>
 #include <unistd.h>
-#include <linux/watchdog.h>
 
 #include "basic/fd-util.h"
 #include "basic/log.h"

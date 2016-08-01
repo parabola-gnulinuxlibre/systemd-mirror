@@ -20,20 +20,21 @@
 #include <errno.h>
 
 #include "basic/alloc-util.h"
-#include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "dbus-timer.h"
 #include "basic/fs-util.h"
 #include "basic/parse-util.h"
 #include "basic/random-util.h"
 #include "basic/special.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
-#include "timer.h"
 #include "basic/unit-name.h"
-#include "unit.h"
 #include "basic/user-util.h"
 #include "basic/virt.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+
+#include "dbus-timer.h"
+#include "timer.h"
+#include "unit.h"
 
 static const UnitActiveState state_translation_table[_TIMER_STATE_MAX] = {
         [TIMER_DEAD] = UNIT_INACTIVE,

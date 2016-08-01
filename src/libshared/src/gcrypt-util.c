@@ -22,8 +22,8 @@
 #ifdef HAVE_GCRYPT
 #include <gcrypt.h>
 
-#include "gcrypt-util.h"
 #include "basic/hexdecoct.h"
+#include "shared/gcrypt-util.h"
 
 void initialize_libgcrypt(bool secmem) {
         const char *p;

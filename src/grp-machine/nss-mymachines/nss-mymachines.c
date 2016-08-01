@@ -24,7 +24,6 @@
 #include <systemd/sd-login.h>
 
 #include "basic/alloc-util.h"
-#include "bus-common-errors.h"
 #include "basic/hostname-util.h"
 #include "basic/in-addr-util.h"
 #include "basic/macro.h"
@@ -33,6 +32,7 @@
 #include "basic/string-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "sd-bus/bus-common-errors.h"
 
 NSS_GETHOSTBYNAME_PROTOTYPES(mymachines);
 NSS_GETPW_PROTOTYPES(mymachines);

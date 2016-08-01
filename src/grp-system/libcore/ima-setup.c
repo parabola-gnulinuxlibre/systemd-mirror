@@ -24,9 +24,10 @@
 
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
-#include "ima-setup.h"
 #include "basic/log.h"
 #include "basic/util.h"
+
+#include "ima-setup.h"
 
 #define IMA_SECFS_DIR "/sys/kernel/security/ima"
 #define IMA_SECFS_POLICY IMA_SECFS_DIR "/policy"

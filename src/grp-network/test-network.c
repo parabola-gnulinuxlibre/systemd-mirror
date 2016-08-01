@@ -18,9 +18,9 @@
 ***/
 
 #include "basic/alloc-util.h"
+#include "networkd.h"
 #include "systemd-network/dhcp-lease-internal.h"
 #include "systemd-network/network-internal.h"
-#include "networkd.h"
 
 static void test_deserialize_in_addr(void) {
         _cleanup_free_ struct in_addr *addresses = NULL;

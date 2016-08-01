@@ -21,8 +21,8 @@
 
 #include <systemd/sd-bus.h>
 
-#include "shared/output-mode.h"
 #include "shared/install.h"
+#include "shared/output-mode.h"
 
 typedef struct UnitInfo {
         const char *machine;

@@ -25,7 +25,6 @@
 
 #include "basic/alloc-util.h"
 #include "basic/conf-files.h"
-#include "shared/dropin.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"
 #include "basic/fileio-label.h"
@@ -38,6 +37,7 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
+#include "shared/dropin.h"
 
 int drop_in_file(const char *dir, const char *unit, unsigned level,
                  const char *name, char **_p, char **_q) {

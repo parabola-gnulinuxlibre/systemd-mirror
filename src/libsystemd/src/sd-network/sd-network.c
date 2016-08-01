@@ -23,8 +23,6 @@
 #include <string.h>
 #include <sys/inotify.h>
 
-#include "sd-network.h"
-
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
@@ -35,6 +33,8 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+
+#include "sd-network.h"
 
 _public_ int sd_network_get_operational_state(char **state) {
         _cleanup_free_ char *s = NULL;

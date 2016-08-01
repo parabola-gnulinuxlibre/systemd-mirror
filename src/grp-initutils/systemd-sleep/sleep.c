@@ -28,10 +28,10 @@
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/log.h"
-#include "shared/sleep-config.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "shared/sleep-config.h"
 
 static char* arg_verb = NULL;
 

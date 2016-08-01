@@ -32,11 +32,11 @@
 #include "basic/locale-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
-#include "shared/pager.h"
 #include "basic/process-util.h"
 #include "basic/signal-util.h"
 #include "basic/string-util.h"
 #include "basic/terminal-util.h"
+#include "shared/pager.h"
 
 static pid_t pager_pid = 0;
 

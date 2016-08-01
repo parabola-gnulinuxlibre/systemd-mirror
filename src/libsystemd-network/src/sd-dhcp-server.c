@@ -20,15 +20,14 @@
 
 #include <sys/ioctl.h>
 
-#include "systemd-network/sd-dhcp-server.h"
-
 #include "basic/alloc-util.h"
-#include "systemd-network/dhcp-internal.h"
-#include "systemd-network/dhcp-server-internal.h"
 #include "basic/fd-util.h"
 #include "basic/in-addr-util.h"
 #include "basic/siphash24.h"
 #include "basic/string-util.h"
+#include "systemd-network/dhcp-internal.h"
+#include "systemd-network/dhcp-server-internal.h"
+#include "systemd-network/sd-dhcp-server.h"
 
 #define DHCP_DEFAULT_LEASE_TIME_USEC USEC_PER_HOUR
 #define DHCP_MAX_LEASE_TIME_USEC (USEC_PER_HOUR*12)

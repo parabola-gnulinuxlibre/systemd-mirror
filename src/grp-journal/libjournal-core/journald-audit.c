@@ -18,13 +18,14 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "sd-journal/audit-type.h"
 #include "basic/fd-util.h"
 #include "basic/hexdecoct.h"
 #include "basic/io-util.h"
-#include "journald-audit.h"
 #include "basic/missing.h"
 #include "basic/string-util.h"
+#include "sd-journal/audit-type.h"
+
+#include "journald-audit.h"
 
 typedef struct MapField {
         const char *audit_field;

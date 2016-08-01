@@ -18,11 +18,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-netlink.h"
-
 #include "basic/alloc-util.h"
-#include "local-addresses.h"
 #include "basic/macro.h"
+
+#include "local-addresses.h"
+#include "sd-netlink.h"
 
 static int address_compare(const void *_a, const void *_b) {
         const struct local_address *a = _a, *b = _b;

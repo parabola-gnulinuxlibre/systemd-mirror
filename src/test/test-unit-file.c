@@ -31,18 +31,19 @@
 #include "basic/fileio.h"
 #include "basic/hashmap.h"
 #include "basic/hostname-util.h"
-#include "shared/install-printf.h"
-#include "shared/install.h"
-#include "load-fragment.h"
 #include "basic/macro.h"
 #include "basic/rm-rf.h"
-#include "shared/specifier.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
-#include "test-helper.h"
-#include "shared/tests.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "load-fragment.h"
+#include "shared/install-printf.h"
+#include "shared/install.h"
+#include "shared/specifier.h"
+#include "shared/tests.h"
+
+#include "test-helper.h"
 
 static int test_unit_file_get_set(void) {
         int r;

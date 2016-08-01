@@ -27,9 +27,9 @@
 #include <systemd/sd-journal.h>
 
 #include "basic/macro.h"
-#include "shared/output-mode.h"
 #include "basic/time-util.h"
 #include "basic/util.h"
+#include "shared/output-mode.h"
 
 int output_journal(
                 FILE *f,

@@ -24,9 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "systemd-network/sd-ipv4acd.h"
-#include "systemd-network/sd-ipv4ll.h"
-
 #include "basic/alloc-util.h"
 #include "basic/in-addr-util.h"
 #include "basic/list.h"
@@ -35,6 +32,8 @@
 #include "basic/siphash24.h"
 #include "basic/sparse-endian.h"
 #include "basic/util.h"
+#include "systemd-network/sd-ipv4acd.h"
+#include "systemd-network/sd-ipv4ll.h"
 
 #define IPV4LL_NETWORK 0xA9FE0000L
 #define IPV4LL_NETMASK 0xFFFF0000L

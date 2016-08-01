@@ -30,9 +30,6 @@
 
 #include "basic/alloc-util.h"
 #include "basic/audit-util.h"
-#include "bus-common-errors.h"
-#include "bus-error.h"
-#include "shared/bus-util.h"
 #include "basic/def.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
@@ -45,6 +42,9 @@
 #include "basic/strv.h"
 #include "basic/terminal-util.h"
 #include "basic/util.h"
+#include "sd-bus/bus-common-errors.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
 
 static int parse_argv(
                 pam_handle_t *handle,

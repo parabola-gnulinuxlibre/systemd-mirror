@@ -22,19 +22,20 @@
 
 #include "basic/alloc-util.h"
 #include "basic/conf-files.h"
-#include "shared/conf-parser.h"
-#include "shared/dns-domain.h"
 #include "basic/fd-util.h"
 #include "basic/hostname-util.h"
-#include "systemd-network/network-internal.h"
-#include "networkd-network.h"
-#include "networkd.h"
 #include "basic/parse-util.h"
 #include "basic/set.h"
 #include "basic/stat-util.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "shared/conf-parser.h"
+#include "shared/dns-domain.h"
+#include "systemd-network/network-internal.h"
+
+#include "networkd-network.h"
+#include "networkd.h"
 
 static int network_load_one(Manager *manager, const char *filename) {
         _cleanup_network_free_ Network *network = NULL;

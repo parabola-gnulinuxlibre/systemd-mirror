@@ -43,7 +43,6 @@
 #include "basic/fs-util.h"
 #include "basic/lockfile-util.h"
 #include "basic/log.h"
-#include "shared/machine-pool.h"
 #include "basic/macro.h"
 #include "basic/missing.h"
 #include "basic/mkdir.h"
@@ -54,6 +53,7 @@
 #include "basic/signal-util.h"
 #include "basic/stat-util.h"
 #include "basic/string-util.h"
+#include "shared/machine-pool.h"
 
 #define VAR_LIB_MACHINES_SIZE_START (1024UL*1024UL*500UL)
 #define VAR_LIB_MACHINES_FREE_MIN (1024UL*1024UL*750UL)

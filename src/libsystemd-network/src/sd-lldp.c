@@ -20,15 +20,14 @@
 
 #include <arpa/inet.h>
 
-#include "systemd-network/sd-lldp.h"
-
 #include "basic/alloc-util.h"
+#include "basic/ether-addr-util.h"
 #include "basic/fd-util.h"
+#include "basic/socket-util.h"
 #include "systemd-network/lldp-internal.h"
 #include "systemd-network/lldp-neighbor.h"
 #include "systemd-network/lldp-network.h"
-#include "basic/socket-util.h"
-#include "basic/ether-addr-util.h"
+#include "systemd-network/sd-lldp.h"
 
 #define LLDP_DEFAULT_NEIGHBORS_MAX 128U
 

@@ -19,18 +19,19 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/input.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <linux/input.h>
 
 #include <systemd/sd-messages.h>
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
-#include "logind-button.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+
+#include "logind-button.h"
 
 Button* button_new(Manager *m, const char *name) {
         Button *b;

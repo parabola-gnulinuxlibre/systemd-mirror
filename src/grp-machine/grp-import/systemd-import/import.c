@@ -25,13 +25,14 @@
 #include "basic/fd-util.h"
 #include "basic/fs-util.h"
 #include "basic/hostname-util.h"
-#include "import-raw.h"
-#include "import-tar.h"
-#include "shared/import-util.h"
-#include "shared/machine-image.h"
 #include "basic/signal-util.h"
 #include "basic/string-util.h"
 #include "basic/verbs.h"
+#include "shared/import-util.h"
+#include "shared/machine-image.h"
+
+#include "import-raw.h"
+#include "import-tar.h"
 
 static bool arg_force = false;
 static bool arg_read_only = false;

@@ -32,9 +32,10 @@
 #include "basic/fileio.h"
 #include "basic/log.h"
 #include "basic/macro.h"
-#include "smack-setup.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+
+#include "smack-setup.h"
 
 #ifdef HAVE_SMACK
 

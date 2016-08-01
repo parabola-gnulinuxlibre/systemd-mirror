@@ -20,8 +20,8 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "basic/fileio.h"
 #include "basic/fileio-label.h"
+#include "basic/fileio.h"
 #include "basic/log.h"
 #include "basic/selinux-util.h"
 #include "basic/string-util.h"

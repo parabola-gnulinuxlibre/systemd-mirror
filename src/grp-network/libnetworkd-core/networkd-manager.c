@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
  ***/
 
-#include <sys/socket.h>
 #include <linux/if.h>
+#include <sys/socket.h>
 
 #include <systemd/sd-daemon.h>
 
@@ -30,15 +30,15 @@
 #include "basic/path-util.h"
 #include "basic/set.h"
 #include "basic/virt.h"
+#include "libudev-private.h"
+#include "sd-netlink/local-addresses.h"
+#include "sd-netlink/netlink-util.h"
 #include "sd-netlink/sd-netlink.h"
 #include "shared/bus-util.h"
 #include "shared/conf-parser.h"
 #include "shared/dns-domain.h"
 #include "shared/udev-util.h"
 
-#include "libudev-private.h"
-#include "local-addresses.h"
-#include "netlink-util.h"
 #include "networkd.h"
 
 /* use 8 MB for receive socket kernel queue. */

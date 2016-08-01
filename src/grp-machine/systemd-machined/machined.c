@@ -24,17 +24,17 @@
 #include <systemd/sd-daemon.h>
 
 #include "basic/alloc-util.h"
-#include "bus-error.h"
-#include "shared/bus-util.h"
 #include "basic/cgroup-util.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
 #include "basic/formats-util.h"
 #include "basic/hostname-util.h"
 #include "basic/label.h"
-#include "shared/machine-image.h"
-#include "machined.h"
 #include "basic/signal-util.h"
+#include "machined.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-util.h"
+#include "shared/machine-image.h"
 
 Manager *manager_new(void) {
         Manager *m;

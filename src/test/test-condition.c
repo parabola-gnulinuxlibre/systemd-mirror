@@ -20,17 +20,17 @@
 #include <systemd/sd-id128.h>
 
 #include "basic/alloc-util.h"
-#include "shared/apparmor-util.h"
 #include "basic/architecture.h"
 #include "basic/audit-util.h"
-#include "shared/condition.h"
 #include "basic/hostname-util.h"
-#include "shared/ima-util.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/selinux-util.h"
 #include "basic/smack-util.h"
 #include "basic/util.h"
+#include "shared/apparmor-util.h"
+#include "shared/condition.h"
+#include "shared/ima-util.h"
 
 static void test_condition_test_path(void) {
         Condition *condition;

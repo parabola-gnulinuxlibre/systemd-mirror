@@ -19,8 +19,9 @@
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"
-#include "network-util.h"
 #include "basic/strv.h"
+
+#include "network-util.h"
 
 bool network_is_online(void) {
         _cleanup_free_ char *state = NULL;

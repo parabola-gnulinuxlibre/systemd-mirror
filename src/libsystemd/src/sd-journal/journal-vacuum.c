@@ -26,13 +26,14 @@
 #include "basic/alloc-util.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
-#include "journal-def.h"
-#include "journal-file.h"
-#include "journal-vacuum.h"
 #include "basic/parse-util.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
 #include "basic/xattr-util.h"
+
+#include "journal-def.h"
+#include "journal-file.h"
+#include "journal-vacuum.h"
 
 struct vacuum_info {
         uint64_t usage;

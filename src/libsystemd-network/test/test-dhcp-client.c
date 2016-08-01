@@ -22,15 +22,15 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#include "systemd-network/sd-dhcp-client.h"
 #include <systemd/sd-event.h>
 
 #include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/util.h"
 #include "systemd-network/dhcp-identifier.h"
 #include "systemd-network/dhcp-internal.h"
 #include "systemd-network/dhcp-protocol.h"
-#include "basic/fd-util.h"
-#include "basic/util.h"
+#include "systemd-network/sd-dhcp-client.h"
 
 static uint8_t mac_addr[] = {'A', 'B', 'C', '1', '2', '3'};
 

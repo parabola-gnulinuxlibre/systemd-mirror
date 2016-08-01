@@ -27,8 +27,8 @@
 #include <unistd.h>
 
 #include "basic/parse-util.h"
-#include "udev.h"
 #include "basic/util.h"
+#include "udev.h"
 
 static void help(void) {
         printf("%s settle OPTIONS\n\n"

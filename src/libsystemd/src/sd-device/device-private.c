@@ -22,12 +22,7 @@
 #include <net/if.h>
 #include <sys/types.h>
 
-#include "sd-device.h"
-
 #include "basic/alloc-util.h"
-#include "device-internal.h"
-#include "device-private.h"
-#include "device-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/fs-util.h"
@@ -44,6 +39,11 @@
 #include "basic/strxcpyx.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+
+#include "device-internal.h"
+#include "device-private.h"
+#include "device-util.h"
+#include "sd-device.h"
 
 int device_add_property(sd_device *device, const char *key, const char *value) {
         int r;

@@ -25,8 +25,8 @@
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/macro.h"
-#include "mmap-cache.h"
 #include "basic/util.h"
+#include "sd-journal/mmap-cache.h"
 
 int main(int argc, char *argv[]) {
         int x, y, z, r;

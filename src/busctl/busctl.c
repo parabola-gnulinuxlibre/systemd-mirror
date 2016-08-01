@@ -22,17 +22,10 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "sd-bus/bus-dump.h"
-#include "sd-bus/bus-internal.h"
-#include "sd-bus/bus-signature.h"
-#include "sd-bus/bus-type.h"
-#include "shared/bus-util.h"
-#include "busctl-introspect.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"
 #include "basic/locale-util.h"
 #include "basic/log.h"
-#include "shared/pager.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/set.h"
@@ -40,6 +33,14 @@
 #include "basic/terminal-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "sd-bus/bus-dump.h"
+#include "sd-bus/bus-internal.h"
+#include "sd-bus/bus-signature.h"
+#include "sd-bus/bus-type.h"
+#include "shared/bus-util.h"
+#include "shared/pager.h"
+
+#include "busctl-introspect.h"
 
 static bool arg_no_pager = false;
 static bool arg_legend = true;

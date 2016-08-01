@@ -31,10 +31,12 @@
 
 
 #include <stddef.h>
-#include <sys/socket.h>
-#include "shared/conf-parser.h"
-#include "journald-server.h"
 #include <string.h>
+#include <sys/socket.h>
+
+#include "shared/conf-parser.h"
+
+#include "journald-server.h"
 
 #define TOTAL_KEYWORDS 28
 #define MIN_WORD_LENGTH 12

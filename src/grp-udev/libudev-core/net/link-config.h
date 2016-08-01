@@ -19,11 +19,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "libudev.h"
+#include <libudev.h>
 
-#include "shared/condition.h"
-#include "ethtool-util.h"
 #include "basic/list.h"
+#include "shared/condition.h"
+
+#include "ethtool-util.h"
 
 typedef struct link_config_ctx link_config_ctx;
 typedef struct link_config link_config;

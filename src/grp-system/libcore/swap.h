@@ -20,7 +20,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "libudev.h"
+#include <libudev.h>
 
 typedef struct Swap Swap;
 

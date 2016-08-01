@@ -26,12 +26,12 @@
 #include "basic/conf-files.h"
 #include "basic/fileio.h"
 #include "basic/fs-util.h"
-#include "sd-hwdb/hwdb-internal.h"
-#include "sd-hwdb/hwdb-util.h"
 #include "basic/strbuf.h"
 #include "basic/string-util.h"
-#include "udev.h"
 #include "basic/util.h"
+#include "sd-hwdb/hwdb-internal.h"
+#include "sd-hwdb/hwdb-util.h"
+#include "udev.h"
 
 /*
  * Generic udev properties, key/value database based on modalias strings.

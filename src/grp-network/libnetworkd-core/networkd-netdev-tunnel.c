@@ -18,10 +18,10 @@
 ***/
 
 #include <arpa/inet.h>
-#include <net/if.h>
-#include <linux/ip.h>
 #include <linux/if_tunnel.h>
+#include <linux/ip.h>
 #include <linux/ip6_tunnel.h>
+#include <net/if.h>
 
 #include "basic/missing.h"
 #include "basic/parse-util.h"

@@ -18,11 +18,12 @@
 ***/
 
 #include "basic/alloc-util.h"
-#include "shared/dns-domain.h"
 #include "basic/list.h"
+#include "basic/string-util.h"
+#include "shared/dns-domain.h"
+
 #include "resolved-dns-packet.h"
 #include "resolved-dns-zone.h"
-#include "basic/string-util.h"
 
 /* Never allow more than 1K entries */
 #define ZONE_MAX 1024

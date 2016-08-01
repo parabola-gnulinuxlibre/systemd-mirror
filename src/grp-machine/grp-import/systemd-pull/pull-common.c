@@ -29,8 +29,6 @@
 #include "basic/io-util.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
-#include "pull-common.h"
-#include "pull-job.h"
 #include "basic/rm-rf.h"
 #include "basic/signal-util.h"
 #include "basic/siphash24.h"
@@ -38,6 +36,9 @@
 #include "basic/strv.h"
 #include "basic/util.h"
 #include "basic/web-util.h"
+
+#include "pull-common.h"
+#include "pull-job.h"
 
 #define FILENAME_ESCAPE "/.#\"\'"
 #define HASH_URL_THRESHOLD_LENGTH (_POSIX_PATH_MAX - 16)

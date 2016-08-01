@@ -40,7 +40,6 @@
 #include <unistd.h>
 
 #include "basic/alloc-util.h"
-#include "shared/ask-password-api.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/formats-util.h"
@@ -59,6 +58,7 @@
 #include "basic/umask-util.h"
 #include "basic/utf8.h"
 #include "basic/util.h"
+#include "shared/ask-password-api.h"
 
 #define KEYRING_TIMEOUT_USEC ((5 * USEC_PER_MINUTE) / 2)
 

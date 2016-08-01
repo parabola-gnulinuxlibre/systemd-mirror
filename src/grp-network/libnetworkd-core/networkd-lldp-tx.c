@@ -25,13 +25,14 @@
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/hostname-util.h"
-#include "networkd-lldp-tx.h"
-#include "networkd.h"
 #include "basic/parse-util.h"
 #include "basic/random-util.h"
 #include "basic/socket-util.h"
 #include "basic/string-util.h"
 #include "basic/unaligned.h"
+
+#include "networkd-lldp-tx.h"
+#include "networkd.h"
 
 /* The LLDP spec calls this "txFastInit", see 9.2.5.19 */
 #define LLDP_TX_FAST_INIT 4U

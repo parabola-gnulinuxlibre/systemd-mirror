@@ -36,7 +36,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "shared/acl-util.h"
 #include "basic/alloc-util.h"
 #include "basic/btrfs-util.h"
 #include "basic/capability-util.h"
@@ -62,7 +61,6 @@
 #include "basic/rm-rf.h"
 #include "basic/selinux-util.h"
 #include "basic/set.h"
-#include "shared/specifier.h"
 #include "basic/stat-util.h"
 #include "basic/stdio-util.h"
 #include "basic/string-table.h"
@@ -71,6 +69,8 @@
 #include "basic/umask-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "shared/acl-util.h"
+#include "shared/specifier.h"
 
 /* This reads all files listed in /etc/tmpfiles.d/?*.conf and creates
  * them in the file system. This is intended to be used to create

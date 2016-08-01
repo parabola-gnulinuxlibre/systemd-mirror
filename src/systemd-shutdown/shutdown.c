@@ -33,18 +33,19 @@
 #include "basic/cgroup-util.h"
 #include "basic/def.h"
 #include "basic/fileio.h"
-#include "killall.h"
 #include "basic/log.h"
 #include "basic/missing.h"
 #include "basic/parse-util.h"
 #include "basic/process-util.h"
 #include "basic/string-util.h"
-#include "shared/switch-root.h"
 #include "basic/terminal-util.h"
-#include "umount.h"
 #include "basic/util.h"
 #include "basic/virt.h"
+#include "shared/switch-root.h"
 #include "shared/watchdog.h"
+
+#include "killall.h"
+#include "umount.h"
 
 #define FINALIZE_ATTEMPTS 50
 

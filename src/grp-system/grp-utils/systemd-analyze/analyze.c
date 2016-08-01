@@ -26,15 +26,10 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "analyze-verify.h"
-#include "sd-bus/bus-error.h"
-#include "shared/bus-unit-util.h"
-#include "shared/bus-util.h"
 #include "basic/glob-util.h"
 #include "basic/hashmap.h"
 #include "basic/locale-util.h"
 #include "basic/log.h"
-#include "shared/pager.h"
 #include "basic/parse-util.h"
 #include "basic/special.h"
 #include "basic/strv.h"
@@ -42,6 +37,12 @@
 #include "basic/terminal-util.h"
 #include "basic/unit-name.h"
 #include "basic/util.h"
+#include "sd-bus/bus-error.h"
+#include "shared/bus-unit-util.h"
+#include "shared/bus-util.h"
+#include "shared/pager.h"
+
+#include "analyze-verify.h"
 
 #define SCALE_X (0.1 / 1000.0)   /* pixels per us */
 #define SCALE_Y (20.0)

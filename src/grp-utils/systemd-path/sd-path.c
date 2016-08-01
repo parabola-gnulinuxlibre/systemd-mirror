@@ -17,8 +17,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-path.h"
-
 #include "basic/alloc-util.h"
 #include "basic/architecture.h"
 #include "basic/fd-util.h"
@@ -29,6 +27,8 @@
 #include "basic/strv.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+
+#include "sd-path.h"
 
 static int from_environment(const char *envname, const char *fallback, const char **ret) {
         assert(ret);

@@ -22,11 +22,11 @@
 #include <stddef.h>
 #include <unistd.h>
 
-#include "shared/ask-password-api.h"
 #include "basic/def.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/strv.h"
+#include "shared/ask-password-api.h"
 
 static const char *arg_icon = NULL;
 static const char *arg_id = NULL;

@@ -22,12 +22,7 @@
 #include <net/if.h>
 #include <sys/types.h>
 
-#include "sd-device.h"
-
 #include "basic/alloc-util.h"
-#include "device-internal.h"
-#include "device-private.h"
-#include "device-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/fs-util.h"
@@ -41,6 +36,11 @@
 #include "basic/strv.h"
 #include "basic/strxcpyx.h"
 #include "basic/util.h"
+
+#include "device-internal.h"
+#include "device-private.h"
+#include "device-util.h"
+#include "sd-device.h"
 
 int device_new_aux(sd_device **ret) {
         _cleanup_(sd_device_unrefp) sd_device *device = NULL;

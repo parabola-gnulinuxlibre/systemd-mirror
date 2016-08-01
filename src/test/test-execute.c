@@ -26,13 +26,14 @@
 #include "basic/fileio.h"
 #include "basic/fs-util.h"
 #include "basic/macro.h"
-#include "manager.h"
 #include "basic/mkdir.h"
 #include "basic/path-util.h"
 #include "basic/rm-rf.h"
-#include "test-helper.h"
-#include "unit.h"
 #include "basic/util.h"
+#include "manager.h"
+#include "unit.h"
+
+#include "test-helper.h"
 
 typedef void (*test_function_t)(Manager *m);
 
