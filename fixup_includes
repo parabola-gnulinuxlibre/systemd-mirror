@@ -10,12 +10,15 @@ out() {
 }
 
 # system
+# linux
 # public
 # protected
 # private
 classify() {
         local path=$1
-        if [[ -f "${current_file%/*}/${path}" ]]; then
+        if [[ "$path" = linux/* ]]; then
+                out linux "$path"
+        elif [[ -f "${current_file%/*}/${path}" ]]; then
                 out private "$path"
         elif [[ "$path" != systemd/* ]] &&
              [[ "$path" != libudev.h ]] &&
@@ -24,7 +27,7 @@ classify() {
                 out system "$path"
         else
                 case "$path" in
-                        asm/sgidefs.h|dbus/dbus.h|efi.h|efilib.h|gio/gio.h|glib.h|libmount.h|linux/auto_dev-ioctl.h)
+                        asm/sgidefs.h|dbus/dbus.h|efi.h|efilib.h|gio/gio.h|glib.h|libmount.h)
                                 out system "$path"
                                 ;;
                         util.h|*/util.h)
@@ -61,7 +64,7 @@ classify() {
                                         esac
                                 else
                                         >&2 printf 'Cannot figure out: %q\n' "$path"
-                                        panic
+                                        exit 2
                                 fi
                                 ;;
                 esac
@@ -75,29 +78,32 @@ phase0() {
         phase=phase0
         hook=:
         local line="$1"
-        if [[ $line == '#include'* ]]; then
-                phase1 "$line"
-        else
-                printf '%s\n' "$line"
-        fi
+        case "$line" in
+                '#include'*|'typedef struct '*';')
+                        phase1 "$line"
+                        ;;
+                *)
+                        printf '%s\n' "$line"
+                        ;;
+        esac
 }
 
 phase1_tail=
 system=()
+linux=()
 public=()
 protected=()
+typedef=(); typedef_last=true
 private=()
 phase1_flush() {
         local b=:
         if [[ ${#system[@]} -gt 0 ]]; then
-                if printf '%s\n' "${system[@]}" | grep -F '<linux/if.h>' &>/dev/null; then
-                        # The include order for <linux/if.h> matters.  We could
-                        # try to sort it a bit, but let's just trust humans to
-                        # do that.
-                        printf '%s\n' "${system[@]}"
-                else
-                        printf '%s\n' "${system[@]}" | sort -u
-                fi
+                printf '%s\n' "${system[@]}" | sort -u
+                b=echo
+        fi
+        if [[ ${#linux[@]} -gt 0 ]]; then
+                $b
+                printf '%s\n' "${linux[@]}"
                 b=echo
         fi
         if [[ ${#public[@]} -gt 0 ]]; then
@@ -110,9 +116,19 @@ phase1_flush() {
                 printf '%s\n' "${protected[@]}" | sort -u
                 b=echo
         fi
+        if [[ ${#typedef[@]} -gt 0 ]] && ! $typedef_last; then
+                $b
+                printf '%s\n' "${typedef[@]}" | sort -u
+                b=echo
+        fi
         if [[ ${#private[@]} -gt 0 ]]; then
                 $b
                 printf '%s\n' "${private[@]}" | sort -u
+                b=echo
+        fi
+        if [[ ${#typedef[@]} -gt 0 ]] && $typedef_last; then
+                $b
+                printf '%s\n' "${typedef[@]}"
         fi
         printf '%s' "$phase1_tail"
 }
@@ -129,12 +145,18 @@ phase1() {
                         local re='^#include [<"]([^">]*)[">](.*)'
                         if [[ "$line" =~ $re ]]; then
                                 IFS=' '
-                                read -r class path < <(classify "${BASH_REMATCH[1]}")
+                                local buf
+                                buf="$(classify "${BASH_REMATCH[1]}")" || panic
+                                read -r class path <<<"$buf"
                                 case "$class" in
                                         system)
                                                 printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
                                                 system+=("$line")
                                                 ;;
+                                        linux)
+                                                printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
+                                                linux+=("$line")
+                                                ;;                                                
                                         public)
                                                 printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
                                                 public+=("$line")
@@ -144,6 +166,9 @@ phase1() {
                                                 protected+=("$line")
                                                 ;;
                                         private)
+                                                if [[ ${#typedef[@]} -gt 0 ]]; then
+                                                        typedef_last=false
+                                                fi
                                                 printf -v line '#include "%s"%s' "$path" "${BASH_REMATCH[2]}"
                                                 private+=("$line")
                                                 ;;
@@ -151,6 +176,10 @@ phase1() {
                         else
                                 panic
                         fi
+                        ;;
+                'typedef struct '*';')
+                        phase1_tail=''
+                        typedef+=("$line")
                         ;;
                 *)
                         phase1_flush
@@ -171,6 +200,7 @@ main() {
         current_file="$1"
         printf ' => %s\n' "$current_file"
         set -o pipefail
+        trap 'rm -f -- "$current_file.tmp"' EXIT
         {
                 IFS=''
                 while read -r line; do
