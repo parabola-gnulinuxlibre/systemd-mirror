@@ -25,8 +25,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <linux/auto_fs4.h>
 #include <linux/auto_dev-ioctl.h>
+#include <linux/auto_fs4.h>
 
 #include "basic/alloc-util.h"
 #include "basic/async.h"

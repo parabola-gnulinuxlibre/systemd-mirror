@@ -19,6 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <systemd/sd-event.h>
+
 typedef struct DnsTransaction DnsTransaction;
 typedef enum DnsTransactionState DnsTransactionState;
 typedef enum DnsTransactionSource DnsTransactionSource;
