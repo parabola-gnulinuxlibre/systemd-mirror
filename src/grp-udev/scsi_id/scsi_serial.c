@@ -20,8 +20,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
-#include <linux/bsg.h>
-#include <linux/types.h>
 #include <scsi/scsi.h>
 #include <scsi/sg.h>
 #include <stdio.h>
@@ -32,6 +30,9 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+
+#include <linux/bsg.h>
+#include <linux/types.h>
 
 #include <libudev.h>
 

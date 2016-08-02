@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct Transaction Transaction;
-
 #include "basic/hashmap.h"
+
+typedef struct Transaction Transaction;
 
 #include "job.h"
 #include "manager.h"

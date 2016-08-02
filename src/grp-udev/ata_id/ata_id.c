@@ -23,8 +23,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
-#include <linux/bsg.h>
-#include <linux/hdreg.h>
 #include <scsi/scsi.h>
 #include <scsi/scsi_ioctl.h>
 #include <scsi/sg.h>
@@ -36,6 +34,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <linux/bsg.h>
+#include <linux/hdreg.h>
 
 #include <libudev.h>
 

@@ -18,14 +18,15 @@
 ***/
 
 #include <errno.h>
-#include <linux/filter.h>
-#include <linux/if_infiniband.h>
-#include <linux/if_packet.h>
 #include <net/ethernet.h>
 #include <net/if_arp.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
+
+#include <linux/filter.h>
+#include <linux/if_infiniband.h>
+#include <linux/if_packet.h>
 
 #include "basic/fd-util.h"
 #include "basic/socket-util.h"

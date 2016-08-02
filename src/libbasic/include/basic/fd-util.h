@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <sys/socket.h>
 
-#include "basic/macro.h"
+#include "macro.h"
 
 /* Make sure we can distinguish fd 0 and NULL */
 #define FD_TO_PTR(fd) INT_TO_PTR((fd)+1)

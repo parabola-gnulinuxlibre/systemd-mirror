@@ -22,7 +22,7 @@
 #include <libintl.h>
 #include <stdbool.h>
 
-#include "basic/macro.h"
+#include "macro.h"
 
 typedef enum LocaleVariable {
         /* We don't list LC_ALL here on purpose. People should be

@@ -23,6 +23,13 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <net/ethernet.h>
+#include <stdlib.h>
+#include <sys/resource.h>
+#include <sys/syscall.h>
+#include <uchar.h>
+#include <unistd.h>
+
 #include <linux/audit.h>
 #include <linux/capability.h>
 #include <linux/if_link.h>
@@ -31,12 +38,6 @@
 #include <linux/neighbour.h>
 #include <linux/oom.h>
 #include <linux/rtnetlink.h>
-#include <net/ethernet.h>
-#include <stdlib.h>
-#include <sys/resource.h>
-#include <sys/syscall.h>
-#include <uchar.h>
-#include <unistd.h>
 
 #ifdef HAVE_AUDIT
 #include <libaudit.h>
@@ -50,7 +51,7 @@
 #include <linux/btrfs.h>
 #endif
 
-#include "basic/macro.h"
+#include "macro.h"
 
 #ifndef RLIMIT_RTTIME
 #define RLIMIT_RTTIME 15
@@ -1013,4 +1014,4 @@ typedef int32_t key_serial_t;
 
 #endif
 
-#include "basic/missing_syscall.h"
+#include "missing_syscall.h"

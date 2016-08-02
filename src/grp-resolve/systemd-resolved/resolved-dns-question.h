@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct DnsQuestion DnsQuestion;
-
 #include "basic/macro.h"
+
+typedef struct DnsQuestion DnsQuestion;
 
 #include "resolved-dns-rr.h"
 

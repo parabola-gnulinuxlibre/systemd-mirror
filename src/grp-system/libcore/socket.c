@@ -20,13 +20,14 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <linux/sctp.h>
 #include <mqueue.h>
 #include <netinet/tcp.h>
 #include <signal.h>
 #include <sys/epoll.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include <linux/sctp.h>
 
 #include "basic/alloc-util.h"
 #include "basic/copy.h"

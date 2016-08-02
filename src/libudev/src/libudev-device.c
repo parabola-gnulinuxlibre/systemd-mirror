@@ -22,7 +22,6 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <linux/sockios.h>
 #include <net/if.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -33,6 +32,8 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include <linux/sockios.h>
 
 #include <libudev.h>
 

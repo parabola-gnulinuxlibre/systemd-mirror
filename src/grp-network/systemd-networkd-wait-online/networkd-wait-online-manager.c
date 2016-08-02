@@ -17,9 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <netinet/ether.h>
-#include <linux/if.h>
 #include <fnmatch.h>
+#include <netinet/ether.h>
+
+#include <linux/if.h>
 
 #include "basic/alloc-util.h"
 #include "basic/time-util.h"

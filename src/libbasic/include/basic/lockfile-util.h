@@ -21,8 +21,8 @@
 
 #include <stddef.h>
 
-#include "basic/macro.h"
-#include "basic/missing.h"
+#include "macro.h"
+#include "missing.h"
 
 typedef struct LockFile {
         char *path;

@@ -20,14 +20,15 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <linux/kd.h>
-#include <linux/tiocl.h>
-#include <linux/vt.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+
+#include <linux/kd.h>
+#include <linux/tiocl.h>
+#include <linux/vt.h>
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"

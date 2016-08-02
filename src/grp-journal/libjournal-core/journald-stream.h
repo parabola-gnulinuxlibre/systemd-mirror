@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct StdoutStream StdoutStream;
-
 #include "basic/fdset.h"
+
+typedef struct StdoutStream StdoutStream;
 
 #include "journald-server.h"
 

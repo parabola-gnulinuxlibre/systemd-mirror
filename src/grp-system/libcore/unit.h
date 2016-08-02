@@ -23,15 +23,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "shared/condition.h"
-#include "shared/install.h"
 #include "basic/list.h"
 #include "basic/unit-name.h"
+#include "shared/condition.h"
+#include "shared/install.h"
 
 typedef struct Unit Unit;
-typedef struct UnitVTable UnitVTable;
 typedef struct UnitRef UnitRef;
 typedef struct UnitStatusMessageFormats UnitStatusMessageFormats;
+typedef struct UnitVTable UnitVTable;
 
 #include "failure-action.h"
 

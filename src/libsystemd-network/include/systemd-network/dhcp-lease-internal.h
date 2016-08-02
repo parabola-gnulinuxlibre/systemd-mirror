@@ -20,13 +20,15 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/if_packet.h>
 #include <stdint.h>
+
+#include <linux/if_packet.h>
 
 #include "basic/list.h"
 #include "basic/util.h"
-#include "systemd-network/dhcp-protocol.h"
-#include "systemd-network/sd-dhcp-client.h"
+
+#include "dhcp-protocol.h"
+#include "sd-dhcp-client.h"
 
 struct sd_dhcp_route {
         struct in_addr dst_addr;

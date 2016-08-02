@@ -18,9 +18,10 @@
 ***/
 
 #include <errno.h>
-#include <linux/netlink.h>
 #include <stdio.h>
 #include <sys/socket.h>
+
+#include <linux/netlink.h>
 
 #include "basic/alloc-util.h"
 #include "basic/audit-util.h"

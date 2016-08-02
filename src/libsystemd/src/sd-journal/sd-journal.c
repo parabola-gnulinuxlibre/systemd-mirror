@@ -20,12 +20,13 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
-#include <linux/magic.h>
 #include <poll.h>
 #include <stddef.h>
 #include <sys/inotify.h>
 #include <sys/vfs.h>
 #include <unistd.h>
+
+#include <linux/magic.h>
 
 #include <systemd/sd-journal.h>
 

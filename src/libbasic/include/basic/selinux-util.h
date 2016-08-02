@@ -23,7 +23,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#include "basic/macro.h"
+#include "macro.h"
 
 bool mac_selinux_use(void);
 bool mac_selinux_have(void);

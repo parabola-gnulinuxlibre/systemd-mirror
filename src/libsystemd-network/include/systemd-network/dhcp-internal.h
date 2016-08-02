@@ -20,14 +20,16 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/if_packet.h>
 #include <net/ethernet.h>
 #include <net/if_arp.h>
 #include <stdint.h>
 
+#include <linux/if_packet.h>
+
 #include "basic/socket-util.h"
-#include "systemd-network/dhcp-protocol.h"
-#include "systemd-network/sd-dhcp-client.h"
+
+#include "dhcp-protocol.h"
+#include "sd-dhcp-client.h"
 
 int dhcp_network_bind_raw_socket(int index, union sockaddr_union *link,
                                  uint32_t xid, const uint8_t *mac_addr,

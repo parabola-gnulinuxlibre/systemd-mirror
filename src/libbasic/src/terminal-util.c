@@ -20,9 +20,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <linux/kd.h>
-#include <linux/tiocl.h>
-#include <linux/vt.h>
 #include <poll.h>
 #include <signal.h>
 #include <stdarg.h>
@@ -37,6 +34,10 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
+
+#include <linux/kd.h>
+#include <linux/tiocl.h>
+#include <linux/vt.h>
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"

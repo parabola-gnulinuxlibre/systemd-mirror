@@ -17,8 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/rfkill.h>
 #include <poll.h>
+
+#include <linux/rfkill.h>
 
 #include <libudev.h>
 #include <systemd/sd-daemon.h>

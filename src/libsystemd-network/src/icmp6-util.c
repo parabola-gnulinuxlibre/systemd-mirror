@@ -18,7 +18,6 @@
 ***/
 
 #include <errno.h>
-#include <linux/if_packet.h>
 #include <netinet/icmp6.h>
 #include <netinet/in.h>
 #include <netinet/ip6.h>
@@ -27,6 +26,8 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <linux/if_packet.h>
 
 #include "basic/fd-util.h"
 #include "basic/socket-util.h"

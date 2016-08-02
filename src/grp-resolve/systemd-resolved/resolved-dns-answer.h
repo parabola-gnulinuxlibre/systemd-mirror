@@ -19,10 +19,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include "basic/macro.h"
+
 typedef struct DnsAnswer DnsAnswer;
 typedef struct DnsAnswerItem DnsAnswerItem;
-
-#include "basic/macro.h"
 
 #include "resolved-dns-rr.h"
 

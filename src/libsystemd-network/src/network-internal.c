@@ -18,8 +18,9 @@
 ***/
 
 #include <arpa/inet.h>
-#include <linux/if.h>
 #include <netinet/ether.h>
+
+#include <linux/if.h>
 
 #include "basic/alloc-util.h"
 #include "basic/ether-addr-util.h"

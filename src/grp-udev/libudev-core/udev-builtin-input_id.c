@@ -22,13 +22,14 @@
  */
 
 #include <errno.h>
-#include <linux/input.h>
-#include <linux/limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <linux/input.h>
+#include <linux/limits.h>
 
 #include "basic/fd-util.h"
 #include "basic/stdio-util.h"

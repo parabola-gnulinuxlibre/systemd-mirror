@@ -21,7 +21,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
-#include <linux/reboot.h>
 #include <locale.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -30,6 +29,8 @@
 #include <sys/reboot.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
+#include <linux/reboot.h>
 
 #include <systemd/sd-bus.h>
 #include <systemd/sd-daemon.h>

@@ -18,9 +18,10 @@
 ***/
 
 #include <errno.h>
-#include <linux/if_infiniband.h>
 #include <string.h>
 #include <sys/ioctl.h>
+
+#include <linux/if_infiniband.h>
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"

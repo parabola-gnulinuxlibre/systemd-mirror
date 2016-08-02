@@ -27,8 +27,8 @@
 #include "basic/macro.h"
 #include "basic/sparse-endian.h"
 
-typedef struct DnsPacketHeader DnsPacketHeader;
 typedef struct DnsPacket DnsPacket;
+typedef struct DnsPacketHeader DnsPacketHeader;
 
 #include "resolved-def.h"
 #include "resolved-dns-answer.h"

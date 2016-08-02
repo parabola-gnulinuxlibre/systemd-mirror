@@ -20,6 +20,7 @@
 #include <netinet/ether.h>
 #include <netinet/icmp6.h>
 #include <netinet/in.h>
+
 #include <linux/if.h>
 
 #include "systemd-network/sd-ndisc.h"

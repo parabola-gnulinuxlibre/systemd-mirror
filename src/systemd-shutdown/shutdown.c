@@ -19,7 +19,6 @@
 
 #include <errno.h>
 #include <getopt.h>
-#include <linux/reboot.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -28,6 +27,8 @@
 #include <sys/reboot.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include <linux/reboot.h>
 
 #include "basic/alloc-util.h"
 #include "basic/cgroup-util.h"

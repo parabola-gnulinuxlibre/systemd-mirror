@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#include "basic/macro.h"
+#include "macro.h"
 
 char octchar(int x) _const_;
 int unoctchar(char c) _const_;

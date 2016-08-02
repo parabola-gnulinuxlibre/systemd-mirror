@@ -20,11 +20,13 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <linux/auto_fs4.h>
 #include <sys/epoll.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include <linux/auto_fs4.h>
+#include <linux/auto_dev-ioctl.h>
 
 #include "basic/alloc-util.h"
 #include "basic/async.h"
@@ -47,7 +49,6 @@
 
 #include "automount.h"
 #include "dbus-automount.h"
-#include "linux/auto_dev-ioctl.h"
 #include "mount.h"
 #include "unit.h"
 

@@ -22,8 +22,9 @@
 #include <stdbool.h>
 
 #include "shared/condition.h"
-#include "systemd-network/sd-dhcp-lease.h"
 #include "udev.h"
+
+#include "sd-dhcp-lease.h"
 
 bool net_match_config(const struct ether_addr *match_mac,
                       char * const *match_path,

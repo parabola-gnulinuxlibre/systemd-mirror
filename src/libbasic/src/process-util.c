@@ -20,7 +20,6 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
-#include <linux/oom.h>
 #include <sched.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -33,6 +32,8 @@
 #include <sys/wait.h>
 #include <syslog.h>
 #include <unistd.h>
+
+#include <linux/oom.h>
 #ifdef HAVE_VALGRIND_VALGRIND_H
 #include <valgrind/valgrind.h>
 #endif

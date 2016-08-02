@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/macro.h"
+#include "macro.h"
 
 typedef enum ExtractFlags {
         EXTRACT_RELAX                    = 1,

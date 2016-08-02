@@ -17,8 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/audit.h>
 #include <stdio.h>
+
+#include <linux/audit.h>
 
 #include "sd-journal/audit-type.h"
 

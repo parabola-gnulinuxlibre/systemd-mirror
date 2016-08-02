@@ -17,11 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/input.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+
+#include <linux/input.h>
 
 #include "basic/fd-util.h"
 #include "basic/parse-util.h"

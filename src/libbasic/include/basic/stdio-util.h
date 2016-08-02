@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#include "basic/macro.h"
+#include "macro.h"
 
 #define xsprintf(buf, fmt, ...) \
         assert_message_se((size_t) snprintf(buf, ELEMENTSOF(buf), fmt, __VA_ARGS__) < ELEMENTSOF(buf), "xsprintf: " #buf "[] must be big enough")

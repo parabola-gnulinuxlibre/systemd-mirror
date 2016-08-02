@@ -18,6 +18,7 @@
 ***/
 
 #include <fcntl.h>
+
 #include <linux/magic.h>
 #ifdef HAVE_ACL
 #include <sys/acl.h>

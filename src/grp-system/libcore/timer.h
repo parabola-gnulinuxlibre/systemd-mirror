@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct Timer Timer;
-
 #include "basic/calendarspec.h"
+
+typedef struct Timer Timer;
 
 typedef enum TimerBase {
         TIMER_ACTIVE,

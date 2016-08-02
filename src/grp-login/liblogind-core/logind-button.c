@@ -19,10 +19,11 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <linux/input.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+
+#include <linux/input.h>
 
 #include <systemd/sd-messages.h>
 

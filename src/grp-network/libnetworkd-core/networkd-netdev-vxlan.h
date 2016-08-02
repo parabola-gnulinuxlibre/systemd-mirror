@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct VxLan VxLan;
-
 #include "basic/in-addr-util.h"
+
+typedef struct VxLan VxLan;
 
 #include "networkd-netdev.h"
 

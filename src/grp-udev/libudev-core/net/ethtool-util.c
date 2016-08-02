@@ -17,10 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/ethtool.h>
-#include <linux/sockios.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
+
+#include <linux/ethtool.h>
+#include <linux/sockios.h>
 
 #include "basic/log.h"
 #include "basic/string-table.h"

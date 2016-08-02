@@ -19,6 +19,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "shared/install.h"
+#include "install.h"
 
 int install_full_printf(UnitFileInstallInfo *i, const char *format, char **ret);

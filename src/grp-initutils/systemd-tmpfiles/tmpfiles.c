@@ -25,7 +25,6 @@
 #include <getopt.h>
 #include <glob.h>
 #include <limits.h>
-#include <linux/fs.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -35,6 +34,8 @@
 #include <sys/xattr.h>
 #include <time.h>
 #include <unistd.h>
+
+#include <linux/fs.h>
 
 #include "basic/alloc-util.h"
 #include "basic/btrfs-util.h"

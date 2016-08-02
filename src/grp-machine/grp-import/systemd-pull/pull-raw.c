@@ -18,8 +18,9 @@
 ***/
 
 #include <curl/curl.h>
-#include <linux/fs.h>
 #include <sys/xattr.h>
+
+#include <linux/fs.h>
 
 #include <systemd/sd-daemon.h>
 

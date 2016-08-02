@@ -23,7 +23,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "basic/macro.h"
+#include "macro.h"
 
 static inline void umaskp(mode_t *u) {
         umask(*u);

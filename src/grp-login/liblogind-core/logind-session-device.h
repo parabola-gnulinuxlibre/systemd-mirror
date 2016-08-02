@@ -20,10 +20,10 @@
 ***/
 
 typedef enum DeviceType DeviceType;
-typedef struct SessionDevice SessionDevice;
-
 #include "basic/list.h"
 #include "logind.h"
+
+typedef struct SessionDevice SessionDevice;
 
 enum DeviceType {
         DEVICE_TYPE_UNKNOWN,

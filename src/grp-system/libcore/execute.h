@@ -19,12 +19,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct ExecStatus ExecStatus;
-typedef struct ExecCommand ExecCommand;
-typedef struct ExecContext ExecContext;
-typedef struct ExecRuntime ExecRuntime;
-typedef struct ExecParameters ExecParameters;
-
 #include <sched.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -33,6 +27,12 @@ typedef struct ExecParameters ExecParameters;
 #include "basic/fdset.h"
 #include "basic/list.h"
 #include "basic/missing.h"
+
+typedef struct ExecCommand ExecCommand;
+typedef struct ExecContext ExecContext;
+typedef struct ExecParameters ExecParameters;
+typedef struct ExecRuntime ExecRuntime;
+typedef struct ExecStatus ExecStatus;
 
 #include "namespace.h"
 

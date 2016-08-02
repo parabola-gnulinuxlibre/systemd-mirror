@@ -21,10 +21,11 @@
 
 #include <stdbool.h>
 
+#include "basic/macro.h"
+
 typedef struct LookupPaths LookupPaths;
 
-#include "shared/install.h"
-#include "basic/macro.h"
+#include "install.h"
 
 typedef enum LookupPathsFlags {
         LOOKUP_PATHS_EXCLUDE_GENERATED = 1,

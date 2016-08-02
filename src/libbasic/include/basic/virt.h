@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-#include "basic/macro.h"
+#include "macro.h"
 
 enum {
         VIRTUALIZATION_NONE = 0,

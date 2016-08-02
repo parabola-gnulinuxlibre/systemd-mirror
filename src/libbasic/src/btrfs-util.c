@@ -20,7 +20,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
-#include <linux/loop.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +29,8 @@
 #include <sys/statfs.h>
 #include <sys/sysmacros.h>
 #include <unistd.h>
+
+#include <linux/loop.h>
 
 #ifdef HAVE_LINUX_BTRFS_H
 #include <linux/btrfs.h>

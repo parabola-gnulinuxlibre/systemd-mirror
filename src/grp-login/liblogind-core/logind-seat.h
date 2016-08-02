@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct Seat Seat;
-
 #include "basic/list.h"
+
+typedef struct Seat Seat;
 
 #include "logind-session.h"
 

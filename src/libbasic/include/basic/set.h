@@ -19,8 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/hashmap.h"
-#include "basic/macro.h"
+#include "hashmap.h"
+#include "macro.h"
 
 Set *internal_set_new(const struct hash_ops *hash_ops  HASHMAP_DEBUG_PARAMS);
 #define set_new(ops) internal_set_new(ops  HASHMAP_DEBUG_SRC_ARGS)

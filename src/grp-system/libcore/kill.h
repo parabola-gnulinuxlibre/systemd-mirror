@@ -19,12 +19,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct KillContext KillContext;
-
 #include <stdbool.h>
 #include <stdio.h>
 
 #include "basic/macro.h"
+
+typedef struct KillContext KillContext;
 
 typedef enum KillMode {
         /* The kill mode is a property of a unit. */

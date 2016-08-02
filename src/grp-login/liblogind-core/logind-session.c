@@ -19,12 +19,13 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <linux/kd.h>
-#include <linux/vt.h>
 #include <signal.h>
 #include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+
+#include <linux/kd.h>
+#include <linux/vt.h>
 
 #include <systemd/sd-messages.h>
 

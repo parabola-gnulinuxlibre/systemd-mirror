@@ -17,8 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/veth.h>
 #include <net/if.h>
+
+#include <linux/veth.h>
 
 #include <libudev.h>
 #include <systemd/sd-id128.h>

@@ -17,8 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/magic.h>
 #include <sys/mount.h>
+
+#include <linux/magic.h>
 
 #include "basic/alloc-util.h"
 #include "basic/cgroup-util.h"

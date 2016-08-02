@@ -25,10 +25,9 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 
-#include <systemd/sd-event.h>
-#include <systemd/sd-id128.h>
-
 #include "_sd-common.h"
+#include "sd-event.h"
+#include "sd-id128.h"
 
 _SD_BEGIN_DECLARATIONS;
 
@@ -107,8 +106,8 @@ typedef int (*sd_bus_object_find_t) (sd_bus *bus, const char *path, const char *
 typedef int (*sd_bus_node_enumerator_t) (sd_bus *bus, const char *prefix, void *userdata, char ***ret_nodes, sd_bus_error *ret_error);
 typedef int (*sd_bus_track_handler_t) (sd_bus_track *track, void *userdata);
 
-#include <systemd/sd-bus-protocol.h>
-#include <systemd/sd-bus-vtable.h>
+#include <sd-bus-protocol.h>
+#include <sd-bus-vtable.h>
 
 /* Connections */
 

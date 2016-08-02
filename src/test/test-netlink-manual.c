@@ -19,9 +19,10 @@
 
 #include <arpa/inet.h>
 #include <libkmod.h>
+#include <net/if.h>
+
 #include <linux/if_tunnel.h>
 #include <linux/ip.h>
-#include <net/if.h>
 
 #include "basic/macro.h"
 #include "basic/util.h"

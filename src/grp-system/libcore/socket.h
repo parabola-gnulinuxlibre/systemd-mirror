@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct Socket Socket;
-
 #include "basic/socket-util.h"
+
+typedef struct Socket Socket;
 
 #include "mount.h"
 #include "service.h"

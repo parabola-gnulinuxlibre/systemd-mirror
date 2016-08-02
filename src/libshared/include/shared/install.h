@@ -24,17 +24,18 @@ typedef enum UnitFileState UnitFileState;
 typedef enum UnitFilePresetMode UnitFilePresetMode;
 typedef enum UnitFileChangeType UnitFileChangeType;
 typedef enum UnitFileType UnitFileType;
-typedef struct UnitFileChange UnitFileChange;
-typedef struct UnitFileList UnitFileList;
-typedef struct UnitFileInstallInfo UnitFileInstallInfo;
-
 #include <stdbool.h>
 
 #include "basic/hashmap.h"
 #include "basic/macro.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
-#include "shared/path-lookup.h"
+
+typedef struct UnitFileChange UnitFileChange;
+typedef struct UnitFileInstallInfo UnitFileInstallInfo;
+typedef struct UnitFileList UnitFileList;
+
+#include "path-lookup.h"
 
 enum UnitFileScope {
         UNIT_FILE_SYSTEM,

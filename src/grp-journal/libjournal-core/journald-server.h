@@ -24,13 +24,14 @@
 
 #include <systemd/sd-event.h>
 
+#include "basic/hashmap.h"
+#include "basic/list.h"
+#include "sd-journal/journal-file.h"
+
 typedef struct Server Server;
 
-#include "basic/hashmap.h"
-#include "sd-journal/journal-file.h"
 #include "journald-rate-limit.h"
 #include "journald-stream.h"
-#include "basic/list.h"
 
 typedef enum Storage {
         STORAGE_AUTO,

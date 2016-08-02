@@ -24,8 +24,8 @@
 #include <stdint.h>
 #include <uchar.h>
 
-#include "basic/macro.h"
-#include "basic/missing.h"
+#include "macro.h"
+#include "missing.h"
 
 #define UTF8_REPLACEMENT_CHARACTER "\xef\xbf\xbd"
 #define UTF8_BYTE_ORDER_MARK "\xef\xbb\xbf"

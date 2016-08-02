@@ -18,13 +18,14 @@
 ***/
 
 #include <errno.h>
-#include <linux/if_infiniband.h>
 #include <net/ethernet.h>
 #include <net/if_arp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+
+#include <linux/if_infiniband.h>
 
 #include "basic/alloc-util.h"
 #include "basic/async.h"

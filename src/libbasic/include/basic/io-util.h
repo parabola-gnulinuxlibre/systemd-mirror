@@ -25,8 +25,8 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 
-#include "basic/macro.h"
-#include "basic/time-util.h"
+#include "macro.h"
+#include "time-util.h"
 
 int flush_fd(int fd);
 

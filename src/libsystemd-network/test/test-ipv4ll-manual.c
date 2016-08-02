@@ -18,10 +18,11 @@
 ***/
 
 #include <errno.h>
-#include <linux/veth.h>
 #include <net/if.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#include <linux/veth.h>
 
 #include <systemd/sd-event.h>
 

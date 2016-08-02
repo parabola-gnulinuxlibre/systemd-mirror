@@ -21,7 +21,7 @@
 
 #include <sys/resource.h>
 
-#include "basic/macro.h"
+#include "macro.h"
 
 const char *rlimit_to_string(int i) _const_;
 int rlimit_from_string(const char *s) _pure_;

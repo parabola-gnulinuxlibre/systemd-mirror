@@ -18,8 +18,9 @@
 ***/
 
 #include <netinet/ether.h>
-#include <linux/if.h>
 #include <unistd.h>
+
+#include <linux/if.h>
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"

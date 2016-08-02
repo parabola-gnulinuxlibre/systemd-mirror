@@ -19,10 +19,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct User User;
-
 #include "basic/list.h"
 #include "logind.h"
+
+typedef struct User User;
 
 typedef enum UserState {
         USER_OFFLINE,    /* Not logged in at all */

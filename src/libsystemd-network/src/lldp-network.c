@@ -18,8 +18,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/filter.h>
 #include <netinet/if_ether.h>
+
+#include <linux/filter.h>
 
 #include "basic/fd-util.h"
 #include "basic/socket-util.h"

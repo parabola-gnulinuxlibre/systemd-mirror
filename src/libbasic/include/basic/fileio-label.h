@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 
-#include "basic/fileio.h"
+#include "fileio.h"
 
 int write_string_file_atomic_label(const char *fn, const char *line);
 int write_env_file_label(const char *fname, char **l);

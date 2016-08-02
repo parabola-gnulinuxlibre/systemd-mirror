@@ -32,7 +32,7 @@ typedef uint64_t nsec_t;
 #define NSEC_FMT "%" PRIu64
 #define USEC_FMT "%" PRIu64
 
-#include "basic/macro.h"
+#include "macro.h"
 
 typedef struct dual_timestamp {
         usec_t realtime;

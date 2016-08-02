@@ -26,9 +26,8 @@
 
 #include <systemd/sd-event.h>
 
-#include "systemd-network/sd-dhcp6-lease.h"
-
 #include "_sd-common.h"
+#include "sd-dhcp6-lease.h"
 
 _SD_BEGIN_DECLARATIONS;
 

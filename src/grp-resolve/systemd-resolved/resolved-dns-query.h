@@ -24,13 +24,13 @@
 
 #include "basic/set.h"
 
-typedef struct DnsQueryCandidate DnsQueryCandidate;
 typedef struct DnsQuery DnsQuery;
+typedef struct DnsQueryCandidate DnsQueryCandidate;
 
 #include "resolved-dns-answer.h"
 #include "resolved-dns-question.h"
-#include "resolved-dns-stream.h"
 #include "resolved-dns-search-domain.h"
+#include "resolved-dns-stream.h"
 
 struct DnsQueryCandidate {
         DnsQuery *query;

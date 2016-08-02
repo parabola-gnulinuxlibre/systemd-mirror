@@ -25,8 +25,8 @@
 #include <sys/types.h>
 #include <uchar.h>
 
-#include "basic/missing.h"
-#include "basic/string-util.h"
+#include "missing.h"
+#include "string-util.h"
 
 /* What characters are special in the shell? */
 /* must be escaped outside and inside double-quotes */

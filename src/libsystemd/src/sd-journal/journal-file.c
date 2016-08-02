@@ -19,13 +19,14 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <linux/fs.h>
 #include <pthread.h>
 #include <stddef.h>
 #include <sys/mman.h>
 #include <sys/statvfs.h>
 #include <sys/uio.h>
 #include <unistd.h>
+
+#include <linux/fs.h>
 
 #include <systemd/sd-event.h>
 

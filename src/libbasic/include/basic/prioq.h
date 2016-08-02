@@ -21,8 +21,8 @@
 
 #include <stdbool.h>
 
-#include "basic/hashmap.h"
-#include "basic/macro.h"
+#include "hashmap.h"
+#include "macro.h"
 
 typedef struct Prioq Prioq;
 

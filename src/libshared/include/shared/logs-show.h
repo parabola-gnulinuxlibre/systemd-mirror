@@ -29,7 +29,8 @@
 #include "basic/macro.h"
 #include "basic/time-util.h"
 #include "basic/util.h"
-#include "shared/output-mode.h"
+
+#include "output-mode.h"
 
 int output_journal(
                 FILE *f,

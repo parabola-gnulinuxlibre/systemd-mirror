@@ -18,8 +18,6 @@
 ***/
 
 #include <errno.h>
-#include <linux/filter.h>
-#include <linux/netlink.h>
 #include <poll.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -27,6 +25,9 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
+#include <linux/filter.h>
+#include <linux/netlink.h>
 
 #include <libudev.h>
 

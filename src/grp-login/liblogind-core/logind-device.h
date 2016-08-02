@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct Device Device;
-
 #include "basic/list.h"
+
+typedef struct Device Device;
 
 #include "logind-seat.h"
 #include "logind-session-device.h"

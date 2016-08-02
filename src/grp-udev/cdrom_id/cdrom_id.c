@@ -21,7 +21,6 @@
 #include <fcntl.h>
 #include <getopt.h>
 #include <limits.h>
-#include <linux/cdrom.h>
 #include <scsi/sg.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -33,6 +32,8 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+
+#include <linux/cdrom.h>
 
 #include <libudev.h>
 

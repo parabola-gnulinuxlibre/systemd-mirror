@@ -19,7 +19,6 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <linux/loop.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -32,6 +31,8 @@
 #include <sys/statfs.h>
 #include <sys/statvfs.h>
 #include <unistd.h>
+
+#include <linux/loop.h>
 
 #include <systemd/sd-bus-protocol.h>
 #include <systemd/sd-bus.h>

@@ -26,7 +26,7 @@
 #include <sys/types.h>
 #include <sys/vfs.h>
 
-#include "basic/macro.h"
+#include "macro.h"
 
 int is_symlink(const char *path);
 int is_dir(const char *path, bool follow);

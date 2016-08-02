@@ -27,9 +27,8 @@
 
 #include <systemd/sd-event.h>
 
-#include "systemd-network/sd-dhcp-lease.h"
-
 #include "_sd-common.h"
+#include "sd-dhcp-lease.h"
 
 _SD_BEGIN_DECLARATIONS;
 

@@ -19,11 +19,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct AddressPool AddressPool;
-
 #include "basic/in-addr-util.h"
 #include "basic/list.h"
 
+typedef struct AddressPool AddressPool;
 typedef struct Manager Manager;
 
 struct AddressPool {

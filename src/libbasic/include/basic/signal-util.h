@@ -21,7 +21,7 @@
 
 #include <signal.h>
 
-#include "basic/macro.h"
+#include "macro.h"
 
 int reset_all_signal_handlers(void);
 int reset_signal_mask(void);

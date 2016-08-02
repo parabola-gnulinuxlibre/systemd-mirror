@@ -17,8 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/capability.h>
 #include <stdlib.h>
+
+#include <linux/capability.h>
 
 #include "basic/alloc-util.h"
 #include "basic/audit-util.h"

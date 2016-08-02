@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/hashmap.h"
+#include "hashmap.h"
 
 typedef struct OrderedSet OrderedSet;
 

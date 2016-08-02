@@ -19,11 +19,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct Service Service;
-typedef struct ServiceFDStore ServiceFDStore;
-
 #include "basic/exit-status.h"
 #include "basic/ratelimit.h"
+
+typedef struct Service Service;
+typedef struct ServiceFDStore ServiceFDStore;
 
 #include "kill.h"
 #include "path.h"

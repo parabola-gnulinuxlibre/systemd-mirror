@@ -18,10 +18,11 @@
 ***/
 
 #include <fcntl.h>
-#include <linux/vt.h>
 #include <pwd.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
+
+#include <linux/vt.h>
 
 #include "basic/alloc-util.h"
 #include "basic/cgroup-util.h"

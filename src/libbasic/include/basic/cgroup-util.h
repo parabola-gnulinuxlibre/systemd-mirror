@@ -25,10 +25,10 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#include "basic/def.h"
-#include "basic/hashmap.h"
-#include "basic/macro.h"
-#include "basic/set.h"
+#include "def.h"
+#include "hashmap.h"
+#include "macro.h"
+#include "set.h"
 
 /* An enum of well known cgroup controllers */
 typedef enum CGroupController {

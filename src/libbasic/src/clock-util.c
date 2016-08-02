@@ -20,12 +20,13 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <linux/rtc.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <time.h>
+
+#include <linux/rtc.h>
 
 #include "basic/clock-util.h"
 #include "basic/fd-util.h"

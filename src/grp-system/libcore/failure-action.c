@@ -18,8 +18,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/reboot.h>
 #include <sys/reboot.h>
+
+#include <linux/reboot.h>
 
 #include "basic/special.h"
 #include "basic/string-table.h"
