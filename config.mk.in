@@ -109,7 +109,7 @@ libshared.CPPFLAGS                   = -I$(topsrcdir)/src/libshared/include $(li
 libshared.DEPENDS                    =   $(topoutdir)/src/libshared/src/libshared.la
 
 libsystemd-internal.CPPFLAGS         = -I$(topsrcdir)/src/libsystemd/src -I$(topoutdir)/src/libsystemd/src $(libsystemd.CPPFLAGS) $(libbasic.CPPFLAGS)
-libsystemd-internal.DEPENDS          = $(topoutdir)/src/libsystemd/src/libsystemd-internal.la
+libsystemd-internal.DEPENDS          =   $(topoutdir)/src/libsystemd/src/libsystemd-internal.la
 libsystemd-network.CPPFLAGS          = -I$(topsrcdir)/src/libsystemd-network/include
 libsystemd-network.DEPENDS           =   $(topoutdir)/src/libsystemd-network/src/libsystemd-network.la
 libsystemd.CPPFLAGS                  = -I$(topsrcdir)/src/libsystemd/include

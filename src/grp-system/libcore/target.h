@@ -19,6 +19,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#if __INCLUDE_LEVEL__ <= 1
+#error "Do not include target.h directly; use unit.h, which includes target.h."
+#endif
+
 typedef struct Target Target;
 
 struct Target {

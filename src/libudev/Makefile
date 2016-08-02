@@ -23,6 +23,42 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+LIBUDEV_CURRENT=7
+LIBUDEV_REVISION=4
+LIBUDEV_AGE=6
+
+include_HEADERS += \
+	src/libudev/libudev.h
+
+rootlib_LTLIBRARIES += \
+	libudev.la
+
+libudev_la_LDFLAGS = \
+	$(AM_LDFLAGS) \
+	-version-info $(LIBUDEV_CURRENT):$(LIBUDEV_REVISION):$(LIBUDEV_AGE) \
+	-Wl,--version-script=$(srcdir)/libudev.sym
+
+pkgconfiglib_DATA += \
+	src/libudev/libudev.pc
+
+EXTRA_DIST += \
+	src/libudev/libudev.pc.in
+
+$(outdir)/test-libudev-sym.c: \
+		$(srcdir)/libudev.sym \
+		$(srcdir)/udev.h
+	$(generate-sym-test)
+
+nodist_test_libudev_sym_SOURCES = \
+	test-libudev-sym.c
+test_libudev_sym_CFLAGS = \
+	$(AM_CFLAGS) \
+	-Wno-deprecated-declarations
+test_libudev_sym_LDADD = \
+	libudev.la
+
+systemd.sed_files += libudev.pc
+
 at.subdirs += src
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

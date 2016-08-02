@@ -23,16 +23,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "shared/condition.h"
+#include "shared/install.h"
+#include "basic/list.h"
+#include "basic/unit-name.h"
+
 typedef struct Unit Unit;
 typedef struct UnitVTable UnitVTable;
 typedef struct UnitRef UnitRef;
 typedef struct UnitStatusMessageFormats UnitStatusMessageFormats;
 
-#include "shared/condition.h"
 #include "failure-action.h"
-#include "shared/install.h"
-#include "basic/list.h"
-#include "basic/unit-name.h"
 
 typedef enum KillOperation {
         KILL_TERMINATE,

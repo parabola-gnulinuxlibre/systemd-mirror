@@ -18,13 +18,13 @@
 ***/
 
 #include <errno.h>
-#include <linux/fs.h>
 #include <sched.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <linux/fs.h>
 
 #include "basic/alloc-util.h"
 #include "basic/fd-util.h"

@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/if.h>
 #include <netinet/ether.h>
+#include <linux/if.h>
 
 #include "systemd-network/network-internal.h"
 #include "systemd-network/sd-dhcp6-client.h"

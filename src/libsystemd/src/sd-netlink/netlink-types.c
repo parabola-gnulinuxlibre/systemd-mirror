@@ -17,18 +17,18 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <linux/if.h>
-#include <linux/if_addr.h>
-#include <linux/if_bridge.h>
-#include <linux/if_link.h>
-#include <linux/if_tunnel.h>
-#include <linux/in6.h>
-#include <linux/ip.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <linux/veth.h>
 #include <stdint.h>
 #include <sys/socket.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <linux/in6.h>
+#include <linux/veth.h>
+#include <linux/if_bridge.h>
+#include <linux/if_addr.h>
+#include <linux/if.h>
+#include <linux/ip.h>
+#include <linux/if_link.h>
+#include <linux/if_tunnel.h>
 
 #include "basic/macro.h"
 #include "basic/missing.h"

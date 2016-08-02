@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
  ***/
 
-#include <linux/if.h>
 #include <sys/socket.h>
+#include <linux/if.h>
 
 #include <systemd/sd-daemon.h>
 

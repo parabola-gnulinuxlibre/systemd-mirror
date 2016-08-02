@@ -90,7 +90,14 @@ private=()
 phase1_flush() {
         local b=:
         if [[ ${#system[@]} -gt 0 ]]; then
-                printf '%s\n' "${system[@]}" | sort -u
+                if printf '%s\n' "${system[@]}" | grep -F '<linux/if.h>' &>/dev/null; then
+                        # The include order for <linux/if.h> matters.  We could
+                        # try to sort it a bit, but let's just trust humans to
+                        # do that.
+                        printf '%s\n' "${system[@]}"
+                else
+                        printf '%s\n' "${system[@]}" | sort -u
+                fi
                 b=echo
         fi
         if [[ ${#public[@]} -gt 0 ]]; then

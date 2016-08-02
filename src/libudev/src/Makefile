@@ -23,17 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-LIBUDEV_CURRENT=7
-LIBUDEV_REVISION=4
-LIBUDEV_AGE=6
-
-include_HEADERS += \
-	src/libudev/libudev.h
-
-rootlib_LTLIBRARIES += \
-	libudev.la
-
-libudev_la_SOURCES =\
+libudev_internal_la_SOURCES =\
 	src/libudev/libudev.sym \
 	src/libudev/libudev-private.h \
 	src/libudev/libudev-device-internal.h \
@@ -47,39 +37,10 @@ libudev_la_SOURCES =\
 	src/libudev/libudev-queue.c \
 	src/libudev/libudev-hwdb.c
 
-libudev_la_LDFLAGS = \
-	$(AM_LDFLAGS) \
-	-version-info $(LIBUDEV_CURRENT):$(LIBUDEV_REVISION):$(LIBUDEV_AGE) \
-	-Wl,--version-script=$(srcdir)/libudev.sym
-
-libudev_la_LIBADD = \
+libudev_internal_la_LIBADD = \
 	libsystemd-internal.la
-
-pkgconfiglib_DATA += \
-	src/libudev/libudev.pc
-
-EXTRA_DIST += \
-	src/libudev/libudev.pc.in
 
 noinst_LTLIBRARIES += \
 	libudev-internal.la
-
-libudev_internal_la_SOURCES =\
-	$(libudev_la_SOURCES)
-
-$(outdir)/test-libudev-sym.c: \
-		$(srcdir)/libudev.sym \
-		$(srcdir)/udev.h
-	$(generate-sym-test)
-
-nodist_test_libudev_sym_SOURCES = \
-	test-libudev-sym.c
-test_libudev_sym_CFLAGS = \
-	$(AM_CFLAGS) \
-	-Wno-deprecated-declarations
-test_libudev_sym_LDADD = \
-	libudev.la
-
-systemd.sed_files += libudev.pc
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

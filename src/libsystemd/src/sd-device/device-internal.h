@@ -23,6 +23,8 @@
 #include "basic/hashmap.h"
 #include "basic/set.h"
 
+#include "sd-device.h"
+
 struct sd_device {
         uint64_t n_ref;
 

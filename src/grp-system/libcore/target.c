@@ -23,7 +23,6 @@
 #include "basic/unit-name.h"
 
 #include "dbus-target.h"
-#include "target.h"
 #include "unit.h"
 
 static const UnitActiveState state_translation_table[_TARGET_STATE_MAX] = {
