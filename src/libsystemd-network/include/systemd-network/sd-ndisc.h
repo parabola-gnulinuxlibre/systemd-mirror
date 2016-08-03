@@ -22,6 +22,7 @@
 
 #include <inttypes.h>
 #include <net/ethernet.h>
+#include <netinet/in.h>
 
 #include <systemd/sd-event.h>
 
