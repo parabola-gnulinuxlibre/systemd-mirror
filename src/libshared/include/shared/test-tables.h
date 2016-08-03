@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "basic/macro.h"
+
 typedef const char* (*lookup_t)(int);
 typedef int (*reverse_t)(const char*);
 

@@ -21,6 +21,8 @@
 
 typedef struct Slice Slice;
 
+#include "unit.h"
+
 struct Slice {
         Unit meta;
 

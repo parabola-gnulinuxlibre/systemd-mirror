@@ -19,5 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <systemd/sd-id128.h>
+
 int machine_id_commit(const char *root);
 int machine_id_setup(const char *root, sd_id128_t machine_id);

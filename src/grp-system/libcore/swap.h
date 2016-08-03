@@ -24,6 +24,8 @@
 
 typedef struct Swap Swap;
 
+#include "unit.h"
+
 typedef enum SwapExecCommand {
         SWAP_EXEC_ACTIVATE,
         SWAP_EXEC_DEACTIVATE,

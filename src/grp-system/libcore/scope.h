@@ -22,6 +22,7 @@
 typedef struct Scope Scope;
 
 #include "kill.h"
+#include "unit.h"
 
 typedef enum ScopeResult {
         SCOPE_SUCCESS,

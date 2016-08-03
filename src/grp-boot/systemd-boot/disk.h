@@ -15,5 +15,7 @@
 #ifndef __SDBOOT_DISK_H
 #define __SDBOOT_DISK_H
 
+#include <efi.h>
+
 EFI_STATUS disk_get_part_uuid(EFI_HANDLE *handle, CHAR16 uuid[37]);
 #endif

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <curl/curl.h>
 #include <inttypes.h>
 
 #include <systemd/sd-event.h>

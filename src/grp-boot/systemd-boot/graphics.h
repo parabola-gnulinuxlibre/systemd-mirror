@@ -18,5 +18,7 @@
 #ifndef __SDBOOT_GRAPHICS_H
 #define __SDBOOT_GRAPHICS_H
 
+#include <efi.h>
+
 EFI_STATUS graphics_mode(BOOLEAN on);
 #endif

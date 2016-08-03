@@ -20,7 +20,9 @@
 ***/
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 /* One context per object type, plus one of the header, plus one "additional" one */
 #define MMAP_CACHE_MAX_CONTEXTS 9

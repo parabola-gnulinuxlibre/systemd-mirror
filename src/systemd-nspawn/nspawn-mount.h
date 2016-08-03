@@ -20,6 +20,7 @@
 ***/
 
 #include <stdbool.h>
+#include <sys/types.h>
 
 typedef enum VolatileMode {
         VOLATILE_NO,

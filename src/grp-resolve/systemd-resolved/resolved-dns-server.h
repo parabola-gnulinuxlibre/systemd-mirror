@@ -23,16 +23,6 @@
 
 typedef struct DnsServer DnsServer;
 
-typedef enum DnsServerType {
-        DNS_SERVER_SYSTEM,
-        DNS_SERVER_FALLBACK,
-        DNS_SERVER_LINK,
-} DnsServerType;
-#define _DNS_SERVER_TYPE_MAX (DNS_SERVER_LINK + 1)
-
-const char* dns_server_type_to_string(DnsServerType i) _const_;
-DnsServerType dns_server_type_from_string(const char *s) _pure_;
-
 typedef enum DnsServerFeatureLevel {
         DNS_SERVER_FEATURE_LEVEL_TCP,
         DNS_SERVER_FEATURE_LEVEL_UDP,
@@ -51,6 +41,16 @@ int dns_server_feature_level_from_string(const char *s) _pure_;
 
 #include "resolved-link.h"
 #include "resolved-manager.h"
+
+typedef enum DnsServerType {
+        DNS_SERVER_SYSTEM,
+        DNS_SERVER_FALLBACK,
+        DNS_SERVER_LINK,
+} DnsServerType;
+#define _DNS_SERVER_TYPE_MAX (DNS_SERVER_LINK + 1)
+
+const char* dns_server_type_to_string(DnsServerType i) _const_;
+DnsServerType dns_server_type_from_string(const char *s) _pure_;
 
 struct DnsServer {
         Manager *manager;

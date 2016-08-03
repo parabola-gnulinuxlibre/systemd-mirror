@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "logind.h"
-
 typedef struct Button Button;
+
+#include "logind.h"
 
 struct Button {
         Manager *manager;

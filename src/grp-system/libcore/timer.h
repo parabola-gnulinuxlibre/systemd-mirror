@@ -23,6 +23,8 @@
 
 typedef struct Timer Timer;
 
+#include "unit.h"
+
 typedef enum TimerBase {
         TIMER_ACTIVE,
         TIMER_BOOT,

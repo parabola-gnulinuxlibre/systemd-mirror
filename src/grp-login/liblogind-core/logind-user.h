@@ -20,9 +20,10 @@
 ***/
 
 #include "basic/list.h"
-#include "logind.h"
 
 typedef struct User User;
+
+#include "logind.h"
 
 typedef enum UserState {
         USER_OFFLINE,    /* Not logged in at all */

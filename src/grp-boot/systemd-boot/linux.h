@@ -15,6 +15,8 @@
 #ifndef __SDBOOT_kernel_H
 #define __SDBOOT_kernel_H
 
+#include <efi.h>
+
 EFI_STATUS linux_exec(EFI_HANDLE *image,
                       CHAR8 *cmdline, UINTN cmdline_size,
                       UINTN linux_addr,

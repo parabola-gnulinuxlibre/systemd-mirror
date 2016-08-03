@@ -1,6 +1,7 @@
 #pragma once
 
 #include "macro.h"
+#include "missing.h" /* for BTRFS_UUID_SIZE */
 #include "sparse-endian.h"
 
 /* Stolen from btrfs' ctree.h */

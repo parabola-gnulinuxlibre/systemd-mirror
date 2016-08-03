@@ -13,6 +13,8 @@
 #ifndef __SDBOOT_MEASURE_H
 #define __SDBOOT_MEASURE_H
 
+#include <efi.h>
+
 #ifndef SD_TPM_PCR
 #define SD_TPM_PCR 8
 #endif

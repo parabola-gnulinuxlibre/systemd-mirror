@@ -20,7 +20,6 @@
 ***/
 
 typedef struct BusName BusName;
-typedef struct BusNamePolicy BusNamePolicy;
 
 #include "bus-policy.h"
 #include "unit.h"

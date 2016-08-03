@@ -21,6 +21,8 @@
 
 typedef struct Device Device;
 
+#include "unit.h"
+
 typedef enum DeviceFound {
         DEVICE_NOT_FOUND = 0,
         DEVICE_FOUND_UDEV = 1,

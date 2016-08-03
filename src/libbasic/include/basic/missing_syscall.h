@@ -22,6 +22,10 @@
 
 /* Missing glibc definitions to access certain kernel APIs */
 
+#if __INCLUDE_LEVEL__ <= 1
+#error "Do not include missing_syscall.h directly; include it through missing.h."
+#endif
+
 #if !HAVE_DECL_PIVOT_ROOT
 static inline int pivot_root(const char *new_root, const char *put_old) {
         return syscall(SYS_pivot_root, new_root, put_old);

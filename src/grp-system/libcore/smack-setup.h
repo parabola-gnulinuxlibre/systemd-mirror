@@ -21,4 +21,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <stdbool.h>
+
 int mac_smack_setup(bool *loaded_policy);

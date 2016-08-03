@@ -28,12 +28,13 @@
 #include "basic/hashmap.h"
 #include "basic/list.h"
 #include "basic/set.h"
+
+typedef struct Manager Manager;
+
 #include "logind-action.h"
 #include "logind-button.h"
 #include "logind-device.h"
 #include "logind-inhibit.h"
-
-typedef struct Manager Manager;
 
 struct Manager {
         sd_event *event;

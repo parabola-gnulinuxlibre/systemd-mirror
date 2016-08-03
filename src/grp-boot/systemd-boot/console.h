@@ -16,6 +16,8 @@
 #ifndef __SDBOOT_CONSOLE_H
 #define __SDBOOT_CONSOLE_H
 
+#include <efi.h>
+
 #define EFI_SHIFT_STATE_VALID           0x80000000
 #define EFI_RIGHT_CONTROL_PRESSED       0x00000004
 #define EFI_LEFT_CONTROL_PRESSED        0x00000008

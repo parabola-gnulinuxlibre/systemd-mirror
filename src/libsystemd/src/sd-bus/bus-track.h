@@ -19,4 +19,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <systemd/sd-bus.h>
+
 void bus_track_dispatch(sd_bus_track *track);

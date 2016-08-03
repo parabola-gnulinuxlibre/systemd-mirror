@@ -20,6 +20,7 @@
 ***/
 
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef struct XMLIntrospectOps {
         int (*on_path)(const char *path, void *userdata);

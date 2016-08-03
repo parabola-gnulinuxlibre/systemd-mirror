@@ -19,7 +19,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <stdlib.h>
 #include <sys/stat.h>
+
+#include "macro.h"
 
 typedef enum RemoveFlags {
         REMOVE_ONLY_DIRECTORIES = 1,

@@ -27,6 +27,7 @@ typedef struct ServiceFDStore ServiceFDStore;
 
 #include "kill.h"
 #include "path.h"
+#include "socket.h"
 
 typedef enum ServiceRestart {
         SERVICE_RESTART_NO,
@@ -199,7 +200,7 @@ struct Service {
 
 extern const UnitVTable service_vtable;
 
-int service_set_socket_fd(Service *s, int fd, struct Socket *socket, bool selinux_context_net);
+int service_set_socket_fd(Service *s, int fd, Socket *socket, bool selinux_context_net);
 void service_close_socket_fd(Service *s);
 
 const char* service_restart_to_string(ServiceRestart i) _const_;

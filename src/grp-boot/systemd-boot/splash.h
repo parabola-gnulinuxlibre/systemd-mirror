@@ -16,5 +16,7 @@
 #ifndef __SDBOOT_SPLASH_H
 #define __SDBOOT_SPLASH_H
 
+#include <efi.h>
+
 EFI_STATUS graphics_splash(UINT8 *content, UINTN len, const EFI_GRAPHICS_OUTPUT_BLT_PIXEL *background);
 #endif

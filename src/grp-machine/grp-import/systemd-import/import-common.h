@@ -19,6 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <sys/types.h>
+
 int import_make_read_only_fd(int fd);
 int import_make_read_only(const char *path);
 

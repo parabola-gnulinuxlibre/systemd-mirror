@@ -19,5 +19,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <systemd/sd-bus.h>
 
 extern const sd_bus_vtable bus_busname_vtable[];

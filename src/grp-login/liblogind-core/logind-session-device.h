@@ -19,11 +19,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef enum DeviceType DeviceType;
 #include "basic/list.h"
-#include "logind.h"
 
+typedef enum DeviceType DeviceType;
 typedef struct SessionDevice SessionDevice;
+
+#include "logind.h"
 
 enum DeviceType {
         DEVICE_TYPE_UNKNOWN,

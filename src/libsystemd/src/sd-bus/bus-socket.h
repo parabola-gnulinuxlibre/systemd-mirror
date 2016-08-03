@@ -19,6 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <stdbool.h>
+
 #include <systemd/sd-bus.h>
 
 void bus_socket_setup(sd_bus *b);
