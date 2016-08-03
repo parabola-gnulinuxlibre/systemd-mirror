@@ -79,7 +79,7 @@ phase0() {
         hook=:
         local line="$1"
         case "$line" in
-                '#include'*|'typedef struct '*';')
+                '#include'*|'typedef '*';')
                         phase1 "$line"
                         ;;
                 *)
@@ -177,7 +177,7 @@ phase1() {
                                 panic
                         fi
                         ;;
-                'typedef struct '*';')
+                'typedef '*';')
                         phase1_tail=''
                         typedef+=("$line")
                         ;;
