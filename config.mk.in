@@ -25,8 +25,6 @@ ifeq ($(origin topsrcdir),undefined)
 topoutdir := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 topsrcdir := $(topoutdir)/@top_srcdir@
 
-MAKEFLAGS += --warn-undefined-variables
-include $(topsrcdir)/build-aux/no-builtin-variables.mk
 .LIBPATTERNS = lib%.so lib%.a
 
 include $(topoutdir)/gnustandards.mk

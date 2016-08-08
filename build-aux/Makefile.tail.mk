@@ -17,35 +17,25 @@
 
 include $(call _at.reverse,$(sort $(wildcard $(topsrcdir)/build-aux/Makefile.each.tail/*.mk)))
 
-# Move all of the dirlocal variables to their namespaced version
-$(foreach v,$(at.dirlocal),$(eval $v/$(outdir) := $$($v)))
-$(foreach v,$(at.dirlocal),$(eval undefine $v))
+_at.tmp_targets := $(at.targets)
+_at.tmp_subdirs := $(call at.addprefix,$(outdir),$(at.subdirs))
 
-# Adjust subdirs and depdirs to be relative to $(outdir)
-at.subdirs/$(outdir) := $(sort $(patsubst %/,%,$(call at.addprefix,$(outdir)/,$(at.subdirs/$(outdir)))))
-at.depdirs/$(outdir) := $(sort $(patsubst %/,%,$(call at.addprefix,$(outdir)/,$(at.depdirs/$(outdir)))))
+# Clean the environment
+$(foreach _at.tmp_variable,$(filter-out _at.tmp_variable $(_at.VARIABLES),$(.VARIABLES)), \
+          $(foreach _at.tmp_target,$(_at.tmp_targets), \
+                    $(if $(filter recursive,$(flavor $(_at.tmp_variable))), \
+                         $(eval $(_at.tmp_target): private $(_at.tmp_variable)  = $(subst $(at.nl),$$(at.nl),$(value $(_at.tmp_variable)))), \
+                         $(eval $(_at.tmp_target): private $(_at.tmp_variable) := $$($(_at.tmp_variable))))) \
+          $(eval undefine $(_at.tmp_variable)))
 
-# Remember that this is a directory that we've visited
-_at.outdirs := $(_at.outdirs) $(outdir)
-
-# Generic phony target declarations:
-# mark them phony
-.PHONY: $(addprefix $(outdir)/,$(at.phony))
-# have them depend on subdirs
-$(foreach t,$(at.phony),$(eval $(outdir)/$t: $(addsuffix /$t,$(at.subdirs/$(outdir)))))
-
-# Include Makefiles from other directories
+# Recurse
 $(foreach _at.NO_ONCE,y,\
-	$(foreach makefile,$(call at.path,$(addsuffix /$(at.Makefile),$(at.subdirs/$(outdir)) $(at.depdirs/$(outdir)))),\
-		$(eval include $(filter-out $(_at.included_makefiles),$(makefile)))))
+          $(foreach _at.tmp,$(call at.path,$(addsuffix /$(at.Makefile),$(_at.tmp_subdirs))),\
+                    $(if $(filter-out $(_at.MAKEFILE_LIST),$(abspath $(_at.tmp))),\
+                         $(eval include $(_at.tmp)))))
 
 # This bit only gets evaluated once, after all of the other Makefiles are read
 ifeq ($(origin _at.NO_ONCE),undefined)
-
-outdir = /bogus
-srcdir = /bogus
-
-$(foreach v,$(at.dirlocal),$(eval $v=))
 
 include $(call _at.reverse,$(sort $(wildcard $(topsrcdir)/build-aux/Makefile.once.tail/*.mk)))
 

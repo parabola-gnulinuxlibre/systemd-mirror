@@ -13,15 +13,17 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-_dist.copyfile = $(MKDIR_P) $(dir $2) && $(CP) -T $1 $2
-_dist.addfile = $(call _dist.copyfile,$3,$2/$(call at.relto,$1,$3))
-$(topoutdir)/$(dist.pkgname)-$(dist.version): $(foreach v,$(filter std.src_files/% std.gen_files/%,$(.VARIABLES)),$($v))
-	$(RM) -r $@ $(@D)/.tmp.$(@F)
-	$(MKDIR) $(@D)/.tmp.$(@F)
-	$(foreach f,$^,$(call _dist.addfile,$(topsrcdir),$(@D)/.tmp.$(@F),$f)$(at.nl))
-	$(MV) $(@D)/.tmp.$(@F) $@ || $(RM) -r $(@D)/.tmp.$(@F)
+files.src.src ?=
+files.src.int ?=
+files.src.cfg ?=
+files.src.gen ?=
+files.src = $(sort $(foreach _files.v,$(filter files.src.%,$(.VARIABLES)),$($(_files.v))))
 
-$(topoutdir)/$(dist.pkgname)-$(dist.version).tar: %.tar: %
-	$(TAR) cf $@ -C $(<D) $(<F)
-$(topoutdir)/$(dist.pkgname)-$(dist.version).tar.gz: %.gz: %
-	$(GZIP) $(GZIPFLAGS) < $< > $@
+files.out.slow ?=
+files.out.int ?=
+files.out.cfg ?=
+$(foreach t,$(files.groups),$(eval files.out.$t ?=))
+files.out = $(sort $(foreach _files.v,$(filter files.out.%,$(.VARIABLES)),$($(_files.v))))
+
+$(foreach t,$(files.groups),$(eval files.sys.$t ?=))
+files.sys = $(sort $(foreach _files.v,$(filter files.sys.%,$(.VARIABLES)),$($(_files.v))))

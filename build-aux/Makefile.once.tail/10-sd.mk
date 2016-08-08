@@ -21,9 +21,9 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
-autogen_files = aclocal.m4 automake.mk.in config.h.in configure po/Makefile.in.in
-# $*=% had better be $(topsrcdir), but we can't enforce that
-$(addprefix %/,$(autogen_files)): %/configure.ac %/autogen.sh
+_sd.autogen_files = aclocal.m4 automake.mk.in config.h.in configure po/Makefile.in.in
+# `$*`/`%` had better be $(topsrcdir), but we can't enforce that
+$(addprefix %/,$(_sd.autogen_files)): %/configure.ac %/autogen.sh
 	cd $(topsrcdir) && ./autogen.sh
 
 config_files = config.mk automake.mk autoconf.mk gnustandards.mk po/Makefile.in
@@ -51,21 +51,21 @@ valgrind-tests: $(TESTS)
 		x="\n\n"; \
 	done
 
-exported-%: %
-	$(AM_V_GEN)$(NM) -g --defined-only $(builddir)/.libs/$(<:.la=.so) 2>&1 /dev/null | grep " T " | cut -d" " -f3 > $@
+# exported-%: %
+# 	$(AM_V_GEN)$(NM) -g --defined-only $(builddir)/.libs/$(<:.la=.so) 2>&1 /dev/null | grep " T " | cut -d" " -f3 > $@
 
-exported: $(addprefix exported-, $(lib_LTLIBRARIES))
-	$(AM_V_GEN)sort -u $^ > $@
+# exported: $(addprefix exported-, $(lib_LTLIBRARIES))
+# 	$(AM_V_GEN)sort -u $^ > $@
 
-.PHONY: check-api-docs
-check-api-docs: exported man
-	$(AM_V_GEN)for symbol in `cat exported` ; do \
-		if test -f $(builddir)/man/$$symbol.html ; then \
-			echo "  Symbol $$symbol() is documented." ; \
-		else \
-			echo "‣ Symbol $$symbol() lacks documentation." ; \
-		fi ; \
-	done
+# .PHONY: check-api-docs
+# check-api-docs: exported man
+# 	$(AM_V_GEN)for symbol in `cat exported` ; do \
+# 		if test -f $(builddir)/man/$$symbol.html ; then \
+# 			echo "  Symbol $$symbol() is documented." ; \
+# 		else \
+# 			echo "‣ Symbol $$symbol() lacks documentation." ; \
+# 		fi ; \
+# 	done
 
 OBJECT_VARIABLES:=$(filter %_OBJECTS,$(.VARIABLES))
 ALL_OBJECTS:=$(foreach v,$(OBJECT_VARIABLES),$($(v)))

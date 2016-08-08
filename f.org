@@ -1,0 +1,44 @@
+| check                | DATA |             | PROGRAMS |         |
+| noinst               | DATA | LTLIBRARIES | PROGRAMS |         |
+|----------------------+------+-------------+----------+---------|
+| lib                  |      | LTLIBRARIES |          |         |
+| pamlib               |      | LTLIBRARIES |          |         |
+|----------------------+------+-------------+----------+---------|
+| bin                  |      |             | PROGRAMS | SCRIPTS |
+| kernelinstall        |      |             |          | SCRIPTS |
+| rootbin              |      |             | PROGRAMS |         |
+| systemgenerator      |      |             | PROGRAMS |         |
+| udevlibexec          |      |             | PROGRAMS |         |
+| xinitrc              |      |             |          | SCRIPTS |
+|----------------------+------+-------------+----------+---------|
+| rootlibexec          | DATA |             | PROGRAMS |         |
+|----------------------+------+-------------+----------+---------|
+| bashcompletion       | DATA |             |          |         |
+| bootlib              | DATA |             |          |         |
+| catalog              | DATA |             |          |         |
+| dbuspolicy           | DATA |             |          |         |
+| dbussystemservice    | DATA |             |          |         |
+| doc                  | DATA |             |          |         |
+| etc                  | DATA |             |          |         |
+| gatewayddocumentroot | DATA |             |          |         |
+| network              | DATA |             |          |         |
+| pam                  | DATA |             |          |         |
+| pamconf              | DATA |             |          |         |
+| pkgconfigdata        | DATA |             |          |         |
+| pkgconfiglib         | DATA |             |          |         |
+| pkgdata              | DATA |             |          |         |
+| pkgsysconf           | DATA |             |          |         |
+| polkitpolicy         | DATA |             |          |         |
+| rpmmacros            | DATA |             |          |         |
+| sysctl               | DATA |             |          |         |
+| systempreset         | DATA |             |          |         |
+| systemunit           | DATA |             |          |         |
+| sysusers             | DATA |             |          |         |
+| sysvinit             | DATA |             |          |         |
+| tmpfiles             | DATA |             |          |         |
+| udevconf             | DATA |             |          |         |
+| udevhwdb             | DATA |             |          |         |
+| udevrules            | DATA |             |          |         |
+| userunit             | DATA |             |          |         |
+| varlog               | DATA |             |          |         |
+| zshcompletion        | DATA |             |          |         |
