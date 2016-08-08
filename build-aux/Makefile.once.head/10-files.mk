@@ -13,15 +13,25 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-_dist.copyfile = $(MKDIR_P) $(dir $2) && $(CP) -T $1 $2
-_dist.addfile = $(call _dist.copyfile,$3,$2/$(call at.relto,$1,$3))
-$(topoutdir)/$(dist.pkgname)-$(dist.version): $(foreach v,$(filter std.src_files/% std.gen_files/%,$(.VARIABLES)),$($v))
-	$(RM) -r $@ $(@D)/.tmp.$(@F)
-	$(MKDIR) $(@D)/.tmp.$(@F)
-	$(foreach f,$^,$(call _dist.addfile,$(topsrcdir),$(@D)/.tmp.$(@F),$f)$(at.nl))
-	$(MV) $(@D)/.tmp.$(@F) $@ || $(RM) -r $(@D)/.tmp.$(@F)
+mod.files.description = Keeping track of groups of files
+mod.files.depends += nested
 
-$(topoutdir)/$(dist.pkgname)-$(dist.version).tar: %.tar: %
-	$(TAR) cf $@ -C $(<D) $(<F)
-$(topoutdir)/$(dist.pkgname)-$(dist.version).tar.gz: %.gz: %
-	$(GZIP) $(GZIPFLAGS) < $< > $@
+files.groups ?= all
+files.default ?= all
+files.vcsclean ?= files.vcsclean
+files.generate ?= files.generate
+
+.DEFAULT_GOAL = $(files.default_group)
+
+# Standard creative PHONY targets
+nested.targets += $(foreach g,$(files.groups), $g install-$g install-$gdirs)
+# Standard destructive PHONY targets
+nested.targets += uninstall mostlyclean clean distclean maintainer-clean
+
+# User configuration
+
+DESTDIR ?=
+
+RM      ?= rm -f
+RMDIR_P ?= rmdir -p --ignore-fail-on-non-empty
+TRUE    ?= true

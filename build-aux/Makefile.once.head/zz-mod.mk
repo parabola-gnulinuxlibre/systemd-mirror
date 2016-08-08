@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2016  Luke Shumaker
+# Copyright (C) 2016  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -13,32 +13,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Developer configuration
+mod.mod.description = Print information about Autothing modules
 
-dist.exts ?= .tar.gz
-dist.pkgname ?= $(firstword $(PACKAGE_TARNAME) $(PACKAGE) $(PACKAGE_NAME))
-dist.version ?= $(firstword $(PACKAGE_VERSION) $(VERSION))
+_mod.target = at-mod-info
+_mod.modules := $(sort $(patsubst %.mk,%,$(filter %.mk,$(subst -, ,$(notdir $(wildcard $(topsrcdir)/build-aux/Makefile.*/??-*.mk))))))
+_mod.quote = '$(subst ','\'',$1)'
 
-ifeq ($(dist.pkgname),)
-$(error dist.pkgname must be set)
-endif
-ifeq ($(dist.version),)
-$(error dist.version must be set)
-endif
-
-# User configuration
-
-CP      ?= cp
-GZIP    ?= gzip
-MKDIR   ?= mkdir
-MKDIR_P ?= mkdir -p
-MV      ?= mv
-RM      ?= rm -f
-TAR     ?= tar
-
-GZIPFLAGS ?= $(GZIP_ENV)
-GZIP_ENV ?= --best
-
-# Implementation
-
-at.phony += dist
+_mod.vars = $(filter $(addsuffix .%,$(_mod.modules)),$(.VARIABLES))
+_mod.once := $(_mod.vars)
+_mod.each :=

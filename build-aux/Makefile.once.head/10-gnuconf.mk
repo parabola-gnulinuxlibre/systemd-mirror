@@ -14,11 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # This file is based on §7.2 "Makefile Conventions" of the release of
-# the GNU Coding Standards dated April 13, 2016.
+# the GNU Coding Standards dated July 25, 2016.
+
+mod.gnuconf.description = GNU standard configuration variables
 
 gnuconf.pkgname ?= $(firstword $(PACKAGE_TARNAME) $(PACKAGE) $(PACKAGE_NAME))
 ifeq ($(gnuconf.pkgname),)
-$(error gnuconf.pkgname must be set)
+$(error Autothing module: gnuconf: gnuconf.pkgname must be set)
 endif
 
 # 7.2.2: Utilities in Makefiles
@@ -54,43 +56,69 @@ TOUCH ?= touch
 TR ?= tr
 TRUE ?= true
 
-# These must be user-configurable
+# 7.2.2: Utilities in Makefiles/7.2.3: Variables for Specifying Commands
+# ----------------------------------------------------------------------
+
+# Standard user-configurable programs.
+#
+# The list of programs here is specified in §7.2.2, but the associated FLAGS
+# variables are specified in §7.2.3.  I found it cleaner to list them together.
 AR ?= ar
 ARFLAGS ?=
 BISON ?= bison
 BISONFLAGS ?=
 CC ?= cc
-CCFLAGS ?= $(CFLAGS)
+CFLAGS ?= # CFLAGS instead of CCFLAGS
 FLEX ?= flex
 FLEXFLAGS ?=
 INSTALL ?= install
-#INSTALLFLAGS ?=
+# There is no INSTALLFLAGS[0]
 LD ?= ld
 LDFLAGS ?=
-LDCONFIG ?= ldconfig #TODO
+LDCONFIG ?= ldconfig # TODO[1]
 LDCONFIGFLAGS ?=
 LEX ?= lex
-LEXFLAGS ?= $(LFLAGS)
+LFLAGS ?= # LFLAGS instead of LEXFLAGS
 #MAKE
 MAKEINFO ?= makeinfo
 MAKEINFOFLAGS ?=
-RANLIB ?= ranlib #TODO
+RANLIB ?= ranlib # TODO[1]
 RANLIBFLAGS ?=
 TEXI2DVI ?= texi2dvi
 TEXI2DVIFLAGS ?=
 YACC ?= yacc
-YACCFLAGS ?= $(YFLAGS)
+YFLAGS ?= # YFLAGS instead of YACCFLAGS
 
-CFLAGS ?=
-LFLAGS ?=
-YFLAGS ?=
-
-LN_S ?= ln -s #TODO
+LN_S ?= ln -s # TODO[2]
 
 CHGRP ?= chgrp
+CHGRPFLAGS ?=
 CHMOD ?= chmod
+CHMODFLAGS ?=
 CHOWN ?= chown
+CHOWNFLAGS ?=
 MKNOD ?= mknod
+MKNODFLAGS ?=
+
+# [0]: There is no INSTALLFLAGS because it would be inconsistent with how the
+#      standards otherwise recommend using $(INSTALL); with INSTALL_PROGRAM and
+#      INSTALL_DATA; which are specified in a way precluding the use of
+#      INSTALLFLAGS.  To have the variable, but to ignore it in the common case
+#      would be confusing.
+#
+# [1]: The RANLIB and LDCONFIG variables need some extra smarts; §7.2.2 says:
+#
+#       > When you use ranlib or ldconfig, you should make sure nothing bad
+#       > happens if the system does not have the program in question. Arrange
+#       > to ignore an error from that command, and print a message before the
+#       > command to tell the user that failure of this command does not mean a
+#       > problem. (The Autoconf ‘AC_PROG_RANLIB’ macro can help with this.)
+#
+# [2]: The LN_S variable isn't standard, but we have it here as an (incomplete)
+#      stub to help support this bit of §7.2.2:
+#
+#       > If you use symbolic links, you should implement a fallback for
+#       > systems that don’t have symbolic links.
 
 # 7.2.3: Variables for Specifying Commands
 # ----------------------------------------

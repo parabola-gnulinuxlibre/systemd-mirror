@@ -13,27 +13,30 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Declare the default target
-all: build
-.PHONY: all noop
+mod.dist.description = Make distribution tarballs
 
-# Standard creative PHONY targets
-at.phony += build install installdirs
-# Standard destructive PHONY targets
-at.phony += uninstall mostlyclean clean distclean maintainer-clean
+# Developer configuration
 
-at.dirlocal += std.src_files
-at.dirlocal += std.gen_files
-at.dirlocal += std.cfg_files
-at.dirlocal += std.out_files
-at.dirlocal += std.sys_files
-at.dirlocal += std.clean_files
-at.dirlocal += std.slow_files
+dist.exts ?= .tar.gz
+dist.pkgname ?= $(firstword $(PACKAGE_TARNAME) $(PACKAGE) $(PACKAGE_NAME))
+dist.version ?= $(firstword $(PACKAGE_VERSION) $(VERSION))
+
+ifeq ($(dist.pkgname),)
+$(error Autothing module: dist: dist.pkgname must be set)
+endif
+ifeq ($(dist.version),)
+$(error Autothing module: dist: dist.version must be set)
+endif
 
 # User configuration
 
-DESTDIR ?=
-
+CP      ?= cp
+GZIP    ?= gzip
+MKDIR   ?= mkdir
+MKDIR_P ?= mkdir -p
+MV      ?= mv
 RM      ?= rm -f
-RMDIR_P ?= rmdir -p
-TRUE    ?= true
+TAR     ?= tar
+
+GZIPFLAGS ?= $(GZIP_ENV)
+GZIP_ENV ?= --best
