@@ -14,12 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Add some more defaults to the *_files variables
 
-$(foreach _files.var,$(patsubst files.%,%,files.src $(filter files.src.%,$(.VARIABLES))),\
-          $(eval _files.$(_files.var) = $$(call at.addprefix,$$(srcdir),$$(files.$(_files.var)))))
-$(foreach _files.var,$(patsubst files.%,%,files.out $(filter files.out.%,$(.VARIABLES))),\
-          $(eval _files.$(_files.var) = $$(call at.addprefix,$$(outdir),$$(files.$(_files.var)))))
-$(foreach _files.var,$(patsubst files.%,%,files.sys $(filter files.sys.%,$(.VARIABLES))),\
-          $(eval _files.$(_files.var) = $$(addprefix $$(DESTDIR),$$(files.$(_files.var)))))
+$(eval \
+  $(foreach _files.var,$(filter files.src files.src.%,$(.VARIABLES)),\
+    _$(_files.var) = $$(call at.addprefix,$$(srcdir),$$($(_files.var)))$(at.nl))\
+  $(foreach _files.var,$(filter files.out files.out.%,$(.VARIABLES)),\
+    _$(_files.var) = $$(call at.addprefix,$$(outdir),$$($(_files.var)))$(at.nl))\
+  $(foreach _files.var,$(filter files.sys files.sys.%,$(.VARIABLES)),\
+    _$(_files.var) = $$(addprefix $$(DESTDIR),$$($(_files.var)))$(at.nl)))
 
 _files.all = $(_files.src) $(_files.out) $(_files.sys)
 
@@ -29,10 +30,11 @@ at.targets += $(subst *,%,$(_files.all))
 $(outdir)/$(files.generate): $(_files.src.gen) $(_files.src.cfg)
 $(outdir)/install: $(_files.sys.$(files.default))
 $(outdir)/installdirs: $(sort $(dir $(_files.sys)))
-$(foreach _files.g,$(files.groups),\
-          $(eval $$(outdir)/$(_files.g): $$(_files.out.$(_files.g))))
-$(foreach _files.g,$(filter-out $(files.default),$(files.groups)),\
-          $(eval $$(outdir)/install-$(_files.g): $$(_files.sys.$(_files.g))))
+$(eval \
+  $(foreach _files.g,$(files.groups),\
+    $$(outdir)/$(_files.g): $$(_files.out.$(_files.g))$(at.nl))\
+  $(foreach _files.g,$(filter-out $(files.default),$(files.groups)),\
+    $$(outdir)/install-$(_files.g): $$(_files.sys.$(_files.g)))$(at.nl))
 
 # Destructive targets
 _files.uninstall   = $(_files.sys)

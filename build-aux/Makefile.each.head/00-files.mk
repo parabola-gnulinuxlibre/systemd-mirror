@@ -22,8 +22,8 @@ files.src = $(sort $(foreach _files.v,$(filter files.src.%,$(.VARIABLES)),$($(_f
 files.out.slow ?=
 files.out.int ?=
 files.out.cfg ?=
-$(foreach t,$(files.groups),$(eval files.out.$t ?=))
+$(eval $(foreach t,$(files.groups),files.out.$t ?=$(at.nl)))
 files.out = $(sort $(foreach _files.v,$(filter files.out.%,$(.VARIABLES)),$($(_files.v))))
 
-$(foreach t,$(files.groups),$(eval files.sys.$t ?=))
+$(eval $(foreach t,$(files.groups),files.sys.$t ?=$(at.nl)))
 files.sys = $(sort $(foreach _files.v,$(filter files.sys.%,$(.VARIABLES)),$($(_files.v))))

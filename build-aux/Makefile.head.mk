@@ -47,6 +47,10 @@ _at.addprefix = $(call _at.path,$(if $(filter-out /%,$2),$1/$2,$2))
 _at.rest = $(wordlist 2,$(words $1),$1)
 _at.reverse = $(if $1,$(call _at.reverse,$(_at.rest))) $(firstword $1)
 
+_at.target_variable           = $(_at.target_variable.$(flavor $2))
+_at.target_variable.recursive = $1: private $2  = $(subst $(at.nl),$$(at.nl),$(value $2))
+_at.target_variable.simple    = $1: private $2 := $$($2)
+
 # Sanity checking ######################################################
 ifeq ($(filter undefine,$(.FEATURES)),)
 $(error Autothing: We need a version of Make that supports 'undefine')
@@ -60,8 +64,6 @@ endif
 ifneq ($(call _at.is_strict_subdir,$(topoutdir),$(topsrcdir)),)
 $(error Autothing: topsrcdir=$(topsrcdir) must not be a subdirectory of topoutdir=$(topoutdir))
 endif
-
-# Internal setup #######################################################
 
 # External provisions ##################################################
 
