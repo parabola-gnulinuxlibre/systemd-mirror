@@ -21,7 +21,7 @@ files.default ?= all
 files.vcsclean ?= files.vcsclean
 files.generate ?= files.generate
 
-.DEFAULT_GOAL = $(files.default_group)
+.DEFAULT_GOAL = $(files.default)
 
 # Standard creative PHONY targets
 nested.targets += $(foreach g,$(files.groups), $g install-$g install-$gdirs)
