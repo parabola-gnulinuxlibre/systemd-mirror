@@ -30,8 +30,8 @@ systemctl_SOURCES = \
 systemctl_LDADD = \
 	libshared.la
 
-systemd.CPPFLAGS += -DROOTLIBEXECDIR=\"$(rootlibexecdir)\"
-systemd.CPPFLAGS += -DSYSTEM_SYSVINIT_PATH=\"$(SYSTEM_SYSVINIT_PATH)\"
-systemd.CPPFLAGS += -DSYSTEMD_BINARY_PATH=\"$(rootlibexecdir)/systemd\"
+sd.CPPFLAGS += -DROOTLIBEXECDIR=\"$(rootlibexecdir)\"
+sd.CPPFLAGS += -DSYSTEM_SYSVINIT_PATH=\"$(SYSTEM_SYSVINIT_PATH)\"
+sd.CPPFLAGS += -DSYSTEMD_BINARY_PATH=\"$(rootlibexecdir)/systemd\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

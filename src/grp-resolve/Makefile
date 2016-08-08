@@ -23,6 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-at.subdirs += systemd-resolved nss-resolve
+nested.subdirs += systemd-resolved nss-resolve
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

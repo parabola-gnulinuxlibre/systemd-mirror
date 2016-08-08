@@ -53,6 +53,6 @@ libjournal_core_la_LIBADD = \
 noinst_LTLIBRARIES += \
 	libjournal-core.la
 
-systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
+sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

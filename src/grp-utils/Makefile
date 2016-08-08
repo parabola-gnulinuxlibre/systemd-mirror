@@ -23,10 +23,10 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-at.subdirs += systemd-ac-power
-at.subdirs += systemd-escape
-at.subdirs += systemd-notify
-at.subdirs += systemd-path
-at.subdirs += systemd-socket-activate
+nested.subdirs += systemd-ac-power
+nested.subdirs += systemd-escape
+nested.subdirs += systemd-notify
+nested.subdirs += systemd-path
+nested.subdirs += systemd-socket-activate
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

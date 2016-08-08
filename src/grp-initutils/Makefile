@@ -23,21 +23,21 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-at.subdirs += systemd-backlight
-at.subdirs += systemd-binfmt
-at.subdirs += systemd-detect-virt
-at.subdirs += systemd-firstboot
-at.subdirs += systemd-fsck
-at.subdirs += systemd-quotacheck
-at.subdirs += systemd-random-seed
-at.subdirs += systemd-rfkill
-at.subdirs += systemd-sleep
-at.subdirs += systemd-sysctl
-at.subdirs += systemd-sysusers
-at.subdirs += systemd-tmpfiles
-at.subdirs += systemd-update-done
-at.subdirs += systemd-update-utmp
-at.subdirs += systemd-user-sessions
-at.subdirs += systemd-vconsole-setup
+nested.subdirs += systemd-backlight
+nested.subdirs += systemd-binfmt
+nested.subdirs += systemd-detect-virt
+nested.subdirs += systemd-firstboot
+nested.subdirs += systemd-fsck
+nested.subdirs += systemd-quotacheck
+nested.subdirs += systemd-random-seed
+nested.subdirs += systemd-rfkill
+nested.subdirs += systemd-sleep
+nested.subdirs += systemd-sysctl
+nested.subdirs += systemd-sysusers
+nested.subdirs += systemd-tmpfiles
+nested.subdirs += systemd-update-done
+nested.subdirs += systemd-update-utmp
+nested.subdirs += systemd-user-sessions
+nested.subdirs += systemd-vconsole-setup
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

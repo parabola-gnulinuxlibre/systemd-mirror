@@ -331,6 +331,6 @@ libsystemd-internal.la.SOURCES =
 libsystemd-internal.la.SOURCES += $(patsubst src/libsystemd/%,%,$(filter %.c,$(_libsystemd_internal_la_SOURCES)))
 libsystemd-internal.la.SOURCES += $(addprefix sd-journal/,$(notdir $(filter %.c,$(_libsystemd_journal_internal_la_SOURCES))))
 libsystemd-internal.la.DEPENDS = $(addprefix $(outdir)/,$(libsystemd-internal.la.SOURCES:.c=.lo))
-at.subdirs += $(sort $(dir $(libsystemd-internal.la.SOURCES)))
+nested.subdirs += $(sort $(dir $(libsystemd-internal.la.SOURCES)))
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

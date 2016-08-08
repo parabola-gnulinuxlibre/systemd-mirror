@@ -27,7 +27,7 @@ noinst_LTLIBRARIES += \
 	libudev-core.la
 
 $(outdir)/keyboard-keys-list.txt:
-	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM -include linux/input.h - < /dev/null | $(AWK) '/^#define[ \t]+KEY_[^ ]+[ \t]+[0-9K]/ { if ($$2 != "KEY_MAX") { print $$2 } }' > $@
+	$(AM_V_GEN)$(CPP) $(sd.ALL_CPPFLAGS) -dM -include linux/input.h - < /dev/null | $(AWK) '/^#define[ \t]+KEY_[^ ]+[ \t]+[0-9K]/ { if ($$2 != "KEY_MAX") { print $$2 } }' > $@
 
 $(outdir)/keyboard-keys-from-name.gperf: $(outdir)/keyboard-keys-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct key { const char* name; unsigned short id; };"; print "%null-strings"; print "%%";} { print tolower(substr($$1 ,5)) ", " $$1 }' < $< > $@
@@ -100,8 +100,8 @@ endif # HAVE_ACL
 
 libudev-core.la.SOURCES = $(patsubst src/udev/%,%,$(filter %.c,$(_libudev_core_la_SOURCES) $(_nodist_libudev_core_la_SOURCES)))
 libudev-core.la.DEPENDS = $(addprefix $(outdir)/,$(libudev-core.la.SOURCES:.c=.lo))
-at.subdirs += net
+nested.subdirs += net
 $(outdir)/udev-builtin-keyboard.lo: $(outdir)/keyboard-keys-from-name.h
-systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
+sd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

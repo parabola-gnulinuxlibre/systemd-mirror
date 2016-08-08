@@ -43,6 +43,6 @@ EXTRA_DIST += \
 nodist_systemunit_DATA += \
 	units/quotaon.service
 
-systemd.CPPFLAGS += -DQUOTACHECK=\"$(QUOTACHECK)\"
+sd.CPPFLAGS += -DQUOTACHECK=\"$(QUOTACHECK)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

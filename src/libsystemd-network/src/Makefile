@@ -78,8 +78,8 @@ libsystemd_network_la_SOURCES = \
 libsystemd_network_la_LIBADD = \
 	$(KMOD_LIBS)
 
-systemd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
-systemd.CPPFLAGS += $(libshared.CPPFLAGS)
-systemd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
+sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
+sd.CPPFLAGS += $(libshared.CPPFLAGS)
+sd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

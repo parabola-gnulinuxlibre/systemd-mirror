@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-at.subdirs += src
+nested.subdirs += src
 
 # intltoolize
 std.gen_files += m4/intltool.m4

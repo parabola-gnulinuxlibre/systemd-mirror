@@ -39,6 +39,6 @@ libfirewall_la_LIBADD = \
 	$(LIBIPTC_LIBS)
 endif # HAVE_LIBIPTC
 
-systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
+sd.CPPFLAGS += $(libbasic.CPPFLAGS)
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

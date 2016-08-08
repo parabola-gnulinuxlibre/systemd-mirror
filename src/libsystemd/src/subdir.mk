@@ -24,9 +24,9 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-systemd.CPPFLAGS += $(libsystemd.CPPFLAGS)
-systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
-systemd.CPPFLAGS += $(libshared.CPPFLAGS)
-systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
+sd.CPPFLAGS += $(libsystemd.CPPFLAGS)
+sd.CPPFLAGS += $(libbasic.CPPFLAGS)
+sd.CPPFLAGS += $(libshared.CPPFLAGS)
+sd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -30,6 +30,6 @@ systemd_sleep_SOURCES = \
 systemd_sleep_LDADD = \
 	libshared.la
 
-systemd.CPPFLAGS += -DSYSTEM_SLEEP_PATH=\"$(systemsleepdir)\"
+sd.CPPFLAGS += -DSYSTEM_SLEEP_PATH=\"$(systemsleepdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

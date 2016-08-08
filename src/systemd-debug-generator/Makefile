@@ -31,6 +31,6 @@ systemd_debug_generator_SOURCES = \
 systemd_debug_generator_LDADD = \
 	libshared.la
 
-systemd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
+sd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

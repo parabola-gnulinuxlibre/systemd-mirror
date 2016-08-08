@@ -32,14 +32,14 @@ EXTRA_DIST += \
 	src/libsystemd/sd-bus/DIFFERENCES \
 	src/libsystemd/sd-bus/GVARIANT-SERIALIZATION
 
-_libsystemd_la_SOURCES = \
+#libsystemd_la_SOURCES = \
 	$(libsystemd_internal_la_SOURCES) \
 	$(libsystemd_journal_internal_la_SOURCES)
 
-_nodist_libsystemd_la_SOURCES = \
+#nodist_libsystemd_la_SOURCES = \
 	$(nodist_libsystemd_internal_la_SOURCES)
 
-libsystemd_la_CFLAGS = \
+#libsystemd_la_CFLAGS = \
 	$(libsystemd_internal_la_CFLAGS) \
 	$(libsystemd_journal_internal_la_CFLAGS)
 
@@ -48,7 +48,7 @@ libsystemd_la_LDFLAGS = \
 	-version-info $(LIBSYSTEMD_CURRENT):$(LIBSYSTEMD_REVISION):$(LIBSYSTEMD_AGE) \
 	-Wl,--version-script=$(srcdir)/libsystemd.sym
 
-libsystemd_la_LIBADD = \
+#libsystemd_la_LIBADD = \
 	$(libsystemd_internal_la_LIBADD) \
 	$(libsystemd_journal_internal_la_LIBADD)
 
@@ -90,17 +90,15 @@ tests += \
 	test-local-addresses \
 	test-resolve
 
-test-libsystemd-sym.c: \
-		$(top_builddir)/src/libsystemd/libsystemd.sym \
-		src/systemd/sd-journal.h \
-		src/systemd/sd-daemon.h \
-		src/systemd/sd-login.h \
-		src/systemd/sd-bus.h \
-		src/systemd/sd-utf8.h \
-		src/systemd/sd-resolve.h \
-		src/systemd/sd-path.h \
-		src/systemd/sd-event.h
-	$(generate-sym-test)
+$(outdir)/test-libsystemd-sym.c: \
+		$(srcdir)/include/systemd/sd-journal.h \
+		$(srcdir)/include/systemd/sd-daemon.h \
+		$(srcdir)/include/systemd/sd-login.h \
+		$(srcdir)/include/systemd/sd-bus.h \
+		$(srcdir)/include/systemd/sd-utf8.h \
+		$(srcdir)/include/systemd/sd-resolve.h \
+		$(srcdir)/include/systemd/sd-path.h \
+		$(srcdir)/include/systemd/sd-event.h
 
 nodist_test_libsystemd_sym_SOURCES = \
 	test-libsystemd-sym.c
@@ -108,7 +106,7 @@ test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
 $(outdir)/libsystemd.la: $(srcdir)/libsystemd.sym
-at.subdirs += src
-systemd.sed_files += libsystemd.pc
+nested.subdirs += src
+sd.sed_files += libsystemd.pc
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

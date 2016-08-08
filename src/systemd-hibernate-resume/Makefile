@@ -57,6 +57,6 @@ EXTRA_DIST += \
 	units/systemd-hibernate-resume@.service.in \
 	units/systemd-hybrid-sleep.service.in
 
-systemd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
+sd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

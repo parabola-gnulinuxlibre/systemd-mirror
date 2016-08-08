@@ -48,7 +48,7 @@ $(addprefix $(outdir)/,$(am.PROGRAMS)): $(outdir)/%:
 	$(AM_V_CCLD)$(sd.LINK) $(lt.link_files)
 
 # Stupid test that everything purported to be exported really is
-$(outdir)/test-lib%-sym.c: lib%.sym
+$(outdir)/test-lib%-sym.c: $(srcdir)/lib%.sym
 	$(AM_V_GEN){\
 		printf '#include <stdio.h>\n' && \
 		printf '#include "%s"\n' $(notdir $(filter %.h, $^)) && \

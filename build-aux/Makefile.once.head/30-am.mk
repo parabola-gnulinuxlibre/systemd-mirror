@@ -45,7 +45,7 @@ endif
 am.$1 = $$(am.check_$1) $$(am.noinst_$1) $$(call am.inst2noinst_$1,$$(am.inst_$1))
 endef
 ########################################################################
-# TODO: I'm not in love with how _am.per_PROGRAM figures out at.subdirs
+# TODO: I'm not in love with how _am.per_PROGRAM figures out am.subdirs
 # $1 = filename
 # $2 = varname
 define _am.per_PROGRAM
@@ -58,10 +58,12 @@ $$(outdir)/$1: $$(_am.depends)
 am.subdirs := $$(sort $$(am.subdirs)\
                       $$(filter-out $$(abspath $$(srcdir)),\
                                     $$(abspath $$(dir $$(filter-out -l% /%,$$(_am.depends))))))
+am.CPPFLAGS := $$(am.CPPFLAGS)
+am.CFLAGS := $$(am.CFLAGS)
 $(foreach var,_am.depends $(call am.var_LTLIBRARIES,$2),undefine $(var)$(at.nl))
 endef
 ########################################################################
-# TODO: I'm not in love with how _am.per_LTLIBRARY figures out at.subdirs
+# TODO: I'm not in love with how _am.per_LTLIBRARY figures out am.subdirs
 # $1 = filename
 # $2 = varname
 define _am.per_LTLIBRARY
@@ -74,6 +76,8 @@ $$(outdir)/$1: $$(_am.depends)
 am.subdirs := $$(sort $$(am.subdirs)\
                       $$(filter-out $$(abspath $$(srcdir)),\
                                     $$(abspath $$(dir $$(filter-out -l% /%,$$(_am.depends))))))
+am.CPPFLAGS := $$(am.CPPFLAGS)
+am.CFLAGS := $$(am.CFLAGS)
 $(foreach var,_am.depends $(call am.var_LTLIBRARIES,$2),undefine $(var)$(at.nl))
 endef
 ########################################################################

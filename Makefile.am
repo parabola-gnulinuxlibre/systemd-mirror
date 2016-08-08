@@ -821,7 +821,7 @@ EXTRA_DIST += \
 	man/glib-event-glue.c
 
 #@src/libbasic/Makefile --------------------------------------------------------
-at.subdirs += src include
+nested.subdirs += src include
 #@src/libbasic/src/Makefile
 noinst_LTLIBRARIES += \
 	libbasic.la
@@ -1041,7 +1041,7 @@ libbasic_la_LIBADD = \
 	-lm
 
 #@src/libshared/Makefile -------------------------------------------------------
-at.subdirs += src
+nested.subdirs += src
 #@src/libshared/src/Makefile
 noinst_LTLIBRARIES += \
 	libshared.la
@@ -1370,7 +1370,7 @@ CLEANFILES += \
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 
 #@src/libbasic/include/Makefile
-at.subdirs += basic
+nested.subdirs += basic
 #@src/libbasic/include/basic/Makefile
 src/basic/errno-list.txt:
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -3493,7 +3493,7 @@ busctl_LDADD = \
 	libshared.la
 
 #@src/libsystemd-network/Makefile ----------------------------------------------
-at.subdirs += src test
+nested.subdirs += src test
 #@src/libsystemd-network/src/Makefile
 noinst_LTLIBRARIES += \
 	libsystemd-network.la
@@ -6577,35 +6577,35 @@ add-key:
 #@src/Makefile
 
 #@src/libudev/Makefile
-at.subdirs += src
+nested.subdirs += src
 
 #@src/libsystemd/src/subdir.mk
-systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
-systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
+sd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
+sd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
 #@src/grp-boot/Makefile
-at.subdirs += bootctl systemd-boot
+nested.subdirs += bootctl systemd-boot
 
 #@src/grp-coredump/Makefile
-at.subdirs += coredumpctl systemd-coredump
+nested.subdirs += coredumpctl systemd-coredump
 
 #@src/grp-machine/Makefile
-at.subdirs += machinectl systemd-machined
-at.subdirs += nss-mymachines
+nested.subdirs += machinectl systemd-machined
+nested.subdirs += nss-mymachines
 
 #@src/grp-journal-remote/Makefile
-at.subdirs += systemd-journa-gatewayd
-at.subdirs += systemd-journa-remote
-at.subdirs += systemd-journa-upload
+nested.subdirs += systemd-journa-gatewayd
+nested.subdirs += systemd-journa-remote
+nested.subdirs += systemd-journa-upload
 
 #@src/grp-resolve/Makefile
-at.subdirs += systemd-resolved nss-resolve
+nested.subdirs += systemd-resolved nss-resolve
 
 #@src/grp-system/Makefile
-at.subdirs += systemctl systemd
+nested.subdirs += systemctl systemd
 
 #@src/grp-timedate/Makefile
-at.subdirs += timedatectl systemd-timedated
+nested.subdirs += timedatectl systemd-timedated
 
 #@all
 include $(topsrcdir)/build-aux/Makefile.tail.mk

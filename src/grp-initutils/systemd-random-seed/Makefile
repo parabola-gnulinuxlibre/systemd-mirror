@@ -44,7 +44,7 @@ endif # ENABLE_RANDOMSEED
 EXTRA_DIST += \
 	units/systemd-random-seed.service.in
 
-systemd.CPPFLAGS += -DRANDOM_SEED_DIR=\"$(localstatedir)/lib/systemd/\"
-systemd.CPPFLAGS += -DRANDOM_SEED=\"$(localstatedir)/lib/systemd/random-seed\"
+sd.CPPFLAGS += -DRANDOM_SEED_DIR=\"$(localstatedir)/lib/systemd/\"
+sd.CPPFLAGS += -DRANDOM_SEED=\"$(localstatedir)/lib/systemd/random-seed\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

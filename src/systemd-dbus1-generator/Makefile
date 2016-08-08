@@ -46,7 +46,7 @@ dist_xinitrc_SCRIPTS = \
 INSTALL_EXEC_HOOKS += dbus1-generator-install-hook
 UNINSTALL_EXEC_HOOKS += dbus1-generator-uninstall-hook
 
-systemd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
-systemd.CPPFLAGS += -DUSER_DATA_UNIT_PATH=\"$(userunitdir)\"
+sd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
+sd.CPPFLAGS += -DUSER_DATA_UNIT_PATH=\"$(userunitdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -23,10 +23,10 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-at.subdirs += systemd-analyze
-at.subdirs += systemd-delta
-at.subdirs += systemd-fstab-generator
-at.subdirs += systemd-run
-at.subdirs += systemd-sysv-generator
+nested.subdirs += systemd-analyze
+nested.subdirs += systemd-delta
+nested.subdirs += systemd-fstab-generator
+nested.subdirs += systemd-run
+nested.subdirs += systemd-sysv-generator
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

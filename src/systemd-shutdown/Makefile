@@ -36,7 +36,7 @@ systemd_shutdown_SOURCES = \
 systemd_shutdown_LDADD = \
 	libshared.la
 
-systemd.CPPFLAGS += -DSYSTEM_SHUTDOWN_PATH=\"$(systemshutdowndir)\"
-systemd.CPPFLAGS += -DKEXEC=\"$(KEXEC)\"
+sd.CPPFLAGS += -DSYSTEM_SHUTDOWN_PATH=\"$(systemshutdowndir)\"
+sd.CPPFLAGS += -DKEXEC=\"$(KEXEC)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

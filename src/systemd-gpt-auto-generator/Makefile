@@ -40,6 +40,6 @@ systemd_gpt_auto_generator_CFLAGS = \
 	$(BLKID_CFLAGS)
 endif # HAVE_BLKID
 
-systemd.CPPFLAGS += -DSYSTEMD_CRYPTSETUP_PATH=\"$(rootlibexecdir)/systemd-cryptsetup\"
+sd.CPPFLAGS += -DSYSTEMD_CRYPTSETUP_PATH=\"$(rootlibexecdir)/systemd-cryptsetup\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

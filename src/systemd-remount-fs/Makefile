@@ -32,7 +32,7 @@ systemd_remount_fs_SOURCES = \
 systemd_remount_fs_LDADD = \
 	libshared.la
 
-systemd.CPPFLAGS += -DMOUNT_PATH=\"$(MOUNT_PATH)\"
-systemd.CPPFLAGS += -DUMOUNT_PATH=\"$(UMOUNT_PATH)\"
+sd.CPPFLAGS += -DMOUNT_PATH=\"$(MOUNT_PATH)\"
+sd.CPPFLAGS += -DUMOUNT_PATH=\"$(UMOUNT_PATH)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

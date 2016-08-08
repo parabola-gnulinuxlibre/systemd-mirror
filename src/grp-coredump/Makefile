@@ -23,6 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-at.subdirs += coredumpctl systemd-coredump
+nested.subdirs += coredumpctl systemd-coredump
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

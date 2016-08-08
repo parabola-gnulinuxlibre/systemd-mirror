@@ -73,6 +73,6 @@ EXTRA_DIST += \
 	hwdb/ids-update.pl \
 	hwdb/sdio.ids
 
-systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
+sd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

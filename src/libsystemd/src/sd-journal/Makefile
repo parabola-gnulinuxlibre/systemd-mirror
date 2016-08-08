@@ -34,8 +34,8 @@ $(outdir)/audit_type-list.txt: $(call at.path,$(topsrcdir)/src/libbasic/include/
 $(outdir)/audit_type-to-name.h: $(outdir)/audit_type-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
 
-systemd.CPPFLAGS += $(libbasic.CPPFLAGS)
-systemd.CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"
+sd.CPPFLAGS += $(libbasic.CPPFLAGS)
+sd.CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"
 $(outdir)/audit-type.lo: $(outdir)/audit_type-to-name.h
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -32,7 +32,7 @@ systemd_path_SOURCES = \
 systemd_path_LDADD = \
 	libbasic.la
 
-systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
-systemd.CPPFLAGS += -DROOTLIBDIR=\"$(rootlibdir)\"
+sd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
+sd.CPPFLAGS += -DROOTLIBDIR=\"$(rootlibdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

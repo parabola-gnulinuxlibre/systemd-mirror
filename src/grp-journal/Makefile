@@ -167,8 +167,8 @@ tests += \
 	test-compress-benchmark
 endif # HAVE_COMPRESSION
 
-at.subdirs += journalctl systemd-journald libjournal-core
-at.subdirs += systemd-cat
-#at.subdirs += grp-remote
+nested.subdirs += journalctl systemd-journald libjournal-core
+nested.subdirs += systemd-cat
+#nested.subdirs += grp-remote
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

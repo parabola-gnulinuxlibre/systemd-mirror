@@ -68,10 +68,10 @@ dist_systemunit_DATA_busnames += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.systemd1.busname
 
-systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
+sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 
-systemd.CPPFLAGS += -DSYSTEMD_BINARY_PATH=\"$(rootlibexecdir)/systemd\"
-systemd.CPPFLAGS += -DSYSTEMD_SHUTDOWN_BINARY_PATH=\"$(rootlibexecdir)/systemd-shutdown\"
-systemd.CPPFLAGS += -DSYSTEMCTL_BINARY_PATH=\"$(rootbindir)/systemctl\"
+sd.CPPFLAGS += -DSYSTEMD_BINARY_PATH=\"$(rootlibexecdir)/systemd\"
+sd.CPPFLAGS += -DSYSTEMD_SHUTDOWN_BINARY_PATH=\"$(rootlibexecdir)/systemd-shutdown\"
+sd.CPPFLAGS += -DSYSTEMCTL_BINARY_PATH=\"$(rootbindir)/systemctl\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

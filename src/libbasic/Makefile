@@ -23,5 +23,5 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-at.subdirs += src include
+nested.subdirs += src include
 include $(topsrcdir)/build-aux/Makefile.tail.mk

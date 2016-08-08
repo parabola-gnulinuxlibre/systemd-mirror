@@ -139,22 +139,22 @@ libshared_la_LIBADD = \
 	$(LIBIDN_LIBS) \
 	$(SECCOMP_LIBS)
 
-systemd.CPPFLAGS += $(addprefix -I,$(call at.path,$(srcdir)/../include $(srcdir)/../include/shared))
-systemd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
-systemd.CPPFLAGS += -DSYSTEM_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/system\"
-systemd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
-systemd.CPPFLAGS += -DSYSTEM_SYSVINIT_PATH=\"$(SYSTEM_SYSVINIT_PATH)\"
-systemd.CPPFLAGS += -DSYSTEM_SYSVRCND_PATH=\"$(SYSTEM_SYSVRCND_PATH)\"
-systemd.CPPFLAGS += -DUSER_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/user\"
-systemd.CPPFLAGS += -DUSER_DATA_UNIT_PATH=\"$(userunitdir)\"
+sd.CPPFLAGS += $(addprefix -I,$(call at.path,$(srcdir)/../include $(srcdir)/../include/shared))
+sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
+sd.CPPFLAGS += -DSYSTEM_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/system\"
+sd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
+sd.CPPFLAGS += -DSYSTEM_SYSVINIT_PATH=\"$(SYSTEM_SYSVINIT_PATH)\"
+sd.CPPFLAGS += -DSYSTEM_SYSVRCND_PATH=\"$(SYSTEM_SYSVRCND_PATH)\"
+sd.CPPFLAGS += -DUSER_CONFIG_UNIT_PATH=\"$(pkgsysconfdir)/user\"
+sd.CPPFLAGS += -DUSER_DATA_UNIT_PATH=\"$(userunitdir)\"
 
-systemd.CPPFLAGS += -DSYSTEMD_FSCK_PATH=\"$(libexecdir)/systemd-fsck\"
+sd.CPPFLAGS += -DSYSTEMD_FSCK_PATH=\"$(libexecdir)/systemd-fsck\"
 
-systemd.CPPFLAGS += -DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(bindir)/systemd-tty-ask-password-agent\"
+sd.CPPFLAGS += -DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(bindir)/systemd-tty-ask-password-agent\"
 
-systemd.CPPFLAGS += -DSYSTEM_GENERATOR_PATH=\"$(systemgeneratordir)\"
-systemd.CPPFLAGS += -DUSER_GENERATOR_PATH=\"$(usergeneratordir)\"
+sd.CPPFLAGS += -DSYSTEM_GENERATOR_PATH=\"$(systemgeneratordir)\"
+sd.CPPFLAGS += -DUSER_GENERATOR_PATH=\"$(usergeneratordir)\"
 
-systemd.CPPFLAGS += -DPOLKIT_AGENT_BINARY_PATH=\"$(bindir)/pkttyagent\"
+sd.CPPFLAGS += -DPOLKIT_AGENT_BINARY_PATH=\"$(bindir)/pkttyagent\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
