@@ -19,6 +19,8 @@ _mod.target = at-mod-info
 _mod.modules := $(sort $(patsubst %.mk,%,$(filter %.mk,$(subst -, ,$(notdir $(wildcard $(topsrcdir)/build-aux/Makefile.*/??-*.mk))))))
 _mod.quote = '$(subst ','\'',$1)'
 
+$(eval $(foreach _mod.tmp,$(_mod.modules),mod.$(_mod.tmp).description ?=$(at.nl)mod.$(_mod.tmp).depends ?=$(at.nl)))
+
 _mod.vars = $(filter $(addsuffix .%,$(_mod.modules)),$(.VARIABLES))
 _mod.once := $(_mod.vars)
 _mod.each :=
