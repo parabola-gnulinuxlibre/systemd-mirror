@@ -113,8 +113,7 @@ systemd_boot_sources = \
 	src/boot/efi/boot.c
 
 systemd_boot = systemd-boot$(EFI_MACHINE_TYPE_NAME).efi
-std.out_files += $(systemd_boot)
-std.sys_files += $(bootlibdir)/$(systemd_boot)
+bootlib_DATA += $(systemd_boot)
 $(outdir)/systemd-boot.so: $(addprefix $(outdir)/,$(notdir $(systemd_boot_sources:.c=.o)))
 # ------------------------------------------------------------------------------
 stub_headers = \
@@ -137,8 +136,7 @@ stub_sources = \
 	src/boot/efi/stub.c
 
 stub = linux$(EFI_MACHINE_TYPE_NAME).efi.stub
-std.out_files += $(stub)
-std.sys_files += $(bootlibdir)/$(stub)
+bootlib_DATA += $(stub)
 $(outdir)/linux.so: $(addprefix $(outdir)/,$(notdir $(stub_sources:.c=.o)))
 # ------------------------------------------------------------------------------
 $(outdir)/test-efi-disk.img: $(outdir)/$(systemd_boot) $(outdir)/$(stub) $(srcdir)/test-efi-create-disk.sh
@@ -147,7 +145,7 @@ $(outdir)/test-efi-disk.img: $(outdir)/$(systemd_boot) $(outdir)/$(stub) $(srcdi
 test-efi: $(outdir)/test-efi-disk.img
 	$(QEMU) -machine accel=kvm -m 1024 -bios $(QEMU_BIOS) -snapshot test-efi-disk.img
 
-std.clean_files += test-efi-disk.img
+files.out.int += test-efi-disk.img
 # ------------------------------------------------------------------------------
 endif # HAVE_GNUEFI
 endif # ENABLE_EFI

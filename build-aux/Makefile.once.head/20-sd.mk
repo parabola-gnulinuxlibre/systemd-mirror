@@ -21,7 +21,7 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
-mod.sd.description = systemd build rules
+mod.sd.description = (systemd) shared build rules
 mod.sd.depends += am
 
 TESTS ?=
@@ -47,10 +47,11 @@ sd.COMPILE   = $(CC) $(sd.ALL_CPPFLAGS) $(sd.ALL_CFLAGS)
 sd.LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=compile $(CC) $(sd.ALL_CPPFLAGS) $(sd.ALL_CFLAGS)
 sd.LINK      = $(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=link $(CCLD) $(sd.ALL_CFLAGS) $(sd.ALL_LDFLAGS) -o $@
 
-am.INSTALL_PROGRAM   = $(AM_V_PROG)$(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
-am.INSTALL_SCRIPT    = $(AM_V_SCRIPT)$(INSTALL_SCRIPT) $< $@
-am.INSTALL_LTLIBRARY = $(AM_V_LIB)$(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=install $(INSTALL) $< $@
-am.INSTALL_DATA      = $(AM_V_DATA)$(INSTALL_DATA) $< $@
+am.INSTALL_PROGRAMS    = $(AM_V_PROG)$(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+am.INSTALL_SCRIPTS     = $(AM_V_SCRIPT)$(INSTALL_SCRIPT) $< $@
+am.INSTALL_LTLIBRARIES = $(AM_V_LIB)$(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=install $(INSTALL) $< $@
+am.INSTALL_DATA        = $(AM_V_DATA)$(INSTALL_DATA) $< $@
+am.INSTALL_HEADERS     = $(AM_V_HEADER)$(INSTALL_DATA) $< $@
 
 CC ?= c99
 CCLD ?= c99
@@ -132,6 +133,11 @@ AM_V_LIB ?= $(AM_V_LIB_$(V))
 AM_V_LIB_ ?= $(AM_V_LIB_$(AM_DEFAULT_VERBOSITY))
 AM_V_LIB_0 ?= @echo "  LIB     " $@;
 AM_V_LIB_1 ?=
+
+AM_V_HEADER ?= $(AM_V_HEADER_$(V))
+AM_V_HEADER_ ?= $(AM_V_HEADER_$(AM_DEFAULT_VERBOSITY))
+AM_V_HEADER_0 ?= @echo "  HEADER  " $@;
+AM_V_HEADER_1 ?=
 
 AM_V_at ?= $(AM_V_at_$(V))
 AM_V_at_ ?= $(AM_V_at_$(AM_DEFAULT_VERBOSITY))

@@ -13,14 +13,30 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-mod.mod.description = Print information about Autothing modules
+mod.mod.description = Display information about Autothing modules
 
-_mod.target = at-mod-info
-_mod.modules := $(sort $(patsubst %.mk,%,$(filter %.mk,$(subst -, ,$(notdir $(wildcard $(topsrcdir)/build-aux/Makefile.*/??-*.mk))))))
-_mod.quote = '$(subst ','\'',$1)'
+# The trickery that is _mod.empty/_mod.space is from §6.2 of the GNU Make
+# manual, "The Two Flavors of Variables".
+_mod.empty :=
+_mod.space := $(_mod.empty) #
+undefine _mod.empty
+# _mod.rest is equivalent to GMSL rest.
+_mod.rest = $(wordlist 2,$(words $1),$1)
 
-$(eval $(foreach _mod.tmp,$(_mod.modules),mod.$(_mod.tmp).description ?=$(at.nl)mod.$(_mod.tmp).depends ?=$(at.nl)))
+_mod.file2mod = $(foreach _mod.tmp,$(patsubst %.mk,%,$(notdir $1)),$(subst $(_mod.space),-,$(call _mod.rest,$(subst -, ,$(_mod.tmp)))))
 
-_mod.vars = $(filter $(addsuffix .%,$(_mod.modules)),$(.VARIABLES))
-_mod.once := $(_mod.vars)
-_mod.each :=
+_mod.modules := $(sort $(call _mod.file2mod,$(wildcard $(topsrcdir)/build-aux/Makefile.*/??-*.mk)))
+undefine _mod.rest
+undefine _mod.file2mod
+
+$(eval $(foreach _mod.tmp,$(_mod.modules),\
+  mod.$(_mod.tmp).description ?=$(at.nl)\
+  mod.$(_mod.tmp).depends ?=$(at.nl)\
+  mod.$(_mod.tmp).files ?=$(at.nl)))
+
+_mod.quote-pattern = $(subst %,\%,$(subst \,\\,$1))
+_mod.quote-shell-each = $(foreach _mod.tmp,$1,$(call _mod.quote-shell,$(_mod.tmp)))
+
+# I put this as the last line in the file because it confuses Emacs syntax
+# highlighting and makes the remainder of the file difficult to edit.
+_mod.quote-shell = $(subst $(at.nl),'$$'\n'','$(subst ','\'',$1)')

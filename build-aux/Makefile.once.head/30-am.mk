@@ -1,10 +1,12 @@
-mod.am.description = Support for Automake variables (systemd specific)
+mod.am.description = (systemd) Automake-to-Autothing magic
 mod.am.depends += gnuconf
 
 am.inst2noinst_DATA = $(notdir \
         $(patsubst $(sysusersdir)/%.conf,%.sysusers,\
         $(patsubst $(sysctldir)/%.conf,%.sysctl,\
         $1)))
+am.inst2noinst_HEADERS = $(abspath $(addprefix $(srcdir)/include/,$(notdir $1)))
+
 am.var_PROGRAMS    = $1_SOURCES nodist_$1_SOURCES $1_CFLAGS $1_CPPFLAGS $1_LDFLAGS $1_LDADD
 am.var_LTLIBRARIES = $1_SOURCES nodist_$1_SOURCES $1_CFLAGS $1_CPPFLAGS $1_LDFLAGS $1_LIBADD
 
@@ -21,7 +23,7 @@ $(eval $(foreach p,$(am.primaries),am.inst2noinst_$p ?= $$(notdir $$1)$(at.nl)))
 
 am.primary2dirs = $(filter $(patsubst %dir,%,$(filter %dir,$(.VARIABLES))),\
                            $(patsubst %_$1,%,$(filter %_$1,$(.VARIABLES))))
-am.inst2dirs = $(sort $(dir $(foreach p,$(am.primaries),$(am.inst_$p))))
+am.inst2dirs = $(sort $(patsubst %/,%,$(dir $(foreach p,$(am.primaries),$(am.inst_$p)))))
 
 am.file2var = $(subst -,_,$(subst .,_,$1))
 am.file2sources  = $(addprefix $(srcdir)/,$(notdir $($(am.file2var)_SOURCES)))
@@ -35,13 +37,11 @@ define _am.per_primary
 noinst_$1 ?=
 check_$1 ?=
 
-am.inst_$1 := $$(foreach d,$$(call am.primary2dirs,$1),$$($$d_$1))
+am.inst_$1 := $$(foreach d,$$(call am.primary2dirs,$1),$$(addprefix $$($$ddir)/,$$(notdir $$($$d_$1))))
 am.noinst_$1 := $$(noinst_$1)
 am.check_$1 := $$(check_$1)
 $(foreach d,$(call am.primary2dirs,$1) noinst check,undefine $d_$1$(at.nl))
-ifneq ($$(am.inst_$1),)
-$$(am.inst_$1): private am.INSTALL = $$(am.INSTALL_$1)
-endif
+$$(addprefix $$(DESTDIR),$$(am.inst_$1)): private am.INSTALL = $$(am.INSTALL_$1)
 am.$1 = $$(am.check_$1) $$(am.noinst_$1) $$(call am.inst2noinst_$1,$$(am.inst_$1))
 endef
 ########################################################################
@@ -89,4 +89,12 @@ $$(DESTDIR)$1/%: $$(srcdir)/%
 	@$$(NORMAL_INSTALL)
 	$$(am.INSTALL)
 endef
-
+########################################################################
+define _am.per_include_directory
+$$(DESTDIR)$1/%: $$(outdir)/include/%
+	@$$(NORMAL_INSTALL)
+	$$(am.INSTALL)
+$$(DESTDIR)$1/%: $$(srcdir)/include/%
+	@$$(NORMAL_INSTALL)
+	$$(am.INSTALL)
+endef

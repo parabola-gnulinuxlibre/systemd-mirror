@@ -26,23 +26,23 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 nested.subdirs += src
 
 # intltoolize
-std.gen_files += m4/intltool.m4
-std.gen_files += po/Makefile.in.in
+files.src.gen += m4/intltool.m4
+files.src.gen += po/Makefile.in.in
 # autoreconf
-std.gen_files += aclocal.m4
-std.gen_files += automake.mk.in
-std.gen_files += build-aux/compile
-std.gen_files += build-aux/config.guess
-std.gen_files += build-aux/config.sub
-std.gen_files += build-aux/install-sh
-std.gen_files += build-aux/ltmain.sh
-std.gen_files += build-aux/missing
-std.gen_files += m4/libtool.m4
-std.gen_files += m4/ltoptions.m4
-std.gen_files += m4/ltsugar.m4
-std.gen_files += m4/ltversion.m4
-std.gen_files += m4/lt~obsolete.m4
-std.gen_files += config.h.in
-std.gen_files += configure
+files.src.gen += aclocal.m4
+files.src.gen += automake.mk.in
+files.src.gen += build-aux/compile
+files.src.gen += build-aux/config.guess
+files.src.gen += build-aux/config.sub
+files.src.gen += build-aux/install-sh
+files.src.gen += build-aux/ltmain.sh
+files.src.gen += build-aux/missing
+files.src.gen += m4/libtool.m4
+files.src.gen += m4/ltoptions.m4
+files.src.gen += m4/ltsugar.m4
+files.src.gen += m4/ltversion.m4
+files.src.gen += m4/lt~obsolete.m4
+files.src.gen += config.h.in
+files.src.gen += configure
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -44,6 +44,4 @@ lib_LTLIBRARIES += \
 	libnss_myhostname.la
 endif # HAVE_MYHOSTNAME
 
-libnss_myhostname_la_LIBADD += libshared.la # oops, because I moved local-addresses.{c,h} into libshared
-
 include $(topsrcdir)/build-aux/Makefile.tail.mk

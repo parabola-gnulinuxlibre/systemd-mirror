@@ -7,6 +7,22 @@ $(eval \
   $(foreach f,$(am.LTLIBRARIES),$(call _am.per_LTLIBRARY,$f,$(call am.file2var,$f))$(at.nl))\
   $(foreach d,$(am.inst2dirs)  ,$(call _am.per_directory,$d)$(at.nl)))
 
+$(DESTDIR)$(includedir)/%.h: $(srcdir)/include/%.h
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL)
+$(DESTDIR)$(sysusersdir)/%.conf: $(srcdir)/%.sysusers
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL)
+$(DESTDIR)$(sysusersdir)/%.conf: $(outdir)/%.sysusers
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL)
+$(DESTDIR)$(sysctldir)/%.conf: $(srcdir)/%.sysctl
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL)
+$(DESTDIR)$(sysctldir)/%.conf: $(outdir)/%.sysctl
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL)
+
 at.subdirs += $(am.subdirs)
 files.sys.all += $(foreach p,$(am.primaries),$(am.inst_$p))
 files.out.all += $(foreach p,$(am.primaries),$(am.noinst_$p))

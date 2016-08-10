@@ -52,10 +52,12 @@ libsystemd_la_LDFLAGS = \
 	$(libsystemd_internal_la_LIBADD) \
 	$(libsystemd_journal_internal_la_LIBADD)
 
+libsystemd_la_LIBADD = $(libsystemd-internal.DEPENDS)
+
 pkgconfiglib_DATA += \
 	src/libsystemd/libsystemd.pc
 
-pkginclude_HEADERS += \
+_pkginclude_HEADERS += \
 	src/systemd/sd-bus.h \
 	src/systemd/sd-bus-protocol.h \
 	src/systemd/sd-bus-vtable.h \
@@ -63,6 +65,11 @@ pkginclude_HEADERS += \
 	src/systemd/sd-login.h \
 	src/systemd/sd-id128.h \
 	src/systemd/sd-daemon.h
+
+_pkginclude_HEADERS += \
+	src/systemd/sd-journal.h \
+	src/systemd/sd-messages.h \
+	src/systemd/_sd-common.h
 
 rootlib_LTLIBRARIES += \
 	libsystemd.la
@@ -105,6 +112,11 @@ nodist_test_libsystemd_sym_SOURCES = \
 test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
+$(DESTDIR)$(pkgincludedir)/%.h: $(srcdir)/include/systemd/%.h
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL_HEADERS)
+
+files.sys.all += $(addprefix $(pkgincludedir)/,$(notdir $(_pkginclude_HEADERS)))
 $(outdir)/libsystemd.la: $(srcdir)/libsystemd.sym
 nested.subdirs += src
 sd.sed_files += libsystemd.pc

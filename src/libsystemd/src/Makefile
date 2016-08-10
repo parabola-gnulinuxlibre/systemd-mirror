@@ -116,141 +116,6 @@ libsystemd_internal_la_LIBADD = \
 noinst_LTLIBRARIES += \
 	libsystemd-internal.la
 
-test_bus_marshal_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-marshal.c
-
-test_bus_marshal_LDADD = \
-	libshared.la \
-	$(GLIB_LIBS) \
-	$(DBUS_LIBS)
-
-test_bus_marshal_CFLAGS = \
-	$(AM_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(DBUS_CFLAGS)
-
-test_bus_signature_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-signature.c
-
-test_bus_signature_LDADD = \
-	libshared.la
-
-test_bus_chat_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-chat.c
-
-test_bus_chat_LDADD = \
-	libshared.la
-
-test_bus_cleanup_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-cleanup.c
-
-test_bus_cleanup_CFLAGS = \
-	$(AM_CFLAGS) \
-	$(SECCOMP_CFLAGS)
-
-test_bus_cleanup_LDADD = \
-	libshared.la
-
-test_bus_server_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-server.c
-
-test_bus_server_LDADD = \
-	libshared.la
-
-test_bus_objects_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-objects.c
-
-test_bus_objects_LDADD = \
-	libshared.la
-
-test_bus_error_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-error.c
-
-test_bus_error_LDADD = \
-	libshared.la
-
-test_bus_gvariant_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-gvariant.c
-
-test_bus_gvariant_LDADD = \
-	libshared.la \
-	$(GLIB_LIBS)
-
-test_bus_gvariant_CFLAGS = \
-	$(AM_CFLAGS) \
-	$(GLIB_CFLAGS)
-
-test_bus_creds_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-creds.c
-
-test_bus_creds_LDADD = \
-	libshared.la
-
-test_bus_match_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-match.c
-
-test_bus_match_LDADD = \
-	libshared.la
-
-test_bus_kernel_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-kernel.c
-
-test_bus_kernel_LDADD = \
-	libshared.la
-
-test_bus_kernel_bloom_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-kernel-bloom.c
-
-test_bus_kernel_bloom_LDADD = \
-	libshared.la
-
-test_bus_benchmark_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-benchmark.c
-
-test_bus_benchmark_LDADD = \
-	libshared.la
-
-test_bus_zero_copy_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-zero-copy.c
-
-test_bus_zero_copy_LDADD = \
-	libshared.la
-
-test_bus_introspect_SOURCES = \
-	src/libsystemd/sd-bus/test-bus-introspect.c
-
-test_bus_introspect_LDADD = \
-	libshared.la
-
-test_event_SOURCES = \
-	src/libsystemd/sd-event/test-event.c
-
-test_event_LDADD = \
-	libshared.la
-
-test_netlink_SOURCES = \
-	src/libsystemd/sd-netlink/test-netlink.c
-
-test_netlink_LDADD = \
-	libshared.la
-
-test_local_addresses_SOURCES = \
-	src/libsystemd/sd-netlink/test-local-addresses.c
-
-test_local_addresses_LDADD = \
-	libshared.la
-
-test_resolve_SOURCES = \
-	src/libsystemd/sd-resolve/test-resolve.c
-
-test_resolve_LDADD = \
-	libshared.la
-
-pkginclude_HEADERS += \
-	src/systemd/sd-journal.h \
-	src/systemd/sd-messages.h \
-	src/systemd/_sd-common.h
-
 _libsystemd_journal_internal_la_SOURCES = \
 	src/journal/sd-journal.c \
 	src/systemd/sd-journal.h \
@@ -276,7 +141,7 @@ _libsystemd_journal_internal_la_SOURCES = \
 	src/shared/gcrypt-util.h \
 	src/shared/gcrypt-util.c
 
-nodist_libsystemd_journal_internal_la_SOURCES = \
+#nodist_libsystemd_journal_internal_la_SOURCES = \
 	src/journal/audit_type-to-name.h
 
 gperf_txt_sources += \
@@ -314,23 +179,25 @@ _libsystemd_journal_internal_la_SOURCES += \
 libsystemd_journal_internal_la_LIBADD += \
 	$(GCRYPT_LIBS)
 
-# fsprg.c is a drop-in file using void pointer arithmetic
 libsystemd_journal_internal_la_CFLAGS += \
-	$(GCRYPT_CFLAGS) \
-	-Wno-pointer-arith
+	$(GCRYPT_CFLAGS)
 endif # HAVE_GCRYPT
 
-_noinst_LTLIBRARIES += \
+#noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la
 
-libsystemd_internal_la_CFLAGS   += $(libsystemd_journal_internal_la_CFLAGS)
-libsystemd_internal_la_LIBADD   += $(libsystemd_journal_internal_la_LIBADD)
-libsystemd_internal_la_LDADD    += $(libsystemd_journal_internal_la_LDADD)
+# Hook into the `am` module
+libsystemd_internal_la_CFLAGS += $(libsystemd_journal_internal_la_CFLAGS)
+libsystemd_internal_la_LIBADD += $(libsystemd_journal_internal_la_LIBADD)
 
-libsystemd-internal.la.SOURCES =
-libsystemd-internal.la.SOURCES += $(patsubst src/libsystemd/%,%,$(filter %.c,$(_libsystemd_internal_la_SOURCES)))
-libsystemd-internal.la.SOURCES += $(addprefix sd-journal/,$(notdir $(filter %.c,$(_libsystemd_journal_internal_la_SOURCES))))
-libsystemd-internal.la.DEPENDS = $(addprefix $(outdir)/,$(libsystemd-internal.la.SOURCES:.c=.lo))
-nested.subdirs += $(sort $(dir $(libsystemd-internal.la.SOURCES)))
+# Don't bother trying to hook into the `am` module for the sources; the only
+# thing it adds over declaring the dependencies is adding the appropriate
+# directories to am.subdirs=>at.subdirs; but we can do that here just as easily
+# with nested.subdirs.
+sd.libsystemd_SOURCES =
+sd.libsystemd_SOURCES += $(patsubst src/libsystemd/%,%,$(filter %.c,$(_libsystemd_internal_la_SOURCES)))
+sd.libsystemd_SOURCES += $(addprefix sd-journal/,$(notdir $(filter %.c,$(_libsystemd_journal_internal_la_SOURCES))))
+$(outdir)/libsystemd-internal.la: $(addprefix $(outdir)/,$(sd.libsystemd_SOURCES:.c=.lo))
+nested.subdirs += $(sort $(dir $(sd.libsystemd_SOURCES)))
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

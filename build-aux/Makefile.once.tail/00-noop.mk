@@ -1,2 +1,0 @@
-noop:
-.PHONY: noop

@@ -17,13 +17,16 @@ files.src.src ?=
 files.src.int ?=
 files.src.cfg ?=
 files.src.gen ?=
-files.src = $(sort $(foreach _files.v,$(filter files.src.%,$(.VARIABLES)),$($(_files.v))))
 
 files.out.slow ?=
 files.out.int ?=
 files.out.cfg ?=
-$(eval $(foreach t,$(files.groups),files.out.$t ?=$(at.nl)))
-files.out = $(sort $(foreach _files.v,$(filter files.out.%,$(.VARIABLES)),$($(_files.v))))
 
-$(eval $(foreach t,$(files.groups),files.sys.$t ?=$(at.nl)))
-files.sys = $(sort $(foreach _files.v,$(filter files.sys.%,$(.VARIABLES)),$($(_files.v))))
+# define files.out.$(group) files.sys.$(group) for every files.group
+$(eval $(foreach t,$(files.groups),files.out.$t ?=$(at.nl)files.sys.$t ?=$(at.nl)))
+
+# define files.src, files.out, and files.sys aggregates
+$(eval \
+  files.src = $$(sort $(foreach _files.v,$(filter files.src.%,$(.VARIABLES)),$$($(_files.v))))$(at.nl)\
+  files.out = $$(sort $(foreach _files.v,$(filter files.out.%,$(.VARIABLES)),$$($(_files.v))))$(at.nl)\
+  files.sys = $$(sort $(foreach _files.v,$(filter files.sys.%,$(.VARIABLES)),$$($(_files.v)))))

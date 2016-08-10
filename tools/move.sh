@@ -337,7 +337,7 @@ fixup_makefiles() (
 	    -e '/^	\$\(AM_V_at\)\$\(MKDIR_P\) \$\(dir \$@\)/d' \
 	    -e 's/ \$\(CFLAGS\) / /g' \
 	    -e 's/ \$\(CPPFLAGS\) / /g' \
-	    -e 's/ \$\(AM_CPPFLAGS\) / $(ALL_CPPFLAGS) /g' \
+	    -e 's/ \$\(AM_CPPFLAGS\) / $(sd.ALL_CPPFLAGS) /g' \
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
 	    src/libbasic/include/basic/Makefile \
 	    src/libsystemd/src/Makefile \

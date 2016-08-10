@@ -98,8 +98,8 @@ libudev_core_la_SOURCES += \
 	src/systemd/sd-login.h
 endif # HAVE_ACL
 
-libudev-core.la.SOURCES = $(patsubst src/udev/%,%,$(filter %.c,$(_libudev_core_la_SOURCES) $(_nodist_libudev_core_la_SOURCES)))
-libudev-core.la.DEPENDS = $(addprefix $(outdir)/,$(libudev-core.la.SOURCES:.c=.lo))
+sd.libudev-core_SOURCES = $(patsubst src/udev/%,%,$(filter %.c,$(_libudev_core_la_SOURCES) $(_nodist_libudev_core_la_SOURCES)))
+$(outdir)/libudev-core.la: $(addprefix $(outdir)/,$(sd.libudev-core_SOURCES:.c=.lo))
 nested.subdirs += net
 $(outdir)/udev-builtin-keyboard.lo: $(outdir)/keyboard-keys-from-name.h
 sd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"

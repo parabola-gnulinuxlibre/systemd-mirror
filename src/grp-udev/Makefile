@@ -69,6 +69,7 @@ SYSINIT_TARGET_WANTS += \
 	systemd-udevd.service \
 	systemd-udev-trigger.service
 
+sd.sed_files += $(notdir $(patsubst %.in,%,$(filter %.in,$(EXTRA_DIST))))
 nested.subdirs += systemd-udevd udevadm
 nested.subdirs += ata_id cdrom_id collect mtd_probe scsi_id v4l_id
 

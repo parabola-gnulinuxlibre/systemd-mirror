@@ -29,10 +29,13 @@ audit_list_includes += -include libaudit.h
 endif # HAVE_AUDIT
 
 $(outdir)/audit_type-list.txt: $(call at.path,$(topsrcdir)/src/libbasic/include/basic/missing.h)
-	$(AM_V_GEN)$(CPP) $(ALL_CPPFLAGS) -dM $(audit_list_includes) - </dev/null | grep -vE 'AUDIT_.*(FIRST|LAST)_' | $(SED) -r -n 's/^#define\s+AUDIT_(\w+)\s+([0-9]{4})\s*$$/\1\t\2/p' | sort -k2 >$@
+	$(AM_V_GEN)$(CPP) $(sd.ALL_CPPFLAGS) -dM $(audit_list_includes) - </dev/null | grep -vE 'AUDIT_.*(FIRST|LAST)_' | $(SED) -r -n 's/^#define\s+AUDIT_(\w+)\s+([0-9]{4})\s*$$/\1\t\2/p' | sort -k2 >$@
 
 $(outdir)/audit_type-to-name.h: $(outdir)/audit_type-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
+
+# fsprg.c is a drop-in file using void pointer arithmetic
+$(outdir)/fsprg.lo: sd.ALL_CFLAGS += -Wno-pointer-arith
 
 sd.CPPFLAGS += $(libbasic.CPPFLAGS)
 sd.CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"

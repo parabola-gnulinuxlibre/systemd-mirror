@@ -68,6 +68,8 @@ dist_systemunit_DATA_busnames += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.systemd1.busname
 
+sd.sed_files += $(notdir $(patsubst %.in,%,$(filter %.in,$(EXTRA_DIST))))
+
 sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 
 sd.CPPFLAGS += -DSYSTEMD_BINARY_PATH=\"$(rootlibexecdir)/systemd\"

@@ -38,6 +38,8 @@ libudev_la_LDFLAGS = \
 	-version-info $(LIBUDEV_CURRENT):$(LIBUDEV_REVISION):$(LIBUDEV_AGE) \
 	-Wl,--version-script=$(srcdir)/libudev.sym
 
+libudev_la_LIBADD += $(libudev-internal.DEPENDS)
+
 pkgconfiglib_DATA += \
 	src/libudev/libudev.pc
 
@@ -45,9 +47,7 @@ EXTRA_DIST += \
 	src/libudev/libudev.pc.in
 
 $(outdir)/test-libudev-sym.c: \
-		$(srcdir)/libudev.sym \
 		$(srcdir)/udev.h
-	$(generate-sym-test)
 
 nodist_test_libudev_sym_SOURCES = \
 	test-libudev-sym.c
