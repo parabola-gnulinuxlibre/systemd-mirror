@@ -1,5 +1,12 @@
 mod.am.depends += files
 
+bin_PROGRAMS ?=
+bin_SCRIPTS ?=
+bashcompletion_DATA ?=
+zshcompletion_DATA ?=
+bashcompletion_DATA := $(sort $(bashcompletion_DATA) $(bin_PROGRAMS) $(bin_SCRIPTS))
+zshcompletion_DATA := $(sort $(zshcompletion_DATA) $(addprefix _,$(bin_PROGRAMS) $(bin_SCRIPTS)))
+
 $(eval \
   $(foreach p,$(am.primaries)  ,$(call _am.per_primary,$p)$(at.nl)))
 $(eval \
@@ -20,6 +27,18 @@ $(DESTDIR)$(sysctldir)/%.conf: $(srcdir)/%.sysctl
 	@$(NORMAL_INSTALL)
 	$(am.INSTALL)
 $(DESTDIR)$(sysctldir)/%.conf: $(outdir)/%.sysctl
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL)
+$(DESTDIR)$(bashcompletiondir)/%: $(srcdir)/%.completion.bash
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL)
+$(DESTDIR)$(bashcompletiondir)/%: $(outdir)/%.completion.bash
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL)
+$(DESTDIR)$(zshcompletiondir)/_%: $(srcdir)/%.completion.zsh
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL)
+$(DESTDIR)$(zshcompletiondir)/_%: $(outdir)/%.completion.zsh
 	@$(NORMAL_INSTALL)
 	$(am.INSTALL)
 

@@ -66,12 +66,9 @@ dist_systemunit_DATA += \
 nodist_systemunit_DATA += \
 	units/systemd-journal-remote.service
 
-journal-remote-install-hook: journal-install-hook
-	-$(MKDIR_P) $(DESTDIR)/var/log/journal/remote
-	-chown 0:0 $(DESTDIR)/var/log/journal/remote
-	-chmod 755 $(DESTDIR)/var/log/journal/remote
-
-INSTALL_EXEC_HOOKS += journal-remote-install-hook
+files.sys.all += /var/log/journal/remote
+$(DESTDIR)/var/log/journal/remote:
+	$(MKDIR_P) $@
 
 nodist_pkgsysconf_DATA += \
 	src/journal-remote/journal-remote.conf

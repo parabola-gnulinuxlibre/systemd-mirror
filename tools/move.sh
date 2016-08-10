@@ -348,6 +348,29 @@ fixup_makefiles() (
 	done
 )
 
+breakup_zshcompletion() (
+	sed_expr='
+		1 {
+			i #compdef %s
+			d
+		}
+		/^case/,/^esac/ {
+			/^    %s)/,/^    ;;/ {
+				s/^        //p
+			}
+			d
+		}
+	'
+
+	cd shell-completion/zsh
+	read -r _ cmds < _systemd
+	for cmd in $cmds; do
+		printf -v cmd_sed_expr "$sed_expr" $cmd $cmd
+		sed -e "$cmd_sed_expr" < _systemd > _$cmd
+	done
+	rm _systemd
+)
+
 move() (
 	>&2 echo ' => move_files'
 	move_files
@@ -357,6 +380,8 @@ move() (
 	fixup_includes
 	>&2 echo ' => fixup_makefiles'
 	fixup_makefiles
+	>&2 echo ' => breakup_zshutils'
+	breakup_zshcompletion
 )
 
 main() {

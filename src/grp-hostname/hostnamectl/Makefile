@@ -20,9 +20,26 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-nested.subdirs += systemd-hostnamed hostnamectl
+ifneq ($(ENABLE_HOSTNAMED),)
+
+hostnamectl_SOURCES = \
+	src/hostname/hostnamectl.c
+
+hostnamectl_LDADD = \
+	libshared.la
+
+bin_PROGRAMS += \
+	hostnamectl
+
+dist_bashcompletion_data += \
+	shell-completion/bash/hostnamectl
+
+dist_zshcompletion_data += \
+	shell-completion/zsh/_hostnamectl
+
+endif
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

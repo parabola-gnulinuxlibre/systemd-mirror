@@ -20,9 +20,33 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-nested.subdirs += systemd-hostnamed hostnamectl
+basic_dns_sources =
+
+systemd_resolve_SOURCES = \
+	src/resolve/resolve-tool.c \
+	$(basic_dns_sources) \
+	src/shared/gcrypt-util.c \
+	src/shared/gcrypt-util.h
+
+nodist_systemd_resolve_SOURCES = \
+	src/resolve/dns_type-from-name.h \
+	src/resolve/dns_type-to-name.h
+
+systemd_resolve_LDADD = \
+	libshared.la
+
+bin_PROGRAMS += \
+	systemd-resolve
+
+dist_bashcompletion_data += \
+	shell-completion/bash/systemd-resolve
+
+dist_zshcompletion_data += \
+	shell-completion/zsh/_systemd-resolve
+
+systemd_resolve_LDADD += libbasic-dns.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

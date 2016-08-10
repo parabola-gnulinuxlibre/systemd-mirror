@@ -20,9 +20,46 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-nested.subdirs += systemd-hostnamed hostnamectl
+ifneq ($(ENABLE_HOSTNAMED),)
+systemd_hostnamed_SOURCES = \
+	src/hostname/hostnamed.c
+
+systemd_hostnamed_LDADD = \
+	libshared.la
+
+rootlibexec_PROGRAMS += \
+	systemd-hostnamed
+
+nodist_systemunit_DATA += \
+	units/systemd-hostnamed.service
+
+dist_systemunit_DATA_busnames += \
+	units/org.freedesktop.hostname1.busname
+
+dist_dbuspolicy_DATA += \
+	src/hostname/org.freedesktop.hostname1.conf
+
+dist_dbussystemservice_DATA += \
+	src/hostname/org.freedesktop.hostname1.service
+
+polkitpolicy_files += \
+	src/hostname/org.freedesktop.hostname1.policy
+
+SYSTEM_UNIT_ALIASES += \
+	systemd-hostnamed.service dbus-org.freedesktop.hostname1.service
+
+BUSNAMES_TARGET_WANTS += \
+	org.freedesktop.hostname1.busname
+
+endif # ENABLE_HOSTNAMED
+
+polkitpolicy_in_files += \
+	src/hostname/org.freedesktop.hostname1.policy.in
+
+EXTRA_DIST += \
+	units/systemd-hostnamed.service.in
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

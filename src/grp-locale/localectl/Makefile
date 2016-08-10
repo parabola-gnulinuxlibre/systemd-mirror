@@ -20,9 +20,26 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-nested.subdirs += systemd-hostnamed hostnamectl
+ifneq ($(ENABLE_LOCALED),)
+
+localectl_SOURCES = \
+	src/locale/localectl.c
+
+localectl_LDADD = \
+	libshared.la
+
+bin_PROGRAMS += \
+	localectl
+
+dist_bashcompletion_data += \
+	shell-completion/bash/localectl
+
+dist_zshcompletion_data += \
+	shell-completion/zsh/_localectl
+
+endif # ENABLE_LOCALED
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

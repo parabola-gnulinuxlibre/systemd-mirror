@@ -1,10 +1,15 @@
 mod.am.description = (systemd) Automake-to-Autothing magic
 mod.am.depends += gnuconf
 
-am.inst2noinst_DATA = $(notdir \
+am.inst2noinst_DATA = \
+        $(patsubst %.completion.bash,$(abspath $(srcdir))/%.completion.bash,\
+        $(patsubst %.completion.zsh,$(abspath $(srcdir))/%.completion.zsh,\
+        $(notdir \
         $(patsubst $(sysusersdir)/%.conf,%.sysusers,\
         $(patsubst $(sysctldir)/%.conf,%.sysctl,\
-        $1)))
+        $(patsubst $(bashcompletiondir)/%,%.completion.bash,\
+        $(patsubst $(zshcompletiondir)/_%,%.completion.zsh,\
+        $1)))))))
 am.inst2noinst_HEADERS = $(abspath $(addprefix $(srcdir)/include/,$(notdir $1)))
 
 am.var_PROGRAMS    = $1_SOURCES nodist_$1_SOURCES $1_CFLAGS $1_CPPFLAGS $1_LDFLAGS $1_LDADD
