@@ -24,13 +24,13 @@ ifeq ($(origin _at.NO_ONCE),undefined)
 # These 4 functions are all $(call _at.func,parent,child)
 _at.is_strict_subdir  = $(filter $(abspath $1)/%,$(abspath $2))
 _at.is_subdir         = $(filter $(abspath $1)/%,$(abspath $2)/.)
-_at.relbase = $(strip                                 \
-  $(if $(call _at.is_subdir,$1,$2),                   \
-       $(patsubst $(abspath $1)/%,%,$(abspath $2)/.), \
+_at.relbase = $(strip                                                 \
+  $(if $(call _at.is_subdir,$1,$2),                                   \
+       $(patsubst %/.,$(patsubst $(abspath $1)/%,%,$(abspath $2)/.)), \
        $(abspath $2)))
-_at.relto = $(strip                                   \
-  $(if $(call _at.is_subdir,$1,$2),                   \
-       $(patsubst $(abspath $1)/%,%,$(abspath $2)/.), \
+_at.relto = $(strip                                                     \
+  $(if $(call _at.is_subdir,$1,$2),                                     \
+       $(patsubst %/.,%,$(patsubst $(abspath $1)/%,%,$(abspath $2)/.)), \
        ../$(call _at.relto,$(dir $1),$2)))
 
 # These 3 functions only take one operand; we define public multi-operand
@@ -50,6 +50,8 @@ _at.reverse = $(if $1,$(call _at.reverse,$(_at.rest))) $(firstword $1)
 _at.target_variable           = $(_at.target_variable.$(flavor $2))
 _at.target_variable.recursive = $1: private $2  = $(subst $(at.nl),$$(at.nl),$(value $2))
 _at.target_variable.simple    = $1: private $2 := $$($2)
+
+_at.quote-pattern = $(subst %,\%,$(subst \,\\,$1))
 
 # Sanity checking ######################################################
 ifeq ($(filter undefine,$(.FEATURES)),)

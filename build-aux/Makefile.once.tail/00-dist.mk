@@ -15,7 +15,7 @@
 
 _dist.copyfile = $(MKDIR_P) $(dir $2) && $(CP) -T $1 $2
 _dist.addfile = $(call _dist.copyfile,$3,$2/$(call at.relto,$1,$3))
-$(topoutdir)/$(dist.pkgname)-$(dist.version): $(foreach v,$(filter std.src_files/% std.gen_files/%,$(.VARIABLES)),$($v))
+$(topoutdir)/$(dist.pkgname)-$(dist.version): $(_dist.files)
 	$(RM) -r $@ $(@D)/.tmp.$(@F)
 	$(MKDIR) $(@D)/.tmp.$(@F)
 	$(foreach f,$^,$(call _dist.addfile,$(topsrcdir),$(@D)/.tmp.$(@F),$f)$(at.nl))

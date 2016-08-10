@@ -24,7 +24,10 @@ files.generate ?= files.generate
 .DEFAULT_GOAL = $(files.default)
 
 # Standard creative PHONY targets
-nested.targets += $(foreach g,$(files.groups), $g install-$g install-$gdirs)
+nested.targets += $(files.generate)
+nested.targets += install installdirs
+nested.targets += $(foreach g,$(files.groups),$g)
+nested.targets += $(foreach g,$(filter-out $(files.default),$(files.groups)),install-$g install-$gdirs)
 # Standard destructive PHONY targets
 nested.targets += uninstall mostlyclean clean distclean maintainer-clean
 

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-mod.dist.description = Make distribution tarballs
+mod.dist.description = `dist` target for distribution tarballs
 
 # Developer configuration
 
@@ -27,6 +27,8 @@ endif
 ifeq ($(dist.version),)
 $(error Autothing module: dist: dist.version must be set)
 endif
+
+_dist.files =
 
 # User configuration
 

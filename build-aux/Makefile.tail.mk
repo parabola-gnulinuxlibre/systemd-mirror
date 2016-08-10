@@ -22,7 +22,7 @@ _at.tmp_subdirs := $(call at.addprefix,$(outdir),$(at.subdirs))
 
 # Clean the environment
 $(eval \
-  $(foreach _at.tmp_variable,$(filter-out _at.tmp_variable $(_at.VARIABLES),$(.VARIABLES)),\
+  $(foreach _at.tmp_variable,$(filter-out $(call _at.quote-pattern,_at.tmp_variable $(_at.VARIABLES)),$(.VARIABLES)),\
     $(call _at.target_variable,$(_at.tmp_targets),$(_at.tmp_variable))$(at.nl)\
     undefine $(_at.tmp_variable)$(at.nl)))
 
