@@ -20,6 +20,8 @@ am.INSTALL_SCRIPT    ?= $(INSTALL) $< $@
 am.INSTALL_LTLIBRARY ?= $(INSTALL) $< $@
 am.INSTALL_DATA      ?= $(INSTALL_DATA) $< $@
 
+am.LDFLAGS =
+
 ########################################################################
 
 # this list of primaries is based on the Automake 1.15 manual
@@ -58,7 +60,7 @@ $(foreach var,_am.depends $(call am.var_PROGRAMS,$2),$(var) ?=$(at.nl))
 _am.depends += $$(call at.path,$$(call am.file2.o,$1)  $$(call am.file2lib,$1,LDADD))
 am.CPPFLAGS +=                 $$($2_CPPFLAGS)         $$(call am.file2cpp,$1,LDADD)
 am.CFLAGS   +=                 $$($2_CFLAGS)
-$$(outdir)/$1: private ALL_LDFLAGS += $$($2_LDFLAGS)
+$$(outdir)/$1: private am.LDFLAGS := $$($2_LDFLAGS)
 $$(outdir)/$1: $$(_am.depends)
 am.subdirs := $$(sort $$(am.subdirs)\
                       $$(filter-out $$(abspath $$(srcdir)),\
@@ -76,7 +78,7 @@ $(foreach var,_am.depends $(call am.var_LTLIBRARIES,$2),$(var) ?=$(at.nl))
 _am.depends += $$(call at.path,$$(call am.file2.lo,$1) $$(call am.file2lib,$1,LIBADD))
 am.CPPFLAGS +=                 $$($2_CPPFLAGS)         $$(call am.file2cpp,$1,LIBADD)
 am.CFLAGS   +=                 $$($2_CFLAGS)
-$$(outdir)/$1: private ALL_LDFLAGS += $$($2_LDFLAGS)
+$$(outdir)/$1: private am.LDFLAGS := $$($2_LDFLAGS)
 $$(outdir)/$1: $$(_am.depends)
 am.subdirs := $$(sort $$(am.subdirs)\
                       $$(filter-out $$(abspath $$(srcdir)),\

@@ -40,7 +40,7 @@ OUR_CPPFLAGS += $(sort -I$(@D) $(if $(<D),-I$(<D) -I$(call at.out2src,$(<D))))
 # 
 sd.ALL_CFLAGS       = $(strip $(OUR_CFLAGS)       $(am.CFLAGS)       $(sd.CFLAGS)       $(CFLAGS)       )
 sd.ALL_CPPFLAGS     = $(strip $(OUR_CPPFLAGS)     $(am.CPPFLAGS)     $(sd.CPPFLAGS)     $(CPPFLAGS)     )
-sd.ALL_LDFLAGS      = $(strip $(OUR_LDFLAGS)                         $(sd.LDFLAGS)      $(LDFLAGS)      )
+sd.ALL_LDFLAGS      = $(strip $(OUR_LDFLAGS)      $(am.LDFLAGS)      $(sd.LDFLAGS)      $(LDFLAGS)      )
 sd.ALL_LIBTOOLFLAGS = $(strip $(OUR_LIBTOOLFLAGS)                    $(sd.LIBTOOLFLAGS) $(LIBTOOLFLAGS) )
 
 sd.COMPILE   = $(CC) $(sd.ALL_CPPFLAGS) $(sd.ALL_CFLAGS)
