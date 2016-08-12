@@ -29,10 +29,7 @@
 #undef basename
 
 #include "basic/alloc-util.h"
-#include "bus-common-errors.h"
-#include "bus-internal.h"
 #include "basic/bus-label.h"
-#include "shared/bus-util.h"
 #include "basic/copy.h"
 #include "basic/env-util.h"
 #include "basic/fd-util.h"
@@ -40,9 +37,6 @@
 #include "basic/formats-util.h"
 #include "basic/fs-util.h"
 #include "basic/in-addr-util.h"
-#include "local-addresses.h"
-#include "machine-dbus.h"
-#include "machine.h"
 #include "basic/mkdir.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
@@ -50,6 +44,13 @@
 #include "basic/strv.h"
 #include "basic/terminal-util.h"
 #include "basic/user-util.h"
+#include "sd-bus/bus-common-errors.h"
+#include "sd-bus/bus-internal.h"
+#include "sd-netlink/local-addresses.h"
+#include "shared/bus-util.h"
+
+#include "machine-dbus.h"
+#include "machine.h"
 
 static int property_get_id(
                 sd_bus *bus,

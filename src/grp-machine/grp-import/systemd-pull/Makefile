@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 rootlibexec_PROGRAMS += systemd-pull
@@ -34,14 +34,8 @@ systemd_pull_SOURCES = \
 	src/import/pull-job.h \
 	src/import/pull-common.c \
 	src/import/pull-common.h \
-	src/import/import-common.c \
-	src/import/import-common.h \
-	src/import/import-compress.c \
-	src/import/import-compress.h \
 	src/import/curl-util.c \
-	src/import/curl-util.h \
-	src/import/qcow2-util.c \
-	src/import/qcow2-util.h
+	src/import/curl-util.h
 
 systemd_pull_CFLAGS = \
 	$(AM_CFLAGS) \
@@ -54,6 +48,7 @@ systemd_pull_CFLAGS = \
 	-D USER_KEYRING_PATH=\"$(pkgsysconfdir)/import-pubring.gpg\"
 
 systemd_pull_LDADD = \
+	libimport.la \
 	libshared.la \
 	$(LIBCURL_LIBS) \
 	$(XZ_LIBS) \

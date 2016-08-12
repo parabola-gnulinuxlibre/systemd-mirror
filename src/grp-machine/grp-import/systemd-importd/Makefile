@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 rootlibexec_PROGRAMS += systemd-importd
@@ -35,5 +35,35 @@ systemd_importd_CFLAGS = \
 
 systemd_importd_LDADD = \
 	libshared.la
+
+dist_rootlibexec_DATA = \
+	src/import/import-pubring.gpg
+
+nodist_systemunit_DATA += \
+	units/systemd-importd.service
+
+dist_systemunit_DATA_busnames += \
+	units/org.freedesktop.import1.busname
+
+BUSNAMES_TARGET_WANTS += \
+	org.freedesktop.import1.busname
+
+SYSTEM_UNIT_ALIASES += \
+	systemd-importd.service dbus-org.freedesktop.import1.service
+
+dist_dbussystemservice_DATA += \
+	src/import/org.freedesktop.import1.service
+
+dist_dbuspolicy_DATA += \
+	src/import/org.freedesktop.import1.conf
+
+polkitpolicy_files += \
+	src/import/org.freedesktop.import1.policy
+
+polkitpolicy_in_files += \
+	src/import/org.freedesktop.import1.policy.in
+
+EXTRA_DIST += \
+	units/systemd-importd.service.in
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

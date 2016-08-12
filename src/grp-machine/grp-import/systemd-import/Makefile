@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 rootlibexec_PROGRAMS += systemd-import
@@ -29,13 +29,7 @@ systemd_import_SOURCES = \
 	src/import/import-raw.c \
 	src/import/import-raw.h \
 	src/import/import-tar.c \
-	src/import/import-tar.h \
-	src/import/import-common.c \
-	src/import/import-common.h \
-	src/import/import-compress.c \
-	src/import/import-compress.h \
-	src/import/qcow2-util.c \
-	src/import/qcow2-util.h
+	src/import/import-tar.h
 
 systemd_import_CFLAGS = \
 	$(AM_CFLAGS) \
@@ -45,6 +39,7 @@ systemd_import_CFLAGS = \
 
 systemd_import_LDADD = \
 	libshared.la \
+	libimport.la \
 	$(XZ_LIBS) \
 	$(ZLIB_LIBS) \
 	$(BZIP2_LIBS)

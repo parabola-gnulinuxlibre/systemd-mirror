@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(ENABLE_IMPORTD),)
@@ -31,45 +31,11 @@ ifneq ($(HAVE_ZLIB),)
 ifneq ($(HAVE_BZIP2),)
 ifneq ($(HAVE_GCRYPT),)
 
-dist_rootlibexec_DATA = \
-	src/import/import-pubring.gpg
-
-nodist_systemunit_DATA += \
-	units/systemd-importd.service
-
-dist_systemunit_DATA_busnames += \
-	units/org.freedesktop.import1.busname
-
-BUSNAMES_TARGET_WANTS += \
-	org.freedesktop.import1.busname
-
-SYSTEM_UNIT_ALIASES += \
-	systemd-importd.service dbus-org.freedesktop.import1.service
-
-dist_dbussystemservice_DATA += \
-	src/import/org.freedesktop.import1.service
-
-dist_dbuspolicy_DATA += \
-	src/import/org.freedesktop.import1.conf
-
-polkitpolicy_files += \
-	src/import/org.freedesktop.import1.policy
-
-manual_tests += \
-	test-qcow2
-
-test_qcow2_SOURCES = \
-	src/import/test-qcow2.c \
-	src/import/qcow2-util.c \
-	src/import/qcow2-util.h
-
-test_qcow2_CFLAGS = \
-	$(AM_CFLAGS) \
-	$(ZLIB_CFLAGS)
-
-test_qcow2_LDADD = \
-	libshared.la \
-	$(ZLIB_LIBS)
+nested.subdirs += libimport
+nested.subdirs += systemd-export
+nested.subdirs += systemd-import
+nested.subdirs += systemd-importd
+nested.subdirs += systemd-pull
 
 endif # HAVE_GCRYPT
 endif # HAVE_BZIP2
@@ -78,12 +44,5 @@ endif # HAVE_XZ
 endif # HAVE_LIBCURL
 
 endif # ENABLE_IMPORTD
-
-polkitpolicy_in_files += \
-	src/import/org.freedesktop.import1.policy.in
-
-EXTRA_DIST += \
-	units/systemd-importd.service.in
-
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

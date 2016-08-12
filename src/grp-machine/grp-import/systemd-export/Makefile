@@ -20,7 +20,7 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 rootlibexec_PROGRAMS += systemd-export
@@ -30,11 +30,7 @@ systemd_export_SOURCES = \
 	src/import/export-tar.c \
 	src/import/export-tar.h \
 	src/import/export-raw.c \
-	src/import/export-raw.h \
-	src/import/import-common.c \
-	src/import/import-common.h \
-	src/import/import-compress.c \
-	src/import/import-compress.h
+	src/import/export-raw.h
 
 systemd_export_CFLAGS = \
 	$(AM_CFLAGS) \
@@ -44,6 +40,7 @@ systemd_export_CFLAGS = \
 
 systemd_export_LDADD = \
 	libshared.la \
+	libimport.la \
 	$(XZ_LIBS) \
 	$(ZLIB_LIBS) \
 	$(BZIP2_LIBS)

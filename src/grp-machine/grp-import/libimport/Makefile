@@ -20,33 +20,32 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-libmachine_core_la_SOURCES = \
-	src/machine/machine.c \
-	src/machine/machine.h \
-	src/machine/machined-dbus.c \
-	src/machine/machine-dbus.c \
-	src/machine/machine-dbus.h \
-	src/machine/image-dbus.c \
-	src/machine/image-dbus.h \
-	src/machine/operation.c \
-	src/machine/operation.h
+noinst_LTLIBRARIES += libimport.la
 
-libmachine_core_la_LIBADD = \
-	libshared.la
+libimport_la_SOURCES = \
+        qcow2-util.c \
+        import-common.c \
+	import-compress.c
 
-noinst_LTLIBRARIES += \
-	libmachine-core.la
+libimport_la_LIBADD += libbasic.la
 
-test_machine_tables_SOURCES = \
-	src/machine/test-machine-tables.c
+manual_tests += \
+	test-qcow2
 
-test_machine_tables_LDADD = \
-	libmachine-core.la
+test_qcow2_SOURCES = \
+	src/import/test-qcow2.c \
+	src/import/qcow2-util.c \
+	src/import/qcow2-util.h
 
-tests += \
-	test-machine-tables
+test_qcow2_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(ZLIB_CFLAGS)
+
+test_qcow2_LDADD = \
+	libshared.la \
+	$(ZLIB_LIBS)
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
