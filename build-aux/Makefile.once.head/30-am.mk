@@ -1,16 +1,16 @@
 mod.am.description = (systemd) Automake-to-Autothing magic
 mod.am.depends += gnuconf
 
-am.inst2noinst_DATA = \
-        $(patsubst %.completion.bash,$(abspath $(srcdir))/%.completion.bash,\
-        $(patsubst %.completion.zsh,$(abspath $(srcdir))/%.completion.zsh,\
+am.sys2out_DATA = \
         $(notdir \
+        $(patsubst $(pamconfdir)/%,%.pam,\
+        $(patsubst $(tmpfilesdir)/%.conf,%.tmpfiles,\
         $(patsubst $(sysusersdir)/%.conf,%.sysusers,\
         $(patsubst $(sysctldir)/%.conf,%.sysctl,\
         $(patsubst $(bashcompletiondir)/%,%.completion.bash,\
         $(patsubst $(zshcompletiondir)/_%,%.completion.zsh,\
         $1)))))))
-am.inst2noinst_HEADERS = $(abspath $(addprefix $(srcdir)/include/,$(notdir $1)))
+am.sys2out_HEADERS = $(abspath $(addprefix $(srcdir)/include/,$(notdir $1)))
 
 am.var_PROGRAMS    = $1_SOURCES nodist_$1_SOURCES $1_CFLAGS $1_CPPFLAGS $1_LDFLAGS $1_LDADD
 am.var_LTLIBRARIES = $1_SOURCES nodist_$1_SOURCES $1_CFLAGS $1_CPPFLAGS $1_LDFLAGS $1_LIBADD
@@ -26,11 +26,11 @@ am.LDFLAGS =
 
 # this list of primaries is based on the Automake 1.15 manual
 am.primaries ?= PROGRAMS LIBRARIES LTLIBRARIES LISP PYTHON JAVA SCRIPTS DATA HEADERS MANS TEXINFOS
-$(eval $(foreach p,$(am.primaries),am.inst2noinst_$p ?= $$(notdir $$1)$(at.nl)))
+$(eval $(foreach p,$(am.primaries),am.sys2out_$p ?= $$(notdir $$1)$(at.nl)))
 
 am.primary2dirs = $(filter $(patsubst %dir,%,$(filter %dir,$(.VARIABLES))),\
-                           $(patsubst %_$1,%,$(filter %_$1,$(.VARIABLES))))
-am.inst2dirs = $(sort $(patsubst %/,%,$(dir $(foreach p,$(am.primaries),$(am.inst_$p)))))
+                           $(patsubst nodist_%,%,$(patsubst dist_%,%,$(patsubst %_$1,%,$(filter %_$1,$(.VARIABLES))))))
+am.sys2dirs = $(sort $(patsubst %/,%,$(dir $(foreach p,$(am.primaries),$(am.sys_$p)))))
 
 am.file2var = $(subst -,_,$(subst .,_,$1))
 am.file2sources  = $(addprefix $(srcdir)/,$(notdir $($(am.file2var)_SOURCES)))
@@ -41,15 +41,17 @@ am.file2lib = $(foreach l,   $($(am.file2var)_$2),$(if $(filter lib%.la,$l), $($
 am.file2cpp = $(foreach l,$1 $($(am.file2var)_$2),$(if $(filter lib%.la,$l), $($(l:.la=).CPPFLAGS) ,    ))
 
 define _am.per_primary
+$(foreach d,$(call am.primary2dirs,$1),$d_$1 ?=$(at.nl)dist_$d_$1 ?=$(at.nl)nodist_$d_$1 ?=$(at.nl))
 noinst_$1 ?=
 check_$1 ?=
 
-am.inst_$1 := $$(foreach d,$$(call am.primary2dirs,$1),$$(addprefix $$($$ddir)/,$$(notdir $$($$d_$1))))
-am.noinst_$1 := $$(noinst_$1)
+am.sys_$1 := $(foreach d,$(call am.primary2dirs,$1),$$(addprefix $$($ddir)/,$$(notdir $$($d_$1) $$(dist_$d_$1) $$(nodist_$d_$1))))
+am.out_$1 := $$(call am.sys2out_$1,$(foreach d,$(call am.primary2dirs,$1),$$(addprefix $$($ddir)/,$$(notdir $$($d_$1) $$(nodist_$d_$1) ))) $$(noinst_$1))
 am.check_$1 := $$(check_$1)
-$(foreach d,$(call am.primary2dirs,$1) noinst check,undefine $d_$1$(at.nl))
-$$(addprefix $$(DESTDIR),$$(am.inst_$1)): private am.INSTALL = $$(am.INSTALL_$1)
-am.$1 = $$(am.check_$1) $$(am.noinst_$1) $$(call am.inst2noinst_$1,$$(am.inst_$1))
+$(foreach d,$(call am.primary2dirs,$1),undefine $d_$1$(at.nl)undefine dist_$d_$1$(at.nl)undefine nodist_$d_$1$(at.nl))
+undefine noinst_$1
+undefine check_$1
+$$(addprefix $$(DESTDIR),$$(am.sys_$1)): private am.INSTALL = $$(am.INSTALL_$1)
 endef
 ########################################################################
 # TODO: I'm not in love with how _am.per_PROGRAM figures out am.subdirs

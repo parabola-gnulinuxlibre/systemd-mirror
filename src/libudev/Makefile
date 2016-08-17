@@ -57,8 +57,6 @@ test_libudev_sym_CFLAGS = \
 test_libudev_sym_LDADD = \
 	libudev.la
 
-sd.sed_files += libudev.pc
-
 nested.subdirs += src
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

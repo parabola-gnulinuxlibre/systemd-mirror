@@ -35,6 +35,10 @@ systemd_CFLAGS = \
 systemd_LDADD = \
 	libcore.la
 
+dist_tmpfiles_DATA = \
+	tmpfiles.d/systemd.conf \
+        systemd-tmp.conf
+
 dist_pkgsysconf_DATA += \
 	src/core/system.conf \
 	src/core/user.conf
@@ -67,8 +71,6 @@ dist_systemunit_DATA_busnames += \
 
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.systemd1.busname
-
-sd.sed_files += $(notdir $(patsubst %.in,%,$(filter %.in,$(EXTRA_DIST))))
 
 sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 

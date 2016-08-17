@@ -42,6 +42,11 @@ dist_udevrules_DATA += \
 	rules/78-sound-card.rules \
 	rules/80-net-setup-link.rules
 
+ifneq ($(HAVE_KMOD),)
+dist_udevrules_DATA += \
+	rules/80-drivers.rules
+endif # HAVE_KMOD
+
 nodist_udevrules_DATA += \
 	rules/99-systemd.rules
 
@@ -69,7 +74,6 @@ SYSINIT_TARGET_WANTS += \
 	systemd-udevd.service \
 	systemd-udev-trigger.service
 
-sd.sed_files += $(notdir $(patsubst %.in,%,$(filter %.in,$(EXTRA_DIST))))
 nested.subdirs += systemd-udevd udevadm
 nested.subdirs += ata_id cdrom_id collect mtd_probe scsi_id v4l_id
 

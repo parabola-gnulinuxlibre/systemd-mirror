@@ -60,6 +60,9 @@ nodist_systemunit_DATA += \
 dist_gatewayddocumentroot_DATA = \
 	src/journal-remote/browse.html
 
+dist_sysusers_DATA += \
+	sysusers.d/systemd-journal-gateway.conf
+
 endif # HAVE_MICROHTTPD
 
 EXTRA_DIST += \

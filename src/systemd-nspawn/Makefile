@@ -82,6 +82,9 @@ test_patch_uid_LDADD = \
 manual_tests += \
 	test-patch-uid
 
+dist_tmpfiles_DATA = \
+	tmpfiles.d/systemd-nspawn.conf
+
 sd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

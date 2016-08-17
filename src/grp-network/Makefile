@@ -23,7 +23,8 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-dist_network_DATA = \
+# TODO
+_dist_network_DATA = \
 	network/99-default.link \
 	network/80-container-host0.network \
 	network/80-container-ve.network \
@@ -64,33 +65,6 @@ tests += \
 	test-networkd-conf \
 	test-network \
 	test-network-tables
-
-dist_systemunit_DATA += \
-	units/systemd-networkd.socket
-
-nodist_systemunit_DATA += \
-	units/systemd-networkd.service \
-	units/systemd-networkd-wait-online.service
-
-dist_systemunit_DATA_busnames += \
-	units/org.freedesktop.network1.busname
-
-dist_dbussystemservice_DATA += \
-	src/network/org.freedesktop.network1.service
-
-dist_dbuspolicy_DATA += \
-	src/network/org.freedesktop.network1.conf
-
-GENERAL_ALIASES += \
-	$(systemunitdir)/systemd-networkd.socket $(pkgsysconfdir)/system/sockets.target.wants/systemd-networkd.socket \
-	$(systemunitdir)/systemd-networkd.service $(pkgsysconfdir)/system/multi-user.target.wants/systemd-networkd.service \
-	$(systemunitdir)/systemd-networkd-wait-online.service $(pkgsysconfdir)/system/network-online.target.wants/systemd-networkd-wait-online.service
-
-SYSTEM_UNIT_ALIASES += \
-	systemd-networkd.service dbus-org.freedesktop.network1.service
-
-BUSNAMES_TARGET_WANTS += \
-	org.freedesktop.network1.busname
 
 endif # ENABLE_NETWORKD
 

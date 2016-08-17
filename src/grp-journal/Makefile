@@ -167,6 +167,9 @@ tests += \
 	test-compress-benchmark
 endif # HAVE_COMPRESSION
 
+dist_tmpfiles_DATA = \
+	tmpfiles.d/journal-nocow.conf
+
 nested.subdirs += journalctl systemd-journald libjournal-core
 nested.subdirs += systemd-cat
 #nested.subdirs += grp-remote

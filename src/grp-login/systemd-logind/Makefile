@@ -23,7 +23,38 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+_liblogind_core_la_SOURCES = \
+	src/login/logind-core.c \
+	src/login/logind-device.c \
+	src/login/logind-device.h \
+	src/login/logind-button.c \
+	src/login/logind-button.h \
+	src/login/logind-action.c \
+	src/login/logind-action.h \
+	src/login/logind-seat.c \
+	src/login/logind-seat.h \
+	src/login/logind-session.c \
+	src/login/logind-session.h \
+	src/login/logind-session-device.c \
+	src/login/logind-session-device.h \
+	src/login/logind-user.c \
+	src/login/logind-user.h \
+	src/login/logind-inhibit.c \
+	src/login/logind-inhibit.h \
+	src/login/logind-dbus.c \
+	src/login/logind-session-dbus.c \
+	src/login/logind-seat-dbus.c \
+	src/login/logind-user-dbus.c \
+	src/login/logind-utmp.c \
+	src/login/logind-acl.h
+
+ifneq ($(HAVE_ACL),)
+_liblogind_core_la_SOURCES += \
+	src/login/logind-acl.c
+endif # HAVE_ACL
+
 systemd_logind_SOURCES = \
+	$(_liblogind_core_la_SOURCES) \
 	src/login/logind.c \
 	src/login/logind.h
 
@@ -31,9 +62,67 @@ nodist_systemd_logind_SOURCES = \
 	src/login/logind-gperf.c
 
 systemd_logind_LDADD = \
-	liblogind-core.la
+	libshared.la
 
 rootlibexec_PROGRAMS += \
 	systemd-logind
+
+
+nodist_systemunit_DATA += \
+	units/systemd-logind.service
+
+dist_systemunit_DATA += \
+	units/user.slice
+
+dist_systemunit_DATA_busnames += \
+	units/org.freedesktop.login1.busname
+
+dist_dbussystemservice_DATA += \
+	src/login/org.freedesktop.login1.service
+
+dist_dbuspolicy_DATA += \
+	src/login/org.freedesktop.login1.conf
+
+nodist_pkgsysconf_DATA += \
+	src/login/logind.conf
+
+polkitpolicy_files += \
+	src/login/org.freedesktop.login1.policy
+
+INSTALL_DIRS += \
+	$(systemdstatedir)
+
+MULTI_USER_TARGET_WANTS += \
+	systemd-logind.service
+
+SYSTEM_UNIT_ALIASES += \
+	systemd-logind.service dbus-org.freedesktop.login1.service
+
+BUSNAMES_TARGET_WANTS += \
+	org.freedesktop.login1.busname
+
+dist_udevrules_DATA += \
+	src/login/70-uaccess.rules \
+	src/login/70-power-switch.rules
+
+nodist_udevrules_DATA += \
+	src/login/71-seat.rules \
+	src/login/73-seat-late.rules
+
+
+polkitpolicy_in_files += \
+	src/login/org.freedesktop.login1.policy.in
+
+gperf_gperf_sources += \
+	src/login/logind-gperf.gperf
+
+EXTRA_DIST += \
+	src/login/71-seat.rules.in \
+	src/login/73-seat-late.rules.in \
+	units/systemd-logind.service.in \
+	src/login/logind.conf.in
+
+sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
+sd.CPPFLAGS += -DKEXEC=\"$(KEXEC)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

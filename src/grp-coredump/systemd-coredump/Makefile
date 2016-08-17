@@ -75,7 +75,7 @@ CLEANFILES += \
 endif # ENABLE_COREDUMP
 
 EXTRA_DIST += \
-	sysctl.d/50-coredump.conf.in \
+	sysctl.d/50-coredump.sysctl.in \
 	units/systemd-coredump@.service.in
 
 sd.CPPFLAGS += -I$(topsrcdir)/src/grp-journal/libjournal-core

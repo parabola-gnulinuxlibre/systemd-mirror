@@ -49,6 +49,18 @@ journalctl_LDADD += \
 	$(QRENCODE_LIBS)
 endif # HAVE_QRENCODE
 
+nodist_systemunit_DATA += \
+	units/systemd-journal-flush.service \
+	units/systemd-journal-catalog-update.service
+
+SYSINIT_TARGET_WANTS += \
+	systemd-journal-flush.service \
+	systemd-journal-catalog-update.service
+
+EXTRA_DIST += \
+	units/systemd-journal-flush.service.in \
+	units/systemd-journal-catalog-update.service.in
+
 sd.CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

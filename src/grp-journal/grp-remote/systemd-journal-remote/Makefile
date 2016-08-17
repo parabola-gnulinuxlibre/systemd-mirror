@@ -63,6 +63,9 @@ endif # HAVE_GNUTLS
 dist_systemunit_DATA += \
 	units/systemd-journal-remote.socket
 
+dist_sysusers_DATA += \
+	sysusers.d/systemd-journal-remote.conf
+
 nodist_systemunit_DATA += \
 	units/systemd-journal-remote.service
 

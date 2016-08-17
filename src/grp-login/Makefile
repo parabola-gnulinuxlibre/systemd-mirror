@@ -56,60 +56,9 @@ tests += \
 	test-login-tables \
 	test-login-shared
 
-
-nodist_systemunit_DATA += \
-	units/systemd-logind.service
-
-dist_systemunit_DATA += \
-	units/user.slice
-
-dist_systemunit_DATA_busnames += \
-	units/org.freedesktop.login1.busname
-
-dist_dbussystemservice_DATA += \
-	src/login/org.freedesktop.login1.service
-
-dist_dbuspolicy_DATA += \
-	src/login/org.freedesktop.login1.conf
-
-nodist_pkgsysconf_DATA += \
-	src/login/logind.conf
-
-polkitpolicy_files += \
-	src/login/org.freedesktop.login1.policy
-
-INSTALL_DIRS += \
-	$(systemdstatedir)
-
-MULTI_USER_TARGET_WANTS += \
-	systemd-logind.service
-
-SYSTEM_UNIT_ALIASES += \
-	systemd-logind.service dbus-org.freedesktop.login1.service
-
-BUSNAMES_TARGET_WANTS += \
-	org.freedesktop.login1.busname
-
-dist_udevrules_DATA += \
-	src/login/70-uaccess.rules \
-	src/login/70-power-switch.rules
-
-nodist_udevrules_DATA += \
-	src/login/71-seat.rules \
-	src/login/73-seat-late.rules
+nested.subdirs += loginctl systemd-logind
+nested.subdirs += pam_systemd systemd-inhibit
 
 endif # ENABLE_LOGIND
-
-polkitpolicy_in_files += \
-	src/login/org.freedesktop.login1.policy.in
-
-gperf_gperf_sources += \
-	src/login/logind-gperf.gperf
-
-EXTRA_DIST += \
-	src/login/71-seat.rules.in \
-	src/login/73-seat-late.rules.in \
-	units/systemd-logind.service.in \
-	src/login/logind.conf.in
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

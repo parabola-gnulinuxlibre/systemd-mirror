@@ -1,1 +1,1 @@
-../../grp-login/liblogind-core/logind-acl.c
+../../grp-login/systemd-logind/logind-acl.c

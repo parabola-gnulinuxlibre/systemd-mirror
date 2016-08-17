@@ -80,9 +80,6 @@ libudev_core_la_LIBADD = \
 ifneq ($(HAVE_KMOD),)
 libudev_core_la_SOURCES += \
 	src/udev/udev-builtin-kmod.c
-
-dist_udevrules_DATA += \
-	rules/80-drivers.rules
 endif # HAVE_KMOD
 
 ifneq ($(HAVE_BLKID),)

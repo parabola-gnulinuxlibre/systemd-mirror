@@ -45,7 +45,11 @@ nodist_systemunit_DATA += \
 
 nodist_pkgsysconf_DATA += \
         src/journal-remote/journal-upload.conf
-endif
+
+dist_sysusers_DATA += \
+	sysusers.d/systemd-journal-upload.conf
+
+endif # HAVE_LIBCURL
 
 EXTRA_DIST += \
         units/systemd-journal-upload.service.in \

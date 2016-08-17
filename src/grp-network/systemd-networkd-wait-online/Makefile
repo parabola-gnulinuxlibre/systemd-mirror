@@ -41,4 +41,13 @@ systemd_networkd_wait_online_LDADD = \
 	libsystemd-network.la \
 	libshared.la
 
+nodist_systemunit_DATA += \
+	units/systemd-networkd-wait-online.service
+
+GENERAL_ALIASES += \
+	$(systemunitdir)/systemd-networkd-wait-online.service $(pkgsysconfdir)/system/network-online.target.wants/systemd-networkd-wait-online.service
+
+EXTRA_DIST += \
+	units/systemd-networkd-wait-online.service.in
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

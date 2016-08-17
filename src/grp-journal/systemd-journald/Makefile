@@ -40,14 +40,13 @@ dist_systemunit_DATA += \
 	units/systemd-journald-audit.socket
 
 nodist_systemunit_DATA += \
-	units/systemd-journald.service \
-	units/systemd-journal-flush.service \
-	units/systemd-journal-catalog-update.service
+	units/systemd-journald.service
 
 dist_pkgsysconf_DATA += \
 	src/journal/journald.conf
 
-dist_catalog_DATA = \
+# TODO
+_dist_catalog_DATA = \
 	catalog/systemd.bg.catalog \
 	catalog/systemd.be.catalog \
 	catalog/systemd.be@latin.catalog \
@@ -66,14 +65,10 @@ SOCKETS_TARGET_WANTS += \
 	systemd-journald-audit.socket
 
 SYSINIT_TARGET_WANTS += \
-	systemd-journald.service \
-	systemd-journal-flush.service \
-	systemd-journal-catalog-update.service
+	systemd-journald.service
 
 EXTRA_DIST += \
-	units/systemd-journald.service.in \
-	units/systemd-journal-flush.service.in \
-	units/systemd-journal-catalog-update.service.in
+	units/systemd-journald.service.in
 
 gperf_gperf_sources += \
 	src/journal/journald-gperf.gperf

@@ -40,7 +40,8 @@ dbus1-generator-install-hook:
 dbus1-generator-uninstall-hook:
 	rm -f $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
 
-dist_xinitrc_SCRIPTS = \
+# TODO
+_dist_xinitrc_SCRIPTS = \
 	xorg/50-systemd-user.sh
 
 INSTALL_EXEC_HOOKS += dbus1-generator-install-hook
