@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 mod.mod.description = Display information about Autothing modules
+mod.mod.depends += quote
 
 # The trickery that is _mod.empty/_mod.space is from §6.2 of the GNU Make
 # manual, "The Two Flavors of Variables".
@@ -33,10 +34,3 @@ $(eval $(foreach _mod.tmp,$(_mod.modules),\
   mod.$(_mod.tmp).description ?=$(at.nl)\
   mod.$(_mod.tmp).depends ?=$(at.nl)\
   mod.$(_mod.tmp).files ?=$(at.nl)))
-
-_mod.quote-pattern = $(subst %,\%,$(subst \,\\,$1))
-_mod.quote-shell-each = $(foreach _mod.tmp,$1,$(call _mod.quote-shell,$(_mod.tmp)))
-
-# I put this as the last line in the file because it confuses Emacs syntax
-# highlighting and makes the remainder of the file difficult to edit.
-_mod.quote-shell = $(subst $(at.nl),'$$'\n'','$(subst ','\'',$1)')
