@@ -1,0 +1,49 @@
+[remote "r-systemd"]
+	url = https://github.com/systemd/systemd.git
+        tagopt = --no-tags
+	fetch = +refs/heads/*:refs/remotes/r-systemd/*
+	fetch = +refs/tags/*:refs/tags/systemd/*
+[branch "systemd/master"]
+	remote = r-systemd
+	merge = refs/heads/master
+
+[remote "r-elogind"]
+	url = https://github.com/wingo/elogind.git
+        tagopt = --no-tags
+	fetch = +refs/heads/*:refs/remotes/r-elogind/*
+	fetch = +refs/tags/*:refs/tags/elogind/*
+[branch "elogind/master"]
+        remote = r-elogind
+        merge = refs/heads/master
+
+[remote "r-eudev"]
+        url = https://github.com/gentoo/eudev.git
+        tagopt = --no-tags
+	fetch = +refs/heads/*:refs/remotes/r-eudev/*
+	fetch = +refs/tags/*:refs/tags/eudev/*
+[branch "eudev/master"]
+        remote = r-eudev
+        merge = refs/heads/master
+
+[remote "r-parabola"]
+	url = https://git.parabola.nu/~lukeshu/systemd.git
+	pushUrl = ssh://git@git.parabola.nu/~git/~lukeshu/systemd.git
+        tagopt = --no-tags
+	fetch = +refs/heads/*:refs/remotes/r-parabola/*
+[branch "systemd/parabola"]
+	remote = r-parabola
+	merge = refs/heads/systemd/parabola
+[branch "notsystemd/premove"]
+	remote = r-parabola
+	merge = refs/heads/notsystemd/premove
+[branch "notsystemd/postmove"]
+	remote = r-parabola
+	merge = refs/heads/notsystemd/postmove
+[branch "notsystemd/master"]
+	remote = r-parabola
+	merge = refs/heads/notsystemd/postmove
+
+[remote "r-autothing"]
+	url = git://lukeshu.com/autothing
+        tagopt = --no-tags
+	fetch = +refs/heads/*:refs/remotes/r-autothing/*

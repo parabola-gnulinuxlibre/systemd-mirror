@@ -392,16 +392,16 @@ main() {
 		exit 1
 	fi
 
-	git checkout -b postmove
+	git checkout -b tmp/postmove
 
 	move
 
 	git add .
 	git commit -m './move.sh'
-	git merge -s ours lukeshu/postmove
-	git checkout lukeshu/postmove
-	git merge postmove
-	git branch -d postmove
+	git merge -s ours notsystemd/postmove
+	git checkout notsystemd/postmove
+	git merge tmp/postmove
+	git branch -d tmp/postmove
 }
 
 main "$@"

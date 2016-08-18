@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+cd "$(dirname -- "$0")"
+cd "$(git rev-parse --show-toplevel)"
+
+if [ -f .git/hooks/pre-commit.sample ] && [ ! -f .git/hooks/pre-commit ]; then
+        # This part is allowed to fail
+        cp -p .git/hooks/pre-commit.sample .git/hooks/pre-commit && \
+        chmod +x .git/hooks/pre-commit && \
+        echo "Activated pre-commit hook." || :
+fi
+
+declare -A fetch
+git config -f .gitconfig --get-regexp '.*' | while read -r key val; do
+        if [[ $key = *.fetch ]]; then
+                if [[ -z "${fetch[$key]}" ]]; then
+                        git config --local --unset-all "$key"
+                        fetch[$key]='true'
+                fi
+                git config --local --add "$key" "$val"
+        else
+                git config --local "$key" "$val"
+        fi
+done
