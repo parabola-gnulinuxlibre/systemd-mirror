@@ -1,11 +1,12 @@
 mod.am.depends += files
 
+rootbin_PROGRAMS ?=
 bin_PROGRAMS ?=
 bin_SCRIPTS ?=
 bashcompletion_DATA ?=
 zshcompletion_DATA ?=
-dist_bashcompletion_DATA := $(sort $(bashcompletion_DATA) $(bin_PROGRAMS) $(bin_SCRIPTS))
-dist_zshcompletion_DATA := $(sort $(zshcompletion_DATA) $(addprefix _,$(bin_PROGRAMS) $(bin_SCRIPTS)))
+dist_bashcompletion_DATA := $(sort $(bashcompletion_DATA) $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(bin_SCRIPTS))
+dist_zshcompletion_DATA := $(sort $(zshcompletion_DATA) $(addprefix _,$(rootbin_PROGRAMS) $(bin_PROGRAMS) $(bin_SCRIPTS)))
 
 $(eval \
   $(foreach p,$(am.primaries)  ,$(call _am.per_primary,$p)$(at.nl)))

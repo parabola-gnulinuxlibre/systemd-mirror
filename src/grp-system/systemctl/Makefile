@@ -30,6 +30,10 @@ systemctl_SOURCES = \
 systemctl_LDADD = \
 	libshared.la
 
+files.out.all += systemctl.completion.bash
+files.out.all += systemctl.completion.zsh
+sd.sed_files += systemctl.completion.bash
+sd.sed_files += systemctl.completion.zsh
 sd.CPPFLAGS += -DROOTLIBEXECDIR=\"$(rootlibexecdir)\"
 sd.CPPFLAGS += -DSYSTEM_SYSVINIT_PATH=\"$(SYSTEM_SYSVINIT_PATH)\"
 sd.CPPFLAGS += -DSYSTEMD_BINARY_PATH=\"$(rootlibexecdir)/systemd\"
