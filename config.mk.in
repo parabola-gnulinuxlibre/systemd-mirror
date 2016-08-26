@@ -46,6 +46,9 @@ EFI_CPPFLAGS =
 EFI_CFLAGS =
 EFI_LDFLAGS =
 
+SYSTEM_SYSVINIT_PATH = @SYSTEM_SYSVINIT_PATH@
+SYSTEM_SYSVRCND_PATH = @SYSTEM_SYSVRCND_PATH@
+
 # Dirs of external packages
 dbuspolicydir=@dbuspolicydir@
 dbussessionservicedir=@dbussessionservicedir@
@@ -347,30 +350,26 @@ OBJEXT = @OBJEXT@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
 
-# FIXME: hardcoded
-PATH_SEPARATOR = :
-PKG_CONFIG_LIBDIR =
-PKG_CONFIG_PATH = /home/luke/.prefix/lib/pkgconfig
-PYTHON_EXEC_PREFIX = ${exec_prefix}
-PYTHON_PLATFORM = linux
-PYTHON_PREFIX = ${prefix}
-PYTHON_VERSION = 3.5
-QEMU_BIOS =
-RC_LOCAL_SCRIPT_PATH_START = /etc/rc.local
-RC_LOCAL_SCRIPT_PATH_STOP = /usr/sbin/halt.local
-SET_MAKE =
-SYSTEM_GID_MAX = 999
-SYSTEM_SYSVINIT_PATH =
-SYSTEM_SYSVRCND_PATH =
-SYSTEM_UID_MAX = 999
-TELINIT = /lib/sysvinit/telinit
-TTY_GID = 5
-USE_NLS = yes
+PATH_SEPARATOR = @PATH_SEPARATOR@
+PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
+PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+PYTHON_EXEC_PREFIX = @PYTHON_EXEC_PREFIX@
+PYTHON_PLATFORM = @PYTHON_PLATFORM@
+PYTHON_PREFIX = @PYTHON_PREFIX@
+PYTHON_VERSION = @PYTHON_VERSION@
+QEMU_BIOS = @QEMU_BIOS@
+RC_LOCAL_SCRIPT_PATH_START = @RC_LOCAL_SCRIPT_PATH_START@
+RC_LOCAL_SCRIPT_PATH_STOP = @RC_LOCAL_SCRIPT_PATH_STOP@
+SYSTEM_GID_MAX = @SYSTEM_GID_MAX@
+SYSTEM_UID_MAX = @SYSTEM_UID_MAX@
+TELINIT = @TELINIT@
+TTY_GID = @TTY_GID@
+USE_NLS = @USE_NLS@
 
-build = x86_64-unknown-linux-gnu
-build_alias =
-build_cpu = x86_64
-build_os = linux-gnu
-build_vendor = unknown
+build = @build@
+build_alias = @build_alias@
+build_cpu = @build_cpu@
+build_os = @build_os@
+build_vendor = @build_vendor@
 
 endif
