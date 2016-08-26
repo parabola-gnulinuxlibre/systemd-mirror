@@ -115,7 +115,7 @@ libsystemd.DEPENDS                   =   $(topoutdir)/src/libsystemd/libsystemd.
 
 libudev.CPPFLAGS                     = -I$(topsrcdir)/src/libudev/include
 libudev.DEPENDS                      =   $(topoutdir)/src/libudev/src/libudev.la
-libudev-internal.CPPFLAGS            = $(libudev.CPPFLAGS) $(libbasic.CPPFLAGS)
+libudev-internal.CPPFLAGS            = -I$(topsrcdir)/src/libudev/src $(libudev.CPPFLAGS) $(libbasic.CPPFLAGS)
 libudev-internal.DEPENDS             =   $(topoutdir)/src/libudev/src/libudev-internal.la
 # -core libs
 libcore.CPPFLAGS                     = -I$(topsrcdir)/src/grp-system/libcore $(libshared.CPPFLAGS)
@@ -128,14 +128,14 @@ libjournal-core.DEPENDS    =   $(topoutdir)/src/grp-journal/libjournal-core/libj
 #liblogind-core.DEPENDS     =
 libmachine-core.CPPFLAGS   = -I$(topsrcdir)/src/grp-machine/libmachine-core/include
 libmachine-core.DEPENDS    =   $(topoutdir)/src/grp-machine/libmachine-core/src/libmachine-core.la
-#libnetworkd-core.CPPFLAGS  =
-#libnetworkd-core.DEPENDS   =
+libnetworkd-core.CPPFLAGS  = -I$(topsrcdir)/src/grp-network/libnetworkd-core $(libsystemd-internal.CPPFLAGS) $(libsystemd-network.CPPFLAGS) $(libshared.CPPFLAGS) $(libudev-internal.CPPFLAGS)
+libnetworkd-core.DEPENDS   =   $(topoutdir)/src/grp-network/libnetworkd-core/libnetworkd-core.la
 libudev-core.CPPFLAGS      = -I$(topoutdir)/src/grp-udev/libudev-core $(libsystemd-network.CPPFLAGS) $(libshared.CPPFLAGS)
 libudev-core.DEPENDS       =   $(topoutdir)/src/grp-udev/libudev-core/libudev-core.la
 libbasic-dns.CPPFLAGS      = -I$(topoutdir)/src/grp-resolve/libbasic-dns -I$(topsrcdir)/src/grp-resolve/libbasic-dns
 libbasic-dns.DEPENDS       =   $(topoutdir)/src/grp-resolve/libbasic-dns/libbasic-dns.la
 libimport.CPPFLAGS         = -I$(topsrcdir)/src/grp-machine/grp-import/libimport
-libimport.DEPENDS          =   $(topoutdir)/src/grp-machine/grp-import/libimport/libimport.la $(libbasic.DEPENDS)
+libimport.DEPENDS          =   $(topoutdir)/src/grp-machine/grp-import/libimport/libimport.la
 # NSS modules
 libnss_myhostname.CPPFLAGS =
 libnss_myhostname.DEPENDS  =

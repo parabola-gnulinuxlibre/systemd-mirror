@@ -30,6 +30,7 @@ systemd_networkd_SOURCES = \
 	src/network/networkd.c
 
 systemd_networkd_LDADD = \
+	libbasic.la \
 	libnetworkd-core.la
 
 ifneq ($(HAVE_LIBIPTC),)
@@ -41,8 +42,7 @@ dist_systemunit_DATA += \
 	units/systemd-networkd.socket
 
 nodist_systemunit_DATA += \
-	units/systemd-networkd.service \
-	units/systemd-networkd-wait-online.service
+	units/systemd-networkd.service
 
 dist_systemunit_DATA_busnames += \
 	units/org.freedesktop.network1.busname
@@ -55,8 +55,7 @@ dist_dbuspolicy_DATA += \
 
 GENERAL_ALIASES += \
 	$(systemunitdir)/systemd-networkd.socket $(pkgsysconfdir)/system/sockets.target.wants/systemd-networkd.socket \
-	$(systemunitdir)/systemd-networkd.service $(pkgsysconfdir)/system/multi-user.target.wants/systemd-networkd.service \
-	$(systemunitdir)/systemd-networkd-wait-online.service $(pkgsysconfdir)/system/network-online.target.wants/systemd-networkd-wait-online.service
+	$(systemunitdir)/systemd-networkd.service $(pkgsysconfdir)/system/multi-user.target.wants/systemd-networkd.service
 
 SYSTEM_UNIT_ALIASES += \
 	systemd-networkd.service dbus-org.freedesktop.network1.service

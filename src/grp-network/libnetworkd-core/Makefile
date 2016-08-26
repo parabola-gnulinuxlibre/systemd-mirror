@@ -88,6 +88,10 @@ nodist_libnetworkd_core_la_SOURCES = \
 
 libnetworkd_core_la_LIBADD = \
 	libsystemd-network.la \
+	libsystemd-internal.la \
+	libfirewall.la \
 	libshared.la
+
+sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

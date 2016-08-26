@@ -73,9 +73,9 @@ gperf_gperf_sources += \
 	src/network/networkd-network-gperf.gperf \
 	src/network/networkd-netdev-gperf.gperf
 
-EXTRA_DIST += \
-	units/systemd-networkd.service.m4.in \
-	units/systemd-networkd-wait-online.service.in \
-	test/networkd-test.py
+nested.subdirs += libnetworkd-core
+nested.subdirs += networkctl
+nested.subdirs += systemd-networkd
+nested.subdirs += systemd-networkd-wait-online
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
