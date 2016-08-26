@@ -29,4 +29,10 @@ systemd_sysv_generator_SOURCES = \
 systemd_sysv_generator_LDADD = \
 	libcore.la
 
+sysvinit_DATA = \
+	docs/sysvinit/README
+
+EXTRA_DIST += \
+	docs/sysvinit/README.in \
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

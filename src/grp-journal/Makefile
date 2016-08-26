@@ -174,4 +174,15 @@ nested.subdirs += journalctl systemd-journald libjournal-core
 nested.subdirs += systemd-cat
 #nested.subdirs += grp-remote
 
+ifneq ($(HAVE_SYSV_COMPAT),)
+varlog_DATA = \
+	docs/var-log/README
+
+CLEANFILES += \
+	docs/var-log/README
+endif # HAVE_SYSV_COMPAT
+
+EXTRA_DIST += \
+	docs/var-log/README.in
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk
