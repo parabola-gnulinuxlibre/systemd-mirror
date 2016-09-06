@@ -22,7 +22,7 @@ quote.pattern = $(call _quote.backslash, \ % ,$1)
 quote.ere     = $(call _quote.backslash, \ ^ . [ $$ ( ) | * + ? { ,$1)
 quote.bre     = $(call _quote.backslash, \ ^ . [ $$       *       ,$1)
 
-quote.shell-each = $(foreach _quote.tmp,$1,$(call quote.shell,$(_mod.tmp)))
+quote.shell-each = $(foreach _quote.tmp,$1,$(call quote.shell,$(_quote.tmp)))
 
 # I put this as the last line in the file because it confuses Emacs syntax
 # highlighting and makes the remainder of the file difficult to edit.
