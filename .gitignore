@@ -310,3 +310,4 @@ stamp-*
 /automake.mk
 /config.mk
 /gnustandards.mk
+/Makefile-src.mk

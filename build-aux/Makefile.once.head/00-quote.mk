@@ -15,7 +15,13 @@
 
 mod.quote.description = Macros to quote tricky strings
 
-quote.pattern = $(subst %,\%,$(subst \,\\,$1))
+_quote.backslash = $(if $1,$(call _quote.backslash,$(wordlist 2,$(words $1),$1),$(subst $(firstword $1),\$(firstword $1),$2)),$2)
+
+quote.var     = $(subst $(at.nl),\$(at.nl),$(subst $$,$$$$,$1))
+quote.pattern = $(call _quote.backslash, \ % ,$1)
+quote.ere     = $(call _quote.backslash, \ ^ . [ $$ ( ) | * + ? { ,$1)
+quote.bre     = $(call _quote.backslash, \ ^ . [ $$       *       ,$1)
+
 quote.shell-each = $(foreach _quote.tmp,$1,$(call quote.shell,$(_mod.tmp)))
 
 # I put this as the last line in the file because it confuses Emacs syntax
