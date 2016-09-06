@@ -119,7 +119,7 @@
     <example>
       <title>Integration in the GLib event loop</title>
 
-      <programlisting><xi:include href="glib-event-glue.c" parse="text" /></programlisting>
+      <programlisting><xi:include href="sd_event_get_fd-glib-example.c" parse="text" /></programlisting>
     </example>
   </refsect1>
 
