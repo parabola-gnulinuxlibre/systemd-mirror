@@ -16,7 +16,7 @@
 mod.gitfiles.description = Automatically populate files.src.src from git
 mod.gitfiles.depends += files nested write-ifchanged quote
 
-gitfiles.file ?= Makefile-src.mk
+gitfiles.file ?= gitfiles.mk
 
 _gitfiles.all =
 -include $(topsrcdir)/$(gitfiles.file)
