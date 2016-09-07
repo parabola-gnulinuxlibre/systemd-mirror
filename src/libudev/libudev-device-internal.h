@@ -21,7 +21,7 @@
 ***/
 
 #include "libudev.h"
-#include "sd-device.h"
+#include <systemd/sd-device.h>
 
 #include "libudev-private.h"
 

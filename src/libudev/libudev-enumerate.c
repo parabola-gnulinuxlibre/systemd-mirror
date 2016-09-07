@@ -29,7 +29,7 @@
 #include <sys/stat.h>
 
 #include "libudev.h"
-#include "sd-device.h"
+#include <systemd/sd-device.h>
 
 #include "alloc-util.h"
 #include "device-enumerator-private.h"
