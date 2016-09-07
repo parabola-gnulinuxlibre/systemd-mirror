@@ -27,6 +27,7 @@
 /bootctl
 /build-aux/*
 !/build-aux/Makefile*
+!/build-aux/write-atomic
 !/build-aux/write-ifchanged
 !/build-aux/no-builtin-variables.mk
 /busctl
@@ -305,6 +306,7 @@ config.status
 configure
 stamp-*
 .tmp*
+.var*
 /autoconf.mk
 /automake.mk.in
 /automake.mk
