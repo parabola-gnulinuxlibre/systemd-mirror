@@ -357,6 +357,7 @@ move_files() (
 		done
 	)
 	(
+		set -x
 		cd shell-completion/bash
 		for file in *; do
 			if [[ -d ../src/"$file" ]]; then
