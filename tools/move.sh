@@ -12,8 +12,11 @@ in_array() {
 split_lib() {
 	local d=$1
 
-	mkdir "$d/test"
-	mv "$d"/test-* -t "$d/test"
+	local t=("$d"/test-*)
+	if [[ -f ${t[0]} ]]; then
+		mkdir "$d/test"
+		mv "$d"/test-* -t "$d/test"
+	fi
 
 	mkdir "$d/src"
 	mv "$d"/*.c -t "$d/src"
@@ -27,7 +30,11 @@ split_lib() {
 grp() {
 	local grp=$1
 	shift
-	mkdir "$grp"
+	if [[ -d "${grp}.d" ]]; then
+		mv -T "${grp}.d" "$grp"
+	else
+		mkdir "$grp"
+	fi
 	mv "$@" -t "$grp"
 }
 
@@ -43,7 +50,6 @@ move_files() (
 	mv -T src/{,systemd-}sysv-generator
 
 	mv -T src/{,systemd-}ac-power
-	mv -T src/{,systemd-}activate
 	mv -T src/{,systemd-}analyze
 	mv -T src/{,systemd-}ask-password
 	mv -T src/{,systemd-}backlight
@@ -51,7 +57,6 @@ move_files() (
 	mv -T src/{,systemd-}cgls
 	mv -T src/{,systemd-}cgroups-agent
 	mv -T src/{,systemd-}cgtop
-	mv -T src/{,systemd-}coredump
 	mv -T src/{,systemd-}cryptsetup
 	mv -T src/{,systemd-}delta
 	mv -T src/{,systemd-}detect-virt
@@ -84,6 +89,7 @@ move_files() (
 	mv -T src/vconsole     src/systemd-vconsole-setup
 	mv -T src/socket-proxy src/systemd-socket-proxyd
 	mv -T src/timesync     src/systemd-timesyncd
+	mv -T src/activate     src/systemd-socket-activate
 
 	mv src/udev/*_id    -t src
 	mv src/udev/collect -t src
@@ -91,12 +97,21 @@ move_files() (
 	mv -T src/boot/efi src/systemd-boot
 	mv -T src/boot     src/bootctl
 
+	mkdir src/libsystemd/src
+	mv -t src/libsystemd/src src/libsystemd/sd-*
+	mkdir src/libsystemd/include
+	mv -T src/systemd src/libsystemd/include/systemd
+
 	mkdir src/busctl
 	mv src/libsystemd/src/sd-bus/busctl* -t src/busctl
 
-	mkdir src/coredumpctl
-	mv src/coredump{,ctl}/coredumpctl.c
-	
+	mkdir src/systemd
+	mv -t src/systemd \
+	   src/core/main* \
+	   src/core/macros.systemd.in \
+	   src/core/system.conf \
+	   src/core/org.*
+
 	mv -T src/{,lib}basic
 	mv -T src/{,lib}core
 	mv -T src/{,lib}shared
@@ -111,14 +126,15 @@ move_files() (
 	split_lib src/libshared
 	split_lib src/libsystemd-network
 
-	mkdir src/libsystemd/include
-	mv -T src/{,libsystemd/include}/systemd
+	mkdir src/systemd-hibernate-resume-generator
+	mv -t src/systemd-hibernate-resume-generator \
+	   src/systemd-hibernate-resume/*generator*
 
 	# src/resolve => src/{libbasic-dns,resolve,resolved}
 	mkdir src/libbasic-dns
 	mv -t src/libbasic-dns \
 	   src/resolve/dns-type.{c,h} \
-	   src/resolve/resolved-dns-{anser,dnssec,packet,question,rr}.{c,h} \
+	   src/resolve/resolved-dns-{answer,dnssec,packet,question,rr}.{c,h} \
 	   src/resolve/test-*
 	mkdir src/systemd-resolve
 	mv -t src/systemd-resolve \
@@ -135,7 +151,7 @@ move_files() (
 	   src/import/import-common.{c,h} \
 	   src/import/import-compress.{c,h} \
 	   src/import/qcow2-util.{c,h} \
-	   src/import/test-qcow2.h
+	   src/import/test-qcow2.c
 	mkdir src/systemd-export
 	mv -t src/systemd-export \
 	   src/import/export*
@@ -146,11 +162,17 @@ move_files() (
 	   src/import/org.*
 	mkdir src/systemd-import
 	mv -t src/systemd-import \
-	   src/import*
+	   src/import/import*
+	mkdir src/systemd-pull
+	mv -t src/systemd-pull \
+	   src/import/pull* \
+	   src/import/curl-util*
+	rmdir src/import
 
 	# src/journal => src/..
 	mkdir src/libjournal-core
 	mv -t src/libjournal-core \
+	   src/journal/.gitignore \
 	   src/journal/journald-* \
 	   src/journal/test-*
 	mkdir src/systemd-cat
@@ -158,10 +180,10 @@ move_files() (
 	   src/journal/cat.c
 	mkdir src/journalctl
 	mv -t src/journalctl \
-	   src/journalctl/journal-qrcode.{c,h} \
-	   src/journalctl/journalctl.c
-	mkdir src/journald
-	mv -t src/journald \
+	   src/journal/journal-qrcode.{c,h} \
+	   src/journal/journalctl.c
+	mkdir src/systemd-journald
+	mv -t src/systemd-journald \
 	   src/journal/journald.*
 	mkdir src/libsystemd/src/sd-journal
 	mv -t src/libsystemd/src/sd-journal \
@@ -194,19 +216,22 @@ move_files() (
 	# src/network => src/...
 	mkdir src/systemd-networkd-wait-online
 	mv -t src/systemd-networkd-wait-online \
-	   network/networkd-wait-online*
+	   src/network/networkd-wait-online*
 	mkdir src/libnetworkd-core
 	mv -t src/libnetworkd-core \
-	   network/.gitignore \
-	   network/networkd-*
+	   src/network/.gitignore \
+	   src/network/networkd-*
 	mkdir src/networkctl
 	mv -t src/networkctl \
-	   network/networkctl.c
+	   src/network/networkctl.c
 	mkdir src/systemd-networkd
 	mv -t src/systemd-networkd \
-	   network/networkd* \
-	   network/org.*
-	rmdir network
+	   src/network/networkd* \
+	   src/network/org.*
+	mkdir src/grp-network.d
+	mv -t src/grp-network.d \
+	   src/network/test-*
+	rmdir src/network
 
 	# src/machine => src/{machinectl,systemd-machined}
 	mkdir src/machinectl
@@ -214,8 +239,103 @@ move_files() (
 	   src/machine/machinectl*
 	mkdir src/systemd-machined
 	mv -t src/systemd-machined \
-	   machine/.gitignore \
-	   machine/*
+	   src/machine/.gitignore \
+	   src/machine/*
+	rmdir src/machine
+
+	# src/coredump => src/{coredumpctl,systemd-coredump}
+	mkdir src/coredumpctl
+	mv -t src/coredumpctl \
+	   src/coredump/coredumpctl*
+	mkdir src/systemd-coredump
+	mv -t src/systemd-coredump \
+	   src/coredump/*
+	rmdir src/coredump
+
+	# src/hostname => src/{hostnamectl,systemd-hostnamed}
+	mkdir src/hostnamectl
+	mv -t src/hostnamectl \
+	   src/hostname/hostnamectl*
+	mkdir src/systemd-hostnamed
+	mv -t src/systemd-hostnamed \
+	   src/hostname/.gitignore \
+	   src/hostname/*
+	rmdir src/hostname
+
+	# src/journal-remote => src/...
+	mkdir src/systemd-journal-gatewayd
+	mv -t src/systemd-journal-gatewayd \
+	   src/journal-remote/journal-gateway*
+	mkdir src/systemd-journal-remote
+	mv -t src/systemd-journal-remote \
+	   src/journal-remote/journal-remote*
+	mkdir src/systemd-journal-upload
+	mv -t src/systemd-journal-upload \
+	   src/journal-remote/journal-upload*
+	mkdir src/grp-remote.d
+	mv -t src/grp-remote.d \
+	   src/journal-remote/.gitignore \
+	   src/journal-remote/browse.html \
+	   src/journal-remote/log-generator.py \
+	   src/journal-remote/microhttpd*
+	rmdir src/journal-remote
+
+	# src/locale => src/...
+	mkdir src/localectl
+	mv -t src/localectl \
+	   src/locale/localectl*
+	mkdir src/systemd-localed
+	mv -t src/systemd-localed \
+	   src/locale/.gitignore \
+	   src/locale/*
+	rmdir src/locale
+
+	# src/login => src/...
+	mkdir src/grp-login.d
+	mv -t src/grp-login.d \
+	   src/login/.gitignore \
+	   src/login/test-*
+	mkdir src/loginctl
+	mv -t src/loginctl \
+	   src/login/loginctl* \
+	   src/login/sysfs-show*
+	mkdir src/pam_systemd
+	mv -t src/pam_systemd \
+	   src/login/pam*
+	mkdir src/systemd-inhibit
+	mv -t src/systemd-inhibit \
+	   src/login/inhibit*
+	mkdir src/systemd-logind
+	mv -t src/systemd-logind \
+	   src/login/logind* \
+	   src/login/*.rules \
+	   src/login/*.rules.in \
+	   src/login/org.*
+	mv -T src/login/systemd-user.m4 src/systemd-logind/systemd-user.pam.m4
+	rmdir src/login
+
+	# src/timedate => src/...
+	mkdir src/timedatectl
+	mv -t src/timedatectl \
+	   src/timedate/timedatectl*
+	mkdir src/systemd-timedated
+	mv -t src/systemd-timedated \
+	   src/timedate/.gitignore \
+	   src/timedate/timedated* \
+	   src/timedate/org.*
+	rmdir src/timedate
+
+	# src/udev => src/...
+	mv -T src/udev/udev.h src/libudev/udev.h
+	mkdir src/udevadm
+	mv -t src/udevadm \
+	   src/udev/udevadm*
+	mkdir src/libudev-core
+	mv -t src/libudev-core \
+	   src/udev/udev-*
+	mkdir src/systemd-udevd
+	mv -t src/systemd-udevd \
+	   src/udev/udevd*
 
 	# auto-distribute the stuff
 	(
@@ -285,16 +405,17 @@ move_files() (
 	    src/systemd-hibernate-resume \
 	    src/systemd-hibernate-resume-generator \
 	    src/systemd-sleep
+	grp src/grp-remote \
+	    src/systemd-journal-gatewayd \
+	    src/systemd-journal-remote \
+	    src/systemd-journal-upload
 	grp src/grp-journal \
 	    catalog \
+	    src/grp-remote \
 	    src/journalctl \
 	    src/libjournal-core \
 	    src/systemd-cat \
 	    src/systemd-journald
-	grp src/grp-journal/grp-remote \
-	    src/systemd-journal-gatewayd \
-	    src/systemd-journal-remote \
-	    src/systemd-journal-upload
 	grp src/grp-locale \
 	    src/localectl \
 	    src/systemd-localed
@@ -324,11 +445,11 @@ move_files() (
 	    src/nss-resolve \
 	    src/systemd-resolve \
 	    src/systemd-resolved
-	grp src/systemd \
+	grp src/grp-system \
 	    src/libcore \
 	    src/systemctl \
 	    src/systemd
-	grp src/systemd/grp-utils \
+	grp src/grp-system/grp-utils \
 	    src/systemd-analyze \
 	    src/systemd-delta \
 	    src/systemd-fstab-generator \
@@ -342,7 +463,7 @@ move_files() (
 	    src/*_id \
 	    src/systemd-hwdb \
 	    src/systemd-udevd \
-	    src/systemd-udevadm
+	    src/udevadm
 	grp src/grp-utils \
 	    src/systemd-ac-power \
 	    src/systemd-escape \
@@ -352,8 +473,6 @@ move_files() (
 )
 
 breakup_makefile() (
-        find . \( -name Makefile -o -name '*.mk' \) -delete
-
         touch .tmp.move.all
         files=(.tmp.move.all)
         file=/dev/null
@@ -430,6 +549,8 @@ breakup_zshcompletion() (
 )
 
 move() (
+        find . \( -name Makefile -o -name '*.mk' \) -delete
+
 	>&2 echo ' => breakup_zshcompletion'
 	breakup_zshcompletion
 	>&2 echo ' => move_files'
