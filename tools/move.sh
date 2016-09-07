@@ -9,22 +9,97 @@ in_array() {
 	return 1 # Not Found
 }
 
+split_lib() {
+	local d=$1
+
+	mkdir "$d/test"
+	mv "$d"/test-* -t "$d/test"
+
+	mkdir "$d/src"
+	mv "$d"/*.c -t "$d/src"
+
+	local h=${d##*/lib}
+	mkdir "$d/include"
+	mkdir "$d/include/$h"
+	mv "$d"/*.h -t "$d/include/$h"
+}
+
+grp() {
+	local grp=$1
+	shift
+	mkdir "$grp"
+	mv "$@" -t "$grp"
+}
+
 move_files() (
-	for d in libsystemd libudev; do
-		mkdir src/$d-new
-		mv -T src/$d src/$d-new/src
-		mv -T src/$d-new src/$d
-	done
+	# first focus on getting directories to the right names.
+	mv -T src/{,systemd-}dbus1-generator
+	mv -T src/{,systemd-}debug-generator
+	mv -T src/{,systemd-}fstab-generator
+	mv -T src/{,systemd-}getty-generator
+	mv -T src/{,systemd-}gpt-auto-generator
+	mv -T src/{,systemd-}rc-local-generator
+	mv -T src/{,systemd-}system-update-generator
+	mv -T src/{,systemd-}sysv-generator
 
-	for d in basic core shared; do
-		mv -T src/{,lib}$d
-	done
+	mv -T src/{,systemd-}ac-power
+	mv -T src/{,systemd-}activate
+	mv -T src/{,systemd-}analyze
+	mv -T src/{,systemd-}ask-password
+	mv -T src/{,systemd-}backlight
+	mv -T src/{,systemd-}binfmt
+	mv -T src/{,systemd-}cgls
+	mv -T src/{,systemd-}cgroups-agent
+	mv -T src/{,systemd-}cgtop
+	mv -T src/{,systemd-}coredump
+	mv -T src/{,systemd-}cryptsetup
+	mv -T src/{,systemd-}delta
+	mv -T src/{,systemd-}detect-virt
+	mv -T src/{,systemd-}escape
+	mv -T src/{,systemd-}firstboot
+	mv -T src/{,systemd-}fsck
+	mv -T src/{,systemd-}hibernate-resume
+	mv -T src/{,systemd-}hwdb
+	mv -T src/{,systemd-}initctl
+	mv -T src/{,systemd-}machine-id-setup
+	mv -T src/{,systemd-}modules-load
+	mv -T src/{,systemd-}notify
+	mv -T src/{,systemd-}nspawn
+	mv -T src/{,systemd-}path
+	mv -T src/{,systemd-}quotacheck
+	mv -T src/{,systemd-}random-seed
+	mv -T src/{,systemd-}remount-fs
+	mv -T src/{,systemd-}reply-password
+	mv -T src/{,systemd-}rfkill
+	mv -T src/{,systemd-}run
+	mv -T src/{,systemd-}sleep
+	mv -T src/{,systemd-}stdio-bridge
+	mv -T src/{,systemd-}sysctl
+	mv -T src/{,systemd-}sysusers
+	mv -T src/{,systemd-}tmpfiles
+	mv -T src/{,systemd-}tty-ask-password-agent
+	mv -T src/{,systemd-}update-done
+	mv -T src/{,systemd-}update-utmp
+	mv -T src/{,systemd-}user-sessions
+	mv -T src/vconsole     src/systemd-vconsole-setup
+	mv -T src/socket-proxy src/systemd-socket-proxyd
+	mv -T src/timesync     src/systemd-timesyncd
 
-	mkdir src/libbasic/src
-	mv src/libbasic/*.c src/libbasic/src/
-	mkdir src/libbasic/include
-	mkdir src/libbasic/include/basic
-	mv src/libbasic/.gitignore src/libbasic/*.h src/libbasic/include/basic/
+	mv src/udev/*_id    -t src
+	mv src/udev/collect -t src
+
+	mv -T src/boot/efi src/systemd-boot
+	mv -T src/boot     src/bootctl
+
+	mkdir src/busctl
+	mv src/libsystemd/src/sd-bus/busctl* -t src/busctl
+
+	mkdir src/coredumpctl
+	mv src/coredump{,ctl}/coredumpctl.c
+	
+	mv -T src/{,lib}basic
+	mv -T src/{,lib}core
+	mv -T src/{,lib}shared
 
 	mv -T src/lib{shared,core}/linux
 
@@ -32,265 +107,248 @@ move_files() (
 	mv -T src/lib{shared,firewall}/firewall-util.c
 	mv -T src/lib{shared,firewall}/firewall-util.h
 
-	mkdir src/libshared/src
-	mv src/libshared/*.c src/libshared/src/
-	mkdir src/libshared/include
-	mkdir src/libshared/include/shared
-	mv src/libshared/*.h src/libshared/include/shared/
-
-	mkdir src/libsystemd-network/test
-	mv src/libsystemd-network/test-* src/libsystemd-network/test
-	mkdir src/libsystemd-network/src
-	mv src/libsystemd-network/*.c src/libsystemd-network/src/
-	mkdir src/libsystemd-network/include
-	mkdir src/libsystemd-network/include/systemd-network
-	mv src/libsystemd-network/*.h src/libsystemd-network/include/systemd-network/
-
-	pfix=(
-		dbus1-generator
-		debug-generator
-		fstab-generator
-		getty-generator
-		gpt-auto-generator
-		rc-local-generator
-		system-update-generator
-		sysv-generator
-
-		ac-power
-		activate
-		analyze
-		ask-password
-		backlight
-		binfmt
-		cgls
-		cgroups-agent
-		cgtop
-		coredump
-		cryptsetup
-		delta
-		detect-virt
-		escape
-		firstboot
-		fsck
-		hibernate-resume
-		hwdb
-		initctl
-		machine-id-setup
-		modules-load
-		notify
-		nspawn
-		path
-		quotacheck
-		random-seed
-		remount-fs
-		reply-password
-		rfkill
-		run
-		sleep
-		socket-proxy
-		stdio-bridge
-		sysctl
-		sysusers
-		timesync
-		tmpfiles
-		tty-ask-password-agent
-		update-done
-		update-utmp
-		user-sessions
-	)
-	for d in "${pfix[@]}"; do
-		mv -T src/{,systemd-}$d
-	done
-	mv -T src/vconsole src/systemd-vconsole-setup
-
-	dmon=(
-		systemd-socket-proxy
-		systemd-timesync
-	)
-	for d in "${dmon[@]}"; do
-		mv -T "src/$d"{,d}
-	done
-
-	mv -T {shell-completion/bash/,src/kernel-install/bash-completion_}kernel-install
-	mv -T {shell-completion/zsh/_,src/kernel-install/zsh-completion_}kernel-install
-	mv -T {man,src/kernel-install}/kernel-install.xml
+	split_lib src/libbasic
+	split_lib src/libshared
+	split_lib src/libsystemd-network
 
 	mkdir src/libsystemd/include
 	mv -T src/{,libsystemd/include}/systemd
 
-	mkdir src/grp-machine
-	mv -T src/machine src/grp-machine/libmachine-core
-	mkdir src/grp-machine/systemd-machined
-	mv -T src/grp-machine/{libmachine-core,systemd-machined}/machined.c
-	mkdir src/grp-machine/machinectl
-	mv -T src/grp-machine/{libmachine-core,machinectl}/machinectl.c
-	mv -T src/{,grp-machine}/nss-mymachines
+	# src/resolve => src/{libbasic-dns,resolve,resolved}
+	mkdir src/libbasic-dns
+	mv -t src/libbasic-dns \
+	   src/resolve/dns-type.{c,h} \
+	   src/resolve/resolved-dns-{anser,dnssec,packet,question,rr}.{c,h} \
+	   src/resolve/test-*
+	mkdir src/systemd-resolve
+	mv -t src/systemd-resolve \
+	   src/resolve/resolve-tool.c
+	mkdir src/systemd-resolved
+	mv -t src/systemd-resolved \
+	   src/resolve/.gitignore \
+	   src/resolve/*
+	rmdir src/resolve
 
-	mkdir src/grp-resolve
-	mv -T src/{resolve,grp-resolve/systemd-resolved}
-	mv -T src/{,grp-resolve}/nss-resolve
+	# src/import => src/{libimport,systemd-{export,importd,import}}
+	mkdir src/libimport
+	mv -t src/libimport \
+	   src/import/import-common.{c,h} \
+	   src/import/import-compress.{c,h} \
+	   src/import/qcow2-util.{c,h} \
+	   src/import/test-qcow2.h
+	mkdir src/systemd-export
+	mv -t src/systemd-export \
+	   src/import/export*
+	mkdir src/systemd-importd
+	mv -t src/systemd-importd \
+	   src/import/.gitignore \
+	   src/import/importd.c \
+	   src/import/org.*
+	mkdir src/systemd-import
+	mv -t src/systemd-import \
+	   src/import*
 
-	mkdir src/grp-system
-	mv -T src/{,grp-system}/systemctl
-
-	mkdir src/grp-system/systemd
-	mv -T src/{libcore,grp-system/systemd}/main.c
-	mv -T src/{libcore,grp-system/systemd}/macros.systemd.in
-	mv -T src/{libcore,grp-system/systemd}/org.freedesktop.systemd1.conf
-	mv -T src/{libcore,grp-system/systemd}/org.freedesktop.systemd1.policy.in.in
-	mv -T src/{libcore,grp-system/systemd}/org.freedesktop.systemd1.service
-	mv -T src/{libcore,grp-system/systemd}/system.conf
-	mv -T src/{libcore,grp-system/systemd}/systemd.pc.in
-	mv -T src/{libcore,grp-system/systemd}/triggers.systemd.in
-	mv -T src/{libcore,grp-system/systemd}/user.conf
-
-	mkdir src/libudev/include
-	mv -T src/libudev/{src,include}/libudev.h
-
-	mv -T src/libsystemd/{src,}/libsystemd.pc.in
-	mv -T src/libsystemd/{src,}/libsystemd.sym
-	mv -T src/libsystemd/{src,}/.gitignore
-
-	mkdir src/systemd-shutdown
-
-	mkdir src/grp-coredump
-	mv -T src/{,grp-coredump}/systemd-coredump
-	mkdir src/grp-coredump/coredumpctl
-	mv -T src/grp-coredump/{systemd-coredump,coredumpctl}/coredumpctl.c
-
-	mkdir src/grp-boot
-	mv -T src/boot/efi src/grp-boot/systemd-boot
-	mv -T src/boot src/grp-boot/bootctl
-	mv -T {test,src/grp-boot/systemd-boot}/test-efi-create-disk.sh
-
-	mkdir build-aux
-	mkdir build-aux/Makefile.{once,each}.{head,tail}
-	touch build-aux/Makefile.{once,each}.{head,tail}/.gitignore
-
+	# src/journal => src/..
+	mkdir src/libjournal-core
+	mv -t src/libjournal-core \
+	   src/journal/journald-* \
+	   src/journal/test-*
+	mkdir src/systemd-cat
+	mv -t src/systemd-cat \
+	   src/journal/cat.c
+	mkdir src/journalctl
+	mv -t src/journalctl \
+	   src/journalctl/journal-qrcode.{c,h} \
+	   src/journalctl/journalctl.c
+	mkdir src/journald
+	mv -t src/journald \
+	   src/journal/journald.*
 	mkdir src/libsystemd/src/sd-journal
+	mv -t src/libsystemd/src/sd-journal \
+	   src/journal/audit-type.c \
+	   src/journal/audit-type.h \
+	   src/journal/catalog.c \
+	   src/journal/catalog.h \
+	   src/journal/compress.c \
+	   src/journal/compress.h \
+	   src/journal/fsprg.c \
+	   src/journal/fsprg.h \
+	   src/journal/journal-authenticate.c \
+	   src/journal/journal-authenticate.h \
+	   src/journal/journal-def.h \
+	   src/journal/journal-file.c \
+	   src/journal/journal-file.h \
+	   src/journal/journal-internal.h \
+	   src/journal/journal-send.c \
+	   src/journal/journal-vacuum.c \
+	   src/journal/journal-vacuum.h \
+	   src/journal/journal-verify.c \
+	   src/journal/journal-verify.h \
+	   src/journal/lookup3.c \
+	   src/journal/lookup3.h \
+	   src/journal/mmap-cache.c \
+	   src/journal/mmap-cache.h \
+	   src/journal/sd-journal.c
+	rmdir src/journal
 
-	libsystemd_journal_files=(
-		audit-type.c
-		audit-type.h
-		catalog.c
-		catalog.h
-		compress.c
-		compress.h
-		fsprg.c
-		fsprg.h
-		journal-authenticate.c
-		journal-authenticate.h
-		journal-def.h
-		journal-file.c
-		journal-file.h
-		journal-internal.h
-		journal-send.c
-		journal-vacuum.c
-		journal-vacuum.h
-		journal-verify.c
-		journal-verify.h
-		lookup3.c
-		lookup3.h
-		mmap-cache.c
-		mmap-cache.h
-		sd-journal.c
+	# src/network => src/...
+	mkdir src/systemd-networkd-wait-online
+	mv -t src/systemd-networkd-wait-online \
+	   network/networkd-wait-online*
+	mkdir src/libnetworkd-core
+	mv -t src/libnetworkd-core \
+	   network/.gitignore \
+	   network/networkd-*
+	mkdir src/networkctl
+	mv -t src/networkctl \
+	   network/networkctl.c
+	mkdir src/systemd-networkd
+	mv -t src/systemd-networkd \
+	   network/networkd* \
+	   network/org.*
+	rmdir network
+
+	# src/machine => src/{machinectl,systemd-machined}
+	mkdir src/machinectl
+	mv -t src/machinectl \
+	   src/machine/machinectl*
+	mkdir src/systemd-machined
+	mv -t src/systemd-machined \
+	   machine/.gitignore \
+	   machine/*
+
+	# auto-distribute the stuff
+	(
+		cd man
+		for file in *.xml; do
+			if [[ -d ../src/"${file%.xml}" ]]; then
+				mv "$file" -t ../src/"${file%.xml}"
+			fi
+		done
 	)
-	for file in "${libsystemd_journal_files[@]}"; do
-		mv -T src/{journal,libsystemd/src/sd-journal}/$file
-	done
-
-	mkdir src/busctl
-	mv src/libsystemd/src/sd-bus/busctl* src/busctl
-
-	mv -T src/{udev,libudev/src}/udev.h
-
-	mkdir src/grp-timedate
-	mv -T src/timedate src/grp-timedate/systemd-timedated
-	mkdir src/grp-timedate/timedatectl
-	mv -T src/grp-timedate/{systemd-timedated,timedatectl}/timedatectl.c
-
-	mv -T src/{journal,grp-journal}
-	mv -T {,src/grp-journal/}catalog
-	mkdir src/grp-journal/{systemd-journald,journalctl,libjournal-core}
-	mv -T src/grp-journal/{,systemd-journald}/journald.c
-	mv -T src/grp-journal/{,journalctl}/journalctl.c
-	mv    src/grp-journal/*.* src/grp-journal/libjournal-core/
-
-	mv -T src/{,grp-}journal-remote
-	local suffix
-	for suffix in gatewayd remote upload; do
-		mkdir src/grp-journal-remote/systemd-journal-$suffix
-		mv src/grp-journal-remote/journal-$suffix* src/grp-journal-remote/systemd-journal-$suffix/
-	done
-
-	mv -T src/{,grp-}hostname
-	mv -T src/{,grp-}locale
-	mv -T src/{,grp-}udev
-
-	mv -T src/{,grp-}import
-	mkdir src/grp-import/systemd-importd
-	mv src/grp-import/{,systemd-importd}/importd.c
-	mkdir src/grp-import/systemd-pull
-	mv src/grp-import/pull* src/grp-import/systemd-pull
-	mkdir src/grp-import/systemd-import
-	mv src/grp-import/import* src/grp-import/systemd-import
-	mkdir src/grp-import/systemd-export
-	mv src/grp-import/export* src/grp-import/systemd-export
+	(
+		cd units
+		for file in *; do
+			if [[ -d ../src/"${file%%.*}" ]]; then
+				mv "$file" -t ../src/"${file%%.*}"
+			elif [[ -d ../src/"${file%%@*}" ]]; then
+				mv "$file" -t ../src/"${file%%@*}"
+			fi
+		done
+	)
+	(
+		cd shell-completion/bash
+		for file in *; do
+			if [[ -d ../src/"$file" ]]; then
+				mv -T "$file" "../src/$file/$file.completion.bash"
+			fi
+		done
+	)
+	(
+		cd shell-completion/zsh
+		for file in _*; do
+			if [[ -d ../src/"${file#_}" ]]; then
+				mv -T "$file" "../src/${file#_}/${file#_}.completion.zsh"
+			fi
+		done
+	)
 	
-	mv -T src/{,grp-}network
-	mkdir src/grp-network/systemd-networkd
-	mv src/grp-network/{,systemd-networkd}/networkd.c
-	mkdir src/grp-network/systemd-networkd-wait-online
-	mv src/grp-network/networkd-wait-online* src/grp-network/systemd-networkd-wait-online
-	mkdir src/grp-network/networkctl
-	mv src/grp-network/{,networkctl}/networkctl.c
-	mkdir src/grp-network/libnetworkd-core
-	mv src/grp-network/networkd* src/grp-network/libnetworkd-core
-
-	mv -T src/{,grp-}login
-	mkdir src/grp-login/systemd-logind
-	mv -T src/grp-login/{,systemd-logind}/logind.c
-	mv -T src/grp-login/{,systemd-logind}/logind.h
-	mkdir src/grp-login/liblogind-core
-	mv src/grp-login/logind-* src/grp-login/liblogind-core
-	mkdir src/grp-login/loginctl
-	mv -T src/grp-login/{,loginctl}/loginctl.c
-	mv -T src/grp-login/{,loginctl}/sysfs-show.h
-	mv -T src/grp-login/{,loginctl}/sysfs-show.c
-	mkdir src/grp-login/systemd-inhibit
-	mv -T src/grp-login/{,systemd-inhibit}/inhibit.c
-	mkdir src/grp-login/pam_systemd
-	mv -T src/grp-login/{,pam_systemd}/pam_systemd.c
-	mv -T src/grp-login/{,pam_systemd}/pam_systemd.sym
-
-	mkdir src/grp-udev/d-udevadm
-	mv src/grp-udev/udevadm* src/grp-udev/d-udevadm/
-	mkdir src/grp-udev/systemd-udevd
-	mv -T src/grp-udev/{,systemd-udevd}/udevd.c
-	mkdir src/grp-udev/libudev-core
-	mv src/grp-udev/udev* src/grp-udev/libudev-core/
-	mv -T src/grp-udev/{,libudev-core}/net
-	mv -T src/grp-udev/{d-,}udevadm
-
-	mv -T src/{libcore,systemd-shutdown}/shutdown.c
-	mv -T src/{libcore,systemd-shutdown}/umount.c
-	mv -T src/{libcore,systemd-shutdown}/umount.h
-
-	mkdir src/grp-helperunits
-	helperunits=(
-		backlight
-		binfmt
-		detect-virt
-		quotacheck
-		random-seed
-		rfkill
-		sleep
-		vconsole-setup
-		user-sessions
-	)
-	for hu in "${helperunits[@]}"; do
-		mv -T src/systemd-"$hu" src/grp-helperunits/systemd-"$hu"
-	done
+	# categorize
+	grp src/grp-boot \
+	    src/bootctl \
+	    src/kernel-install \
+	    src/systemd-boot
+	grp src/grp-coredump \
+	    src/coredumpctl \
+	    src/systemd-coredump
+	grp src/grp-hostname \
+	    src/hostnamectl \
+	    src/systemd-hostnamed
+	grp src/grp-initprogs \
+	    src/systemd-backlight \
+	    src/systemd-binfmt \
+	    src/systemd-detect-virt \
+	    src/systemd-firstboot \
+	    src/systemd-fsck \
+	    src/systemd-modules-load \
+	    src/systemd-quotacheck \
+	    src/systemd-random-seed \
+	    src/systemd-rfkill \
+	    src/systemd-sysctl \
+	    src/systemd-sysusers \
+	    src/systemd-tmpfiles \
+	    src/systemd-update-done \
+	    src/systemd-update-utmp \
+	    src/systemd-user-sessions \
+	    src/systemd-vconsole-setup
+	grp src/grp-initprogs/grp-sleep \
+	    src/systemd-hibernate-resume \
+	    src/systemd-hibernate-resume-generator \
+	    src/systemd-sleep
+	grp src/grp-journal \
+	    catalog \
+	    src/journalctl \
+	    src/libjournal-core \
+	    src/systemd-cat \
+	    src/systemd-journald
+	grp src/grp-journal/grp-remote \
+	    src/systemd-journal-gatewayd \
+	    src/systemd-journal-remote \
+	    src/systemd-journal-upload
+	grp src/grp-locale \
+	    src/localectl \
+	    src/systemd-localed
+	grp src/grp-login \
+	    src/loginctl \
+	    src/pam_systemd \
+	    src/systemd-inhibit \
+	    src/systemd-logind
+	grp src/grp-machine \
+	    src/machinectl \
+	    src/nss-mymachines \
+	    src/systemd-machined
+	grp src/grp-machine/grp-import \
+	    src/libimport \
+	    src/systemd-export \
+	    src/systemd-import \
+	    src/systemd-importd \
+	    src/systemd-pull
+	grp src/grp-network \
+	    network \
+	    src/libnetworkd-core \
+	    src/networkctl \
+	    src/systemd-networkd \
+	    src/systemd-networkd-wait-online
+	grp src/grp-resolve \
+	    src/libbasic-dns \
+	    src/nss-resolve \
+	    src/systemd-resolve \
+	    src/systemd-resolved
+	grp src/systemd \
+	    src/libcore \
+	    src/systemctl \
+	    src/systemd
+	grp src/systemd/grp-utils \
+	    src/systemd-analyze \
+	    src/systemd-delta \
+	    src/systemd-fstab-generator \
+	    src/systemd-run \
+	    src/systemd-sysv-generator
+	grp src/grp-timedate \
+	    src/systemd-timedated \
+	    src/timedatectl
+	grp src/grp-udev \
+	    rules \
+	    src/*_id \
+	    src/systemd-hwdb \
+	    src/systemd-udevd \
+	    src/systemd-udevadm
+	grp src/grp-utils \
+	    src/systemd-ac-power \
+	    src/systemd-escape \
+	    src/systemd-notify \
+	    src/systemd-path \
+	    src/systemd-socket-activate
 )
 
 breakup_makefile() (
@@ -372,16 +430,16 @@ breakup_zshcompletion() (
 )
 
 move() (
+	>&2 echo ' => breakup_zshcompletion'
+	breakup_zshcompletion
 	>&2 echo ' => move_files'
 	move_files
 	>&2 echo ' => breakup_makefile'
-	breakup_makefile
+	#breakup_makefile
 	>&2 echo ' => fixup_includes'
 	fixup_includes
 	>&2 echo ' => fixup_makefiles'
-	fixup_makefiles
-	>&2 echo ' => breakup_zshutils'
-	breakup_zshcompletion
+	#fixup_makefiles
 )
 
 main() {
