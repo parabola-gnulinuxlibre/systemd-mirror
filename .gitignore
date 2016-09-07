@@ -314,3 +314,4 @@ stamp-*
 /gnustandards.mk
 /gitfiles.mk
 Makefile-man.mk
+*-gperf.c
