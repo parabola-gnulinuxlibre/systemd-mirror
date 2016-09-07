@@ -357,19 +357,18 @@ move_files() (
 		done
 	)
 	(
-		set -x
 		cd shell-completion/bash
 		for file in *; do
-			if [[ -d ../src/"$file" ]]; then
-				mv -T "$file" "../src/$file/$file.completion.bash"
+			if [[ -d ../../src/"$file" ]]; then
+				mv -T "$file" "../../src/$file/$file.completion.bash"
 			fi
 		done
 	)
 	(
 		cd shell-completion/zsh
 		for file in _*; do
-			if [[ -d ../src/"${file#_}" ]]; then
-				mv -T "$file" "../src/${file#_}/${file#_}.completion.zsh"
+			if [[ -d ../../src/"${file#_}" ]]; then
+				mv -T "$file" "../../src/${file#_}/${file#_}.completion.zsh"
 			fi
 		done
 	)
