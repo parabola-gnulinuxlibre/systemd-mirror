@@ -313,3 +313,4 @@ stamp-*
 /config.mk
 /gnustandards.mk
 /gitfiles.mk
+Makefile-man.mk

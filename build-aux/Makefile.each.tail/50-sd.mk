@@ -90,3 +90,21 @@ $(outdir)/%: $(srcdir)/%.m4 $(top_builddir)/config.status
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
 $(outdir)/%: $(outdir)/%.m4 $(top_builddir)/config.status
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
+
+$(outdir)/%.1: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
+	$(sd.XSLTPROC_PROCESS_MAN)
+
+$(outdir)/%.3: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
+	$(sd.XSLTPROC_PROCESS_MAN)
+
+$(outdir)/%.5: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
+	$(sd.XSLTPROC_PROCESS_MAN)
+
+$(outdir)/%.7: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
+	$(sd.XSLTPROC_PROCESS_MAN)
+
+$(outdir)/%.8: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
+	$(sd.XSLTPROC_PROCESS_MAN)
+
+$(outdir)/%.html: $(srcdir)/%.xml $(topsrcdir)/man/custom-html.xsl $(topoutdir)/man/custom-entities.ent
+	$(sd.XSLTPROC_PROCESS_HTML)

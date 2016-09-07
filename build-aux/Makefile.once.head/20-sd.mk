@@ -47,17 +47,16 @@ sd.COMPILE   = $(CC) $(sd.ALL_CPPFLAGS) $(sd.ALL_CFLAGS)
 sd.LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=compile $(CC) $(sd.ALL_CPPFLAGS) $(sd.ALL_CFLAGS)
 sd.LINK      = $(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=link $(CCLD) $(sd.ALL_CFLAGS) $(sd.ALL_LDFLAGS) -o $@
 
-am.INSTALL_PROGRAMS    = $(AM_V_PROG)$(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
-am.INSTALL_SCRIPTS     = $(AM_V_SCRIPT)$(INSTALL_SCRIPT) $< $@
-am.INSTALL_LTLIBRARIES = $(AM_V_LIB)$(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=install $(INSTALL) $< $@
-am.INSTALL_DATA        = $(AM_V_DATA)$(INSTALL_DATA) $< $@
-am.INSTALL_HEADERS     = $(AM_V_HEADER)$(INSTALL_DATA) $< $@
-
 CC ?= c99
 CCLD ?= c99
 LIBTOOL ?= libtool
 
 V ?=
+
+AM_V_at ?= $(AM_V_at_$(V))
+AM_V_at_ ?= $(AM_V_at_$(AM_DEFAULT_VERBOSITY))
+AM_V_at_0 ?= @
+AM_V_at_1 ?=
 
 AM_V_M4 ?= $(AM_V_M4_$(V))
 AM_V_M4_ ?= $(AM_V_M4_$(AM_DEFAULT_VERBOSITY))
@@ -114,10 +113,23 @@ AM_V_GEN_ ?= $(AM_V_GEN_$(AM_DEFAULT_VERBOSITY))
 AM_V_GEN_0 ?= @echo "  GEN     " $@;
 AM_V_GEN_1 ?=
 
-AM_V_DATA ?= $(AM_V_DATA_$(V))
-AM_V_DATA_ ?= $(AM_V_DATA_$(AM_DEFAULT_VERBOSITY))
-AM_V_DATA_0 ?= @echo "  DATA    " $@;
-AM_V_DATA_1 ?=
+INTLTOOL_V_MERGE ?= $(INTLTOOL_V_MERGE_$(V))
+INTLTOOL_V_MERGE_OPTIONS ?= $(intltool_v_merge_options_$(V))
+INTLTOOL_V_MERGE_ ?= $(INTLTOOL_V_MERGE_$(AM_DEFAULT_VERBOSITY))
+INTLTOOL_V_MERGE_0 ?= @echo "  ITMRG " $@;
+INTLTOOL_V_MERGE_1 ?=
+
+am.INSTALL_PROGRAMS    = $(AM_V_PROG)$(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=install $(INSTALL_PROGRAM) $< $@
+am.INSTALL_SCRIPTS     = $(AM_V_SCRIPT)$(INSTALL_SCRIPT) $< $@
+am.INSTALL_LTLIBRARIES = $(AM_V_LIB)$(LIBTOOL) $(AM_V_lt) --tag=CC $(sd.ALL_LIBTOOLFLAGS) --mode=install $(INSTALL) $< $@
+am.INSTALL_DATA        = $(AM_V_DATA)$(INSTALL_DATA) $< $@
+am.INSTALL_HEADERS     = $(AM_V_HEADER)$(INSTALL_DATA) $< $@
+am.INSTALL_MANS        = $(AM_V_MAN)$(INSTALL_DATA) $< $@
+
+AM_V_lt ?= $(AM_V_lt_$(V))
+AM_V_lt_ ?= $(AM_V_lt_$(AM_DEFAULT_VERBOSITY))
+AM_V_lt_0 ?= --silent
+AM_V_lt_1 ?=
 
 AM_V_PROG ?= $(AM_V_PROG_$(V))
 AM_V_PROG_ ?= $(AM_V_PROG_$(AM_DEFAULT_VERBOSITY))
@@ -134,26 +146,20 @@ AM_V_LIB_ ?= $(AM_V_LIB_$(AM_DEFAULT_VERBOSITY))
 AM_V_LIB_0 ?= @echo "  LIB     " $@;
 AM_V_LIB_1 ?=
 
+AM_V_DATA ?= $(AM_V_DATA_$(V))
+AM_V_DATA_ ?= $(AM_V_DATA_$(AM_DEFAULT_VERBOSITY))
+AM_V_DATA_0 ?= @echo "  DATA    " $@;
+AM_V_DATA_1 ?=
+
 AM_V_HEADER ?= $(AM_V_HEADER_$(V))
 AM_V_HEADER_ ?= $(AM_V_HEADER_$(AM_DEFAULT_VERBOSITY))
 AM_V_HEADER_0 ?= @echo "  HEADER  " $@;
 AM_V_HEADER_1 ?=
 
-AM_V_at ?= $(AM_V_at_$(V))
-AM_V_at_ ?= $(AM_V_at_$(AM_DEFAULT_VERBOSITY))
-AM_V_at_0 ?= @
-AM_V_at_1 ?=
-
-AM_V_lt ?= $(AM_V_lt_$(V))
-AM_V_lt_ ?= $(AM_V_lt_$(AM_DEFAULT_VERBOSITY))
-AM_V_lt_0 ?= --silent
-AM_V_lt_1 ?=
-
-INTLTOOL_V_MERGE ?= $(INTLTOOL_V_MERGE_$(V))
-INTLTOOL_V_MERGE_OPTIONS ?= $(intltool_v_merge_options_$(V))
-INTLTOOL_V_MERGE_ ?= $(INTLTOOL_V_MERGE_$(AM_DEFAULT_VERBOSITY))
-INTLTOOL_V_MERGE_0 ?= @echo "  ITMRG " $@;
-INTLTOOL_V_MERGE_1 ?=
+AM_V_MAN ?= $(AM_V_MAN_$(V))
+AM_V_MAN_ ?= $(AM_V_MAN_$(AM_DEFAULT_VERBOSITY))
+AM_V_MAN_0 ?= @echo "  MAN     " $@;
+AM_V_MAN_1 ?=
 
 sd.substitutions = \
        '|rootlibexecdir=$(rootlibexecdir)|' \
@@ -217,7 +223,29 @@ sd.substitutions = \
        '|binfmtdir=$(binfmtdir)|' \
        '|modulesloaddir=$(modulesloaddir)|'
 
+sd.substitution_keys := $(subst |,,$(shell printf '%s\n' $(sd.substitutions) | cut -d= -f1))
+
 sd.SED_PROCESS = \
 	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
 	$(SED) $(subst '|,-e 's|@,$(subst =,\@|,$(subst |',|g',$(sd.substitutions)))) \
 		< $< > $@
+
+sd.XSLTPROC_FLAGS = \
+	--nonet \
+	--xinclude \
+	--stringparam man.output.quietly 1 \
+	--stringparam funcsynopsis.style ansi \
+	--stringparam man.authors.section.enabled 0 \
+	--stringparam man.copyright.section.enabled 0 \
+	--stringparam systemd.version $(VERSION) \
+	--path '$(outdir):$(srcdir):$(topoutdir)/man:$(topsrcdir)/man'
+
+sd.XSLT = $(if $(XSLTPROC), $(XSLTPROC), xsltproc)
+sd.XSLTPROC_PROCESS_MAN = \
+	$(AM_V_XSLT)$(sd.XSLT) -o $@ $(sd.XSLTPROC_FLAGS) $(srcdir)/man/custom-man.xsl $<
+
+sd.XSLTPROC_PROCESS_HTML = \
+	$(AM_V_XSLT)$(sd.XSLT) -o $@ $(sd.XSLTPROC_FLAGS) $(srcdir)/man/custom-html.xsl $<
+
+sd.html-alias = \
+	$(AM_V_LN)$(LN_S) -f $(notdir $<) $@

@@ -8,6 +8,22 @@ zshcompletion_DATA ?=
 dist_bashcompletion_DATA := $(sort $(bashcompletion_DATA) $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(bin_SCRIPTS))
 dist_zshcompletion_DATA := $(sort $(zshcompletion_DATA) $(addprefix _,$(rootbin_PROGRAMS) $(bin_PROGRAMS) $(bin_SCRIPTS)))
 
+man_MANS ?=
+_am.man_MANS := $(man_MANS)
+undefine man_MANS
+man0_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .0,$(suffix $(_am.tmp))),$(_am.tmp)))
+man1_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .1,$(suffix $(_am.tmp))),$(_am.tmp)))
+man2_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .2,$(suffix $(_am.tmp))),$(_am.tmp)))
+man3_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .3,$(suffix $(_am.tmp))),$(_am.tmp)))
+man4_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .4,$(suffix $(_am.tmp))),$(_am.tmp)))
+man5_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .5,$(suffix $(_am.tmp))),$(_am.tmp)))
+man6_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .6,$(suffix $(_am.tmp))),$(_am.tmp)))
+man7_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .7,$(suffix $(_am.tmp))),$(_am.tmp)))
+man8_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .8,$(suffix $(_am.tmp))),$(_am.tmp)))
+man9_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .9,$(suffix $(_am.tmp))),$(_am.tmp)))
+manl_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .l,$(suffix $(_am.tmp))),$(_am.tmp)))
+mann_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .n,$(suffix $(_am.tmp))),$(_am.tmp)))
+
 $(eval \
   $(foreach p,$(am.primaries)  ,$(call _am.per_primary,$p)$(at.nl)))
 $(eval \

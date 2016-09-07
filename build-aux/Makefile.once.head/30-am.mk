@@ -15,10 +15,14 @@ am.sys2out_HEADERS = $(abspath $(addprefix $(srcdir)/include/,$(notdir $1)))
 am.var_PROGRAMS    = $1_SOURCES nodist_$1_SOURCES $1_CFLAGS $1_CPPFLAGS $1_LDFLAGS $1_LDADD
 am.var_LTLIBRARIES = $1_SOURCES nodist_$1_SOURCES $1_CFLAGS $1_CPPFLAGS $1_LDFLAGS $1_LIBADD
 
-am.INSTALL_PROGRAM   ?= $(INSTALL_PROGRAM) $< $@
-am.INSTALL_SCRIPT    ?= $(INSTALL) $< $@
-am.INSTALL_LTLIBRARY ?= $(INSTALL) $< $@
-am.INSTALL_DATA      ?= $(INSTALL_DATA) $< $@
+# So these are reasonable defaults, to keep my sanity.  They get overridden by
+# `libtool`/`AM_V_*`-aware versions in `*-sd.mk`
+am.INSTALL_PROGRAMS    ?= $(INSTALL_PROGRAM) $< $@
+am.INSTALL_SCRIPTS     ?= $(INSTALL) $< $@
+am.INSTALL_LTLIBRARIES ?= $(INSTALL) $< $@
+am.INSTALL_DATA        ?= $(INSTALL_DATA) $< $@
+am.INSTALL_HEADERS     ?= $(INSTALL_DATA) $< $@
+am.INSTALL_MANS        ?= $(INSTALL_DATA) $< $@
 
 am.LDFLAGS =
 

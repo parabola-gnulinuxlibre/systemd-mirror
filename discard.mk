@@ -513,31 +513,10 @@ EXTRA_DIST += \
 
 # ------------------------------------------------------------------------------
 
-MANPAGES =
-MANPAGES_ALIAS =
-
 include Makefile-man.am
 
 .PHONY: man update-man-list
 man: $(MANPAGES) $(MANPAGES_ALIAS) $(HTML_FILES) $(HTML_ALIAS)
-
-XML_FILES = \
-	${patsubst %.1,%.xml,${patsubst %.3,%.xml,${patsubst %.5,%.xml,${patsubst %.7,%.xml,${patsubst %.8,%.xml,$(MANPAGES)}}}}}
-HTML_FILES = \
-	${XML_FILES:.xml=.html}
-HTML_ALIAS = \
-	${patsubst %.1,%.html,${patsubst %.3,%.html,${patsubst %.5,%.html,${patsubst %.7,%.html,${patsubst %.8,%.html,$(MANPAGES_ALIAS)}}}}}
-
-ifneq ($(ENABLE_MANPAGES),)
-man_MANS = \
-	$(MANPAGES) \
-	$(MANPAGES_ALIAS)
-
-noinst_DATA += \
-	$(HTML_FILES) \
-	$(HTML_ALIAS) \
-	docs/html/man
-endif # ENABLE_MANPAGES
 
 CLEANFILES += \
 	$(man_MANS) \
@@ -563,14 +542,6 @@ CLEANFILES += \
 XML_GLOB = $(wildcard $(top_srcdir)/man/*.xml)
 NON_INDEX_XML_FILES = $(filter-out man/systemd.index.xml,$(XML_FILES))
 SOURCE_XML_FILES = ${patsubst %,$(top_srcdir)/%,$(filter-out man/systemd.directives.xml,$(NON_INDEX_XML_FILES))}
-
-# This target should only be run manually. It recreates Makefile-man.am
-# file in the source directory based on all man/*.xml files. Run it after
-# adding, removing, or changing the conditional in a man page.
-update-man-list: $(top_srcdir)/tools/make-man-rules.py $(XML_GLOB) man/custom-entities.ent
-	$(AM_V_GEN)$(PYTHON) $< $(XML_GLOB) > $(top_srcdir)/Makefile-man.tmp
-	$(AM_V_at)mv $(top_srcdir)/Makefile-man.tmp $(top_srcdir)/Makefile-man.am
-	@echo "Makefile-man.am has been regenerated"
 
 $(outdir)/systemd.index.xml: $(top_srcdir)/tools/make-man-index.py $(NON_INDEX_XML_FILES)
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -864,53 +835,8 @@ EXTRA_DIST += \
 	$(polkitpolicy_in_in_files)
 
 # ------------------------------------------------------------------------------
-$(outdir)/custom-entities.ent: configure.ac
-	$(AM_V_GEN)$(MKDIR_P) $(dir $@)
-	$(AM_V_GEN)(echo '<?xml version="1.0" encoding="utf-8" ?>' && \
-	 printf '$(subst '|,<!ENTITY ,$(subst =, ",$(subst |',">\n,$(substitutions))))') \
-	 > $@ # '
-
 CLEANFILES += \
 	man/custom-entities.ent
-
-XSLTPROC_FLAGS = \
-	--nonet \
-	--xinclude \
-	--stringparam man.output.quietly 1 \
-	--stringparam funcsynopsis.style ansi \
-	--stringparam man.authors.section.enabled 0 \
-	--stringparam man.copyright.section.enabled 0 \
-	--stringparam systemd.version $(VERSION) \
-	--path '$(builddir)/man:$(srcdir)/man'
-
-XSLT = $(if $(XSLTPROC), $(XSLTPROC), xsltproc)
-XSLTPROC_PROCESS_MAN = \
-	$(AM_V_XSLT)$(XSLT) -o $@ $(XSLTPROC_FLAGS) $(srcdir)/man/custom-man.xsl $<
-
-XSLTPROC_PROCESS_HTML = \
-	$(AM_V_XSLT)$(XSLT) -o $@ $(XSLTPROC_FLAGS) $(srcdir)/man/custom-html.xsl $<
-
-$(outdir)/%.1: man/%.xml man/custom-man.xsl man/custom-entities.ent
-	$(XSLTPROC_PROCESS_MAN)
-
-$(outdir)/%.3: man/%.xml man/custom-man.xsl man/custom-entities.ent
-	$(XSLTPROC_PROCESS_MAN)
-
-$(outdir)/%.5: man/%.xml man/custom-man.xsl man/custom-entities.ent
-	$(XSLTPROC_PROCESS_MAN)
-
-$(outdir)/%.7: man/%.xml man/custom-man.xsl man/custom-entities.ent
-	$(XSLTPROC_PROCESS_MAN)
-
-$(outdir)/%.8: man/%.xml man/custom-man.xsl man/custom-entities.ent
-	$(XSLTPROC_PROCESS_MAN)
-
-$(outdir)/%.html: man/%.xml man/custom-html.xsl man/custom-entities.ent
-	$(XSLTPROC_PROCESS_HTML)
-
-define html-alias
-	$(AM_V_LN)$(LN_S) -f $(notdir $<) $@
-endef
 
 EXTRA_DIST += \
 	man/custom-html.xsl \

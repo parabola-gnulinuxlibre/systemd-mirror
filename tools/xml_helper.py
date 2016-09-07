@@ -17,12 +17,17 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
+import os.path
 from lxml import etree as tree
 
 class CustomResolver(tree.Resolver):
     def resolve(self, url, id, context):
+        topsrcdir = os.path.dirname(os.path.dirname(__file__))
         if 'custom-entities.ent' in url:
-            return self.resolve_filename('man/custom-entities.ent', context)
+            return self.resolve_filename(os.path.join(topsrcdir, 'man/custom-entities.ent.in'), context)
+        f = os.path.join(topsrcdir, 'man', os.path.basename(url))
+        if os.path.isfile(f):
+            return self.resolve_filename(f, context)
 
 _parser = tree.XMLParser()
 _parser.resolvers.add(CustomResolver())
