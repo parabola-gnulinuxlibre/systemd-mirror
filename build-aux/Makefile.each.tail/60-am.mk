@@ -2,11 +2,11 @@ mod.am.depends += files
 
 rootbin_PROGRAMS ?=
 bin_PROGRAMS ?=
-bin_SCRIPTS ?=
+dist_bin_SCRIPTS ?=
 bashcompletion_DATA ?=
 zshcompletion_DATA ?=
-dist_bashcompletion_DATA := $(sort $(bashcompletion_DATA) $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(bin_SCRIPTS))
-dist_zshcompletion_DATA := $(sort $(zshcompletion_DATA) $(addprefix _,$(rootbin_PROGRAMS) $(bin_PROGRAMS) $(bin_SCRIPTS)))
+dist_bashcompletion_DATA := $(sort $(bashcompletion_DATA) $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS))
+dist_zshcompletion_DATA := $(sort $(zshcompletion_DATA) $(addprefix _,$(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS)))
 
 man_MANS ?=
 _am.man_MANS := $(man_MANS)
