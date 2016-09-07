@@ -339,6 +339,7 @@ move_files() (
 
 	# auto-distribute the stuff
 	(
+		mv -t src/libsystemd man/sd*
 		cd man
 		for file in *.xml; do
 			if [[ -d ../src/"${file%.xml}" ]]; then
