@@ -341,9 +341,11 @@ move_files() (
 	(
 		mv -t src/libsystemd man/sd*
 		cd man
-		for file in *.xml; do
-			if [[ -d ../src/"${file%.xml}" ]]; then
-				mv "$file" -t ../src/"${file%.xml}"
+		for file in *; do
+			if [[ -d ../src/"${file%%.*}" ]]; then
+				mv "$file" -t ../src/"${file%%.*}"
+			elif [[ -d ../src/"${file%%@*}" ]]; then
+				mv "$file" -t ../src/"${file%%@*}"
 			fi
 		done
 	)
