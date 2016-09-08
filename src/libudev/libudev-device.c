@@ -35,7 +35,7 @@
 #include <unistd.h>
 
 #include "libudev.h"
-#include "sd-device.h"
+#include <systemd/sd-device.h>
 
 #include "alloc-util.h"
 #include "device-private.h"
