@@ -91,8 +91,9 @@ move_files() (
 	mv -T src/timesync     src/systemd-timesyncd
 	mv -T src/activate     src/systemd-socket-activate
 
-	mv src/udev/*_id    -t src
-	mv src/udev/collect -t src
+	mv src/udev/*_id      -t src
+	mv src/udev/mtd_probe -t src
+	mv src/udev/collect   -t src
 
 	mv -T src/boot/efi src/systemd-boot
 	mv -T src/boot     src/bootctl
@@ -332,10 +333,17 @@ move_files() (
 	   src/udev/udevadm*
 	mkdir src/libudev-core
 	mv -t src/libudev-core \
+	   src/udev/net \
 	   src/udev/udev-*
 	mkdir src/systemd-udevd
 	mv -t src/systemd-udevd \
 	   src/udev/udevd*
+	mkdir src/grp-udev.d
+	mv -t src/grp-udev.d \
+	   src/udev/.gitignore \
+	   src/udev/udev.*
+	rm src/udev/.vimrc
+	rmdir src/udev
 
 	# muck
 	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
@@ -507,7 +515,10 @@ move_files() (
 	    src/timedatectl
 	grp src/grp-udev \
 	    rules \
+	    hwdb \
+	    src/libudev-core \
 	    src/*_id \
+	    src/mtd_probe \
 	    src/systemd-hwdb \
 	    src/systemd-udevd \
 	    src/udevadm
