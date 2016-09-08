@@ -385,20 +385,28 @@ move_files() (
 	(
 		cd man
 		for file in *; do
-			if [[ -d ../src/"${file%%.*}" ]]; then
-				mv "$file" -t ../src/"${file%%.*}"
-			elif [[ -d ../src/"${file%%@*}" ]]; then
-				mv "$file" -t ../src/"${file%%@*}"
+			base=${file%%.*}
+			base=${base%%@*}
+			if [[ -d ../src/"${base}" ]]; then
+				mv "$file" -t ../src/"${base}"
+			elif [[ -d ../src/"${base#systemd-}" ]]; then
+				mv "$file" -t ../src/"${base#systemd-}"
+			elif [[ -d ../src/systemd-"${base}" ]]; then
+				mv "$file" -t ../src/systemd-"${base}"
 			fi
 		done
 	)
 	(
 		cd units
 		for file in *; do
-			if [[ -d ../src/"${file%%.*}" ]]; then
-				mv "$file" -t ../src/"${file%%.*}"
-			elif [[ -d ../src/"${file%%@*}" ]]; then
-				mv "$file" -t ../src/"${file%%@*}"
+			base=${file%%.*}
+			base=${base%%@*}
+			if [[ -d ../src/"${base}" ]]; then
+				mv "$file" -t ../src/"${base}"
+			elif [[ -d ../src/"${base#systemd-}" ]]; then
+				mv "$file" -t ../src/"${base#systemd-}"
+			elif [[ -d ../src/systemd-"${base}" ]]; then
+				mv "$file" -t ../src/systemd-"${base}"
 			fi
 		done
 	)
@@ -518,6 +526,7 @@ move_files() (
 	    hwdb \
 	    src/libudev-core \
 	    src/*_id \
+	    src/collect \
 	    src/mtd_probe \
 	    src/systemd-hwdb \
 	    src/systemd-udevd \
