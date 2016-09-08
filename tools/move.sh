@@ -340,6 +340,7 @@ move_files() (
 	# auto-distribute the stuff
 	(
 		mv -t src/libsystemd man/sd*
+		mv -t src/libudev man/udev_*
 		cd man
 		for file in *; do
 			if [[ -d ../src/"${file%%.*}" ]]; then
@@ -349,6 +350,7 @@ move_files() (
 			fi
 		done
 	)
+	mv -T man src/manpages
 	(
 		cd units
 		for file in *; do
@@ -361,20 +363,29 @@ move_files() (
 	)
 	(
 		cd shell-completion/bash
+		mv -T  systemctl.in ../../src/systemctl/systemctl.completion.bash.in
+		cat .gitignore   >> ../../src/systemctl/.gitignore
+		rm .gitignore
 		for file in *; do
 			if [[ -d ../../src/"$file" ]]; then
 				mv -T "$file" "../../src/$file/$file.completion.bash"
 			fi
 		done
 	)
+	rmdir shell-completion/bash
 	(
 		cd shell-completion/zsh
+		mv -T _systemctl.in ../../src/systemctl/systemctl.completion.zsh.in
+		cat .gitignore   >> ../../src/systemctl/.gitignore
+		rm .gitignore
 		for file in _*; do
 			if [[ -d ../../src/"${file#_}" ]]; then
 				mv -T "$file" "../../src/${file#_}/${file#_}.completion.zsh"
 			fi
 		done
 	)
+	mv -T shell-completion/zsh src/zsh-completion
+	rmdir shell-completion
 	
 	# categorize
 	grp src/grp-boot \
