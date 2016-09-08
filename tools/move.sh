@@ -337,10 +337,44 @@ move_files() (
 	mv -t src/systemd-udevd \
 	   src/udev/udevd*
 
+	# muck
+	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
+	mv -t src/libsystemd man/sd*
+	mv -t src/libudev man/udev_*
+	mkdir src/manpages
+	mv -t src/manpages \
+	   man/daemon.xml \
+	   man/file-hierarchy.xml \
+	   man/hostname.xml \
+	   man/localtime.xml \
+	   man/machine-id.xml \
+	   man/machine-info.xml \
+	   man/os-release.xml
+	mv -t src/systemd-sleep \
+	   units/hibernate.target \
+	   units/hybrid-sleep.target \
+	   units/suspend.target \
+	   units/systemd-hibernate.service.in \
+	   units/systemd-hybrid-sleep.service.in \
+	   units/systemd-suspend.service.in
+	mv -t src/systemd-tmpfiles units/systemd-tmpfiles*
+	mv -T tmpfiles.d/var.conf src/systemd-tmpfiles/var.tmpfiles
+	mv -T tmpfiles.d/x11.conf src/systemd-tmpfiles/x11.tmpfiles
+	mkdir src/libudev/src
+	mv -t src/libudev/src src/libudev/*.{c,h}
+	mkdir src/libudev/include
+	mv -T src/libudev/{src,include}/libudev.h
+	mv -t src/libsystemd-network/include/systemd-network \
+	   src/libsystemd/include/systemd/sd-dhcp* \
+	   src/libsystemd/include/systemd/sd-ipv4* \
+	   src/libsystemd/include/systemd/sd-lldp* \
+	   src/libsystemd/include/systemd/sd-ndisc*
+	for l in device hwdb netlink network resolve; do
+		mv -T src/libsystemd/include/systemd/sd-$l.h src/libsystemd/src/sd-$l/sd-$l.h
+	done
+
 	# auto-distribute the stuff
 	(
-		mv -t src/libsystemd man/sd*
-		mv -t src/libudev man/udev_*
 		cd man
 		for file in *; do
 			if [[ -d ../src/"${file%%.*}" ]]; then
@@ -350,7 +384,6 @@ move_files() (
 			fi
 		done
 	)
-	mv -T man src/manpages
 	(
 		cd units
 		for file in *; do
