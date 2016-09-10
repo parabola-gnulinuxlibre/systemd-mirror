@@ -409,7 +409,7 @@ move_files() (
 	mv -t src/systemd-resolved \
 	   man/dnssec-trust-anchors*
 	mv -t src/systemd-tty-ask-password-agent \
-	   man/systemd-ask-password*
+	   man/systemd-ask-password-console*
 
 	# less obvious unit groups
 	# suffix these with '*' in case they gain or lose the .in suffix.
