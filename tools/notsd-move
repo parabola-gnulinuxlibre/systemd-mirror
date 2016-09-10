@@ -678,24 +678,7 @@ breakup_makefile() (
                 fi
         done < <(fixup_makefile <Makefile.am)
         rm .tmp.move.all
-)
 
-fixup_includes() (
-	find src \( -name '*.h' -o -name '*.c' \) \
-	     -exec grep '#include ["<]sd-' -l -- {} + |
-	    xargs -d $'\n' sed -ri \
-		  -e 's|#include "(sd-[^"]*)"|#include <systemd/\1>|' \
-		  -e 's|#include <(sd-[^>]*)>|#include <systemd/\1>|'
-)
-
-fixup_makefile() {
-	sed -r \
-	    -e '/^[^#	]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' \
-	    -e 's|^if (.*)|ifneq ($(\1),)|' \
-	    -e 's|--version-script=.*/([^/]+)\.sym|--version-script=$(srcdir)/\1.sym|g'
-}
-
-fixup_makefiles() (
 	sed -ri \
 	    -e '/^	\$\(AM_V_at\)\$\(MKDIR_P\) \$\(dir \$@\)/d' \
 	    -e 's/ \$\(CFLAGS\) / /g' \
@@ -706,10 +689,14 @@ fixup_makefiles() (
 	    src/libsystemd/src/Makefile \
 	    src/libsystemd/src/sd-journal/Makefile \
 	    src/grp-udev/libudev-core/Makefile
-	find -type f -name Makefile|while read -r filename; do
-		sed -r -i "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="${filename%/*}" config.mk)|" "$filename"
-	done
 )
+
+fixup_makefile() {
+	sed -r \
+	    -e '/^[^#	]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' \
+	    -e 's|^if (.*)|ifneq ($(\1),)|' \
+	    -e 's|--version-script=.*/([^/]+)\.sym|--version-script=$(srcdir)/\1.sym|g'
+}
 
 breakup_zshcompletion() (
 	sed_expr='
@@ -742,11 +729,9 @@ move() (
 	>&2 echo ' => move_files'
 	move_files
 	>&2 echo ' => breakup_makefile'
-	#breakup_makefile
-	>&2 echo ' => fixup_includes'
-	fixup_includes
-	>&2 echo ' => fixup_makefiles'
-	#fixup_makefiles
+	breakup_makefile
+	>&2 echo ' => ./tools/notsd-fixup'
+	./tools/notsd-fixup
 )
 
 main() {
@@ -762,7 +747,7 @@ main() {
 	move
 
 	git add .
-	git commit -m './tools/move.sh'
+	git commit -m './tools/notsd-move'
 	git merge -s ours notsystemd/postmove
 	git checkout notsystemd/postmove
 	git merge tmp/postmove
