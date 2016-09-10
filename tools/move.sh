@@ -465,7 +465,7 @@ move_files() (
 	mv -t src/grp-journal.d tmpfiles.d/journal-nocow.*
 	mv -t src/grp-remote.d tmpfiles.d/systemd-remote.*
 	mv -T tmpfiles.d/systemd{,-journald}.tmpfiles.m4
-
+	mv -t src/systemd tmpfiles.d/systemd-tmpfs.tmpfiles*
 
 	# auto-distribute the stuff
 	for d in man units sysusers.d tmpfiles.d; do
