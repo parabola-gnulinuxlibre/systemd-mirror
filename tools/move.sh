@@ -351,6 +351,7 @@ move_files() (
 
 	# less obvious manpage groups
 	mv -t src/libsystemd \
+	   man/libsystemd* \
 	   man/sd*
 	mv -t src/libudev \
 	   man/udev_*
@@ -378,26 +379,43 @@ move_files() (
 	   man/udev.conf.xml
 	mv -t src/grp-udev.d \
 	   man/udev.xml
+	mv -t src/systemd-cryptsetup \
+	   man/*crypt*
+	mv -t src/systemd-machine-id-setup \
+	   man/systemd-machine-id*
 	mv -T man/glib-event-glue.c src/libsystemd/sd_event_get_fd-glib-example.c
 	mv -T man/systemd-halt.service.xml src/systemd-shutdown/systemd-shutdown.xml
 
 	# less obvious unit groups
+	# suffix these with '*' in case they gain or lose the .in suffix.
 	mv -t src/systemd-sleep \
-	   units/hibernate.target \
-	   units/hybrid-sleep.target \
-	   units/suspend.target \
-	   units/systemd-hibernate.service.in \
-	   units/systemd-hybrid-sleep.service.in \
-	   units/systemd-suspend.service.in
+	   units/hibernate.target* \
+	   units/hybrid-sleep.target* \
+	   units/suspend.target* \
+	   units/systemd-hibernate.service* \
+	   units/systemd-hybrid-sleep.service* \
+	   units/systemd-suspend.service*
 	mv -t src/systemd-shutdown \
-	   units/halt.target \
-	   units/kexec.target \
-	   units/poweroff.target \
-	   units/reboot.target \
-	   units/systemd-halt.service.in \
-	   units/systemd-kexec.service.in \
-	   units/systemd-poweroff.service.in \
-	   units/systemd-reboot.service.in
+	   units/halt.target* \
+	   units/kexec.target* \
+	   units/poweroff.target* \
+	   units/reboot.target* \
+	   units/systemd-halt.service* \
+	   units/systemd-kexec.service* \
+	   units/systemd-poweroff.service* \
+	   units/systemd-reboot.service*
+	mv -t src/systemd-binfmt \
+	   units/*binfmt*
+	mv -t src/systemd-modules-load \
+	   units/kmod*
+	mv -t src/systemd-quotacheck \
+	   units/quota*
+	mv -t src/systemd-journald \
+	   units/*journald*
+	mv -t src/journalctl \
+	   units/*journal*
+	mv -t src/systemd-cryptsetup \
+	   units/cryptsetup*
 
 	# muck
 	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
@@ -547,7 +565,8 @@ move_files() (
 	grp src/grp-system \
 	    src/libcore \
 	    src/systemctl \
-	    src/systemd
+	    src/systemd \
+	    src/systemd-shutdown
 	grp src/grp-system/grp-utils \
 	    src/systemd-analyze \
 	    src/systemd-delta \
