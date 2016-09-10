@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+fixup_makefiles() (
+	find -type f -name Makefile|while read -r filename; do
+		sed -r -i "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="${filename%/*}" config.mk)|" "$filename"
+	done
+)
+
+fixup_includes() (
+        find $(find . -type d -name include) -type d | while read -r dir; do
+                lib="${dir##*/}"
+                pushd "$dir"
+                find . -type f -exec sed -ri -e "s|$lib/||" -- {} +
+                popd
+        done
+
+        find src \( -name '*.h' -o -name '*.c' \) -type f -exec "$0"--includes {} \;
+)
+
+main() {
+        fixup_makefiles
+        fixup_includes
+}
+
+main "$@"
