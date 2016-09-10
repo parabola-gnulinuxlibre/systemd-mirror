@@ -73,6 +73,9 @@ gperf_gperf_sources += \
 	src/network/networkd-network-gperf.gperf \
 	src/network/networkd-netdev-gperf.gperf
 
+dist_systempreset_DATA = \
+	90-networkd.preset
+
 nested.subdirs += libnetworkd-core
 nested.subdirs += networkctl
 nested.subdirs += systemd-networkd

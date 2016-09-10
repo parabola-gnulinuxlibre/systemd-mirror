@@ -61,6 +61,9 @@ EXTRA_DIST += \
 	units/systemd-timesyncd.service.in \
 	src/timesync/timesyncd.conf.in
 
+dist_systempreset_DATA = \
+	90-timesyncd.preset
+
 sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

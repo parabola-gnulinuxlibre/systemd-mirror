@@ -185,4 +185,7 @@ endif # HAVE_SYSV_COMPAT
 EXTRA_DIST += \
 	docs/var-log/README.in
 
+dist_systempreset_DATA = \
+	90-journald.preset
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

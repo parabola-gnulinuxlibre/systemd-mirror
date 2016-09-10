@@ -23,6 +23,9 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+dist_systempreset_DATA = \
+	90-resolved.preset
+
 nested.subdirs += libbasic-dns
 nested.subdirs += systemd-resolved systemd-resolve nss-resolve
 

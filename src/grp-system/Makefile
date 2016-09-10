@@ -23,6 +23,9 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+dist_systempreset_DATA = \
+	90-systemd.preset
+
 nested.subdirs += systemctl systemd systemd-shutdown
 nested.subdirs += libcore
 nested.subdirs += grp-utils
