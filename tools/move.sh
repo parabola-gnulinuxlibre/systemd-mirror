@@ -109,12 +109,16 @@ move_files() (
 	mkdir src/systemd
 	mv -t src/systemd \
 	   src/core/main* \
-	   src/core/macros.systemd.in \
+	   src/core/*systemd* \
 	   src/core/system.conf \
-	   src/core/org.*
+	   src/core/user.conf
+	mkdir src/systemd-shutdown
+	mv -t src/systemd-shutdown \
+	   src/core/shutdown* \
+	   src/core/umount*
+	mv -T src/{,lib}core
 
 	mv -T src/{,lib}basic
-	mv -T src/{,lib}core
 	mv -T src/{,lib}shared
 
 	mv -T src/lib{shared,core}/linux
@@ -364,8 +368,6 @@ move_files() (
 	   man/runlevel.xml \
 	   man/shutdown.xml \
 	   man/telinit.xml
-	mv -t src/systemctl \
-	   man/systemd-halt.service.xml
 	mv -t src/systemd \
 	   man/systemd-system.conf.xml
 	mkdir src/grp-system.d
@@ -377,6 +379,7 @@ move_files() (
 	mv -t src/grp-udev.d \
 	   man/udev.xml
 	mv -T man/glib-event-glue.c src/libsystemd/sd_event_get_fd-glib-example.c
+	mv -T man/systemd-halt.service.xml src/systemd-shutdown/systemd-shutdown.xml
 
 	# less obvious unit groups
 	mv -t src/systemd-sleep \
@@ -386,6 +389,15 @@ move_files() (
 	   units/systemd-hibernate.service.in \
 	   units/systemd-hybrid-sleep.service.in \
 	   units/systemd-suspend.service.in
+	mv -t src/systemd-shutdown \
+	   units/halt.target \
+	   units/kexec.target \
+	   units/poweroff.target \
+	   units/reboot.target \
+	   units/systemd-halt.service.in \
+	   units/systemd-kexec.service.in \
+	   units/systemd-poweroff.service.in \
+	   units/systemd-reboot.service.in
 
 	# muck
 	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
