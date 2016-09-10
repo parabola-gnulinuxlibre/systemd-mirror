@@ -349,6 +349,13 @@ move_files() (
 	rm src/udev/.vimrc
 	rmdir src/udev
 
+	# .conf is such a useless suffix
+	for ext in sysctl sysusers tmpfiles; do
+		for file in $ext.d/*.conf*; do
+			mv -T "$file" "${file/.conf/.$ext}"
+		done
+	done
+
 	# less obvious manpage groups
 	mv -t src/libsystemd \
 	   man/libsystemd* \
@@ -385,25 +392,25 @@ move_files() (
 	   man/systemd-machine-id*
 	mv -T man/glib-event-glue.c src/libsystemd/sd_event_get_fd-glib-example.c
 	mv -T man/systemd-halt.service.xml src/systemd-shutdown/systemd-shutdown.xml
-
+	mv -t src/systemd-path src/libsystemd/include/systemd/sd-path*
+	mv -t src/systemd-path src/libsystemd/src/sd-path/*
+	rmdir src/libsystemd/src/sd-path
+	mv -t src/systemd-coredump \
+	   sysctl.d/*coredump*
+	mv -t src/systemd-sysctl \
+	   sysctl.d/??-default.*
 	# less obvious unit groups
 	# suffix these with '*' in case they gain or lose the .in suffix.
-	mv -t src/systemd-sleep \
-	   units/hibernate.target* \
-	   units/hybrid-sleep.target* \
-	   units/suspend.target* \
-	   units/systemd-hibernate.service* \
-	   units/systemd-hybrid-sleep.service* \
-	   units/systemd-suspend.service*
-	mv -t src/systemd-shutdown \
-	   units/halt.target* \
-	   units/kexec.target* \
-	   units/poweroff.target* \
-	   units/reboot.target* \
-	   units/systemd-halt.service* \
-	   units/systemd-kexec.service* \
-	   units/systemd-poweroff.service* \
-	   units/systemd-reboot.service*
+	for thing in hibernate hybrid-sleep suspend; do
+		mv -t src/systemd-sleep \
+		   units/"$thing".target* \
+		   units/systemd-"$thing".service*
+	done
+	for thing in halt kexec poweroff reboot; do
+		mv -t src/systemd-shutdown \
+		   units/"$thing".target* \
+		   units/systemd-"$thing".service*
+	done
 	mv -t src/systemd-binfmt \
 	   units/*binfmt*
 	mv -t src/systemd-modules-load \
@@ -412,20 +419,30 @@ move_files() (
 	   units/quota*
 	mv -t src/systemd-journald \
 	   units/*journald*
-	mv -t src/journalctl \
-	   units/*journal*
 	mv -t src/systemd-cryptsetup \
 	   units/cryptsetup*
 
 	# muck
 	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
 	mv -t src/systemd-tmpfiles units/systemd-tmpfiles*
-	mv -T tmpfiles.d/var.conf src/systemd-tmpfiles/var.tmpfiles
-	mv -T tmpfiles.d/x11.conf src/systemd-tmpfiles/x11.tmpfiles
+	mv -t src/systemd-tmpfiles \
+	   tmpfiles.d/var.* \
+	   tmpfiles.d/etc.* \
+	   tmpfiles.d/home.* \
+	   tmpfiles.d/*nologin* \
+	   tmpfiles.d/x11.*
+	mv -t src/systemd-sysusers \
+	   sysusers.d/.gitignore \
+	   sysusers.d/basic*
 	mkdir src/libudev/src
 	mv -t src/libudev/src src/libudev/*.{c,h}
 	mkdir src/libudev/include
 	mv -T src/libudev/{src,include}/libudev.h
+	mv -T src/{systemd-networkd,libnetworkd-core}/networkd.h
+	mv -T src/{systemd-resolved,libbasic-dns}/resolved-def.h
+	mv -t src/cdrom_id  rules/*cdrom*
+	mv -t src/mtd_probe rules/*mtd*
+	mv -t src/v4l_id    rules/*v4l*
 	mv -t src/libsystemd-network/include/systemd-network \
 	   src/libsystemd/include/systemd/sd-dhcp* \
 	   src/libsystemd/include/systemd/sd-ipv4* \
@@ -436,8 +453,8 @@ move_files() (
 	done
 
 	# auto-distribute the stuff
-	(
-		cd man
+	for d in man units sysusers.d tmpfiles.d; do
+		pushd $d >/dev/null
 		for file in *; do
 			base=${file%%.*}
 			base=${base%%@*}
@@ -449,47 +466,40 @@ move_files() (
 				mv "$file" -t ../src/systemd-"${base}"
 			fi
 		done
-	)
-	(
-		cd units
-		for file in *; do
-			base=${file%%.*}
-			base=${base%%@*}
-			if [[ -d ../src/"${base}" ]]; then
-				mv "$file" -t ../src/"${base}"
-			elif [[ -d ../src/"${base#systemd-}" ]]; then
-				mv "$file" -t ../src/"${base#systemd-}"
-			elif [[ -d ../src/systemd-"${base}" ]]; then
-				mv "$file" -t ../src/systemd-"${base}"
-			fi
-		done
-	)
-	(
-		cd shell-completion/bash
-		mv -T  systemctl.in ../../src/systemctl/systemctl.completion.bash.in
-		cat .gitignore   >> ../../src/systemctl/.gitignore
-		rm .gitignore
-		for file in *; do
-			if [[ -d ../../src/"$file" ]]; then
-				mv -T "$file" "../../src/$file/$file.completion.bash"
-			fi
-		done
-	)
+		popd >/dev/null
+	done
+	rmdir sysusers.d #tmpfiles.d
+
+	pushd shell-completion/bash >/dev/null
+	mv -T  systemctl.in ../../src/systemctl/systemctl.completion.bash.in
+	cat .gitignore   >> ../../src/systemctl/.gitignore
+	rm .gitignore
+	for file in *; do
+		if [[ -d ../../src/"$file" ]]; then
+			mv -T "$file" "../../src/$file/$file.completion.bash"
+		fi
+	done
+	popd >/dev/null
 	rmdir shell-completion/bash
-	(
-		cd shell-completion/zsh
-		mv -T _systemctl.in ../../src/systemctl/systemctl.completion.zsh.in
-		cat .gitignore   >> ../../src/systemctl/.gitignore
-		rm .gitignore
-		for file in _*; do
-			if [[ -d ../../src/"${file#_}" ]]; then
-				mv -T "$file" "../../src/${file#_}/${file#_}.completion.zsh"
-			fi
-		done
-	)
+
+	pushd shell-completion/zsh >/dev/null
+	mv -T _systemctl.in ../../src/systemctl/systemctl.completion.zsh.in
+	cat .gitignore   >> ../../src/systemctl/.gitignore
+	rm .gitignore
+	for file in _*; do
+		if [[ -d ../../src/"${file#_}" ]]; then
+			mv -T "$file" "../../src/${file#_}/${file#_}.completion.zsh"
+		fi
+	done
+	popd >/dev/null
 	mv -T shell-completion/zsh src/zsh-completion
 	rmdir shell-completion
-	
+
+	# do this *after* auto-splitting, because of
+	# systemd-journal-{gatewayd,remote,upload}.
+	mv -t src/journalctl \
+	   units/*journal*
+
 	# categorize
 	grp src/grp-boot \
 	    src/bootctl \
@@ -647,8 +657,10 @@ fixup_makefiles() (
 	done
 )
 
-breakup_zshcompletion() (
-	sed_expr='
+breakup_misc() {
+	# zsh completion
+	(
+		sed_expr='
 		1 {
 			i #compdef %s
 			d
@@ -661,20 +673,44 @@ breakup_zshcompletion() (
 		}
 	'
 
-	cd shell-completion/zsh
-	read -r _ cmds < _systemd
-	for cmd in $cmds; do
-		printf -v cmd_sed_expr "$sed_expr" $cmd $cmd
-		sed -e "$cmd_sed_expr" < _systemd > _$cmd
-	done
-	rm _systemd
-)
+		cd shell-completion/zsh
+		read -r _ cmds < _systemd
+		for cmd in $cmds; do
+			printf -v cmd_sed_expr "$sed_expr" $cmd $cmd
+			sed -e "$cmd_sed_expr" < _systemd > _$cmd
+		done
+		rm _systemd
+	)
+	# sysusers
+	(
+		cd sysusers.d
+
+		for p in systemd-{journald,networkd,resolved,timesyncd,coredump}; do
+			grep -e '^#' -e '^$' -e "${p%d}" < systemd.conf.m4 > "$p".conf
+		done
+		rm systemd.conf.m4
+
+		for p in systemd-journal-{gatewayd,remote,upload}; do
+			grep -e '^#' -e '^$' -e "${p%d}" < systemd-remote.conf.m4 > "$p".conf
+		done
+		rm systemd-remote.conf.m4
+	)
+	# tmpfiles
+	(
+		cd tmpfiles.d
+
+		sed -n -e '/^#/p' -e '/^$/p' -e '/m4_ifdef(`ENABLE_RESOLVED/,/)/p' < etc.conf.m4 | grep -v m4 > systemd-resolved.conf
+		sed -i                          '/m4_ifdef(`ENABLE_RESOLVED/,/)/d'   etc.conf.m4
+
+		mv -T systemd{,-journald}.conf.m4
+	)
+}
 
 move() (
         find . \( -name Makefile -o -name '*.mk' \) -delete
 
-	>&2 echo ' => breakup_zshcompletion'
-	breakup_zshcompletion
+	>&2 echo ' => breakup_misc'
+	breakup_misc
 	>&2 echo ' => move_files'
 	move_files
 	>&2 echo ' => breakup_makefile'
