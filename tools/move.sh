@@ -379,6 +379,7 @@ move_files() (
 	   man/daemon.xml \
 	   man/file-hierarchy.xml \
 	   man/hostname.xml \
+	   man/locale.conf.xml \
 	   man/localtime.xml \
 	   man/machine-id.xml \
 	   man/machine-info.xml \
@@ -439,6 +440,7 @@ move_files() (
 	   units/machine.slice*
 
 	# muck
+	mv -t src/libbasic/include/basic src/libbasic/.gitignore
 	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
 	mv -t src/systemd-tmpfiles units/systemd-tmpfiles*
 	mv -t src/systemd-tmpfiles \
