@@ -359,6 +359,11 @@ move_files() (
 			mv -T "$file" "${file/.conf/.$ext}"
 		done
 	done
+	for ext in xorg; do
+		for file in $ext/*.sh*; do
+			mv -T "$file" "${file/.sh/.$ext}"
+		done
+	done
 
 	# less obvious manpage groups
 	mv -t src/libsystemd \
@@ -379,7 +384,8 @@ move_files() (
 	   man/halt.xml \
 	   man/runlevel.xml \
 	   man/shutdown.xml \
-	   man/telinit.xml
+	   man/telinit.xml \
+	   man/systemd.preset.xml
 	mv -t src/systemd \
 	   man/systemd-system.conf.xml
 	mkdir src/grp-system.d
@@ -467,7 +473,18 @@ move_files() (
 	mv -t src/grp-remote.d tmpfiles.d/systemd-remote.*
 	mv -T tmpfiles.d/systemd{,-journald}.tmpfiles.m4
 	mv -t src/systemd tmpfiles.d/systemd-tmpfs.tmpfiles*
-	mv -t src/systemd xorg/??-systemd-user.sh; rmdir xorg
+	mv -t src/systemd xorg/??-systemd-user.*; rmdir xorg
+
+	mv -t src/systemd-sysv-generator \
+	   docs/sysvinit/.gitignore \
+	   docs/sysvinit/*
+	rmdir docs/sysvinit
+	mv -t src/grp-journal.d \
+	   docs/var-log/.gitignore \
+	   docs/var-log/*
+	rmdir docs/var-log
+	rm docs/.gitignore
+	rmdir docs
 
 	# auto-distribute the stuff
 	for d in man units sysusers.d tmpfiles.d; do
@@ -737,7 +754,7 @@ main() {
 	move
 
 	git add .
-	git commit -m './move.sh'
+	git commit -m './tools/move.sh'
 	git merge -s ours notsystemd/postmove
 	git checkout notsystemd/postmove
 	git merge tmp/postmove
