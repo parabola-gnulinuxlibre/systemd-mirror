@@ -19,7 +19,7 @@
 
 #include <unistd.h>
 
-#include "sd-daemon.h"
+#include <systemd/sd-daemon.h>
 
 #include "strv.h"
 
