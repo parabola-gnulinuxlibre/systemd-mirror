@@ -128,8 +128,11 @@ move_files() (
 	mv -T src/lib{shared,firewall}/firewall-util.h
 
 	split_lib src/libbasic
-	split_lib src/libshared
 	split_lib src/libsystemd-network
+
+	split_lib src/libshared
+	mv src/libshared/{test,include/shared}/test-tables.h
+	rmdir src/libshared/test
 
 	mkdir src/systemd-hibernate-resume-generator
 	mv -t src/systemd-hibernate-resume-generator \
@@ -341,6 +344,7 @@ move_files() (
 	   src/udev/udev-*
 	mkdir src/systemd-udevd
 	mv -t src/systemd-udevd \
+	   src/udev/udev.conf* \
 	   src/udev/udevd*
 	mkdir src/grp-udev.d
 	mv -t src/grp-udev.d \
@@ -399,6 +403,7 @@ move_files() (
 	   sysctl.d/*coredump*
 	mv -t src/systemd-sysctl \
 	   sysctl.d/??-default.*
+
 	# less obvious unit groups
 	# suffix these with '*' in case they gain or lose the .in suffix.
 	for thing in hibernate hybrid-sleep suspend; do
@@ -421,6 +426,10 @@ move_files() (
 	   units/*journald*
 	mv -t src/systemd-cryptsetup \
 	   units/cryptsetup*
+	mv -t src/systemd-logind \
+	   units/user.slice*
+	mv -t src/systemd-machined \
+	   units/machine.slice*
 
 	# muck
 	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
@@ -430,6 +439,7 @@ move_files() (
 	   tmpfiles.d/etc.* \
 	   tmpfiles.d/home.* \
 	   tmpfiles.d/*nologin* \
+	   tmpfiles.d/legacy.* \
 	   tmpfiles.d/x11.*
 	mv -t src/systemd-sysusers \
 	   sysusers.d/.gitignore \
@@ -451,7 +461,11 @@ move_files() (
 	for l in device hwdb netlink network resolve; do
 		mv -T src/libsystemd/include/systemd/sd-$l.h src/libsystemd/src/sd-$l/sd-$l.h
 	done
-	mv -T systemd{,-journald}.tmpfiles.m4
+	mkdir src/grp-journal.d
+	mv -t src/grp-journal.d tmpfiles.d/journal-nocow.*
+	mv -t src/grp-remote.d tmpfiles.d/systemd-remote.*
+	mv -T tmpfiles.d/systemd{,-journald}.tmpfiles.m4
+
 
 	# auto-distribute the stuff
 	for d in man units sysusers.d tmpfiles.d; do
@@ -500,6 +514,9 @@ move_files() (
 	# systemd-journal-{gatewayd,remote,upload}.
 	mv -t src/journalctl \
 	   units/*journal*
+	# fix a false positive
+	mv -t units \
+	   src/systemd-shutdown/shutdown.target
 
 	# categorize
 	grp src/grp-boot \
