@@ -366,6 +366,9 @@ move_files() (
 	done
 
 	# less obvious manpage groups
+	mv -T man/{glib-event-glue,sd_event_get_fd-glib-example}.c
+	mv -T man/systemd-{halt.service,shutdown}.xml
+	mv -T man/systemd-{suspend.service,sleep}.xml
 	mv -t src/libsystemd \
 	   man/libsystemd* \
 	   man/sd*
@@ -400,16 +403,13 @@ move_files() (
 	   man/*crypt*
 	mv -t src/systemd-machine-id-setup \
 	   man/systemd-machine-id*
-	mv -T man/{glib-event-glue,sd_event_get_fd-glib-example}.c
-	mv -T man/systemd-{halt.service,shutdown}.xml
-	mv -T man/systemd-{suspend.service,sleep}.xml
 	mv -t src/systemd-path src/libsystemd/include/systemd/sd-path*
 	mv -t src/systemd-path src/libsystemd/src/sd-path/*
 	rmdir src/libsystemd/src/sd-path
-	mv -t src/systemd-coredump \
-	   sysctl.d/*coredump*
-	mv -t src/systemd-sysctl \
-	   sysctl.d/??-default.*
+	mv -t src/systemd-resolved \
+	   man/dnssec-trust-anchors*
+	mv -t src/systemd-tty-ask-password-agent \
+	   man/systemd-ask-password*
 
 	# less obvious unit groups
 	# suffix these with '*' in case they gain or lose the .in suffix.
@@ -476,6 +476,10 @@ move_files() (
 	mv -t src/systemd tmpfiles.d/systemd-tmpfs.tmpfiles*
 	mv -t src/systemd xorg/??-systemd-user.*; rmdir xorg
 	mv -t src/systemd-vconsole-setup man/vconsole.conf.xml
+	mv -t src/systemd-coredump \
+	   sysctl.d/*coredump*
+	mv -t src/systemd-sysctl \
+	   sysctl.d/??-default.*
 
 	mv -t src/systemd-sysv-generator \
 	   docs/sysvinit/.gitignore \
