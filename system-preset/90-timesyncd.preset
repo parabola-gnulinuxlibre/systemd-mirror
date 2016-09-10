@@ -8,17 +8,4 @@
 # These ones should be enabled by default, even if distributions
 # generally follow a default-off policy.
 
-enable remote-fs.target
-enable machines.target
-
-enable getty@.service
-
-disable console-getty.service
-disable debug-shell.service
-
-disable halt.target
-disable kexec.target
-disable poweroff.target
-enable reboot.target
-disable rescue.target
-disable exit.target
+enable systemd-timesyncd.service
