@@ -451,6 +451,7 @@ move_files() (
 	for l in device hwdb netlink network resolve; do
 		mv -T src/libsystemd/include/systemd/sd-$l.h src/libsystemd/src/sd-$l/sd-$l.h
 	done
+	mv -T systemd{,-journald}.tmpfiles.m4
 
 	# auto-distribute the stuff
 	for d in man units sysusers.d tmpfiles.d; do
@@ -657,10 +658,8 @@ fixup_makefiles() (
 	done
 )
 
-breakup_misc() {
-	# zsh completion
-	(
-		sed_expr='
+breakup_zshcompletion() (
+	sed_expr='
 		1 {
 			i #compdef %s
 			d
@@ -673,44 +672,20 @@ breakup_misc() {
 		}
 	'
 
-		cd shell-completion/zsh
-		read -r _ cmds < _systemd
-		for cmd in $cmds; do
-			printf -v cmd_sed_expr "$sed_expr" $cmd $cmd
-			sed -e "$cmd_sed_expr" < _systemd > _$cmd
-		done
-		rm _systemd
-	)
-	# sysusers
-	(
-		cd sysusers.d
-
-		for p in systemd-{journald,networkd,resolved,timesyncd,coredump}; do
-			grep -e '^#' -e '^$' -e "${p%d}" < systemd.conf.m4 > "$p".conf
-		done
-		rm systemd.conf.m4
-
-		for p in systemd-journal-{gatewayd,remote,upload}; do
-			grep -e '^#' -e '^$' -e "${p%d}" < systemd-remote.conf.m4 > "$p".conf
-		done
-		rm systemd-remote.conf.m4
-	)
-	# tmpfiles
-	(
-		cd tmpfiles.d
-
-		sed -n -e '/^#/p' -e '/^$/p' -e '/m4_ifdef(`ENABLE_RESOLVED/,/)/p' < etc.conf.m4 | grep -v m4 > systemd-resolved.conf
-		sed -i                          '/m4_ifdef(`ENABLE_RESOLVED/,/)/d'   etc.conf.m4
-
-		mv -T systemd{,-journald}.conf.m4
-	)
-}
+	cd shell-completion/zsh
+	read -r _ cmds < _systemd
+	for cmd in $cmds; do
+		printf -v cmd_sed_expr "$sed_expr" $cmd $cmd
+		sed -e "$cmd_sed_expr" < _systemd > _$cmd
+	done
+	rm _systemd
+)
 
 move() (
         find . \( -name Makefile -o -name '*.mk' \) -delete
 
-	>&2 echo ' => breakup_misc'
-	breakup_misc
+	>&2 echo ' => breakup_zshcompletion'
+	breakup_zshcompletion
 	>&2 echo ' => move_files'
 	move_files
 	>&2 echo ' => breakup_makefile'
