@@ -23,7 +23,8 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-nested.subdirs += systemctl systemd libcore
+nested.subdirs += systemctl systemd systemd-shutdown
+nested.subdirs += libcore
 nested.subdirs += grp-utils
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

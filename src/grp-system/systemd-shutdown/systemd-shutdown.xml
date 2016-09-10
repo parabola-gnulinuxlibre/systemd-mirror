@@ -21,10 +21,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<refentry id="systemd-halt.service">
+<refentry id="systemd-shutdown">
 
   <refentryinfo>
-    <title>systemd-halt.service</title>
+    <title>systemd-shutdown</title>
     <productname>systemd</productname>
 
     <authorgroup>
@@ -38,7 +38,7 @@
   </refentryinfo>
 
   <refmeta>
-    <refentrytitle>systemd-halt.service</refentrytitle>
+    <refentrytitle>systemd-shutdown</refentrytitle>
     <manvolnum>8</manvolnum>
   </refmeta>
 

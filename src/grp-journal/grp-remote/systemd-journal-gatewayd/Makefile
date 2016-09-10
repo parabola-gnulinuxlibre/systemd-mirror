@@ -61,7 +61,7 @@ dist_gatewayddocumentroot_DATA = \
 	src/journal-remote/browse.html
 
 dist_sysusers_DATA += \
-	sysusers.d/systemd-journal-gateway.conf
+	sysusers.d/systemd-journal-gatewayd.conf
 
 endif # HAVE_MICROHTTPD
 

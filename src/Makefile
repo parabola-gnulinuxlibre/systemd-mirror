@@ -60,7 +60,6 @@ nested.subdirs += systemd-nspawn
 nested.subdirs += systemd-rc-local-generator
 nested.subdirs += systemd-remount-fs
 nested.subdirs += systemd-reply-password
-nested.subdirs += systemd-shutdown
 nested.subdirs += systemd-socket-proxyd
 nested.subdirs += systemd-stdio-bridge
 nested.subdirs += systemd-system-update-generator

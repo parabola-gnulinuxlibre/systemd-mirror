@@ -37,7 +37,7 @@ systemd_LDADD = \
 
 dist_tmpfiles_DATA = \
 	tmpfiles.d/systemd.conf \
-        systemd-tmp.conf
+        systemd-tmpfs.conf
 
 dist_pkgsysconf_DATA += \
 	src/core/system.conf \
