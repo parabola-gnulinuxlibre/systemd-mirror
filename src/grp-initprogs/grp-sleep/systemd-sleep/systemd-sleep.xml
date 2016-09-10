@@ -26,7 +26,7 @@
     xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <refentryinfo>
-    <title>systemd-suspend.service</title>
+    <title>systemd-sleep</title>
     <productname>systemd</productname>
 
     <authorgroup>
@@ -40,7 +40,7 @@
   </refentryinfo>
 
   <refmeta>
-    <refentrytitle>systemd-suspend.service</refentrytitle>
+    <refentrytitle>systemd-sleep</refentrytitle>
     <manvolnum>8</manvolnum>
   </refmeta>
 
