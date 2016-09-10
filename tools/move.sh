@@ -400,8 +400,9 @@ move_files() (
 	   man/*crypt*
 	mv -t src/systemd-machine-id-setup \
 	   man/systemd-machine-id*
-	mv -T man/glib-event-glue.c src/libsystemd/sd_event_get_fd-glib-example.c
-	mv -T man/systemd-halt.service.xml src/systemd-shutdown/systemd-shutdown.xml
+	mv -T man/{glib-event-glue,sd_event_get_fd-glib-example}.c
+	mv -T man/systemd-{halt.service,shutdown}.xml
+	mv -T man/systemd-{suspend.service,sleep}.xml
 	mv -t src/systemd-path src/libsystemd/include/systemd/sd-path*
 	mv -t src/systemd-path src/libsystemd/src/sd-path/*
 	rmdir src/libsystemd/src/sd-path
@@ -474,6 +475,7 @@ move_files() (
 	mv -T tmpfiles.d/systemd{,-journald}.tmpfiles.m4
 	mv -t src/systemd tmpfiles.d/systemd-tmpfs.tmpfiles*
 	mv -t src/systemd xorg/??-systemd-user.*; rmdir xorg
+	mv -t src/systemd-vconsole-setup man/vconsole.conf.xml
 
 	mv -t src/systemd-sysv-generator \
 	   docs/sysvinit/.gitignore \
