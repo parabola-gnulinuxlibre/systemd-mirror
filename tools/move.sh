@@ -435,6 +435,7 @@ move_files() (
 	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
 	mv -t src/systemd-tmpfiles units/systemd-tmpfiles*
 	mv -t src/systemd-tmpfiles \
+	   tmpfiles.d/tmp.* \
 	   tmpfiles.d/var.* \
 	   tmpfiles.d/etc.* \
 	   tmpfiles.d/home.* \
@@ -466,6 +467,7 @@ move_files() (
 	mv -t src/grp-remote.d tmpfiles.d/systemd-remote.*
 	mv -T tmpfiles.d/systemd{,-journald}.tmpfiles.m4
 	mv -t src/systemd tmpfiles.d/systemd-tmpfs.tmpfiles*
+	mv -t src/systemd xorg/??-systemd-user.sh; rmdir xorg
 
 	# auto-distribute the stuff
 	for d in man units sysusers.d tmpfiles.d; do
@@ -620,6 +622,15 @@ move_files() (
 	    src/systemd-notify \
 	    src/systemd-path \
 	    src/systemd-socket-activate
+
+	mv -t src/systemd-timesyncd system-preset/??-timesyncd.preset
+	for file in system-preset/??-*.preset; do
+		base="${file##*/??-}"
+		base="${base%.preset}"
+		base="${base%d}"
+		mv -t src/grp-"$base" "$file"
+	done
+	rmdir system-preset
 )
 
 breakup_makefile() (
