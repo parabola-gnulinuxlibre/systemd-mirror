@@ -345,10 +345,11 @@ move_files() (
 	rm src/udev/.vimrc
 	rmdir src/udev
 
-	# muck
-	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
-	mv -t src/libsystemd man/sd*
-	mv -t src/libudev man/udev_*
+	# less obvious manpage groups
+	mv -t src/libsystemd \
+	   man/sd*
+	mv -t src/libudev \
+	   man/udev_*
 	mkdir src/manpages
 	mv -t src/manpages \
 	   man/daemon.xml \
@@ -358,6 +359,26 @@ move_files() (
 	   man/machine-id.xml \
 	   man/machine-info.xml \
 	   man/os-release.xml
+	mv -t src/systemctl \
+	   man/halt.xml \
+	   man/runlevel.xml \
+	   man/shutdown.xml \
+	   man/telinit.xml
+	mv -t src/systemctl \
+	   man/systemd-halt.service.xml
+	mv -t src/systemd \
+	   man/systemd-system.conf.xml
+	mkdir src/grp-system.d
+	mv -t src/grp-system.d \
+	   man/bootup.xml \
+	   man/kernel-command-line.xml
+	mv -t src/systemd-udevd \
+	   man/udev.conf.xml
+	mv -t src/grp-udev.d \
+	   man/udev.xml
+	mv -T man/glib-event-glue.c src/libsystemd/sd_event_get_fd-glib-example.c
+
+	# less obvious unit groups
 	mv -t src/systemd-sleep \
 	   units/hibernate.target \
 	   units/hybrid-sleep.target \
@@ -365,6 +386,9 @@ move_files() (
 	   units/systemd-hibernate.service.in \
 	   units/systemd-hybrid-sleep.service.in \
 	   units/systemd-suspend.service.in
+
+	# muck
+	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
 	mv -t src/systemd-tmpfiles units/systemd-tmpfiles*
 	mv -T tmpfiles.d/var.conf src/systemd-tmpfiles/var.tmpfiles
 	mv -T tmpfiles.d/x11.conf src/systemd-tmpfiles/x11.tmpfiles
