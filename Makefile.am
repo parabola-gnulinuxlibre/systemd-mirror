@@ -741,6 +741,7 @@ EXTRA_DIST += \
 
 # ------------------------------------------------------------------------------
 
+#@build-aux/Makefile.each.tail/70-sd.mk
 MANPAGES =
 MANPAGES_ALIAS =
 
@@ -767,6 +768,7 @@ noinst_DATA += \
 	docs/html/man
 endif # ENABLE_MANPAGES
 
+#@discard.mk
 CLEANFILES += \
 	$(man_MANS) \
 	$(HTML_FILES) \
@@ -1360,7 +1362,7 @@ EXTRA_DIST += \
 CLEANFILES += \
 	$(gperf_txt_sources)
 
-#@build-aux/Makefile.each.tail/20-sd.mk
+#@build-aux/Makefile.each.tail/50-sd.mk
 %-from-name.gperf: %-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct $(notdir $*)_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { printf "%s, %s\n", $$1, $$1 }' <$< >$@
@@ -2734,11 +2736,13 @@ systemd_system_update_generator_SOURCES = \
 systemd_system_update_generator_LDADD = \
 	libshared.la
 
-#@auto/systemd-hibernate-resume/Makefile ---------------------------------------
+#@auto/systemd-hibernate-resume-generator/Makefile -----------------------------
 if ENABLE_HIBERNATE
 systemgenerator_PROGRAMS += \
 	systemd-hibernate-resume-generator
 
+#@auto/systemd-hibernate-resume/Makefile
+if ENABLE_HIBERNATE
 rootlibexec_PROGRAMS += \
 	systemd-hibernate-resume
 
@@ -2748,12 +2752,15 @@ systemd_hibernate_resume_SOURCES = \
 systemd_hibernate_resume_LDADD = \
 	libshared.la
 
+#@auto/systemd-hibernate-resume-generator/Makefile
 systemd_hibernate_resume_generator_SOURCES = \
 	src/hibernate-resume/hibernate-resume-generator.c
 
 systemd_hibernate_resume_generator_LDADD = \
 	libshared.la
+endif # ENABLE_HIBERNATE
 
+#@auto/systemd-hibernate-resume/Makefile
 dist_systemunit_DATA += \
 	units/hibernate.target \
 	units/hybrid-sleep.target
@@ -4801,7 +4808,7 @@ SYSINIT_TARGET_WANTS += \
 
 endif # HAVE_LIBCRYPTSETUP
 
-#@src/grp-hostname/Makefile ----------------------------------------------------
+#@auto/systemd-hostnamed/Makefile ----------------------------------------------
 if ENABLE_HOSTNAMED
 systemd_hostnamed_SOURCES = \
 	src/hostname/hostnamed.c
@@ -4833,6 +4840,10 @@ SYSTEM_UNIT_ALIASES += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.hostname1.busname
 
+endif # ENABLE_HOSTNAMED
+#@auto/hostnamectl/Makefile
+if ENABLE_HOSTNAMED
+
 hostnamectl_SOURCES = \
 	src/hostname/hostnamectl.c
 
@@ -4849,6 +4860,7 @@ dist_zshcompletion_data += \
 	shell-completion/zsh/_hostnamectl
 endif # ENABLE_HOSTNAMED
 
+#@auto/systemd-hostnamed/Makefile
 polkitpolicy_in_files += \
 	src/hostname/org.freedesktop.hostname1.policy.in
 
@@ -5286,7 +5298,7 @@ systemd_export_LDADD = \
 	$(ZLIB_LIBS) \
 	$(BZIP2_LIBS)
 
-#@src/grp-journal/grp-remote/Makefile
+#@auto/systemd-importd/Makefile
 dist_rootlibexec_DATA = \
 	src/import/import-pubring.gpg
 
@@ -6094,7 +6106,7 @@ units/%: units/%.in
 man/%: man/%.in
 	$(SED_PROCESS)
 
-#@build-aux/Makefile.each.tail/20-sd.mk
+#@build-aux/Makefile.each.tail/50-sd.mk
 sysctl.d/%: sysctl.d/%.in
 	$(SED_PROCESS)
 
@@ -6120,7 +6132,7 @@ shell-completion/%: shell-completion/%.in
 %.conf: %.conf.in
 	$(SED_PROCESS)
 
-#@build-aux/Makefile.each.tail/20-sd.mk
+#@build-aux/Makefile.each.tail/50-sd.mk
 %.sh: %.sh.in
 	$(SED_PROCESS)
 	$(AM_V_GEN)chmod +x $@
@@ -6190,7 +6202,7 @@ XSLTPROC_PROCESS_MAN = \
 XSLTPROC_PROCESS_HTML = \
 	$(AM_V_XSLT)$(XSLT) -o $@ $(XSLTPROC_FLAGS) $(srcdir)/man/custom-html.xsl $<
 
-#@build-aux/Makefile.each.tail/20-sd.mk
+#@build-aux/Makefile.each.tail/50-sd.mk
 man/%.1: man/%.xml man/custom-man.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_MAN)
 
@@ -6444,7 +6456,7 @@ install-tree: all
 	$(MAKE) install DESTDIR=$(abs_srcdir)/install-tree
 	tree $(abs_srcdir)/install-tree
 
-#@build-aux/Makefile.once.tail/20-sd.mk
+#@build-aux/Makefile.once.tail/10-sd.mk
 # Let's run all tests of the test suite, but under valgrind. Let's
 # exclude perl/python/shell scripts we have in there
 .PHONY: valgrind-tests
@@ -6497,7 +6509,7 @@ check-includes: $(top_srcdir)/tools/check-includes.pl
 EXTRA_DIST += \
 	$(top_srcdir)/tools/check-includes.pl
 
-#@build-aux/Makefile.once.head/20-sd.mk
+#@build-aux/Makefile.each.tail/50-sd.mk
 # Stupid test that everything purported to be exported really is
 define generate-sym-test
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -6557,7 +6569,7 @@ tests += \
 	test-libsystemd-sym \
 	test-libudev-sym
 
-#@build-aux/Makefile.once.tail/20-sd.mk
+#@build-aux/Makefile.once.tail/10-sd.mk
 .PHONY: cppcheck
 cppcheck:
 	cppcheck --enable=all -q $(top_srcdir)
@@ -6577,7 +6589,96 @@ list-keys:
 
 add-key:
 	gpg --verbose --no-options --no-default-keyring --no-auto-key-locate --batch --trust-model=always --keyring=$(srcdir)/src/import/import-pubring.gpg --import -
+#@Makefile
+nested.subdirs += src
+
+# intltoolize
+files.src.gen += m4/intltool.m4
+files.src.gen += po/Makefile.in.in
+# autoreconf
+files.src.gen += aclocal.m4
+files.src.gen += automake.mk.in
+files.src.gen += build-aux/compile
+files.src.gen += build-aux/config.guess
+files.src.gen += build-aux/config.sub
+files.src.gen += build-aux/install-sh
+files.src.gen += build-aux/ltmain.sh
+files.src.gen += build-aux/missing
+files.src.gen += m4/libtool.m4
+files.src.gen += m4/ltoptions.m4
+files.src.gen += m4/ltsugar.m4
+files.src.gen += m4/ltversion.m4
+files.src.gen += m4/lt~obsolete.m4
+files.src.gen += config.h.in
+files.src.gen += configure
+
 #@src/Makefile
+nested.subdirs += busctl
+nested.subdirs += grp-boot
+nested.subdirs += grp-coredump
+nested.subdirs += grp-hostname
+nested.subdirs += grp-initprogs
+nested.subdirs += grp-journal
+nested.subdirs += grp-locale
+nested.subdirs += grp-login
+nested.subdirs += grp-machine
+nested.subdirs += grp-network
+nested.subdirs += grp-resolve
+nested.subdirs += grp-system
+nested.subdirs += grp-timedate
+nested.subdirs += grp-udev
+nested.subdirs += grp-utils
+nested.subdirs += libbasic
+nested.subdirs += libfirewall
+nested.subdirs += libshared
+nested.subdirs += libsystemd
+nested.subdirs += libsystemd-network
+nested.subdirs += libudev
+nested.subdirs += nss-myhostname
+nested.subdirs += systemd-ask-password
+nested.subdirs += systemd-cgls
+nested.subdirs += systemd-cgroups-agent
+nested.subdirs += systemd-cgtop
+nested.subdirs += systemd-cryptsetup
+nested.subdirs += systemd-dbus1-generator
+nested.subdirs += systemd-debug-generator
+nested.subdirs += systemd-getty-generator
+nested.subdirs += systemd-gpt-auto-generator
+nested.subdirs += systemd-initctl
+nested.subdirs += systemd-machine-id-setup
+nested.subdirs += systemd-nspawn
+nested.subdirs += systemd-rc-local-generator
+nested.subdirs += systemd-remount-fs
+nested.subdirs += systemd-reply-password
+nested.subdirs += systemd-socket-proxyd
+nested.subdirs += systemd-stdio-bridge
+nested.subdirs += systemd-system-update-generator
+nested.subdirs += systemd-timesyncd
+nested.subdirs += systemd-tty-ask-password-agent
+
+#@src/grp-initprogs/Makefile
+nested.subdirs += grp-sleep
+nested.subdirs += systemd-backlight
+nested.subdirs += systemd-binfmt
+nested.subdirs += systemd-detect-virt
+nested.subdirs += systemd-firstboot
+nested.subdirs += systemd-fsck
+nested.subdirs += systemd-modules-load
+nested.subdirs += systemd-quotacheck
+nested.subdirs += systemd-random-seed
+nested.subdirs += systemd-rfkill
+nested.subdirs += systemd-sysctl
+nested.subdirs += systemd-sysusers
+nested.subdirs += systemd-tmpfiles
+nested.subdirs += systemd-update-done
+nested.subdirs += systemd-update-utmp
+nested.subdirs += systemd-user-sessions
+nested.subdirs += systemd-vconsole-setup
+
+#@src/grp-initprogs/grp-sleep/Makefile
+nested.subdirs += systemd-hibernate-resume
+nested.subdirs += systemd-hibernate-resume-generator
+nested.subdirs += systemd-sleep
 
 #@src/libudev/Makefile
 nested.subdirs += src
@@ -6587,7 +6688,7 @@ systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
 systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
 #@src/grp-boot/Makefile
-nested.subdirs += bootctl systemd-boot
+nested.subdirs += bootctl systemd-boot kernel-install
 
 #@src/grp-coredump/Makefile
 nested.subdirs += coredumpctl systemd-coredump
@@ -6609,6 +6710,9 @@ nested.subdirs += systemctl systemd
 
 #@src/grp-timedate/Makefile
 nested.subdirs += timedatectl systemd-timedated
+
+#@src/grp-hostname/Makefile
+nested.subdirs += systemd-hostnamed hostnamectl
 
 #@all
 include $(topsrcdir)/build-aux/Makefile.tail.mk
