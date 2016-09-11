@@ -749,6 +749,7 @@ move() (
 	move_files
 	>&2 echo ' => breakup_makefile'
 	"$0" breakup_makefile |& tail -n20 > .tmp.log || { r=$?; cat .tmp.log; exit $r; }
+	rm .tmp.log
 	>&2 echo ' => ./tools/notsd-fixup'
 	./tools/notsd-fixup
 )
