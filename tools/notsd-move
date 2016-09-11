@@ -660,7 +660,6 @@ move_files() (
 )
 
 breakup_makefile() (
-	set -x
 	mkdir -p build-aux/Makefile.{once,each}.{head,tail}
 
 	touch .tmp.move.all
@@ -740,43 +739,50 @@ breakup_zshcompletion() (
 	rm _systemd
 )
 
+run() (
+	local tmp
+	tmp="$(mktemp --tmpdir)"
+	trap 'rm -f -- "$tmp"' EXIT
+	"$0" "$@" |& tail -n20 > "$tmp" || { r=$?; cat "$tmp"; return $r; }
+	return 0
+)
+
 move() (
 	find . \( -name Makefile -o -name '*.mk' \) -delete
 
 	>&2 echo ' => breakup_zshcompletion'
-	breakup_zshcompletion
+	run breakup_zshcompletion
 	>&2 echo ' => move_files'
-	move_files
+	run move_files
 	>&2 echo ' => breakup_makefile'
-	"$0" breakup_makefile |& tail -n20 > .tmp.log || { r=$?; cat .tmp.log; exit $r; }
-	rm .tmp.log
+	run breakup_makefile
 	>&2 echo ' => ./tools/notsd-fixup'
 	./tools/notsd-fixup
 )
 
 main() {
-	set -e
-	set -o pipefail
-
-	if [[ $# -gt 0 ]]; then
-		"$@"
-	else
-		if [[ -n "$(git status -s)" ]] || [[ -n "$(git clean -xdn)" ]]; then
-			echo 'There are changes in the current directory.' >&2
-			exit 1
-		fi
-
-		git checkout -b tmp/postmove
-
-		move
-
-		git add .
-		git commit -m './tools/notsd-move'
-		git merge -s ours notsystemd/postmove
-		git checkout notsystemd/postmove
-		git merge tmp/postmove
-		git branch -d tmp/postmove
+	if [[ -n "$(git status -s)" ]] || [[ -n "$(git clean -xdn)" ]]; then
+		echo 'There are changes in the current directory.' >&2
+		exit 1
 	fi
+
+	git checkout -b tmp/postmove
+
+	move
+
+	git add .
+	git commit -m './tools/notsd-move'
+	git merge -s ours notsystemd/postmove
+	git checkout notsystemd/postmove
+	git merge tmp/postmove
+	git branch -d tmp/postmove
 }
 
-main "$@"
+set -e
+set -o pipefail
+if [[ $# -gt 0 ]]; then
+	set -x;
+else
+	set -- main
+fi
+"$@"
