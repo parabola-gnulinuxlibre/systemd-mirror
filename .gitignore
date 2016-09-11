@@ -314,4 +314,7 @@ stamp-*
 /gnustandards.mk
 /gitfiles.mk
 Makefile-man.mk
+*-list.txt
 *-gperf.c
+*-to-name.h
+*-from-name.h
