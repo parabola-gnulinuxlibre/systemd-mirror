@@ -228,7 +228,11 @@ main() {
                 done
                 "$hook"
         } < "$current_file" > "$current_file.tmp"
-        mv -Tf "$current_file.tmp" "$current_file"
+        if cmp -s "$current_file.tmp" "$current_file"; then
+                rm -f "$current_file.tmp" || :
+        else
+                mv -Tf "$current_file.tmp" "$current_file"
+        fi
 }
 
 main "$@"
