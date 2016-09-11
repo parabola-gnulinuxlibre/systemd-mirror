@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 
-in_array() {
+in_array() (
+	set +x
 	local needle=$1; shift
 	local item
 	for item in "$@"; do
 		[[ $item = $needle ]] && return 0 # Found
 	done
 	return 1 # Not Found
-}
+)
 
 split_lib() {
 	local d=$1
@@ -659,25 +660,43 @@ move_files() (
 )
 
 breakup_makefile() (
-        touch .tmp.move.all
-        files=(.tmp.move.all)
-        file=/dev/null
-        IFS=''
-        while read -r line; do
-                if [[ $line = '#@'* ]]; then
-                        file="${line#'#@'}"
-                        file="${file%% *}"
-                elif [[ $file = all ]]; then
-                        printf '%s\n' "$line" | tee -a "${files[@]}" >/dev/null
-                else
+	set -x
+	mkdir -p build-aux/Makefile.{once,each}.{head,tail}
+
+	touch .tmp.move.all
+	files=(.tmp.move.all)
+	file=/dev/null
+	IFS=''
+	declare -i i=0
+	trap 'printf "Makefile.am:%d:%s\n" $i "$line"' EXIT
+	while read -r line; do
+		i+=1
+		if [[ $line = '#@'* ]]; then
+			file="${line#'#@'}"
+			file="${file%% *}"
+			if [[ $file = auto/* ]]; then
+				IFS=/
+				read -r auto dir makefile <<<"$file"
+				IFS=''
+				[[ $auto = auto ]]
+				[[ $makefile = Makefile ]]
+				d="$(find src -type d -name "$dir")"
+				[[ -n "$d" ]]
+				[[ "$(wc -l <<<"$d")" = 1 ]]
+				file="$d/Makefile"
+			fi
+		elif [[ $file = all ]]; then
+			printf '%s\n' "$line" | tee -a "${files[@]}" >/dev/null
+		else
 			if ! in_array "$file" "${files[@]}"; then
 				cat .tmp.move.all > "$file"
 				files+=("$file")
 			fi
-                        printf '%s\n' "$line" >> "$file"
-                fi
-        done < <(fixup_makefile <Makefile.am)
-        rm .tmp.move.all
+			printf '%s\n' "$line" >> "$file"
+		fi
+	done < <(fixup_makefile <Makefile.am)
+	trap -- EXIT
+	rm .tmp.move.all
 
 	sed -ri \
 	    -e '/^	\$\(AM_V_at\)\$\(MKDIR_P\) \$\(dir \$@\)/d' \
@@ -722,36 +741,41 @@ breakup_zshcompletion() (
 )
 
 move() (
-        find . \( -name Makefile -o -name '*.mk' \) -delete
+	find . \( -name Makefile -o -name '*.mk' \) -delete
 
 	>&2 echo ' => breakup_zshcompletion'
 	breakup_zshcompletion
 	>&2 echo ' => move_files'
 	move_files
 	>&2 echo ' => breakup_makefile'
-	breakup_makefile
+	"$0" breakup_makefile |& tail -n20 > .tmp.log || { r=$?; cat .tmp.log; exit $r; }
 	>&2 echo ' => ./tools/notsd-fixup'
 	./tools/notsd-fixup
 )
 
 main() {
 	set -e
+	set -o pipefail
 
-	if [[ -n "$(git status -s)" ]] || [[ -n "$(git clean -xdn)" ]]; then
-		echo 'There are changes in the current directory.' >&2
-		exit 1
+	if [[ $# -gt 0 ]]; then
+		"$@"
+	else
+		if [[ -n "$(git status -s)" ]] || [[ -n "$(git clean -xdn)" ]]; then
+			echo 'There are changes in the current directory.' >&2
+			exit 1
+		fi
+
+		git checkout -b tmp/postmove
+
+		move
+
+		git add .
+		git commit -m './tools/notsd-move'
+		git merge -s ours notsystemd/postmove
+		git checkout notsystemd/postmove
+		git merge tmp/postmove
+		git branch -d tmp/postmove
 	fi
-
-	git checkout -b tmp/postmove
-
-	move
-
-	git add .
-	git commit -m './tools/notsd-move'
-	git merge -s ours notsystemd/postmove
-	git checkout notsystemd/postmove
-	git merge tmp/postmove
-	git branch -d tmp/postmove
 }
 
 main "$@"
