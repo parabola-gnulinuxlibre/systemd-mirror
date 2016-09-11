@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
+# The reason we do `find`/`while read`-loops instead of `find -exec` commands
+# is that we want errors from the inner loop to bubble up.
+
 fixup_makefiles() (
-	find -type f -name Makefile|while read -r filename; do
+	find -type f -name Makefile | while read -r filename; do
 		sed -r -i "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="${filename%/*}" config.mk)|" "$filename"
 	done
 )
@@ -9,15 +12,19 @@ fixup_makefiles() (
 fixup_includes() (
         find $(find . -type d -name include) -type d | while read -r dir; do
                 lib="${dir##*/}"
-                pushd "$dir"
+                pushd "$dir" >/dev/null
                 find . -type f -exec sed -ri -e "s|$lib/||" -- {} +
-                popd
+                popd >/dev/null
         done
 
-        find src \( -name '*.h' -o -name '*.c' \) -type f -exec "$0"--includes {} \;
+        find src \( -name '*.h' -o -name '*.c' \) -type f | while read -r filename; do
+                "$0"--includes "$filename"
+        done
 )
 
 main() {
+        set -e
+        set -o pipefail
         fixup_makefiles
         fixup_includes
 }

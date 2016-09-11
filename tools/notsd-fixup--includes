@@ -22,11 +22,34 @@ classify() {
                 out private "$path"
         elif [[ "$path" != systemd/* ]] &&
              [[ "$path" != libudev.h ]] &&
-             cpp -include "$path" <<<'' &>/dev/null;
-        then
+             cpp -include "$path" <<<'' &>/dev/null; then
                 out system "$path"
         else
                 case "$path" in
+                        *-to-name.h|*-from-name.h)
+                                base="${path##*/}"
+                                base="${base%-to-name.h}"
+                                base="${base%-from-name.h}"
+                                case "$base" in
+                                        dns_type)            d=src/grp-resolve/systemd-resolved;;
+                                        keyboard-keys)       d=src/grp-udev/libudev-core;;
+                                        af|arphrd|cap|errno) d=src/libbasic/include/basic;;
+                                        audit_type)          d=src/libsystemd/src/sd-journal;;
+                                        *)
+                                                >&2 printf 'Unknown gperf base: %q\n' "$base"
+                                                >&2 printf 'Cannot figure out: %q\n' "$path"
+                                                exit 2
+                                                ;;
+                                esac
+                                file="$d/${path##*/}"
+                                if [[ "$current_file" = "$d"/* ]]; then
+                                        out private "${file##*/}"
+                                elif [[ "$file" = */include/* ]]; then
+                                        out protected "${file##*/include/}"
+                                else
+                                        out protected "${file##*/}"
+                                fi
+                                ;;
                         asm/sgidefs.h|dbus/dbus.h|efi.h|efilib.h|gio/gio.h|glib.h|libmount.h)
                                 out system "$path"
                                 ;;
@@ -88,13 +111,16 @@ phase0() {
         esac
 }
 
-phase1_tail=
-system=()
-linux=()
-public=()
-protected=()
-typedef=(); typedef_last=true
-private=()
+phase1_init() {
+        phase1_tail=
+        system=()
+        linux=()
+        public=()
+        protected=()
+        typedef=(); typedef_last=true
+        private=()
+}
+phase1_init
 phase1_flush() {
         local b=:
         if [[ ${#system[@]} -gt 0 ]]; then
@@ -131,6 +157,7 @@ phase1_flush() {
                 printf '%s\n' "${typedef[@]}"
         fi
         printf '%s' "$phase1_tail"
+        phase1_init
 }
 phase1() {
         phase=phase1
@@ -183,22 +210,14 @@ phase1() {
                         ;;
                 *)
                         phase1_flush
-                        phase2 "$line"
+                        phase0 "$line"
                         ;;
         esac
 }
 
-phase2() {
-        phase=phase2
-        hook=:
-        local line="$1"
-        printf '%s\n' "$line"
-        cat
-}
-
 main() {
         current_file="$1"
-        printf ' => %s\n' "$current_file"
+        printf ' => %q %q\n' "$0" "$current_file"
         set -o pipefail
         trap 'rm -f -- "$current_file.tmp"' EXIT
         {
@@ -209,7 +228,11 @@ main() {
                 done
                 "$hook"
         } < "$current_file" > "$current_file.tmp"
-        mv -Tf "$current_file.tmp" "$current_file"
+        if cmp -s "$current_file.tmp" "$current_file"; then
+                rm -f "$current_file.tmp" || :
+        else
+                mv -Tf "$current_file.tmp" "$current_file"
+        fi
 }
 
 main "$@"
