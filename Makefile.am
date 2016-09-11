@@ -24,7 +24,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-#@build-aux/Makefile.once.head/20-systemd.mk
+#@build-aux/Makefile.once.head/20-sd.mk
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 AM_MAKEFLAGS = --no-print-directory
 AUTOMAKE_OPTIONS = color-tests parallel-tests
@@ -346,7 +346,7 @@ INSTALL_EXEC_HOOKS += \
 INSTALL_EXEC_HOOKS += \
 	install-busnames-target-wants-hook
 
-#@build-aux/Makefile.once.head/20-systemd.mk -----------------------------------
+#@build-aux/Makefile.once.head/20-sd.mk ----------------------------------------
 V ?=
 
 AM_V_M4 = $(AM_V_M4_$(V))
@@ -822,7 +822,7 @@ EXTRA_DIST += \
 	man/glib-event-glue.c
 
 #@src/libbasic/Makefile --------------------------------------------------------
-at.subdirs += src include
+nested.subdirs += src include
 #@src/libbasic/src/Makefile
 noinst_LTLIBRARIES += \
 	libbasic.la
@@ -1041,7 +1041,7 @@ libbasic_la_LIBADD = \
 	-lm
 
 #@src/libshared/Makefile -------------------------------------------------------
-at.subdirs += src
+nested.subdirs += src
 #@src/libshared/src/Makefile
 noinst_LTLIBRARIES += \
 	libshared.la
@@ -1405,7 +1405,7 @@ EXTRA_DIST += \
 CLEANFILES += \
 	$(gperf_txt_sources)
 
-#@build-aux/Makefile.each.tail/20-systemd.mk
+#@build-aux/Makefile.each.tail/20-sd.mk
 %-from-name.gperf: %-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct $(notdir $*)_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { printf "%s, %s\n", $$1, $$1 }' <$< >$@
@@ -1415,7 +1415,7 @@ CLEANFILES += \
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 
 #@src/libbasic/include/Makefile
-at.subdirs += basic
+nested.subdirs += basic
 #@src/libbasic/include/basic/Makefile
 src/basic/errno-list.txt:
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -2892,6 +2892,7 @@ dist_zshcompletion_data += \
 endif # HAVE_BLKID
 
 endif # ENABLE_EFI
+
 #@auto/systemd-boot/Makefile ---------------------------------------------------
 if ENABLE_EFI
 if HAVE_GNUEFI
@@ -3579,7 +3580,7 @@ busctl_LDADD = \
 	libsystemd-shared.la
 
 #@src/libsystemd-network/Makefile ----------------------------------------------
-at.subdirs += src test
+nested.subdirs += src test
 #@src/libsystemd-network/src/Makefile
 noinst_LTLIBRARIES += \
 	libsystemd-network.la
@@ -6207,7 +6208,7 @@ EXTRA_DIST += \
 	test/loopy.service.d \
 	test/loopy.service.d/compat.conf
 
-#@build-aux/Makefile.once.head/20-systemd.mk -----------------------------------
+#@build-aux/Makefile.once.head/20-sd.mk ----------------------------------------
 substitutions = \
        '|rootlibexecdir=$(rootlibexecdir)|' \
        '|rootbindir=$(rootbindir)|' \
@@ -6282,7 +6283,7 @@ units/%: units/%.in
 man/%: man/%.in
 	$(SED_PROCESS)
 
-#@build-aux/Makefile.each.tail/20-systemd.mk
+#@build-aux/Makefile.each.tail/20-sd.mk
 sysctl.d/%: sysctl.d/%.in
 	$(SED_PROCESS)
 
@@ -6308,7 +6309,7 @@ shell-completion/%: shell-completion/%.in
 %.conf: %.conf.in
 	$(SED_PROCESS)
 
-#@build-aux/Makefile.each.tail/20-systemd.mk
+#@build-aux/Makefile.each.tail/20-sd.mk
 %.sh: %.sh.in
 	$(SED_PROCESS)
 	$(AM_V_GEN)chmod +x $@
@@ -6349,16 +6350,18 @@ EXTRA_DIST += \
 	$(polkitpolicy_in_files) \
 	$(polkitpolicy_in_in_files)
 
-# ------------------------------------------------------------------------------
+#@man/Makefile -----------------------------------------------------------------
 man/custom-entities.ent: configure.ac
 	$(AM_V_GEN)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)(echo '<?xml version="1.0" encoding="utf-8" ?>' && \
 	 printf '$(subst '|,<!ENTITY ,$(subst =, ",$(subst |',">\n,$(substitutions))))') \
 	 > $@ # '
 
+#@discard.mk
 CLEANFILES += \
 	man/custom-entities.ent
 
+#@build-aux/Makefile.once.head/20-sd.mk
 XSLTPROC_FLAGS = \
 	--nonet \
 	--xinclude \
@@ -6376,6 +6379,7 @@ XSLTPROC_PROCESS_MAN = \
 XSLTPROC_PROCESS_HTML = \
 	$(AM_V_XSLT)$(XSLT) -o $@ $(XSLTPROC_FLAGS) $(srcdir)/man/custom-html.xsl $<
 
+#@build-aux/Makefile.each.tail/20-sd.mk
 man/%.1: man/%.xml man/custom-man.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_MAN)
 
@@ -6394,10 +6398,12 @@ man/%.8: man/%.xml man/custom-man.xsl man/custom-entities.ent
 man/%.html: man/%.xml man/custom-html.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_HTML)
 
+#@build-aux/Makefile.once.head/20-sd.mk
 define html-alias
 	$(AM_V_LN)$(LN_S) -f $(notdir $<) $@
 endef
 
+#@discard.mk
 EXTRA_DIST += \
 	man/custom-html.xsl \
 	man/custom-man.xsl
@@ -6618,7 +6624,7 @@ install-tree: all
 	$(MAKE) install DESTDIR=$(abs_srcdir)/install-tree
 	tree $(abs_srcdir)/install-tree
 
-#@build-aux/Makefile.once.tail/20-systemd.mk
+#@build-aux/Makefile.once.tail/20-sd.mk
 # Let's run all tests of the test suite, but under valgrind. Let's
 # exclude perl/python/shell scripts we have in there
 .PHONY: valgrind-tests
@@ -6671,7 +6677,7 @@ check-includes: $(top_srcdir)/tools/check-includes.pl
 EXTRA_DIST += \
 	$(top_srcdir)/tools/check-includes.pl
 
-#@build-aux/Makefile.once.head/20-systemd.mk
+#@build-aux/Makefile.once.head/20-sd.mk
 # Stupid test that everything purported to be exported really is
 define generate-sym-test
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -6731,7 +6737,7 @@ tests += \
 	test-libsystemd-sym \
 	test-libudev-sym
 
-#@build-aux/Makefile.once.tail/20-systemd.mk
+#@build-aux/Makefile.once.tail/20-sd.mk
 .PHONY: cppcheck
 cppcheck:
 	cppcheck --enable=all -q $(top_srcdir)
@@ -6754,35 +6760,35 @@ add-key:
 #@src/Makefile
 
 #@src/libudev/Makefile
-at.subdirs += src
+nested.subdirs += src
 
 #@src/libsystemd/src/subdir.mk
 systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
 systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
 #@src/grp-boot/Makefile
-at.subdirs += bootctl systemd-boot
+nested.subdirs += bootctl systemd-boot
 
 #@src/grp-coredump/Makefile
-at.subdirs += coredumpctl systemd-coredump
+nested.subdirs += coredumpctl systemd-coredump
 
 #@src/grp-machine/Makefile
-at.subdirs += machinectl systemd-machined
-at.subdirs += nss-mymachines
+nested.subdirs += machinectl systemd-machined
+nested.subdirs += nss-mymachines
 
 #@src/grp-journal/grp-remote/Makefile
-at.subdirs += systemd-journa-gatewayd
-at.subdirs += systemd-journa-remote
-at.subdirs += systemd-journa-upload
+nested.subdirs += systemd-journa-gatewayd
+nested.subdirs += systemd-journa-remote
+nested.subdirs += systemd-journa-upload
 
 #@src/grp-resolve/Makefile
-at.subdirs += systemd-resolved nss-resolve
+nested.subdirs += systemd-resolved nss-resolve
 
 #@src/grp-system/Makefile
-at.subdirs += systemctl systemd
+nested.subdirs += systemctl systemd
 
 #@src/grp-timedate/Makefile
-at.subdirs += timedatectl systemd-timedated
+nested.subdirs += timedatectl systemd-timedated
 
 #@all
 include $(topsrcdir)/build-aux/Makefile.tail.mk
