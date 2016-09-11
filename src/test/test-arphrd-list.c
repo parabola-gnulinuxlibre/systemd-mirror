@@ -20,9 +20,9 @@
 #include <net/if_arp.h>
 #include <string.h>
 
-#include "macro.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 static const struct arphrd_name* lookup_arphrd(register const char *str, register unsigned int len);
 
