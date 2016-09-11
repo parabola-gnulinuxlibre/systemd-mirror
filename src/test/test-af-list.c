@@ -20,9 +20,9 @@
 #include <string.h>
 #include <sys/socket.h>
 
-#include "macro.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 static const struct af_name* lookup_af(register const char *str, register unsigned int len);
 

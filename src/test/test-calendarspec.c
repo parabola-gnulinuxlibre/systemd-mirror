@@ -19,10 +19,10 @@
 
 #include <string.h>
 
-#include "alloc-util.h"
-#include "calendarspec.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/calendarspec.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 static void test_one(const char *input, const char *output) {
         CalendarSpec *c;

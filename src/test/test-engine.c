@@ -21,11 +21,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "bus-util.h"
+#include "basic/rm-rf.h"
 #include "manager.h"
-#include "rm-rf.h"
+#include "shared/bus-util.h"
+#include "shared/tests.h"
+
 #include "test-helper.h"
-#include "tests.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_(rm_rf_physical_and_freep) char *runtime_dir = NULL;
