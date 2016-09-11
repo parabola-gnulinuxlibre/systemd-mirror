@@ -25,8 +25,8 @@
 static const struct errno_name* lookup_errno(register const char *str,
                                              register unsigned int len);
 
-#include "errno-from-name.h"
-#include "errno-to-name.h"
+#include "basic/errno-from-name.h"
+#include "basic/errno-to-name.h"
 
 const char *errno_to_name(int id) {
 

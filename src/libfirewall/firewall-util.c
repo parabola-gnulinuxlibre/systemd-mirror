@@ -32,17 +32,19 @@
 #ifndef IFNAMSIZ
 #define IFNAMSIZ 16
 #endif
+#include <libiptc/libiptc.h>
+
 #include <linux/if.h>
 #include <linux/netfilter_ipv4/ip_tables.h>
 #include <linux/netfilter/nf_nat.h>
 #include <linux/netfilter/xt_addrtype.h>
-#include <libiptc/libiptc.h>
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
+#include "basic/in-addr-util.h"
+#include "basic/macro.h"
+#include "basic/socket-util.h"
+
 #include "firewall-util.h"
-#include "in-addr-util.h"
-#include "macro.h"
-#include "socket-util.h"
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(struct xtc_handle*, iptc_free);
 

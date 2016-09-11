@@ -28,16 +28,16 @@
 #include <string.h>
 #include <sys/socket.h>
 
-#include "alloc-util.h"
-#include "dns-domain.h"
-#include "hashmap.h"
-#include "hexdecoct.h"
-#include "in-addr-util.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "utf8.h"
+#include "basic/alloc-util.h"
+#include "basic/hashmap.h"
+#include "basic/hexdecoct.h"
+#include "basic/in-addr-util.h"
+#include "basic/macro.h"
+#include "basic/parse-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/utf8.h"
+#include "shared/dns-domain.h"
 
 int dns_label_unescape(const char **name, char *dest, size_t sz) {
         const char *n;

@@ -23,9 +23,10 @@
 #include <errno.h>
 #include <getopt.h>
 #include <grp.h>
-#include <linux/loop.h>
 #include <pwd.h>
 #include <sched.h>
+
+#include <linux/loop.h>
 #ifdef HAVE_SECCOMP
 #include <seccomp.h>
 #endif
@@ -43,36 +44,43 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "sd-daemon.h"
-#include "sd-id128.h"
+#include <systemd/sd-daemon.h>
+#include <systemd/sd-id128.h>
 
-#include "alloc-util.h"
-#include "barrier.h"
-#include "base-filesystem.h"
-#include "blkid-util.h"
-#include "btrfs-util.h"
-#include "cap-list.h"
-#include "capability-util.h"
-#include "cgroup-util.h"
-#include "copy.h"
-#include "dev-setup.h"
-#include "env-util.h"
-#include "fd-util.h"
-#include "fdset.h"
-#include "fileio.h"
-#include "formats-util.h"
-#include "fs-util.h"
-#include "gpt.h"
-#include "hostname-util.h"
-#include "log.h"
+#include "basic/alloc-util.h"
+#include "basic/barrier.h"
+#include "basic/blkid-util.h"
+#include "basic/btrfs-util.h"
+#include "basic/cap-list.h"
+#include "basic/capability-util.h"
+#include "basic/cgroup-util.h"
+#include "basic/copy.h"
+#include "basic/env-util.h"
+#include "basic/fd-util.h"
+#include "basic/fdset.h"
+#include "basic/fileio.h"
+#include "basic/formats-util.h"
+#include "basic/fs-util.h"
+#include "basic/hostname-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
+#include "basic/mkdir.h"
+#include "basic/mount-util.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/process-util.h"
+#include "basic/random-util.h"
+#include "basic/rm-rf.h"
 #include "loopback-setup.h"
 #include "machine-id-setup.h"
-#include "machine-image.h"
-#include "macro.h"
-#include "missing.h"
-#include "mkdir.h"
-#include "mount-util.h"
-#include "netlink-util.h"
+#include "sd-netlink/netlink-util.h"
+#include "shared/base-filesystem.h"
+#include "shared/dev-setup.h"
+#include "shared/gpt.h"
+#include "shared/machine-image.h"
+#include "shared/ptyfwd.h"
+
 #include "nspawn-cgroup.h"
 #include "nspawn-expose-ports.h"
 #include "nspawn-mount.h"
@@ -82,27 +90,21 @@
 #include "nspawn-settings.h"
 #include "nspawn-setuid.h"
 #include "nspawn-stub-pid1.h"
-#include "parse-util.h"
-#include "path-util.h"
-#include "process-util.h"
-#include "ptyfwd.h"
-#include "random-util.h"
-#include "rm-rf.h"
 #ifdef HAVE_SECCOMP
-#include "seccomp-util.h"
+#include "shared/seccomp-util.h"
 #endif
-#include "selinux-util.h"
-#include "signal-util.h"
-#include "socket-util.h"
-#include "stat-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "terminal-util.h"
-#include "udev-util.h"
-#include "umask-util.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/selinux-util.h"
+#include "basic/signal-util.h"
+#include "basic/socket-util.h"
+#include "basic/stat-util.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/terminal-util.h"
+#include "basic/umask-util.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
+#include "shared/udev-util.h"
 
 /* Note that devpts's gid= parameter parses GIDs as signed values, hence we stay away from the upper half of the 32bit
  * UID range here */

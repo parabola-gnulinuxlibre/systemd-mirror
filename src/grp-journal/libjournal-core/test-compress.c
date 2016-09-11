@@ -21,13 +21,13 @@
 #include <lz4.h>
 #endif
 
-#include "alloc-util.h"
-#include "compress.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "macro.h"
-#include "random-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/macro.h"
+#include "basic/random-util.h"
+#include "basic/util.h"
+#include "sd-journal/compress.h"
 
 #ifdef HAVE_XZ
 # define XZ_OK 0

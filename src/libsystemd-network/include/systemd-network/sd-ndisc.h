@@ -34,7 +34,6 @@ enum {
 };
 
 typedef struct sd_ndisc sd_ndisc;
-
 typedef void(*sd_ndisc_router_callback_t)(sd_ndisc *nd, uint8_t flags, const struct in6_addr *gateway, unsigned lifetime, int pref, void *userdata);
 typedef void(*sd_ndisc_prefix_onlink_callback_t)(sd_ndisc *nd, const struct in6_addr *prefix, unsigned prefixlen,
                                                  unsigned lifetime, void *userdata);

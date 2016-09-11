@@ -31,17 +31,17 @@
 #include <libgen.h>
 #undef basename
 
-#include "alloc-util.h"
-#include "extract-word.h"
-#include "fs-util.h"
-#include "log.h"
-#include "macro.h"
-#include "missing.h"
-#include "path-util.h"
-#include "stat-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "time-util.h"
+#include "basic/alloc-util.h"
+#include "basic/extract-word.h"
+#include "basic/fs-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
+#include "basic/path-util.h"
+#include "basic/stat-util.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/time-util.h"
 
 bool path_is_absolute(const char *p) {
         return p[0] == '/';

@@ -32,16 +32,17 @@
 #include <lz4frame.h>
 #endif
 
-#include "alloc-util.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/io-util.h"
+#include "basic/macro.h"
+#include "basic/sparse-endian.h"
+#include "basic/string-table.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
+
 #include "compress.h"
-#include "fd-util.h"
-#include "io-util.h"
 #include "journal-def.h"
-#include "macro.h"
-#include "sparse-endian.h"
-#include "string-table.h"
-#include "string-util.h"
-#include "util.h"
 
 #ifdef HAVE_LZ4
 DEFINE_TRIVIAL_CLEANUP_FUNC(LZ4F_compressionContext_t, LZ4F_freeCompressionContext);

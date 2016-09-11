@@ -27,13 +27,14 @@
 #include <gnutls/x509.h>
 #endif
 
-#include "alloc-util.h"
-#include "log.h"
-#include "macro.h"
+#include "basic/alloc-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
+
 #include "microhttpd-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
 
 void microhttpd_logger(void *arg, const char *fmt, va_list ap) {
         char *f;

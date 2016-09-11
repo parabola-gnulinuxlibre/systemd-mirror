@@ -23,28 +23,28 @@
 #include <unistd.h>
 
 #ifdef HAVE_XKBCOMMON
-#include <xkbcommon/xkbcommon.h>
 #include <dlfcn.h>
+#include <xkbcommon/xkbcommon.h>
 #endif
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
-#include "alloc-util.h"
-#include "bus-error.h"
-#include "bus-message.h"
-#include "bus-util.h"
-#include "def.h"
-#include "env-util.h"
-#include "fd-util.h"
-#include "fileio-label.h"
-#include "fileio.h"
-#include "locale-util.h"
-#include "mkdir.h"
-#include "path-util.h"
-#include "selinux-util.h"
-#include "strv.h"
-#include "user-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/def.h"
+#include "basic/env-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio-label.h"
+#include "basic/fileio.h"
+#include "basic/locale-util.h"
+#include "basic/mkdir.h"
+#include "basic/path-util.h"
+#include "basic/selinux-util.h"
+#include "basic/strv.h"
+#include "basic/user-util.h"
+#include "basic/util.h"
+#include "sd-bus/bus-error.h"
+#include "sd-bus/bus-message.h"
+#include "shared/bus-util.h"
 
 enum {
         /* We don't list LC_ALL here on purpose. People should be

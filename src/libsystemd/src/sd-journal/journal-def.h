@@ -32,20 +32,16 @@
  */
 
 typedef struct Header Header;
-
 typedef struct ObjectHeader ObjectHeader;
 typedef union Object Object;
-
 typedef struct DataObject DataObject;
 typedef struct FieldObject FieldObject;
 typedef struct EntryObject EntryObject;
 typedef struct HashTableObject HashTableObject;
 typedef struct EntryArrayObject EntryArrayObject;
 typedef struct TagObject TagObject;
-
 typedef struct EntryItem EntryItem;
 typedef struct HashItem HashItem;
-
 typedef struct FSSHeader FSSHeader;
 
 /* Object types */

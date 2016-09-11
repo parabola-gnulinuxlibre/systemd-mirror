@@ -68,11 +68,12 @@ typedef enum StatusType {
         STATUS_TYPE_EMERGENCY,
 } StatusType;
 
+#include "basic/unit-name.h"
+#include "shared/path-lookup.h"
+
 #include "execute.h"
 #include "job.h"
-#include "path-lookup.h"
 #include "show-status.h"
-#include "unit-name.h"
 
 struct Manager {
         /* Note that the set of units we know of is allowed to be

@@ -24,7 +24,8 @@
 #  include <libaudit.h>
 #endif
 
-#include "missing.h"
+#include "basic/macro.h"
+#include "basic/missing.h"
+
 #include "audit-type.h"
 #include "audit_type-to-name.h"
-#include "macro.h"

@@ -31,11 +31,11 @@
 #include <sys/auxv.h>
 #endif
 
-#include "fd-util.h"
-#include "io-util.h"
-#include "missing.h"
-#include "random-util.h"
-#include "time-util.h"
+#include "basic/fd-util.h"
+#include "basic/io-util.h"
+#include "basic/missing.h"
+#include "basic/random-util.h"
+#include "basic/time-util.h"
 
 int dev_urandom(void *p, size_t n) {
         static int have_syscall = -1;

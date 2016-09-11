@@ -32,13 +32,13 @@
 #include <selinux/selinux.h>
 #endif
 
-#include "alloc-util.h"
-#include "log.h"
-#include "macro.h"
-#include "path-util.h"
-#include "selinux-util.h"
-#include "time-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/path-util.h"
+#include "basic/selinux-util.h"
+#include "basic/time-util.h"
+#include "basic/util.h"
 
 #ifdef HAVE_SELINUX
 DEFINE_TRIVIAL_CLEANUP_FUNC(security_context_t, freecon);
