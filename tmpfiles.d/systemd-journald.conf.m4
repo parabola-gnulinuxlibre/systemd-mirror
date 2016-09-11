@@ -7,23 +7,6 @@
 
 # See tmpfiles.d(5) for details
 
-d /run/user 0755 root root -
-F! /run/utmp 0664 root utmp -
-
-d /run/systemd/ask-password 0755 root root -
-d /run/systemd/seats 0755 root root -
-d /run/systemd/sessions 0755 root root -
-d /run/systemd/users 0755 root root -
-d /run/systemd/machines 0755 root root -
-d /run/systemd/shutdown 0755 root root -
-m4_ifdef(`ENABLE_NETWORKD',
-d /run/systemd/netif 0755 systemd-network systemd-network -
-d /run/systemd/netif/links 0755 systemd-network systemd-network -
-d /run/systemd/netif/leases 0755 systemd-network systemd-network -
-)m4_dnl
-
-d /run/log 0755 root root -
-
 z /run/log/journal 2755 root systemd-journal - -
 Z /run/log/journal/%m ~2750 root systemd-journal - -
 m4_ifdef(`HAVE_ACL',`m4_dnl
@@ -68,6 +51,3 @@ a+ /var/log/journal/%m - - - - d:group:wheel:r-x
 a+ /var/log/journal/%m - - - - group:wheel:r-x
 a+ /var/log/journal/%m/system.journal - - - - group:wheel:r--
 '')')')m4_dnl
-
-d /var/lib/systemd 0755 root root -
-d /var/lib/systemd/coredump 0755 root root 3d

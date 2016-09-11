@@ -1,2 +1,2 @@
 /etc.conf
-/systemd.conf
+/systemd-journald.conf
