@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "log.h"
+#include "basic/log.h"
 #include "loopback-setup.h"
 
 int main(int argc, char* argv[]) {
