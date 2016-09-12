@@ -4,7 +4,7 @@
 # is that we want errors from the inner loop to bubble up.
 
 fixup_makefiles() (
-	find -type f -name Makefile | while read -r filename; do
+	find "$@" -type f -name Makefile | while read -r filename; do
 		sed -r -i "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="${filename%/*}" config.mk)|" "$filename"
 	done
 )
@@ -17,7 +17,7 @@ fixup_includes() (
                 popd >/dev/null
         done
 
-        find src \( -name '*.h' -o -name '*.c' \) -type f | while read -r filename; do
+        find "$@" \( -name '*.h' -o -name '*.c' -o -name '*.gperf' \) -type f | while read -r filename; do
                 "$0"--includes "$filename"
         done
 )
@@ -25,8 +25,8 @@ fixup_includes() (
 main() {
         set -e
         set -o pipefail
-        fixup_makefiles
-        fixup_includes
+        fixup_makefiles "$@"
+        fixup_includes "$@"
 }
 
 main "$@"
