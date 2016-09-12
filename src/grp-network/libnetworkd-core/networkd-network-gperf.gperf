@@ -1,9 +1,11 @@
 %{
 #include <stddef.h>
-#include "conf-parser.h"
-#include "networkd.h"
+
+#include "shared/conf-parser.h"
+#include "systemd-network/network-internal.h"
+
 #include "networkd-conf.h"
-#include "network-internal.h"
+#include "networkd.h"
 %}
 struct ConfigPerfItem;
 %null_strings
