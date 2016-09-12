@@ -228,6 +228,8 @@ main() {
                 done
                 "$hook"
         } < "$current_file" > "$current_file.tmp"
+        # I specificially don't use write-ifchanged because I don't want the
+        # temporary file to have the .c suffix.
         if cmp -s "$current_file.tmp" "$current_file"; then
                 rm -f "$current_file.tmp" || :
         else
