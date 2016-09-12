@@ -1,9 +1,11 @@
 %{
 #include <stddef.h>
+
 #include "shared/conf-parser.h"
 #include "systemd-network/network-internal.h"
-#include "link-config.h"
+
 #include "ethtool-util.h"
+#include "link-config.h"
 %}
 struct ConfigPerfItem;
 %null_strings

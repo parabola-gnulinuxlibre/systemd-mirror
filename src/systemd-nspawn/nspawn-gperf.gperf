@@ -1,8 +1,10 @@
 %{
 #include <stddef.h>
+
 #include "shared/conf-parser.h"
-#include "nspawn-settings.h"
+
 #include "nspawn-expose-ports.h"
+#include "nspawn-settings.h"
 %}
 struct ConfigPerfItem;
 %null_strings
