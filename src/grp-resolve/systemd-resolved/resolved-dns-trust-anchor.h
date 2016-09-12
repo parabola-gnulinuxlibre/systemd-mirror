@@ -20,11 +20,10 @@
 ***/
 
 #include "basic/hashmap.h"
-
-typedef struct DnsTrustAnchor DnsTrustAnchor;
-
 #include "resolved-dns-answer.h"
 #include "resolved-dns-rr.h"
+
+typedef struct DnsTrustAnchor DnsTrustAnchor;
 
 /* This contains a fixed database mapping domain names to DS or DNSKEY records. */
 

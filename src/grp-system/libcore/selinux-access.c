@@ -32,14 +32,15 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "audit-fd.h"
-#include "shared/bus-util.h"
 #include "basic/log.h"
 #include "basic/path-util.h"
 #include "basic/selinux-util.h"
 #include "basic/stdio-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
+#include "shared/bus-util.h"
+
+#include "audit-fd.h"
 
 static bool initialized = false;
 

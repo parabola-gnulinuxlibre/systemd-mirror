@@ -21,6 +21,7 @@
 
 #include "resolved-dns-answer.h"
 #include "resolved-dns-question.h"
+
 #include "resolved-manager.h"
 
 int dns_synthesize_ifindex(int ifindex);

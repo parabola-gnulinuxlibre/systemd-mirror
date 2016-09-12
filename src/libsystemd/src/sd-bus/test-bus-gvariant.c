@@ -24,13 +24,14 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
+#include "basic/macro.h"
+#include "basic/util.h"
+#include "shared/bus-util.h"
+
 #include "bus-dump.h"
 #include "bus-gvariant.h"
 #include "bus-internal.h"
 #include "bus-message.h"
-#include "shared/bus-util.h"
-#include "basic/macro.h"
-#include "basic/util.h"
 
 static void test_bus_gvariant_is_fixed_size(void) {
         assert_se(bus_gvariant_is_fixed_size("") > 0);

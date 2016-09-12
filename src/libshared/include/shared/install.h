@@ -19,11 +19,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef enum UnitFileScope UnitFileScope;
-typedef enum UnitFileState UnitFileState;
-typedef enum UnitFilePresetMode UnitFilePresetMode;
-typedef enum UnitFileChangeType UnitFileChangeType;
-typedef enum UnitFileType UnitFileType;
 #include <stdbool.h>
 
 #include "basic/hashmap.h"
@@ -31,6 +26,11 @@ typedef enum UnitFileType UnitFileType;
 #include "basic/strv.h"
 #include "basic/unit-name.h"
 
+typedef enum UnitFileChangeType UnitFileChangeType;
+typedef enum UnitFilePresetMode UnitFilePresetMode;
+typedef enum UnitFileScope UnitFileScope;
+typedef enum UnitFileState UnitFileState;
+typedef enum UnitFileType UnitFileType;
 typedef struct UnitFileChange UnitFileChange;
 typedef struct UnitFileInstallInfo UnitFileInstallInfo;
 typedef struct UnitFileList UnitFileList;

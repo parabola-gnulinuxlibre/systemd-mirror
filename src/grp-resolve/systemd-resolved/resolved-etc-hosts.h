@@ -21,6 +21,7 @@
 
 #include "resolved-dns-answer.h"
 #include "resolved-dns-question.h"
+
 #include "resolved-manager.h"
 
 void manager_etc_hosts_flush(Manager *m);

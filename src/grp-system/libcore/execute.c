@@ -63,7 +63,6 @@
 #include "basic/def.h"
 #include "basic/env-util.h"
 #include "basic/errno-list.h"
-#include "execute.h"
 #include "basic/exit-status.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
@@ -76,12 +75,14 @@
 #include "basic/macro.h"
 #include "basic/missing.h"
 #include "basic/mkdir.h"
-#include "namespace.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
 #include "basic/rlimit-util.h"
 #include "basic/rm-rf.h"
+
+#include "execute.h"
+#include "namespace.h"
 #ifdef HAVE_SECCOMP
 #include "shared/seccomp-util.h"
 #endif
@@ -94,10 +95,11 @@
 #include "basic/strv.h"
 #include "basic/syslog-util.h"
 #include "basic/terminal-util.h"
-#include "unit.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
 #include "shared/utmp-wtmp.h"
+
+#include "unit.h"
 
 #define IDLE_TIMEOUT_USEC (5*USEC_PER_SEC)
 #define IDLE_TIMEOUT2_USEC (1*USEC_PER_SEC)

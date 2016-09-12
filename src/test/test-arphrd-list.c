@@ -26,9 +26,9 @@
 
 static const struct arphrd_name* lookup_arphrd(register const char *str, register unsigned int len);
 
-#include "arphrd-from-name.h"
+#include "basic/arphrd-from-name.h"
 #include "basic/arphrd-list.h"
-#include "arphrd-to-name.h"
+#include "basic/arphrd-to-name.h"
 
 int main(int argc, const char *argv[]) {
 

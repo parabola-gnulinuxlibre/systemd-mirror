@@ -23,8 +23,8 @@
 #include <unistd.h>
 
 #ifdef HAVE_XKBCOMMON
-#include <xkbcommon/xkbcommon.h>
 #include <dlfcn.h>
+#include <xkbcommon/xkbcommon.h>
 #endif
 
 #include <systemd/sd-bus.h>

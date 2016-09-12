@@ -22,12 +22,13 @@
 #endif
 
 #include "basic/alloc-util.h"
+#include "basic/hexdecoct.h"
+#include "basic/string-table.h"
 #include "shared/dns-domain.h"
 #include "shared/gcrypt-util.h"
-#include "basic/hexdecoct.h"
+
 #include "resolved-dns-dnssec.h"
 #include "resolved-dns-packet.h"
-#include "basic/string-table.h"
 
 #define VERIFY_RRS_MAX 256
 #define MAX_KEY_SIZE (32*1024)

@@ -25,20 +25,21 @@
 
 #include "basic/af-list.h"
 #include "basic/alloc-util.h"
-#include "shared/bus-util.h"
 #include "basic/capability-util.h"
-#include "dbus-execute.h"
 #include "basic/env-util.h"
-#include "execute.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/ioprio.h"
 #include "basic/missing.h"
-#include "namespace.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
 #include "basic/rlimit-util.h"
+#include "shared/bus-util.h"
+
+#include "dbus-execute.h"
+#include "execute.h"
+#include "namespace.h"
 #ifdef HAVE_SECCOMP
 #include "shared/seccomp-util.h"
 #endif

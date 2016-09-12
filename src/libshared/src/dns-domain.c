@@ -29,7 +29,6 @@
 #include <sys/socket.h>
 
 #include "basic/alloc-util.h"
-#include "shared/dns-domain.h"
 #include "basic/hashmap.h"
 #include "basic/hexdecoct.h"
 #include "basic/in-addr-util.h"
@@ -38,6 +37,7 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/utf8.h"
+#include "shared/dns-domain.h"
 
 int dns_label_unescape(const char **name, char *dest, size_t sz) {
         const char *n;

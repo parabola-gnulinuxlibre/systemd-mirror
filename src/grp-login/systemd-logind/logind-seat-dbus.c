@@ -25,11 +25,11 @@
 #include "basic/strv.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
-#include "logind.h"
 #include "sd-bus/bus-common-errors.h"
 #include "shared/bus-util.h"
 
 #include "logind-seat.h"
+#include "logind.h"
 
 static int property_get_active_session(
                 sd_bus *bus,

@@ -20,10 +20,10 @@
 #include "basic/alloc-util.h"
 #include "basic/hostname-util.h"
 #include "basic/string-util.h"
+#include "dns-type.h"
 #include "sd-netlink/local-addresses.h"
 #include "shared/dns-domain.h"
 
-#include "dns-type.h"
 #include "resolved-dns-query.h"
 #include "resolved-dns-synthesize.h"
 #include "resolved-etc-hosts.h"

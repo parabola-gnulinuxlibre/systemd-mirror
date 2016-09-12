@@ -27,10 +27,11 @@
 
 #include "basic/log.h"
 #include "basic/macro.h"
-#include "selinux-setup.h"
 #include "basic/selinux-util.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+
+#include "selinux-setup.h"
 
 #ifdef HAVE_SELINUX
 _printf_(2,3)

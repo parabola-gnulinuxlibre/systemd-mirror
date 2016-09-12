@@ -31,14 +31,15 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/alloc-util.h"
-#include "bus-dump.h"
 #include "basic/bus-label.h"
-#include "bus-message.h"
-#include "shared/bus-util.h"
 #include "basic/fd-util.h"
 #include "basic/hexdecoct.h"
 #include "basic/log.h"
 #include "basic/util.h"
+#include "shared/bus-util.h"
+
+#include "bus-dump.h"
+#include "bus-message.h"
 
 static void test_bus_path_encode_unique(void) {
         _cleanup_free_ char *a = NULL, *b = NULL, *c = NULL, *d = NULL, *e = NULL;

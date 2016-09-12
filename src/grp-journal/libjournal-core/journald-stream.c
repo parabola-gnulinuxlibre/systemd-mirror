@@ -33,12 +33,6 @@
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/io-util.h"
-#include "journald-console.h"
-#include "journald-kmsg.h"
-#include "journald-server.h"
-#include "journald-stream.h"
-#include "journald-syslog.h"
-#include "journald-wall.h"
 #include "basic/mkdir.h"
 #include "basic/parse-util.h"
 #include "basic/selinux-util.h"
@@ -46,6 +40,13 @@
 #include "basic/stdio-util.h"
 #include "basic/string-util.h"
 #include "basic/syslog-util.h"
+
+#include "journald-console.h"
+#include "journald-kmsg.h"
+#include "journald-server.h"
+#include "journald-stream.h"
+#include "journald-syslog.h"
+#include "journald-wall.h"
 
 #define STDOUT_STREAMS_MAX 4096
 

@@ -31,11 +31,12 @@
 #include "basic/strv.h"
 #include "basic/unit-name.h"
 #include "basic/user-util.h"
-#include "logind.h"
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-error.h"
 #include "shared/bus-util.h"
 #include "shared/utmp-wtmp.h"
+
+#include "logind.h"
 
 _const_ static usec_t when_wall(usec_t n, usec_t elapse) {
 

@@ -23,12 +23,12 @@
 #include <systemd/sd-bus.h>
 
 #include "basic/set.h"
+#include "resolved-dns-answer.h"
+#include "resolved-dns-question.h"
 
 typedef struct DnsQuery DnsQuery;
 typedef struct DnsQueryCandidate DnsQueryCandidate;
 
-#include "resolved-dns-answer.h"
-#include "resolved-dns-question.h"
 #include "resolved-dns-search-domain.h"
 #include "resolved-dns-stream.h"
 

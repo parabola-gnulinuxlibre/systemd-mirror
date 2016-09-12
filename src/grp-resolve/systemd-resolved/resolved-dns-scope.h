@@ -20,12 +20,12 @@
 ***/
 
 #include "basic/list.h"
+#include "resolved-dns-dnssec.h"
+#include "resolved-dns-packet.h"
 
 typedef struct DnsScope DnsScope;
 
 #include "resolved-dns-cache.h"
-#include "resolved-dns-dnssec.h"
-#include "resolved-dns-packet.h"
 #include "resolved-dns-server.h"
 #include "resolved-dns-stream.h"
 #include "resolved-dns-zone.h"

@@ -33,13 +33,8 @@
 
 #include "basic/af-list.h"
 #include "basic/alloc-util.h"
-#include "sd-bus/bus-error.h"
-#include "sd-bus/bus-internal.h"
-#include "shared/bus-util.h"
 #include "basic/cap-list.h"
 #include "basic/capability-util.h"
-#include "cgroup.h"
-#include "shared/conf-parser.h"
 #include "basic/cpu-set-util.h"
 #include "basic/env-util.h"
 #include "basic/errno-list.h"
@@ -47,13 +42,19 @@
 #include "basic/fd-util.h"
 #include "basic/fs-util.h"
 #include "basic/ioprio.h"
-#include "load-fragment.h"
 #include "basic/log.h"
 #include "basic/missing.h"
 #include "basic/parse-util.h"
 #include "basic/path-util.h"
 #include "basic/process-util.h"
 #include "basic/rlimit-util.h"
+#include "sd-bus/bus-error.h"
+#include "sd-bus/bus-internal.h"
+#include "shared/bus-util.h"
+#include "shared/conf-parser.h"
+
+#include "cgroup.h"
+#include "load-fragment.h"
 #ifdef HAVE_SECCOMP
 #include "shared/seccomp-util.h"
 #endif
@@ -63,10 +64,11 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/unit-name.h"
-#include "unit-printf.h"
-#include "unit.h"
 #include "basic/utf8.h"
 #include "basic/web-util.h"
+
+#include "unit-printf.h"
+#include "unit.h"
 
 int config_parse_warn_compat(
                 const char *unit,

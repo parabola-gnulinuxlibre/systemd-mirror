@@ -27,16 +27,17 @@
 #include <sys/vfs.h>
 #include <unistd.h>
 
-#include "shared/acl-util.h"
 #include "basic/dirent-util.h"
 #include "basic/fd-util.h"
 #include "basic/missing.h"
-#include "nspawn-patch-uid.h"
 #include "basic/stat-util.h"
 #include "basic/stdio-util.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/user-util.h"
+#include "shared/acl-util.h"
+
+#include "nspawn-patch-uid.h"
 
 #ifdef HAVE_ACL
 

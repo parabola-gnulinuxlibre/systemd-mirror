@@ -39,10 +39,10 @@
 #include "basic/utf8.h"
 #include "basic/util.h"
 #include "basic/web-util.h"
-#include "curl-util.h"
 #include "import-common.h"
 #include "shared/import-util.h"
 
+#include "curl-util.h"
 #include "pull-common.h"
 #include "pull-job.h"
 #include "pull-tar.h"

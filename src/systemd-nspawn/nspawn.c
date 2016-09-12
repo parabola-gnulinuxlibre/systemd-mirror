@@ -23,9 +23,10 @@
 #include <errno.h>
 #include <getopt.h>
 #include <grp.h>
-#include <linux/loop.h>
 #include <pwd.h>
 #include <sched.h>
+
+#include <linux/loop.h>
 #ifdef HAVE_SECCOMP
 #include <seccomp.h>
 #endif
@@ -48,30 +49,37 @@
 
 #include "basic/alloc-util.h"
 #include "basic/barrier.h"
-#include "shared/base-filesystem.h"
 #include "basic/blkid-util.h"
 #include "basic/btrfs-util.h"
 #include "basic/cap-list.h"
 #include "basic/capability-util.h"
 #include "basic/cgroup-util.h"
 #include "basic/copy.h"
-#include "shared/dev-setup.h"
 #include "basic/env-util.h"
 #include "basic/fd-util.h"
 #include "basic/fdset.h"
 #include "basic/fileio.h"
 #include "basic/formats-util.h"
 #include "basic/fs-util.h"
-#include "shared/gpt.h"
 #include "basic/hostname-util.h"
 #include "basic/log.h"
-#include "loopback-setup.h"
-#include "machine-id-setup.h"
-#include "shared/machine-image.h"
 #include "basic/macro.h"
 #include "basic/missing.h"
 #include "basic/mkdir.h"
 #include "basic/mount-util.h"
+#include "basic/parse-util.h"
+#include "basic/path-util.h"
+#include "basic/process-util.h"
+#include "basic/random-util.h"
+#include "basic/rm-rf.h"
+#include "shared/base-filesystem.h"
+#include "shared/dev-setup.h"
+#include "shared/gpt.h"
+#include "shared/machine-image.h"
+#include "shared/ptyfwd.h"
+
+#include "loopback-setup.h"
+#include "machine-id-setup.h"
 #include "nspawn-cgroup.h"
 #include "nspawn-expose-ports.h"
 #include "nspawn-mount.h"
@@ -81,12 +89,6 @@
 #include "nspawn-settings.h"
 #include "nspawn-setuid.h"
 #include "nspawn-stub-pid1.h"
-#include "basic/parse-util.h"
-#include "basic/path-util.h"
-#include "basic/process-util.h"
-#include "shared/ptyfwd.h"
-#include "basic/random-util.h"
-#include "basic/rm-rf.h"
 #ifdef HAVE_SECCOMP
 #include "shared/seccomp-util.h"
 #endif
@@ -98,10 +100,10 @@
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/terminal-util.h"
-#include "shared/udev-util.h"
 #include "basic/umask-util.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "shared/udev-util.h"
 
 /* Note that devpts's gid= parameter parses GIDs as signed values, hence we stay away from the upper half of the 32bit
  * UID range here */

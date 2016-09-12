@@ -28,25 +28,20 @@
 #include <elfutils/libdwfl.h>
 #endif
 
+#include <systemd/sd-daemon.h>
 #include <systemd/sd-journal.h>
 #include <systemd/sd-login.h>
-#include <systemd/sd-daemon.h>
 
-#include "shared/acl-util.h"
 #include "basic/alloc-util.h"
 #include "basic/capability-util.h"
 #include "basic/cgroup-util.h"
-#include "sd-journal/compress.h"
-#include "shared/conf-parser.h"
 #include "basic/copy.h"
-#include "coredump-vacuum.h"
 #include "basic/dirent-util.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/fs-util.h"
 #include "basic/io-util.h"
-#include "journald-native.h"
 #include "basic/log.h"
 #include "basic/macro.h"
 #include "basic/missing.h"
@@ -55,12 +50,18 @@
 #include "basic/process-util.h"
 #include "basic/socket-util.h"
 #include "basic/special.h"
-#include "stacktrace.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "journald-native.h"
+#include "sd-journal/compress.h"
+#include "shared/acl-util.h"
+#include "shared/conf-parser.h"
+
+#include "coredump-vacuum.h"
+#include "stacktrace.h"
 
 /* The maximum size up to which we process coredumps */
 #define PROCESS_SIZE_MAX ((uint64_t) (2LLU*1024LLU*1024LLU*1024LLU))

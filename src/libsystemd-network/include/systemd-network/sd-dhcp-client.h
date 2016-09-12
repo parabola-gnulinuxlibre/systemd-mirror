@@ -83,7 +83,6 @@ enum {
 };
 
 typedef struct sd_dhcp_client sd_dhcp_client;
-
 typedef void (*sd_dhcp_client_callback_t)(sd_dhcp_client *client, int event, void *userdata);
 int sd_dhcp_client_set_callback(
                 sd_dhcp_client *client,

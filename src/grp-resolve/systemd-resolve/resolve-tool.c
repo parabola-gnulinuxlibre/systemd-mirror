@@ -28,12 +28,11 @@
 #include "basic/in-addr-util.h"
 #include "basic/parse-util.h"
 #include "basic/terminal-util.h"
+#include "resolved-def.h"
+#include "resolved-dns-packet.h"
 #include "sd-bus/bus-error.h"
 #include "shared/bus-util.h"
 #include "shared/gcrypt-util.h"
-
-#include "resolved-def.h"
-#include "resolved-dns-packet.h"
 
 #define DNS_CALL_TIMEOUT_USEC (45*USEC_PER_SEC)
 

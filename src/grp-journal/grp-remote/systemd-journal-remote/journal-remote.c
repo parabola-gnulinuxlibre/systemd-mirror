@@ -34,15 +34,10 @@
 #include <systemd/sd-daemon.h>
 
 #include "basic/alloc-util.h"
-#include "shared/conf-parser.h"
 #include "basic/def.h"
 #include "basic/escape.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
-#include "journal-file.h"
-#include "journal-remote-write.h"
-#include "journal-remote.h"
-#include "journald-native.h"
 #include "basic/macro.h"
 #include "basic/parse-util.h"
 #include "basic/signal-util.h"
@@ -52,6 +47,12 @@
 #include "basic/string-table.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
+#include "journald-native.h"
+#include "sd-journal/journal-file.h"
+#include "shared/conf-parser.h"
+
+#include "journal-remote-write.h"
+#include "journal-remote.h"
 
 #define REMOTE_JOURNAL_PATH "/var/log/journal/remote"
 

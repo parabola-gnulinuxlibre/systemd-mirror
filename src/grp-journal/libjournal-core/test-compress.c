@@ -22,12 +22,12 @@
 #endif
 
 #include "basic/alloc-util.h"
-#include "compress.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/macro.h"
 #include "basic/random-util.h"
 #include "basic/util.h"
+#include "sd-journal/compress.h"
 
 #ifdef HAVE_XZ
 # define XZ_OK 0

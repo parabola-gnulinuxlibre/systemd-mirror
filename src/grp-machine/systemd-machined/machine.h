@@ -19,10 +19,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct Machine Machine;
-typedef enum KillWho KillWho;
-
 #include "basic/list.h"
+
+typedef enum KillWho KillWho;
+typedef struct Machine Machine;
 
 #include "machined.h"
 #include "operation.h"

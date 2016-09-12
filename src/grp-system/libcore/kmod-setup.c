@@ -24,10 +24,11 @@
 #include <libkmod.h>
 #endif
 
-#include "shared/bus-util.h"
 #include "basic/capability-util.h"
-#include "kmod-setup.h"
 #include "basic/macro.h"
+#include "shared/bus-util.h"
+
+#include "kmod-setup.h"
 
 #ifdef HAVE_KMOD
 static void systemd_kmod_log(

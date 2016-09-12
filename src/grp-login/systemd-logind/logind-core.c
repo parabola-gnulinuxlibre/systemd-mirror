@@ -30,10 +30,11 @@
 #include "basic/strv.h"
 #include "basic/terminal-util.h"
 #include "basic/user-util.h"
-#include "logind.h"
 #include "sd-bus/bus-error.h"
 #include "shared/bus-util.h"
 #include "shared/udev-util.h"
+
+#include "logind.h"
 
 int manager_add_device(Manager *m, const char *sysfs, bool master, Device **_device) {
         Device *d;

@@ -26,12 +26,12 @@
 #include "basic/signal-util.h"
 #include "basic/strv.h"
 #include "basic/util.h"
-#include "logind.h"
 #include "sd-bus/bus-common-errors.h"
 #include "shared/bus-util.h"
 
 #include "logind-session-device.h"
 #include "logind-session.h"
+#include "logind.h"
 
 static int property_get_user(
                 sd_bus *bus,

@@ -19,11 +19,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-typedef struct Session Session;
-typedef enum KillWho KillWho;
-
 #include "basic/list.h"
 #include "basic/login-util.h"
+
+typedef enum KillWho KillWho;
+typedef struct Session Session;
 
 #include "logind-user.h"
 

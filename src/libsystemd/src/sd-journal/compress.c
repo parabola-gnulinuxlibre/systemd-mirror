@@ -33,15 +33,16 @@
 #endif
 
 #include "basic/alloc-util.h"
-#include "compress.h"
 #include "basic/fd-util.h"
 #include "basic/io-util.h"
-#include "journal-def.h"
 #include "basic/macro.h"
 #include "basic/sparse-endian.h"
 #include "basic/string-table.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+
+#include "compress.h"
+#include "journal-def.h"
 
 #ifdef HAVE_LZ4
 DEFINE_TRIVIAL_CLEANUP_FUNC(LZ4F_compressionContext_t, LZ4F_freeCompressionContext);

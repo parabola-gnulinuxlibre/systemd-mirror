@@ -33,12 +33,7 @@
 #undef basename
 
 #include "basic/alloc-util.h"
-#include "bus-bloom.h"
-#include "bus-internal.h"
-#include "bus-kernel.h"
 #include "basic/bus-label.h"
-#include "bus-message.h"
-#include "shared/bus-util.h"
 #include "basic/capability-util.h"
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
@@ -50,6 +45,12 @@
 #include "basic/strv.h"
 #include "basic/user-util.h"
 #include "basic/util.h"
+#include "shared/bus-util.h"
+
+#include "bus-bloom.h"
+#include "bus-internal.h"
+#include "bus-kernel.h"
+#include "bus-message.h"
 
 #define UNIQUE_NAME_MAX (3+DECIMAL_STR_MAX(uint64_t))
 

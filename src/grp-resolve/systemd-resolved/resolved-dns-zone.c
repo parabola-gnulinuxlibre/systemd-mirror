@@ -20,9 +20,9 @@
 #include "basic/alloc-util.h"
 #include "basic/list.h"
 #include "basic/string-util.h"
+#include "resolved-dns-packet.h"
 #include "shared/dns-domain.h"
 
-#include "resolved-dns-packet.h"
 #include "resolved-dns-zone.h"
 
 /* Never allow more than 1K entries */

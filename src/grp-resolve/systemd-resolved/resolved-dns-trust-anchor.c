@@ -29,9 +29,9 @@
 #include "basic/set.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
+#include "resolved-dns-dnssec.h"
 #include "shared/dns-domain.h"
 
-#include "resolved-dns-dnssec.h"
 #include "resolved-dns-trust-anchor.h"
 
 static const char trust_anchor_dirs[] = CONF_PATHS_NULSTR("dnssec-trust-anchors.d");

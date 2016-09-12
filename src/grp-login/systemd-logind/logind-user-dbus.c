@@ -25,10 +25,10 @@
 #include "basic/signal-util.h"
 #include "basic/strv.h"
 #include "basic/user-util.h"
-#include "logind.h"
 #include "shared/bus-util.h"
 
 #include "logind-user.h"
+#include "logind.h"
 
 static int property_get_display(
                 sd_bus *bus,

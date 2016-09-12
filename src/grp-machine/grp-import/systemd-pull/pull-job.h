@@ -22,11 +22,11 @@
 #include <gcrypt.h>
 
 #include "basic/macro.h"
-#include "curl-util.h"
 #include "import-compress.h"
 
-typedef struct PullJob PullJob;
+#include "curl-util.h"
 
+typedef struct PullJob PullJob;
 typedef void (*PullJobFinished)(PullJob *job);
 typedef int (*PullJobOpenDisk)(PullJob *job);
 typedef int (*PullJobHeader)(PullJob *job, const char *header, size_t sz);

@@ -41,7 +41,6 @@
 #include "basic/terminal-util.h"
 #include "basic/unit-name.h"
 #include "basic/user-util.h"
-#include "logind.h"
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-error.h"
 #include "shared/bus-util.h"
@@ -49,6 +48,8 @@
 #include "shared/sleep-config.h"
 #include "shared/udev-util.h"
 #include "shared/utmp-wtmp.h"
+
+#include "logind.h"
 
 int manager_get_session_from_creds(Manager *m, sd_bus_message *message, const char *name, sd_bus_error *error, Session **ret) {
         _cleanup_(sd_bus_creds_unrefp) sd_bus_creds *creds = NULL;

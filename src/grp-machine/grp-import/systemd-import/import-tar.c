@@ -37,11 +37,11 @@
 #include "basic/rm-rf.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
+#include "import-common.h"
+#include "import-compress.h"
 #include "qcow2-util.h"
 #include "shared/machine-pool.h"
 
-#include "import-common.h"
-#include "import-compress.h"
 #include "import-tar.h"
 
 struct TarImport {
