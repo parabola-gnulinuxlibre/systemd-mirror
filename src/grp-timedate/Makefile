@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-nested.subdirs += timedatectl systemd-timedated
+nested.subdirs += systemd-timedated
+nested.subdirs += timedatectl
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

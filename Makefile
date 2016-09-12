@@ -23,8 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-nested.subdirs += src
-
 # intltoolize
 files.src.gen += m4/intltool.m4
 files.src.gen += po/Makefile.in.in
@@ -44,5 +42,9 @@ files.src.gen += m4/ltversion.m4
 files.src.gen += m4/lt~obsolete.m4
 files.src.gen += config.h.in
 files.src.gen += configure
+
+nested.subdirs += man
+nested.subdirs += src
+nested.subdirs += test
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

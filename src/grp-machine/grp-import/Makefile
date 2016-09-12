@@ -31,12 +31,6 @@ ifneq ($(HAVE_ZLIB),)
 ifneq ($(HAVE_BZIP2),)
 ifneq ($(HAVE_GCRYPT),)
 
-nested.subdirs += libimport
-nested.subdirs += systemd-export
-nested.subdirs += systemd-import
-nested.subdirs += systemd-importd
-nested.subdirs += systemd-pull
-
 endif # HAVE_GCRYPT
 endif # HAVE_BZIP2
 endif # HAVE_ZLIB
@@ -44,5 +38,11 @@ endif # HAVE_XZ
 endif # HAVE_LIBCURL
 
 endif # ENABLE_IMPORTD
+
+nested.subdirs += libimport
+nested.subdirs += systemd-export
+nested.subdirs += systemd-import
+nested.subdirs += systemd-importd
+nested.subdirs += systemd-pull
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

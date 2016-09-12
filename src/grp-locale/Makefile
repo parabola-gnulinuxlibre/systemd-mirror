@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-nested.subdirs += systemd-localed localectl
+nested.subdirs += localectl
+nested.subdirs += systemd-localed
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

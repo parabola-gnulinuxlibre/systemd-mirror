@@ -27,6 +27,8 @@ dist_systempreset_DATA = \
 	90-resolved.preset
 
 nested.subdirs += libbasic-dns
-nested.subdirs += systemd-resolved systemd-resolve nss-resolve
+nested.subdirs += nss-resolve
+nested.subdirs += systemd-resolve
+nested.subdirs += systemd-resolved
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

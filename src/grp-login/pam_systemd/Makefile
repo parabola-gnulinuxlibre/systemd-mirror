@@ -53,4 +53,5 @@ dist_pamconf_DATA = \
 EXTRA_DIST += \
 	src/login/systemd-user.m4
 endif # HAVE_PAM
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

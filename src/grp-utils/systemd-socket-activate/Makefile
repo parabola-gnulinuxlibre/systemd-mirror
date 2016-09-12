@@ -23,7 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-
 bin_PROGRAMS += \
 	systemd-socket-activate
 

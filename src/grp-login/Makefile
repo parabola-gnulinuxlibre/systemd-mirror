@@ -56,9 +56,11 @@ tests += \
 	test-login-tables \
 	test-login-shared
 
-nested.subdirs += loginctl systemd-logind
-nested.subdirs += pam_systemd systemd-inhibit
-
 endif # ENABLE_LOGIND
+
+nested.subdirs += loginctl
+nested.subdirs += pam_systemd
+nested.subdirs += systemd-inhibit
+nested.subdirs += systemd-logind
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

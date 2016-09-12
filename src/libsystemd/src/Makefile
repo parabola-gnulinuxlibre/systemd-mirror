@@ -198,6 +198,17 @@ sd.libsystemd_SOURCES =
 sd.libsystemd_SOURCES += $(patsubst src/libsystemd/%,%,$(filter %.c,$(_libsystemd_internal_la_SOURCES)))
 sd.libsystemd_SOURCES += $(addprefix sd-journal/,$(notdir $(filter %.c,$(_libsystemd_journal_internal_la_SOURCES))))
 $(outdir)/libsystemd-internal.la: $(addprefix $(outdir)/,$(sd.libsystemd_SOURCES:.c=.lo))
-nested.subdirs += $(sort $(dir $(sd.libsystemd_SOURCES)))
+
+nested.subdirs += sd-bus
+nested.subdirs += sd-daemon
+nested.subdirs += sd-device
+nested.subdirs += sd-event
+nested.subdirs += sd-hwdb
+nested.subdirs += sd-id128
+nested.subdirs += sd-journal
+nested.subdirs += sd-login
+nested.subdirs += sd-netlink
+nested.subdirs += sd-network
+nested.subdirs += sd-resolve
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

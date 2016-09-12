@@ -26,8 +26,10 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 dist_systempreset_DATA = \
 	90-systemd.preset
 
-nested.subdirs += systemctl systemd systemd-shutdown
-nested.subdirs += libcore
 nested.subdirs += grp-utils
+nested.subdirs += libcore
+nested.subdirs += systemctl
+nested.subdirs += systemd
+nested.subdirs += systemd-shutdown
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

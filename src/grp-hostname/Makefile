@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-nested.subdirs += systemd-hostnamed hostnamectl
+nested.subdirs += hostnamectl
+nested.subdirs += systemd-hostnamed
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

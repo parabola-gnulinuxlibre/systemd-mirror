@@ -67,7 +67,6 @@ systemd_logind_LDADD = \
 rootlibexec_PROGRAMS += \
 	systemd-logind
 
-
 nodist_systemunit_DATA += \
 	units/systemd-logind.service
 
@@ -108,7 +107,6 @@ dist_udevrules_DATA += \
 nodist_udevrules_DATA += \
 	src/login/71-seat.rules \
 	src/login/73-seat-late.rules
-
 
 polkitpolicy_in_files += \
 	src/login/org.freedesktop.login1.policy.in

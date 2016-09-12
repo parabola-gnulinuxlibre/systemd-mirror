@@ -118,6 +118,7 @@ $(DESTDIR)$(pkgincludedir)/%.h: $(srcdir)/include/systemd/%.h
 
 files.sys.all += $(addprefix $(pkgincludedir)/,$(notdir $(_pkginclude_HEADERS)))
 $(outdir)/libsystemd.la: $(srcdir)/libsystemd.sym
+
 nested.subdirs += src
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

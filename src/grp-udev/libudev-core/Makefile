@@ -97,8 +97,9 @@ endif # HAVE_ACL
 
 sd.libudev-core_SOURCES = $(patsubst src/udev/%,%,$(filter %.c,$(_libudev_core_la_SOURCES) $(_nodist_libudev_core_la_SOURCES)))
 $(outdir)/libudev-core.la: $(addprefix $(outdir)/,$(sd.libudev-core_SOURCES:.c=.lo))
-nested.subdirs += net
 $(outdir)/udev-builtin-keyboard.lo: $(outdir)/keyboard-keys-from-name.h
 sd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
+
+nested.subdirs += net
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

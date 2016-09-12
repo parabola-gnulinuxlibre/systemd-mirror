@@ -29,7 +29,6 @@ systemd_cat_SOURCES = \
 systemd_cat_LDADD = \
 	libjournal-core.la
 
-
 bin_PROGRAMS += \
 	systemd-cat
 

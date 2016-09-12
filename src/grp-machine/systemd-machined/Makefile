@@ -71,7 +71,6 @@ SYSTEM_UNIT_ALIASES += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.machine1.busname
 
-
 polkitpolicy_in_files += \
 	src/machine/org.freedesktop.machine1.policy.in
 

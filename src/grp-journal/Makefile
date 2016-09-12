@@ -170,10 +170,6 @@ endif # HAVE_COMPRESSION
 dist_tmpfiles_DATA = \
 	tmpfiles.d/journal-nocow.conf
 
-nested.subdirs += journalctl systemd-journald libjournal-core
-nested.subdirs += systemd-cat
-#nested.subdirs += grp-remote
-
 ifneq ($(HAVE_SYSV_COMPAT),)
 varlog_DATA = \
 	docs/var-log/README
@@ -187,5 +183,11 @@ EXTRA_DIST += \
 
 dist_systempreset_DATA = \
 	90-journald.preset
+
+nested.subdirs += grp-remote
+nested.subdirs += journalctl
+nested.subdirs += libjournal-core
+nested.subdirs += systemd-cat
+nested.subdirs += systemd-journald
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

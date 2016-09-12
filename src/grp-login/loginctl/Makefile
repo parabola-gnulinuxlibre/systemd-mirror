@@ -38,4 +38,5 @@ dist_bashcompletion_data += \
 	shell-completion/bash/loginctl
 
 dist_zshcompletion_data += shell-completion/zsh/_loginctl
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

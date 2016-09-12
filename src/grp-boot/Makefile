@@ -23,6 +23,8 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-nested.subdirs += bootctl systemd-boot kernel-install
+nested.subdirs += bootctl
+nested.subdirs += kernel-install
+nested.subdirs += systemd-boot
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

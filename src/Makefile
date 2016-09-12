@@ -65,5 +65,6 @@ nested.subdirs += systemd-stdio-bridge
 nested.subdirs += systemd-system-update-generator
 nested.subdirs += systemd-timesyncd
 nested.subdirs += systemd-tty-ask-password-agent
+nested.subdirs += test
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

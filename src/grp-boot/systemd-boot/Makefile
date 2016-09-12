@@ -149,4 +149,5 @@ files.out.int += test-efi-disk.img
 # ------------------------------------------------------------------------------
 endif # HAVE_GNUEFI
 endif # ENABLE_EFI
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

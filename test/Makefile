@@ -23,7 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-
 manual_tests += \
 	test-ns \
 	test-cgroup \
@@ -247,7 +246,6 @@ EXTRA_DIST += \
 	test/bus-policy/many-rules.conf \
 	test/bus-policy/test.conf
 
-
 EXTRA_DIST += \
 	src/test/test-helper.h
 
@@ -307,7 +305,6 @@ test_dns_domain_SOURCES = \
 test_dns_domain_LDADD = \
 	libsystemd-network.la \
 	libshared.la
-
 
 ifneq ($(ENABLE_EFI),)
 tests += \

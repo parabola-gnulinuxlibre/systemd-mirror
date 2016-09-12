@@ -74,7 +74,16 @@ SYSINIT_TARGET_WANTS += \
 	systemd-udevd.service \
 	systemd-udev-trigger.service
 
-nested.subdirs += systemd-udevd udevadm
-nested.subdirs += ata_id cdrom_id collect mtd_probe scsi_id v4l_id
+nested.subdirs += ata_id
+nested.subdirs += cdrom_id
+nested.subdirs += collect
+nested.subdirs += hwdb
+nested.subdirs += libudev-core
+nested.subdirs += mtd_probe
+nested.subdirs += scsi_id
+nested.subdirs += systemd-hwdb
+nested.subdirs += systemd-udevd
+nested.subdirs += udevadm
+nested.subdirs += v4l_id
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

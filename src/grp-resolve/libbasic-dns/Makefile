@@ -47,7 +47,6 @@ libbasic_dns_la_SOURCES = \
 	src/resolve/dns-type.c \
 	src/resolve/dns-type.h
 
-
 tests += \
 	test-dns-packet \
 	test-resolve-tables \
