@@ -24,15 +24,15 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "architecture.h"
-#include "log.h"
-#include "macro.h"
-#include "process-util.h"
-#include "string-util.h"
-#include "terminal-util.h"
-#include "util.h"
-#include "virt.h"
+#include "basic/alloc-util.h"
+#include "basic/architecture.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/process-util.h"
+#include "basic/string-util.h"
+#include "basic/terminal-util.h"
+#include "basic/util.h"
+#include "basic/virt.h"
 
 static void test_get_process_comm(void) {
         struct stat st;

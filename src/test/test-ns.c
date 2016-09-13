@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "log.h"
+#include "basic/log.h"
 #include "namespace.h"
 
 int main(int argc, char *argv[]) {
