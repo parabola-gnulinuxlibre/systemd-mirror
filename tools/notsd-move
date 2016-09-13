@@ -683,13 +683,13 @@ breakup_makefile() (
 				[[ "$(wc -l <<<"$d")" = 1 ]]
 				file="$d/Makefile"
 			fi
-		elif [[ $file = all ]]; then
-			printf '%s\n' "$line" | tee -a "${files[@]}" >/dev/null
-		else
 			if ! in_array "$file" "${files[@]}"; then
 				cat .tmp.move.all > "$file"
 				files+=("$file")
 			fi
+		elif [[ $file = all ]]; then
+			printf '%s\n' "$line" | tee -a "${files[@]}" >/dev/null
+		else
 			printf '%s\n' "$line" >> "$file"
 		fi
 	done < <(fixup_makefile <Makefile.am)
