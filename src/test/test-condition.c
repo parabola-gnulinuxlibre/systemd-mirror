@@ -17,20 +17,20 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-id128.h"
+#include <systemd/sd-id128.h>
 
-#include "alloc-util.h"
-#include "apparmor-util.h"
-#include "architecture.h"
-#include "audit-util.h"
-#include "condition.h"
-#include "hostname-util.h"
-#include "ima-util.h"
-#include "log.h"
-#include "macro.h"
-#include "selinux-util.h"
-#include "smack-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/architecture.h"
+#include "basic/audit-util.h"
+#include "basic/hostname-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/selinux-util.h"
+#include "basic/smack-util.h"
+#include "basic/util.h"
+#include "shared/apparmor-util.h"
+#include "shared/condition.h"
+#include "shared/ima-util.h"
 
 static void test_condition_test_path(void) {
         Condition *condition;

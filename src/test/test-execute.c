@@ -23,16 +23,17 @@
 #include <sys/prctl.h>
 #include <sys/types.h>
 
-#include "fileio.h"
-#include "fs-util.h"
-#include "macro.h"
+#include "basic/fileio.h"
+#include "basic/fs-util.h"
+#include "basic/macro.h"
+#include "basic/mkdir.h"
+#include "basic/path-util.h"
+#include "basic/rm-rf.h"
+#include "basic/util.h"
 #include "manager.h"
-#include "mkdir.h"
-#include "path-util.h"
-#include "rm-rf.h"
-#include "test-helper.h"
 #include "unit.h"
-#include "util.h"
+
+#include "test-helper.h"
 
 typedef void (*test_function_t)(Manager *m);
 

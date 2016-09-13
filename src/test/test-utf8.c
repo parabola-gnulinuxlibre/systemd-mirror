@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "string-util.h"
-#include "utf8.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/string-util.h"
+#include "basic/utf8.h"
+#include "basic/util.h"
 
 static void test_utf8_is_printable(void) {
         assert_se(utf8_is_printable("ascii is valid\tunicode", 22));

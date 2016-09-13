@@ -20,10 +20,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fileio.h"
-#include "glob-util.h"
-#include "macro.h"
+#include "basic/alloc-util.h"
+#include "basic/fileio.h"
+#include "basic/glob-util.h"
+#include "basic/macro.h"
 
 static void test_glob_exists(void) {
         char name[] = "/tmp/test-glob_exists.XXXXXX";
