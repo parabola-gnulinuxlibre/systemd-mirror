@@ -24,7 +24,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-#@build-aux/Makefile.once.head/20-systemd.mk
+#@build-aux/Makefile.once.head/20-sd.mk
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 AM_MAKEFLAGS = --no-print-directory
 AUTOMAKE_OPTIONS = color-tests parallel-tests
@@ -43,7 +43,7 @@ SUBDIRS = . po
 # Keep the test-suite.log
 .PRECIOUS: $(TEST_SUITE_LOG) Makefile
 
-#@src/libudev/src/Makefile
+#@src/libudev/Makefile
 LIBUDEV_CURRENT=7
 LIBUDEV_REVISION=4
 LIBUDEV_AGE=6
@@ -347,7 +347,7 @@ INSTALL_EXEC_HOOKS += \
 INSTALL_EXEC_HOOKS += \
 	install-busnames-target-wants-hook
 
-#@build-aux/Makefile.once.head/20-systemd.mk -----------------------------------
+#@build-aux/Makefile.once.head/20-sd.mk ----------------------------------------
 V ?=
 
 AM_V_M4 = $(AM_V_M4_$(V))
@@ -739,7 +739,7 @@ EXTRA_DIST += \
 
 @INTLTOOL_POLICY_RULE@
 
-# ------------------------------------------------------------------------------
+#@build-aux/Makefile.each.tail/70-man.mk ---------------------------------------
 
 MANPAGES =
 MANPAGES_ALIAS =
@@ -821,7 +821,7 @@ EXTRA_DIST += \
 	man/glib-event-glue.c
 
 #@src/libbasic/Makefile --------------------------------------------------------
-at.subdirs += src include
+nested.subdirs += src include
 #@src/libbasic/src/Makefile
 noinst_LTLIBRARIES += \
 	libbasic.la
@@ -1041,7 +1041,7 @@ libbasic_la_LIBADD = \
 	-lm
 
 #@src/libshared/Makefile -------------------------------------------------------
-at.subdirs += src
+nested.subdirs += src
 #@src/libshared/src/Makefile
 noinst_LTLIBRARIES += \
 	libshared.la
@@ -1360,7 +1360,7 @@ EXTRA_DIST += \
 CLEANFILES += \
 	$(gperf_txt_sources)
 
-#@build-aux/Makefile.each.tail/20-systemd.mk
+#@build-aux/Makefile.each.tail/50-sd.mk
 %-from-name.gperf: %-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct $(notdir $*)_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { printf "%s, %s\n", $$1, $$1 }' <$< >$@
@@ -1370,7 +1370,7 @@ CLEANFILES += \
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 
 #@src/libbasic/include/Makefile
-at.subdirs += basic
+nested.subdirs += basic
 #@src/libbasic/include/basic/Makefile
 src/basic/errno-list.txt:
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -1433,7 +1433,7 @@ src/journal/audit_type-to-name.h: src/journal/audit_type-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
 
-#@auto/systemd-resolved/Makefile
+#@auto/libbasic-dns/Makefile
 
 src/resolve/dns_type-list.txt: src/resolve/dns-type.h
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -2601,10 +2601,12 @@ nodist_sysusers_DATA = \
 	sysusers.d/systemd.conf \
 	sysusers.d/basic.conf
 
+#@discard.mk
 if HAVE_REMOTE
 nodist_sysusers_DATA += \
 	sysusers.d/systemd-remote.conf
 endif # HAVE_REMOTE
+#@auto/systemd-sysusers/Makefile
 
 INSTALL_DIRS += \
 	$(sysusersdir)
@@ -2734,10 +2736,13 @@ systemd_system_update_generator_SOURCES = \
 systemd_system_update_generator_LDADD = \
 	libshared.la
 
-#@auto/systemd-hibernate-resume/Makefile ---------------------------------------
+#@auto/systemd-hibernate-resume-generator/Makefile -----------------------------
 if ENABLE_HIBERNATE
 systemgenerator_PROGRAMS += \
 	systemd-hibernate-resume-generator
+
+#@auto/systemd-hibernate-resume/Makefile
+if ENABLE_HIBERNATE
 
 rootlibexec_PROGRAMS += \
 	systemd-hibernate-resume
@@ -2748,11 +2753,24 @@ systemd_hibernate_resume_SOURCES = \
 systemd_hibernate_resume_LDADD = \
 	libshared.la
 
+nodist_systemunit_DATA += \
+	units/systemd-hibernate-resume@.service
+
+endif # ENABLE_HIBERNATE
+
+EXTRA_DIST += \
+	units/systemd-hibernate-resume@.service.in
+
+#@auto/systemd-hibernate-resume-generator/Makefile
 systemd_hibernate_resume_generator_SOURCES = \
 	src/hibernate-resume/hibernate-resume-generator.c
 
 systemd_hibernate_resume_generator_LDADD = \
 	libshared.la
+
+endif # ENABLE_HIBERNATE
+#@auto/systemd-sleep/Makefile
+if ENABLE_HIBERNATE
 
 dist_systemunit_DATA += \
 	units/hibernate.target \
@@ -2760,13 +2778,12 @@ dist_systemunit_DATA += \
 
 nodist_systemunit_DATA += \
 	units/systemd-hibernate.service \
-	units/systemd-hibernate-resume@.service \
 	units/systemd-hybrid-sleep.service
+
 endif # ENABLE_HIBERNATE
 
 EXTRA_DIST += \
 	units/systemd-hibernate.service.in \
-	units/systemd-hibernate-resume@.service.in \
 	units/systemd-hybrid-sleep.service.in
 
 #@auto/bootctl/Makefile --------------------------------------------------------
@@ -2798,6 +2815,7 @@ dist_zshcompletion_data += \
 	shell-completion/zsh/_bootctl
 endif # HAVE_BLKID
 endif # ENABLE_EFI
+
 #@auto/systemd-boot/Makefile ---------------------------------------------------
 if ENABLE_EFI
 if HAVE_GNUEFI
@@ -3352,7 +3370,7 @@ tests += \
 bin_PROGRAMS += \
 	busctl
 
-#@src/libsystemd/src/Makefile
+#@src/libsystemd/src/test.mk
 test_bus_marshal_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-marshal.c
 
@@ -3493,7 +3511,7 @@ busctl_LDADD = \
 	libshared.la
 
 #@src/libsystemd-network/Makefile ----------------------------------------------
-at.subdirs += src test
+nested.subdirs += src test
 #@src/libsystemd-network/src/Makefile
 noinst_LTLIBRARIES += \
 	libsystemd-network.la
@@ -3643,13 +3661,15 @@ tests += \
 	test-dhcp6-client \
 	test-lldp
 
-#@src/libudev/src/Makefile -----------------------------------------------------
+#@src/libudev/Makefile ---------------------------------------------------------
+
 include_HEADERS += \
 	src/libudev/libudev.h
 
-lib_LTLIBRARIES += \
+rootlib_LTLIBRARIES += \
 	libudev.la
 
+#@src/libudev/src/Makefile
 libudev_la_SOURCES =\
 	src/libudev/libudev.sym \
 	src/libudev/libudev-private.h \
@@ -3663,6 +3683,7 @@ libudev_la_SOURCES =\
 	src/libudev/libudev-monitor.c \
 	src/libudev/libudev-queue.c \
 	src/libudev/libudev-hwdb.c
+#@src/libudev/Makefile
 
 libudev_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
@@ -3818,10 +3839,13 @@ libudev_core_la_LIBADD = \
 if HAVE_KMOD
 libudev_core_la_SOURCES += \
 	src/udev/udev-builtin-kmod.c
-
+endif # HAVE_KMOD
+#@src/grp-udev/Makefile
+if HAVE_KMOD
 dist_udevrules_DATA += \
 	rules/80-drivers.rules
 endif # HAVE_KMOD
+#@auto/libudev-core/Makefile
 
 if HAVE_BLKID
 libudev_core_la_SOURCES += \
@@ -4074,6 +4098,7 @@ systemd_journald_LDADD = \
 	libjournal-core.la \
 	libshared.la
 
+#@auto/systemd-cat/Makefile
 systemd_cat_SOURCES = \
 	src/journal/cat.c
 
@@ -4103,7 +4128,8 @@ nodist_systemunit_DATA += \
 
 nodist_pkgsysconf_DATA += \
         src/journal-remote/journal-upload.conf
-endif
+
+endif # HAVE_LIBCURL
 
 EXTRA_DIST += \
         units/systemd-journal-upload.service.in \
@@ -4439,10 +4465,12 @@ libsystemd_journal_internal_la_SOURCES += \
 libsystemd_journal_internal_la_LIBADD += \
 	$(GCRYPT_LIBS)
 
+#@src/libsystemd/src/sd-journal/Makefile
 # fsprg.c is a drop-in file using void pointer arithmetic
 libsystemd_journal_internal_la_CFLAGS += \
 	$(GCRYPT_CFLAGS) \
 	-Wno-pointer-arith
+#@src/libsystemd/src/Makefile
 endif # HAVE_GCRYPT
 
 noinst_LTLIBRARIES += \
@@ -4452,21 +4480,27 @@ noinst_LTLIBRARIES += \
 rootlibexec_PROGRAMS += \
 	systemd-journald
 
+#@auto/journalctl/Makefile
 rootbin_PROGRAMS += \
 	journalctl
 
+#@auto/systemd-cat/Makefile
 bin_PROGRAMS += \
 	systemd-cat
 
+#@auto/systemd-journald/Makefile
 dist_systemunit_DATA += \
 	units/systemd-journald.socket \
 	units/systemd-journald-dev-log.socket \
 	units/systemd-journald-audit.socket
 
 nodist_systemunit_DATA += \
-	units/systemd-journald.service \
+	units/systemd-journald.service
+#@auto/journalctl/Makefile
+nodist_systemunit_DATA += \
 	units/systemd-journal-flush.service \
 	units/systemd-journal-catalog-update.service
+#@auto/systemd-journald/Makefile
 
 dist_pkgsysconf_DATA += \
 	src/journal/journald.conf
@@ -4490,14 +4524,20 @@ SOCKETS_TARGET_WANTS += \
 	systemd-journald-audit.socket
 
 SYSINIT_TARGET_WANTS += \
-	systemd-journald.service \
+	systemd-journald.service
+#@auto/journalctl/Makefile
+SYSINIT_TARGET_WANTS += \
 	systemd-journal-flush.service \
 	systemd-journal-catalog-update.service
+#@auto/systemd-journald/Makefile
 
 EXTRA_DIST += \
-	units/systemd-journald.service.in \
+	units/systemd-journald.service.in
+#@auto/journalctl/Makefile
+EXTRA_DIST += \
 	units/systemd-journal-flush.service.in \
 	units/systemd-journal-catalog-update.service.in
+#@auto/systemd-journald/Makefile
 
 gperf_gperf_sources += \
 	src/journal/journald-gperf.gperf
@@ -4800,7 +4840,7 @@ SYSINIT_TARGET_WANTS += \
 
 endif # HAVE_LIBCRYPTSETUP
 
-#@src/grp-hostname/Makefile ----------------------------------------------------
+#@auto/systemd-hostnamed/Makefile ----------------------------------------------
 if ENABLE_HOSTNAMED
 systemd_hostnamed_SOURCES = \
 	src/hostname/hostnamed.c
@@ -4832,6 +4872,10 @@ SYSTEM_UNIT_ALIASES += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.hostname1.busname
 
+endif # ENABLE_HOSTNAMED
+#@auto/hostnamectl/Makefile
+if ENABLE_HOSTNAMED
+
 hostnamectl_SOURCES = \
 	src/hostname/hostnamectl.c
 
@@ -4848,6 +4892,7 @@ dist_zshcompletion_data += \
 	shell-completion/zsh/_hostnamectl
 endif # ENABLE_HOSTNAMED
 
+#@auto/systemd-hostnamed/Makefile
 polkitpolicy_in_files += \
 	src/hostname/org.freedesktop.hostname1.policy.in
 
@@ -4861,7 +4906,7 @@ dist_systemunit_DATA_busnames += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.systemd1.busname
 
-#@src/grp-locale/Makefile ------------------------------------------------------
+#@auto/systemd-localed/Makefile ------------------------------------------------
 if ENABLE_LOCALED
 systemd_localed_SOURCES = \
 	src/locale/localed.c
@@ -4902,6 +4947,9 @@ dist_pkgdata_DATA = \
 	src/locale/kbd-model-map \
 	src/locale/language-fallback-map
 
+endif # ENABLE_LOCALED
+#@auto/localectl/Makefile
+if ENABLE_LOCALED
 localectl_SOURCES = \
 	src/locale/localectl.c
 
@@ -4917,6 +4965,7 @@ dist_bashcompletion_data += \
 dist_zshcompletion_data += \
 	shell-completion/zsh/_localectl
 endif # ENABLE_LOCALED
+#@auto/systemd-localed/Makefile
 
 .PHONY: update-kbd-model-map
 
@@ -5166,7 +5215,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-machined.service.in
 
-#@src/grp-journal/grp-remote/Makefile ------------------------------------------
+# ------------------------------------------------------------------------------
 if ENABLE_IMPORTD
 
 if HAVE_LIBCURL
@@ -5285,7 +5334,7 @@ systemd_export_LDADD = \
 	$(ZLIB_LIBS) \
 	$(BZIP2_LIBS)
 
-#@src/grp-journal/grp-remote/Makefile
+#@auto/systemd-importd/Makefile
 dist_rootlibexec_DATA = \
 	src/import/import-pubring.gpg
 
@@ -5310,6 +5359,7 @@ dist_dbuspolicy_DATA += \
 polkitpolicy_files += \
 	src/import/org.freedesktop.import1.policy
 
+#@auto/libimport/Makefile
 manual_tests += \
 	test-qcow2
 
@@ -5326,6 +5376,7 @@ test_qcow2_LDADD = \
 	libshared.la \
 	$(ZLIB_LIBS)
 
+#@discard.mk
 endif # HAVE_GCRYPT
 endif # HAVE_BZIP2
 endif # HAVE_ZLIB
@@ -5333,6 +5384,7 @@ endif # HAVE_XZ
 endif # HAVE_LIBCURL
 
 endif # ENABLE_IMPORTD
+#@auto/systemd-importd/Makefile
 
 polkitpolicy_in_files += \
 	src/import/org.freedesktop.import1.policy.in
@@ -5460,7 +5512,7 @@ libnss_resolve_la_LIBADD = \
 lib_LTLIBRARIES += \
 	libnss_resolve.la
 
-#@auto/systemd-resolved/Makefile
+#@auto/systemd-resolve/Makefile
 systemd_resolve_SOURCES = \
 	src/resolve/resolve-tool.c \
 	$(basic_dns_sources) \
@@ -5483,6 +5535,7 @@ dist_bashcompletion_data += \
 dist_zshcompletion_data += \
 	shell-completion/zsh/_systemd-resolve
 
+#@auto/libbasic-dns/Makefile
 tests += \
 	test-dns-packet \
 	test-resolve-tables \
@@ -5540,11 +5593,14 @@ test_dnssec_complex_SOURCES = \
 test_dnssec_complex_LDADD = \
 	libshared.la
 
+#@auto/systemd-resolved/Makefile
 endif # ENABLE_RESOLVED
+#@auto/libbasic-dns/Makefile
 
 gperf_txt_sources += \
 	src/resolve/dns_type-list.txt
 
+#@auto/systemd-resolved/Makefile
 gperf_gperf_sources += \
 	src/resolve/resolved-gperf.gperf
 
@@ -5706,6 +5762,7 @@ tests += \
 	test-network \
 	test-network-tables
 
+#@auto/systemd-networkd/Makefile
 dist_systemunit_DATA += \
 	units/systemd-networkd.socket
 
@@ -5733,6 +5790,7 @@ SYSTEM_UNIT_ALIASES += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.network1.busname
 
+#@src/grp-network/Makefile
 endif # ENABLE_NETWORKD
 
 gperf_gperf_sources += \
@@ -5745,9 +5803,9 @@ EXTRA_DIST += \
 	units/systemd-networkd-wait-online.service.in \
 	test/networkd-test.py
 
-#@src/grp-login/Makefile -------------------------------------------------------
+#@auto/systemd-logind/Makefile -------------------------------------------------
 if ENABLE_LOGIND
-#@src/grp-login/systemd-logind/Makefile
+
 systemd_logind_SOURCES = \
 	src/login/logind.c \
 	src/login/logind.h
@@ -5890,7 +5948,7 @@ dist_pamconf_DATA = \
 EXTRA_DIST += \
 	src/login/systemd-user.m4
 endif # HAVE_PAM
-#@src/grp-login/Makefile
+#@auto/systemd-logind/Makefile
 
 nodist_systemunit_DATA += \
 	units/systemd-logind.service
@@ -6018,7 +6076,7 @@ EXTRA_DIST += \
 	test/loopy.service.d \
 	test/loopy.service.d/compat.conf
 
-#@build-aux/Makefile.once.head/20-systemd.mk -----------------------------------
+#@build-aux/Makefile.once.head/20-sd.mk ----------------------------------------
 substitutions = \
        '|rootlibexecdir=$(rootlibexecdir)|' \
        '|rootbindir=$(rootbindir)|' \
@@ -6093,7 +6151,7 @@ units/%: units/%.in
 man/%: man/%.in
 	$(SED_PROCESS)
 
-#@build-aux/Makefile.each.tail/20-systemd.mk
+#@build-aux/Makefile.each.tail/50-sd.mk
 sysctl.d/%: sysctl.d/%.in
 	$(SED_PROCESS)
 
@@ -6119,7 +6177,7 @@ shell-completion/%: shell-completion/%.in
 %.conf: %.conf.in
 	$(SED_PROCESS)
 
-#@build-aux/Makefile.each.tail/20-systemd.mk
+#@build-aux/Makefile.each.tail/50-sd.mk
 %.sh: %.sh.in
 	$(SED_PROCESS)
 	$(AM_V_GEN)chmod +x $@
@@ -6160,16 +6218,18 @@ EXTRA_DIST += \
 	$(polkitpolicy_in_files) \
 	$(polkitpolicy_in_in_files)
 
-# ------------------------------------------------------------------------------
+#@man/Makefile -----------------------------------------------------------------
 man/custom-entities.ent: configure.ac
 	$(AM_V_GEN)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)(echo '<?xml version="1.0" encoding="utf-8" ?>' && \
 	 printf '$(subst '|,<!ENTITY ,$(subst =, ",$(subst |',">\n,$(substitutions))))') \
 	 > $@ # '
 
+#@discard.mk
 CLEANFILES += \
 	man/custom-entities.ent
 
+#@build-aux/Makefile.once.head/20-sd.mk
 XSLTPROC_FLAGS = \
 	--nonet \
 	--xinclude \
@@ -6187,6 +6247,7 @@ XSLTPROC_PROCESS_MAN = \
 XSLTPROC_PROCESS_HTML = \
 	$(AM_V_XSLT)$(XSLT) -o $@ $(XSLTPROC_FLAGS) $(srcdir)/man/custom-html.xsl $<
 
+#@build-aux/Makefile.each.tail/50-sd.mk
 man/%.1: man/%.xml man/custom-man.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_MAN)
 
@@ -6205,37 +6266,47 @@ man/%.8: man/%.xml man/custom-man.xsl man/custom-entities.ent
 man/%.html: man/%.xml man/custom-html.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_HTML)
 
+#@build-aux/Makefile.once.head/20-sd.mk
 define html-alias
 	$(AM_V_LN)$(LN_S) -f $(notdir $<) $@
 endef
 
+#@discard.mk
 EXTRA_DIST += \
 	man/custom-html.xsl \
 	man/custom-man.xsl
 
 # ------------------------------------------------------------------------------
+#@auto/systemd-sysv-generator/Makefile
 if HAVE_SYSV_COMPAT
 sysvinit_DATA = \
 	docs/sysvinit/README
 
-varlog_DATA = \
-	docs/var-log/README
-
 docs/sysvinit/README: docs/sysvinit/README.in
 	$(SED_PROCESS)
+
+CLEANFILES += \
+	docs/sysvinit/README
+endif # HAVE_SYSV_COMPAT
+
+EXTRA_DIST += \
+	docs/sysvinit/README.in
+#@src/grp-journal/Makefile
+if HAVE_SYSV_COMPAT
+
+varlog_DATA = \
+	docs/var-log/README
 
 docs/var-log/README: docs/var-log/README.in
 	$(SED_PROCESS)
 
 CLEANFILES += \
-	docs/sysvinit/README \
 	docs/var-log/README
 endif # HAVE_SYSV_COMPAT
 
 EXTRA_DIST += \
-	docs/sysvinit/README.in \
 	docs/var-log/README.in
-
+#@discard.mk
 SOCKETS_TARGET_WANTS += \
 	systemd-initctl.socket
 
@@ -6438,7 +6509,7 @@ install-tree: all
 	$(MAKE) install DESTDIR=$(abs_srcdir)/install-tree
 	tree $(abs_srcdir)/install-tree
 
-#@build-aux/Makefile.once.tail/20-systemd.mk
+#@build-aux/Makefile.once.tail/10-sd.mk
 # Let's run all tests of the test suite, but under valgrind. Let's
 # exclude perl/python/shell scripts we have in there
 .PHONY: valgrind-tests
@@ -6491,7 +6562,7 @@ check-includes: $(top_srcdir)/tools/check-includes.pl
 EXTRA_DIST += \
 	$(top_srcdir)/tools/check-includes.pl
 
-#@build-aux/Makefile.once.head/20-systemd.mk
+#@build-aux/Makefile.each.tail/50-sd.mk
 # Stupid test that everything purported to be exported really is
 define generate-sym-test
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -6517,7 +6588,7 @@ test-libsystemd-sym.c: \
 		src/systemd/sd-event.h
 	$(generate-sym-test)
 
-#@src/libudev/src/Makefile
+#@src/libudev/Makefile
 test-libudev-sym.c: \
 		src/libudev/libudev.sym \
 		src/udev/udev.h
@@ -6529,7 +6600,7 @@ nodist_test_libsystemd_sym_SOURCES = \
 test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
-#@src/libudev/src/Makefile
+#@src/libudev/Makefile
 nodist_test_libudev_sym_SOURCES = \
 	test-libudev-sym.c
 test_libudev_sym_CFLAGS = \
@@ -6551,7 +6622,7 @@ tests += \
 	test-libsystemd-sym \
 	test-libudev-sym
 
-#@build-aux/Makefile.once.tail/20-systemd.mk
+#@build-aux/Makefile.once.tail/10-sd.mk
 .PHONY: cppcheck
 cppcheck:
 	cppcheck --enable=all -q $(top_srcdir)
@@ -6571,38 +6642,50 @@ list-keys:
 
 add-key:
 	gpg --verbose --no-options --no-default-keyring --no-auto-key-locate --batch --trust-model=always --keyring=$(srcdir)/src/import/import-pubring.gpg --import -
-#@src/Makefile
-
-#@src/libudev/Makefile
-at.subdirs += src
-
+#@Makefile
+# intltoolize
+files.src.gen += m4/intltool.m4
+files.src.gen += po/Makefile.in.in
+# autoreconf
+files.src.gen += aclocal.m4
+files.src.gen += automake.mk.in
+files.src.gen += build-aux/compile
+files.src.gen += build-aux/config.guess
+files.src.gen += build-aux/config.sub
+files.src.gen += build-aux/install-sh
+files.src.gen += build-aux/ltmain.sh
+files.src.gen += build-aux/missing
+files.src.gen += m4/libtool.m4
+files.src.gen += m4/ltoptions.m4
+files.src.gen += m4/ltsugar.m4
+files.src.gen += m4/ltversion.m4
+files.src.gen += m4/lt~obsolete.m4
+files.src.gen += config.h.in
+files.src.gen += configure
 #@src/libsystemd/src/subdir.mk
-systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
-systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
-
+sd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
+sd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
+#@src/grp-udev/libudev-core/net/Makefile
+sd.CPPFLAGS += $(libshared.CPPFLAGS)
+sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
+#@src/Makefile
 #@src/grp-boot/Makefile
-at.subdirs += bootctl systemd-boot
-
 #@src/grp-coredump/Makefile
-at.subdirs += coredumpctl systemd-coredump
-
-#@src/grp-machine/Makefile
-at.subdirs += machinectl systemd-machined
-at.subdirs += nss-mymachines
-
+#@src/grp-hostname/Makefile
+#@src/grp-initprogs/Makefile
+#@src/grp-initprogs/grp-sleep/Makefile
 #@src/grp-journal/grp-remote/Makefile
-at.subdirs += systemd-journa-gatewayd
-at.subdirs += systemd-journa-remote
-at.subdirs += systemd-journa-upload
-
+#@src/grp-locale/Makefile
+#@src/grp-machine/Makefile
+#@src/grp-machine/grp-import/Makefile
+#@src/grp-machine/grp-import/libimport/Makefile
 #@src/grp-resolve/Makefile
-at.subdirs += systemd-resolved nss-resolve
-
+#@src/grp-resolve/libbasic-dns/Makefile
 #@src/grp-system/Makefile
-at.subdirs += systemctl systemd
-
+#@src/grp-system/grp-utils/Makefile
 #@src/grp-timedate/Makefile
-at.subdirs += timedatectl systemd-timedated
-
+#@src/grp-utils/Makefile
+#@src/libudev/Makefile
 #@all
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk
