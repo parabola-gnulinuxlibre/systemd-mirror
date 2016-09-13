@@ -66,9 +66,7 @@ systemd_resolved_SOURCES = \
 	src/resolve/resolved-dns-trust-anchor.h \
 	src/resolve/resolved-dns-trust-anchor.c \
 	src/resolve/resolved-etc-hosts.h \
-	src/resolve/resolved-etc-hosts.c \
-	src/shared/gcrypt-util.c \
-	src/shared/gcrypt-util.h
+	src/resolve/resolved-etc-hosts.c
 
 nodist_systemd_resolved_SOURCES = \
 	src/resolve/dns_type-from-name.h \

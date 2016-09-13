@@ -27,9 +27,7 @@ basic_dns_sources =
 
 systemd_resolve_SOURCES = \
 	src/resolve/resolve-tool.c \
-	$(basic_dns_sources) \
-	src/shared/gcrypt-util.c \
-	src/shared/gcrypt-util.h
+	$(basic_dns_sources)
 
 nodist_systemd_resolve_SOURCES = \
 	src/resolve/dns_type-from-name.h \
