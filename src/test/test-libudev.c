@@ -22,14 +22,14 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
-#include "libudev.h"
+#include <libudev.h>
 
-#include "fd-util.h"
-#include "log.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "udev-util.h"
-#include "util.h"
+#include "basic/fd-util.h"
+#include "basic/log.h"
+#include "basic/stdio-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
+#include "shared/udev-util.h"
 
 static void print_device(struct udev_device *device) {
         const char *str;

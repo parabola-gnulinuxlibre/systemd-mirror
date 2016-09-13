@@ -19,10 +19,10 @@
 
 #include <string.h>
 
-#include "macro.h"
-#include "replace-var.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/replace-var.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 static char *lookup(const char *variable, void *userdata) {
         return strjoin("<<<", variable, ">>>", NULL);

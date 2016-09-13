@@ -20,15 +20,15 @@
 #include <net/if_arp.h>
 #include <string.h>
 
-#include "macro.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 static const struct arphrd_name* lookup_arphrd(register const char *str, register unsigned int len);
 
-#include "arphrd-from-name.h"
-#include "arphrd-list.h"
-#include "arphrd-to-name.h"
+#include "basic/arphrd-from-name.h"
+#include "basic/arphrd-list.h"
+#include "basic/arphrd-to-name.h"
 
 int main(int argc, const char *argv[]) {
 
