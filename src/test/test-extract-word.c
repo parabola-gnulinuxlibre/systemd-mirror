@@ -21,9 +21,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "extract-word.h"
-#include "log.h"
-#include "string-util.h"
+#include "basic/extract-word.h"
+#include "basic/log.h"
+#include "basic/string-util.h"
 
 static void test_extract_first_word(void) {
         const char *p, *original;
