@@ -23,9 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-rootbin_PROGRAMS += \
-	journalctl
-
 # using _CFLAGS = in the conditional below would suppress AM_CFLAGS
 journalctl_CFLAGS = \
 	$(AM_CFLAGS)
@@ -48,6 +45,9 @@ journalctl_CFLAGS += \
 journalctl_LDADD += \
 	$(QRENCODE_LIBS)
 endif # HAVE_QRENCODE
+
+rootbin_PROGRAMS += \
+	journalctl
 
 nodist_systemunit_DATA += \
 	units/systemd-journal-flush.service \

@@ -40,6 +40,6 @@ dist_bashcompletion_data += \
 dist_zshcompletion_data += \
 	shell-completion/zsh/_hostnamectl
 
-endif
+endif # ENABLE_HOSTNAMED
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

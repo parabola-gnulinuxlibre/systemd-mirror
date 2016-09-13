@@ -23,6 +23,17 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+systemd_logind_SOURCES = \
+	$(_liblogind_core_la_SOURCES) \
+	src/login/logind.c \
+	src/login/logind.h
+
+nodist_systemd_logind_SOURCES = \
+	src/login/logind-gperf.c
+
+systemd_logind_LDADD = \
+	libshared.la
+
 _liblogind_core_la_SOURCES = \
 	src/login/logind-core.c \
 	src/login/logind-device.c \
@@ -52,17 +63,6 @@ ifneq ($(HAVE_ACL),)
 _liblogind_core_la_SOURCES += \
 	src/login/logind-acl.c
 endif # HAVE_ACL
-
-systemd_logind_SOURCES = \
-	$(_liblogind_core_la_SOURCES) \
-	src/login/logind.c \
-	src/login/logind.h
-
-nodist_systemd_logind_SOURCES = \
-	src/login/logind-gperf.c
-
-systemd_logind_LDADD = \
-	libshared.la
 
 rootlibexec_PROGRAMS += \
 	systemd-logind

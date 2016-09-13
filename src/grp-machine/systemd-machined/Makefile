@@ -23,17 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-_libmachine_core_la_SOURCES = \
-	src/machine/machine.c \
-	src/machine/machine.h \
-	src/machine/machined-dbus.c \
-	src/machine/machine-dbus.c \
-	src/machine/machine-dbus.h \
-	src/machine/image-dbus.c \
-	src/machine/image-dbus.h \
-	src/machine/operation.c \
-	src/machine/operation.h
-
 systemd_machined_SOURCES = \
 	$(_libmachine_core_la_SOURCES) \
 	src/machine/machined.c \
@@ -46,6 +35,24 @@ systemd_machined_LDADD = \
 
 rootlibexec_PROGRAMS += \
 	systemd-machined
+
+_libmachine_core_la_SOURCES = \
+	src/machine/machine.c \
+	src/machine/machine.h \
+	src/machine/machined-dbus.c \
+	src/machine/machine-dbus.c \
+	src/machine/machine-dbus.h \
+	src/machine/image-dbus.c \
+	src/machine/image-dbus.h \
+	src/machine/operation.c \
+	src/machine/operation.h
+
+test_machine_tables_SOURCES = \
+	$(_libmachine_core_la_SOURCES) \
+	src/machine/test-machine-tables.c
+
+tests += \
+	test-machine-tables
 
 nodist_systemunit_DATA += \
 	units/systemd-machined.service
@@ -76,12 +83,5 @@ polkitpolicy_in_files += \
 
 EXTRA_DIST += \
 	units/systemd-machined.service.in
-
-test_machine_tables_SOURCES = \
-	$(_libmachine_core_la_SOURCES) \
-	src/machine/test-machine-tables.c
-
-tests += \
-	test-machine-tables
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

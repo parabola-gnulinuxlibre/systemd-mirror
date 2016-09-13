@@ -43,10 +43,10 @@ nodist_systemunit_DATA += \
 endif # ENABLE_HIBERNATE
 
 dist_systemunit_DATA += \
-	units/suspend.target \
+	units/suspend.target
 
 nodist_systemunit_DATA += \
-	units/systemd-suspend.service \
+	units/systemd-suspend.service
 
 EXTRA_DIST += \
 	units/systemd-suspend.service.in \

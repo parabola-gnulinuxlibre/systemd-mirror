@@ -23,22 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_IMPORTD),)
-
-ifneq ($(HAVE_LIBCURL),)
-ifneq ($(HAVE_XZ),)
-ifneq ($(HAVE_ZLIB),)
-ifneq ($(HAVE_BZIP2),)
-ifneq ($(HAVE_GCRYPT),)
-
-endif # HAVE_GCRYPT
-endif # HAVE_BZIP2
-endif # HAVE_ZLIB
-endif # HAVE_XZ
-endif # HAVE_LIBCURL
-
-endif # ENABLE_IMPORTD
-
 nested.subdirs += libimport
 nested.subdirs += systemd-export
 nested.subdirs += systemd-import

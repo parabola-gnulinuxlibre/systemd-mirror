@@ -7,8 +7,6 @@
 
 # See tmpfiles.d(5) for details
 
-# Clear tmp directories separately, to make them easier to override
-
 # Exclude namespace mountpoints created with PrivateTmp=yes
 x /tmp/systemd-private-%b-*
 X /tmp/systemd-private-%b-*/tmp

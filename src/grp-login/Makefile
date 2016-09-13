@@ -23,7 +23,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(ENABLE_LOGIND),)
 test_login_SOURCES = \
 	src/libsystemd/sd-login/test-login.c
 
@@ -55,8 +54,6 @@ manual_tests += \
 tests += \
 	test-login-tables \
 	test-login-shared
-
-endif # ENABLE_LOGIND
 
 nested.subdirs += loginctl
 nested.subdirs += pam_systemd
