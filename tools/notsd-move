@@ -706,6 +706,41 @@ breakup_makefile() (
 	    src/libsystemd/src/Makefile \
 	    src/libsystemd/src/sd-journal/Makefile \
 	    src/grp-udev/libudev-core/Makefile
+
+	ln -sT ../grp-system/libcore/mount-setup.h src/systemd-remount-fs/mount-setup.h
+	ln -sT ../grp-system/libcore/mount-setup.c src/systemd-remount-fs/mount-setup.c
+	ln -sT ../libcore/mount-setup.h src/grp-system/systemd-shutdown/mount-setup.h
+	ln -sT ../libcore/mount-setup.c src/grp-system/systemd-shutdown/mount-setup.c
+	ln -sT ../libcore/killall.h src/grp-system/systemd-shutdown/killall.h
+	ln -sT ../libcore/killall.c src/grp-system/systemd-shutdown/killall.c
+	ln -sT ../../libcore/mount-setup.h src/grp-system/grp-utils/systemd-fstab-generator/mount-setup.h
+	ln -sT ../../libcore/mount-setup.c src/grp-system/grp-utils/systemd-fstab-generator/mount-setup.c
+	ln -sT ../grp-system/libcore/mount-setup.h src/systemd-nspawn/mount-setup.h
+	ln -sT ../grp-system/libcore/loopback-setup.h src/systemd-nspawn/loopback-setup.h
+	ln -sT ../grp-system/libcore/loopback-setup.c src/systemd-nspawn/loopback-setup.c
+	ln -sT ../grp-system/libcore/machine-id-setup.h src/systemd-nspawn/machine-id-setup.h
+	ln -sT ../grp-system/libcore/machine-id-setup.c src/systemd-nspawn/machine-id-setup.c
+	ln -sT ../grp-system/libcore/mount-setup.c src/systemd-nspawn/mount-setup.c
+	ln -sT ../../../libsystemd/include/systemd/_sd-common.h src/libsystemd-network/include/systemd-network/_sd-common.h
+	ln -sT ../../libsystemd/include/systemd/_sd-common.h src/grp-utils/systemd-path/_sd-common.h
+	ln -sT ../../grp-login/systemd-logind/logind-acl.h src/grp-udev/libudev-core/logind-acl.h
+	ln -sT ../../libsystemd/src/sd-login/sd-login.c src/grp-udev/libudev-core/sd-login.c
+	ln -sT ../../grp-login/systemd-logind/logind-acl.c src/grp-udev/libudev-core/logind-acl.c
+	ln -sT ../../../libshared/include/shared/gcrypt-util.h src/libsystemd/src/sd-journal/gcrypt-util.h
+	ln -sT ../../../libshared/src/gcrypt-util.c src/libsystemd/src/sd-journal/gcrypt-util.c
+	ln -sT ../grp-system/libcore/machine-id-setup.h src/systemd-machine-id-setup/machine-id-setup.h
+	ln -sT ../grp-system/libcore/machine-id-setup.c src/systemd-machine-id-setup/machine-id-setup.c
+
+	ln -sT ../subdir.mk src/libsystemd/src/sd-network/Makefile
+	ln -sT ../subdir.mk src/libsystemd/src/sd-bus/Makefile
+	ln -sT ../subdir.mk src/libsystemd/src/sd-event/Makefile
+	ln -sT ../subdir.mk src/libsystemd/src/sd-login/Makefile
+	ln -sT ../subdir.mk src/libsystemd/src/sd-resolve/Makefile
+	ln -sT ../subdir.mk src/libsystemd/src/sd-daemon/Makefile
+	ln -sT ../subdir.mk src/libsystemd/src/sd-netlink/Makefile
+	ln -sT ../subdir.mk src/libsystemd/src/sd-id128/Makefile
+	ln -sT ../subdir.mk src/libsystemd/src/sd-hwdb/Makefile
+	ln -sT ../subdir.mk src/libsystemd/src/sd-device/Makefile
 )
 
 fixup_makefile() {

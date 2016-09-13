@@ -1,25 +1,45 @@
 #!/usr/bin/env bash
 
+# The reason we do `find`/`while read`-loops instead of `find -exec` commands
+# is that we want errors from the inner loop to bubble up.
+
 fixup_makefiles() (
-	find -type f -name Makefile|while read -r filename; do
-		sed -r -i "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="${filename%/*}" config.mk)|" "$filename"
+	find "$@" -type f -name Makefile | while read -r filename; do
+		{
+			<"$filename" sed -r \
+			 -e "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="$(dirname -- "$filename")" config.mk)|" \
+			 -e '/^nested\.subdirs/d' \
+			 -e '/^include \$\(topsrcdir\)\/build-aux\/Makefile\.tail\.mk$/d'
+			echo
+			find "$(dirname "$filename")" -mindepth 2 -maxdepth 2 -name Makefile -print0 |
+			    xargs -r0 dirname -z -- |
+			    xargs -r0 basename -a -z |
+			    xargs -r0 printf 'nested.subdirs += %s\n' | sort
+			echo
+			echo 'include $(topsrcdir)/build-aux/Makefile.tail.mk'
+		} | cat -s | build-aux/write-ifchanged "$filename"
 	done
 )
 
 fixup_includes() (
-        find $(find . -type d -name include) -type d | while read -r dir; do
-                lib="${dir##*/}"
-                pushd "$dir"
-                find . -type f -exec sed -ri -e "s|$lib/||" -- {} +
-                popd
-        done
+	find $(find . -type d -name include) -type d | while read -r dir; do
+		lib="${dir##*/}"
+		pushd "$dir" >/dev/null
+		find . -type f -exec sed -ri -e "s|$lib/||" -- {} +
+		popd >/dev/null
+	done
 
-        find src \( -name '*.h' -o -name '*.c' \) -type f -exec "$0"--includes {} \;
+	find "$@" \( -name '*.h' -o -name '*.c' -o -name '*.gperf' \) -type f | while read -r filename; do
+		"$0"--includes "$filename"
+	done
 )
 
 main() {
-        fixup_makefiles
-        fixup_includes
+	set -e
+	set -o pipefail
+	export LC_COLLATE=C
+	fixup_makefiles "$@"
+	fixup_includes "$@"
 }
 
 main "$@"

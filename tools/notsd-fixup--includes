@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 panic() {
-        >&2 echo panic
-        exit 2
+	>&2 echo panic
+	exit 2
 }
 
 out() {
-        printf '%q ' "$@"
+	printf '%q ' "$@"
 }
 
 # system
@@ -15,201 +15,226 @@ out() {
 # protected
 # private
 classify() {
-        local path=$1
-        if [[ "$path" = linux/* ]]; then
-                out linux "$path"
-        elif [[ -f "${current_file%/*}/${path}" ]]; then
-                out private "$path"
-        elif [[ "$path" != systemd/* ]] &&
-             [[ "$path" != libudev.h ]] &&
-             cpp -include "$path" <<<'' &>/dev/null;
-        then
-                out system "$path"
-        else
-                case "$path" in
-                        asm/sgidefs.h|dbus/dbus.h|efi.h|efilib.h|gio/gio.h|glib.h|libmount.h)
-                                out system "$path"
-                                ;;
-                        util.h|*/util.h)
-                                if [[ "$current_file" = */systemd-boot/* ]]; then
-                                        out private util.h
-                                else
-                                        out protected basic/util.h
-                                fi
-                                ;;
-                        *)
-                                file=$(find src -type f -name "${path##*/}")
-                                if [[ -f "$file" ]]; then
-                                        case "$file" in
-                                                */src/*)
-                                                        if [[ "${current_file%/*}" = "${file%/*}" ]]; then
-                                                                out private "${file##*/}"
-                                                        else
-                                                                out protected "${file##*/src/}"
-                                                        fi
-                                                        ;;
-                                                */libsystemd/include/*|*/libudev/include/*)
-                                                        out public "${file##*/include/}"
-                                                        ;;
-                                                */include/*)
-                                                        out protected "${file##*/include/}"
-                                                        ;;
-                                                *)
-                                                        if [[ "${current_file%/*}" = "${file%/*}" ]]; then
-                                                                out private "${file##*/}"
-                                                        else
-                                                                out protected "${file##*/}"
-                                                        fi
-                                                        ;;
-                                        esac
-                                else
-                                        >&2 printf 'Cannot figure out: %q\n' "$path"
-                                        exit 2
-                                fi
-                                ;;
-                esac
-        fi
+	local path=$1
+	if [[ "$path" = linux/* ]]; then
+		out linux "$path"
+	elif [[ -f "${current_file%/*}/${path}" ]]; then
+		out private "$path"
+	elif [[ "$path" != systemd/* ]] &&
+	     [[ "$path" != libudev.h ]] &&
+	     cpp -include "$path" <<<'' &>/dev/null; then
+		out system "$path"
+	else
+		case "$path" in
+			*-to-name.h|*-from-name.h)
+				base="${path##*/}"
+				base="${base%-to-name.h}"
+				base="${base%-from-name.h}"
+				case "$base" in
+					dns_type)	     d=src/grp-resolve/systemd-resolved;;
+					keyboard-keys)	     d=src/grp-udev/libudev-core;;
+					af|arphrd|cap|errno) d=src/libbasic/include/basic;;
+					audit_type)	     d=src/libsystemd/src/sd-journal;;
+					*)
+						>&2 printf 'Unknown gperf base: %q\n' "$base"
+						>&2 printf 'Cannot figure out: %q\n' "$path"
+						exit 2
+						;;
+				esac
+				file="$d/${path##*/}"
+				if [[ "$current_file" = "$d"/* ]]; then
+					out private "${file##*/}"
+				elif [[ "$file" = */include/* ]]; then
+					out protected "${file##*/include/}"
+				else
+					out protected "${file##*/}"
+				fi
+				;;
+			asm/sgidefs.h|dbus/dbus.h|efi.h|efilib.h|gio/gio.h|glib.h|libmount.h)
+				out system "$path"
+				;;
+			util.h|*/util.h)
+				if [[ "$current_file" = */systemd-boot/* ]]; then
+					out private util.h
+				else
+					out protected basic/util.h
+				fi
+				;;
+			*)
+				file=$(find src -type f -name "${path##*/}")
+				if [[ -f "$file" ]]; then
+					case "$file" in
+						*/src/*)
+							if [[ "${current_file%/*}" = "${file%/*}" ]]; then
+								out private "${file##*/}"
+							else
+								out protected "${file##*/src/}"
+							fi
+							;;
+						*/libsystemd/include/*|*/libudev/include/*)
+							out public "${file##*/include/}"
+							;;
+						*/include/*)
+							out protected "${file##*/include/}"
+							;;
+						*)
+							if [[ "${current_file%/*}" = "${file%/*}" ]]; then
+								out private "${file##*/}"
+							else
+								out protected "${file##*/}"
+							fi
+							;;
+					esac
+				else
+					>&2 printf 'Cannot figure out: %q\n' "$path"
+					exit 2
+				fi
+				;;
+		esac
+	fi
 }
 
 phase=phase0
 hook=:
 
 phase0() {
-        phase=phase0
-        hook=:
-        local line="$1"
-        case "$line" in
-                '#include'*|'typedef '*';')
-                        phase1 "$line"
-                        ;;
-                *)
-                        printf '%s\n' "$line"
-                        ;;
-        esac
+	phase=phase0
+	hook=:
+	local line="$1"
+	case "$line" in
+		'#include'*|'typedef '*';')
+			phase1 "$line"
+			;;
+		*)
+			printf '%s\n' "$line"
+			;;
+	esac
 }
 
-phase1_tail=
-system=()
-linux=()
-public=()
-protected=()
-typedef=(); typedef_last=true
-private=()
+phase1_init() {
+	phase1_tail=
+	system=()
+	linux=()
+	public=()
+	protected=()
+	typedef=(); typedef_last=true
+	private=()
+}
+phase1_init
 phase1_flush() {
-        local b=:
-        if [[ ${#system[@]} -gt 0 ]]; then
-                printf '%s\n' "${system[@]}" | sort -u
-                b=echo
-        fi
-        if [[ ${#linux[@]} -gt 0 ]]; then
-                $b
-                printf '%s\n' "${linux[@]}"
-                b=echo
-        fi
-        if [[ ${#public[@]} -gt 0 ]]; then
-                $b
-                printf '%s\n' "${public[@]}" | sort -u
-                b=echo
-        fi
-        if [[ ${#protected[@]} -gt 0 ]]; then
-                $b
-                printf '%s\n' "${protected[@]}" | sort -u
-                b=echo
-        fi
-        if [[ ${#typedef[@]} -gt 0 ]] && ! $typedef_last; then
-                $b
-                printf '%s\n' "${typedef[@]}" | sort -u
-                b=echo
-        fi
-        if [[ ${#private[@]} -gt 0 ]]; then
-                $b
-                printf '%s\n' "${private[@]}" | sort -u
-                b=echo
-        fi
-        if [[ ${#typedef[@]} -gt 0 ]] && $typedef_last; then
-                $b
-                printf '%s\n' "${typedef[@]}"
-        fi
-        printf '%s' "$phase1_tail"
+	local b=:
+	if [[ ${#system[@]} -gt 0 ]]; then
+		printf '%s\n' "${system[@]}" | sort -u
+		b=echo
+	fi
+	if [[ ${#linux[@]} -gt 0 ]]; then
+		$b
+		printf '%s\n' "${linux[@]}"
+		b=echo
+	fi
+	if [[ ${#public[@]} -gt 0 ]]; then
+		$b
+		printf '%s\n' "${public[@]}" | sort -u
+		b=echo
+	fi
+	if [[ ${#protected[@]} -gt 0 ]]; then
+		$b
+		printf '%s\n' "${protected[@]}" | sort -u
+		b=echo
+	fi
+	if [[ ${#typedef[@]} -gt 0 ]] && ! $typedef_last; then
+		$b
+		printf '%s\n' "${typedef[@]}" | sort -u
+		b=echo
+	fi
+	if [[ ${#private[@]} -gt 0 ]]; then
+		$b
+		printf '%s\n' "${private[@]}" | sort -u
+		b=echo
+	fi
+	if [[ ${#typedef[@]} -gt 0 ]] && $typedef_last; then
+		$b
+		printf '%s\n' "${typedef[@]}"
+	fi
+	printf '%s' "$phase1_tail"
+	phase1_init
 }
 phase1() {
-        phase=phase1
-        hook=phase1_flush
-        local line="$1"
-        case "$line" in
-                '')
-                        phase1_tail+=$'\n'
-                        ;;
-                '#include'*)
-                        phase1_tail=''
-                        local re='^#include [<"]([^">]*)[">](.*)'
-                        if [[ "$line" =~ $re ]]; then
-                                IFS=' '
-                                local buf
-                                buf="$(classify "${BASH_REMATCH[1]}")" || panic
-                                read -r class path <<<"$buf"
-                                case "$class" in
-                                        system)
-                                                printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
-                                                system+=("$line")
-                                                ;;
-                                        linux)
-                                                printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
-                                                linux+=("$line")
-                                                ;;                                                
-                                        public)
-                                                printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
-                                                public+=("$line")
-                                                ;;
-                                        protected)
-                                                printf -v line '#include "%s"%s' "$path" "${BASH_REMATCH[2]}"
-                                                protected+=("$line")
-                                                ;;
-                                        private)
-                                                if [[ ${#typedef[@]} -gt 0 ]]; then
-                                                        typedef_last=false
-                                                fi
-                                                printf -v line '#include "%s"%s' "$path" "${BASH_REMATCH[2]}"
-                                                private+=("$line")
-                                                ;;
-                                esac
-                        else
-                                panic
-                        fi
-                        ;;
-                'typedef '*';')
-                        phase1_tail=''
-                        typedef+=("$line")
-                        ;;
-                *)
-                        phase1_flush
-                        phase2 "$line"
-                        ;;
-        esac
-}
-
-phase2() {
-        phase=phase2
-        hook=:
-        local line="$1"
-        printf '%s\n' "$line"
-        cat
+	phase=phase1
+	hook=phase1_flush
+	local line="$1"
+	case "$line" in
+		'')
+			phase1_tail+=$'\n'
+			;;
+		'#include'*)
+			phase1_tail=''
+			local re='^#include [<"]([^">]*)[">](.*)'
+			if [[ "$line" =~ $re ]]; then
+				IFS=' '
+				local buf
+				buf="$(classify "${BASH_REMATCH[1]}")" || panic
+				read -r class path <<<"$buf"
+				case "$class" in
+					system)
+						printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
+						system+=("$line")
+						;;
+					linux)
+						printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
+						linux+=("$line")
+						;;
+					public)
+						printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
+						public+=("$line")
+						;;
+					protected)
+						printf -v line '#include "%s"%s' "$path" "${BASH_REMATCH[2]}"
+						protected+=("$line")
+						;;
+					private)
+						if [[ ${#typedef[@]} -gt 0 ]]; then
+							typedef_last=false
+						fi
+						printf -v line '#include "%s"%s' "$path" "${BASH_REMATCH[2]}"
+						private+=("$line")
+						;;
+				esac
+			else
+				panic
+			fi
+			;;
+		'typedef '*';')
+			phase1_tail=''
+			typedef+=("$line")
+			;;
+		*)
+			phase1_flush
+			phase0 "$line"
+			;;
+	esac
 }
 
 main() {
-        current_file="$1"
-        printf ' => %s\n' "$current_file"
-        set -o pipefail
-        trap 'rm -f -- "$current_file.tmp"' EXIT
-        {
-                IFS=''
-                while read -r line; do
-                        "$phase" "$line"
-                        IFS=''
-                done
-                "$hook"
-        } < "$current_file" > "$current_file.tmp"
-        mv -Tf "$current_file.tmp" "$current_file"
+	current_file="$1"
+	printf ' => %q %q\n' "$0" "$current_file"
+	set -o pipefail
+	trap 'rm -f -- "$current_file.tmp"' EXIT
+	{
+		IFS=''
+		while read -r line; do
+			"$phase" "$line"
+			IFS=''
+		done
+		"$hook"
+	} < "$current_file" > "$current_file.tmp"
+	# I specificially don't use write-ifchanged because I don't want the
+	# temporary file to have the .c suffix.
+	if cmp -s "$current_file.tmp" "$current_file"; then
+		rm -f "$current_file.tmp" || :
+	else
+		mv -Tf "$current_file.tmp" "$current_file"
+	fi
 }
 
 main "$@"
