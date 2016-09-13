@@ -6817,12 +6817,14 @@ sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
 #@src/grp-initprogs/Makefile
 #@src/grp-initprogs/grp-sleep/Makefile
 #@src/grp-journal/grp-remote/Makefile
+#@src/grp-locale/Makefile
 #@src/grp-machine/Makefile
 #@src/grp-machine/grp-import/Makefile
 #@src/grp-machine/grp-import/libimport/Makefile
 #@src/grp-resolve/Makefile
 #@src/grp-resolve/libbasic-dns/Makefile
 #@src/grp-system/Makefile
+#@src/grp-system/grp-utils/Makefile
 #@src/grp-timedate/Makefile
 #@src/grp-utils/Makefile
 #@src/libudev/Makefile
