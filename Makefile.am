@@ -2743,6 +2743,7 @@ systemgenerator_PROGRAMS += \
 
 #@auto/systemd-hibernate-resume/Makefile
 if ENABLE_HIBERNATE
+
 rootlibexec_PROGRAMS += \
 	systemd-hibernate-resume
 
@@ -2752,28 +2753,37 @@ systemd_hibernate_resume_SOURCES = \
 systemd_hibernate_resume_LDADD = \
 	libshared.la
 
+nodist_systemunit_DATA += \
+	units/systemd-hibernate-resume@.service \
+
+endif # ENABLE_HIBERNATE
+
+EXTRA_DIST += \
+	units/systemd-hibernate-resume@.service.in \
+
 #@auto/systemd-hibernate-resume-generator/Makefile
 systemd_hibernate_resume_generator_SOURCES = \
 	src/hibernate-resume/hibernate-resume-generator.c
 
 systemd_hibernate_resume_generator_LDADD = \
 	libshared.la
-endif # ENABLE_HIBERNATE
 
-#@auto/systemd-hibernate-resume/Makefile
+endif # ENABLE_HIBERNATE
+#@auto/systemd-sleep/Makefile
+if ENABLE_HIBERNATE
+
 dist_systemunit_DATA += \
 	units/hibernate.target \
 	units/hybrid-sleep.target
 
 nodist_systemunit_DATA += \
 	units/systemd-hibernate.service \
-	units/systemd-hibernate-resume@.service \
 	units/systemd-hybrid-sleep.service
+
 endif # ENABLE_HIBERNATE
 
 EXTRA_DIST += \
 	units/systemd-hibernate.service.in \
-	units/systemd-hibernate-resume@.service.in \
 	units/systemd-hybrid-sleep.service.in
 
 #@auto/bootctl/Makefile --------------------------------------------------------
@@ -4112,7 +4122,8 @@ nodist_systemunit_DATA += \
 
 nodist_pkgsysconf_DATA += \
         src/journal-remote/journal-upload.conf
-endif
+
+endif # HAVE_LIBCURL
 
 EXTRA_DIST += \
         units/systemd-journal-upload.service.in \
@@ -4476,9 +4487,12 @@ dist_systemunit_DATA += \
 	units/systemd-journald-audit.socket
 
 nodist_systemunit_DATA += \
-	units/systemd-journald.service \
+	units/systemd-journald.service
+#@auto/journalctl/Makefile
+nodist_systemunit_DATA += \
 	units/systemd-journal-flush.service \
 	units/systemd-journal-catalog-update.service
+#@auto/systemd-journald/Makefile
 
 dist_pkgsysconf_DATA += \
 	src/journal/journald.conf
@@ -4502,14 +4516,20 @@ SOCKETS_TARGET_WANTS += \
 	systemd-journald-audit.socket
 
 SYSINIT_TARGET_WANTS += \
-	systemd-journald.service \
+	systemd-journald.service
+#@auto/journalctl/Makefile
+SYSINIT_TARGET_WANTS += \
 	systemd-journal-flush.service \
 	systemd-journal-catalog-update.service
+#@auto/systemd-journald/Makefile
 
 EXTRA_DIST += \
-	units/systemd-journald.service.in \
+	units/systemd-journald.service.in
+#@auto/journalctl/Makefile
+EXTRA_DIST += \
 	units/systemd-journal-flush.service.in \
 	units/systemd-journal-catalog-update.service.in
+#@auto/systemd-journald/Makefile
 
 gperf_gperf_sources += \
 	src/journal/journald-gperf.gperf
@@ -5187,7 +5207,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-machined.service.in
 
-#@src/grp-journal/grp-remote/Makefile ------------------------------------------
+#@src/grp-machine/grp-import/Makefile ------------------------------------------
 if ENABLE_IMPORTD
 
 if HAVE_LIBCURL
