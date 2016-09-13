@@ -3758,6 +3758,7 @@ include_HEADERS += \
 rootlib_LTLIBRARIES += \
 	libudev.la
 
+#@src/libudev/src/Makefile
 libudev_la_SOURCES =\
 	src/libudev/libudev.sym \
 	src/libudev/libudev-private.h \
@@ -3771,6 +3772,7 @@ libudev_la_SOURCES =\
 	src/libudev/libudev-monitor.c \
 	src/libudev/libudev-queue.c \
 	src/libudev/libudev-hwdb.c
+#@src/libudev/Makefile
 
 libudev_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
@@ -5354,7 +5356,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-machined.service.in
 
-#@src/grp-machine/grp-import/Makefile ------------------------------------------
+# ------------------------------------------------------------------------------
 if ENABLE_IMPORTD
 
 if HAVE_LIBCURL
@@ -5514,7 +5516,7 @@ test_qcow2_LDADD = \
 	libsystemd-shared.la \
 	$(ZLIB_LIBS)
 
-#@src/grp-machine/grp-import/Makefile
+#@discard.mk
 endif # HAVE_GCRYPT
 endif # HAVE_BZIP2
 endif # HAVE_ZLIB
