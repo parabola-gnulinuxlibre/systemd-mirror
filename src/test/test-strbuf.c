@@ -20,10 +20,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "strbuf.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "basic/strbuf.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
+#include "basic/util.h"
 
 static ssize_t add_string(struct strbuf *sb, const char *s) {
         return strbuf_add_string(sb, s, strlen(s));

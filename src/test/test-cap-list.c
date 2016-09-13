@@ -19,12 +19,12 @@
 
 #include <sys/prctl.h>
 
-#include "alloc-util.h"
-#include "cap-list.h"
-#include "capability-util.h"
-#include "fileio.h"
-#include "parse-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/cap-list.h"
+#include "basic/capability-util.h"
+#include "basic/fileio.h"
+#include "basic/parse-util.h"
+#include "basic/util.h"
 
 /* verify the capability parser */
 static void test_cap_list(void) {

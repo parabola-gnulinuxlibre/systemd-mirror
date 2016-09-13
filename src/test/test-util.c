@@ -23,12 +23,12 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "def.h"
-#include "fileio.h"
-#include "fs-util.h"
-#include "rm-rf.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/def.h"
+#include "basic/fileio.h"
+#include "basic/fs-util.h"
+#include "basic/rm-rf.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 static void test_align_power2(void) {
         unsigned long i, p2;

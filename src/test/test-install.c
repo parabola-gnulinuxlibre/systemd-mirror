@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "install.h"
+#include "shared/install.h"
 
 static void dump_changes(UnitFileChange *c, unsigned n) {
         unsigned i;
