@@ -683,7 +683,7 @@ breakup_makefile() (
 				[[ "$(wc -l <<<"$d")" = 1 ]]
 				file="$d/Makefile"
 			fi
-			if ! in_array "$file" "${files[@]}"; then
+			if [[ "$file" != all ]] && ! in_array "$file" "${files[@]}"; then
 				cat .tmp.move.all > "$file"
 				files+=("$file")
 			fi
