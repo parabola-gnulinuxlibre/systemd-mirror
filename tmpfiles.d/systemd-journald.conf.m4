@@ -7,6 +7,8 @@
 
 # See tmpfiles.d(5) for details
 
+d /run/log 0755 root root -
+
 z /run/log/journal 2755 root systemd-journal - -
 Z /run/log/journal/%m ~2750 root systemd-journal - -
 m4_ifdef(`HAVE_ACL',`m4_dnl

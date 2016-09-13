@@ -43,7 +43,7 @@ SUBDIRS = . po
 # Keep the test-suite.log
 .PRECIOUS: $(TEST_SUITE_LOG) Makefile
 
-#@src/libudev/src/Makefile
+#@src/libudev/Makefile
 LIBUDEV_CURRENT=7
 LIBUDEV_REVISION=5
 LIBUDEV_AGE=6
@@ -1478,7 +1478,7 @@ src/journal/audit_type-to-name.h: src/journal/audit_type-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
 
-#@auto/systemd-resolved/Makefile
+#@auto/libbasic-dns/Makefile
 
 src/resolve/dns_type-list.txt: src/resolve/dns-type.h
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -2836,6 +2836,7 @@ systemgenerator_PROGRAMS += \
 
 #@auto/systemd-hibernate-resume/Makefile
 if ENABLE_HIBERNATE
+
 rootlibexec_PROGRAMS += \
 	systemd-hibernate-resume
 
@@ -2845,28 +2846,37 @@ systemd_hibernate_resume_SOURCES = \
 systemd_hibernate_resume_LDADD = \
 	libsystemd-shared.la
 
+nodist_systemunit_DATA += \
+	units/systemd-hibernate-resume@.service
+
+endif # ENABLE_HIBERNATE
+
+EXTRA_DIST += \
+	units/systemd-hibernate-resume@.service.in
+
 #@auto/systemd-hibernate-resume-generator/Makefile
 systemd_hibernate_resume_generator_SOURCES = \
 	src/hibernate-resume/hibernate-resume-generator.c
 
 systemd_hibernate_resume_generator_LDADD = \
 	libsystemd-shared.la
-endif # ENABLE_HIBERNATE
 
-#@auto/systemd-hibernate-resume/Makefile
+endif # ENABLE_HIBERNATE
+#@auto/systemd-sleep/Makefile
+if ENABLE_HIBERNATE
+
 dist_systemunit_DATA += \
 	units/hibernate.target \
 	units/hybrid-sleep.target
 
 nodist_systemunit_DATA += \
 	units/systemd-hibernate.service \
-	units/systemd-hibernate-resume@.service \
 	units/systemd-hybrid-sleep.service
+
 endif # ENABLE_HIBERNATE
 
 EXTRA_DIST += \
 	units/systemd-hibernate.service.in \
-	units/systemd-hibernate-resume@.service.in \
 	units/systemd-hybrid-sleep.service.in
 
 #@auto/bootctl/Makefile --------------------------------------------------------
@@ -3435,7 +3445,7 @@ tests += \
 bin_PROGRAMS += \
 	busctl
 
-#@src/libsystemd/src/Makefile
+#@src/libsystemd/src/test.mk
 test_bus_marshal_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-marshal.c
 
@@ -3740,7 +3750,8 @@ tests += \
 	test-dhcp6-client \
 	test-lldp
 
-#@src/libudev/src/Makefile -----------------------------------------------------
+#@src/libudev/Makefile ---------------------------------------------------------
+
 include_HEADERS += \
 	src/libudev/libudev.h
 
@@ -3906,10 +3917,13 @@ libudev_core_la_LIBADD = \
 if HAVE_KMOD
 libudev_core_la_SOURCES += \
 	src/udev/udev-builtin-kmod.c
-
+endif # HAVE_KMOD
+#@src/grp-udev/Makefile
+if HAVE_KMOD
 dist_udevrules_DATA += \
 	rules/80-drivers.rules
 endif # HAVE_KMOD
+#@auto/libudev-core/Makefile
 
 if HAVE_BLKID
 libudev_core_la_SOURCES += \
@@ -4199,6 +4213,7 @@ nodist_systemunit_DATA += \
 
 nodist_pkgsysconf_DATA += \
         src/journal-remote/journal-upload.conf
+
 endif # HAVE_LIBCURL
 
 EXTRA_DIST += \
@@ -4538,10 +4553,12 @@ libsystemd_journal_internal_la_SOURCES += \
 libsystemd_journal_internal_la_LIBADD += \
 	$(GCRYPT_LIBS)
 
+#@src/libsystemd/src/sd-journal/Makefile
 # fsprg.c is a drop-in file using void pointer arithmetic
 libsystemd_journal_internal_la_CFLAGS += \
 	$(GCRYPT_CFLAGS) \
 	-Wno-pointer-arith
+#@src/libsystemd/src/Makefile
 endif # HAVE_GCRYPT
 
 noinst_LTLIBRARIES += \
@@ -4566,9 +4583,12 @@ dist_systemunit_DATA += \
 	units/systemd-journald-audit.socket
 
 nodist_systemunit_DATA += \
-	units/systemd-journald.service \
+	units/systemd-journald.service
+#@auto/journalctl/Makefile
+nodist_systemunit_DATA += \
 	units/systemd-journal-flush.service \
 	units/systemd-journal-catalog-update.service
+#@auto/systemd-journald/Makefile
 
 dist_pkgsysconf_DATA += \
 	src/journal/journald.conf
@@ -4602,14 +4622,20 @@ SOCKETS_TARGET_WANTS += \
 	systemd-journald-audit.socket
 
 SYSINIT_TARGET_WANTS += \
-	systemd-journald.service \
+	systemd-journald.service
+#@auto/journalctl/Makefile
+SYSINIT_TARGET_WANTS += \
 	systemd-journal-flush.service \
 	systemd-journal-catalog-update.service
+#@auto/systemd-journald/Makefile
 
 EXTRA_DIST += \
-	units/systemd-journald.service.in \
+	units/systemd-journald.service.in
+#@auto/journalctl/Makefile
+EXTRA_DIST += \
 	units/systemd-journal-flush.service.in \
 	units/systemd-journal-catalog-update.service.in
+#@auto/systemd-journald/Makefile
 
 gperf_gperf_sources += \
 	src/journal/journald-gperf.gperf
@@ -5328,7 +5354,7 @@ polkitpolicy_in_files += \
 EXTRA_DIST += \
 	units/systemd-machined.service.in
 
-#@src/grp-journal/grp-remote/Makefile ------------------------------------------
+#@src/grp-machine/grp-import/Makefile ------------------------------------------
 if ENABLE_IMPORTD
 
 if HAVE_LIBCURL
@@ -5471,6 +5497,7 @@ dist_dbuspolicy_DATA += \
 polkitpolicy_files += \
 	src/import/org.freedesktop.import1.policy
 
+#@auto/libimport/Makefile
 manual_tests += \
 	test-qcow2
 
@@ -5487,6 +5514,7 @@ test_qcow2_LDADD = \
 	libsystemd-shared.la \
 	$(ZLIB_LIBS)
 
+#@src/grp-machine/grp-import/Makefile
 endif # HAVE_GCRYPT
 endif # HAVE_BZIP2
 endif # HAVE_ZLIB
@@ -5494,6 +5522,7 @@ endif # HAVE_XZ
 endif # HAVE_LIBCURL
 
 endif # ENABLE_IMPORTD
+#@auto/systemd-importd/Makefile
 
 polkitpolicy_in_files += \
 	src/import/org.freedesktop.import1.policy.in
@@ -5659,6 +5688,7 @@ dist_bashcompletion_data += \
 dist_zshcompletion_data += \
 	shell-completion/zsh/_systemd-resolve
 
+#@auto/libbasic-dns/Makefile
 tests += \
 	test-dns-packet \
 	test-resolve-tables \
@@ -5734,11 +5764,14 @@ test_dnssec_complex_SOURCES = \
 test_dnssec_complex_LDADD = \
 	libsystemd-shared.la
 
+#@auto/systemd-resolved/Makefile
 endif # ENABLE_RESOLVED
+#@auto/libbasic-dns/Makefile
 
 gperf_txt_sources += \
 	src/resolve/dns_type-list.txt
 
+#@auto/systemd-resolved/Makefile
 gperf_gperf_sources += \
 	src/resolve/resolved-gperf.gperf
 
@@ -5910,6 +5943,7 @@ tests += \
 	test-network \
 	test-network-tables
 
+#@auto/systemd-networkd/Makefile
 dist_systemunit_DATA += \
 	units/systemd-networkd.socket
 
@@ -5937,6 +5971,7 @@ SYSTEM_UNIT_ALIASES += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.network1.busname
 
+#@src/grp-network/Makefile
 endif # ENABLE_NETWORKD
 
 gperf_gperf_sources += \
@@ -5949,9 +5984,9 @@ EXTRA_DIST += \
 	units/systemd-networkd-wait-online.service.in \
 	test/networkd-test.py
 
-#@src/grp-login/Makefile -------------------------------------------------------
+#@auto/systemd-logind/Makefile -------------------------------------------------
 if ENABLE_LOGIND
-#@src/grp-login/systemd-logind/Makefile
+
 systemd_logind_SOURCES = \
 	src/login/logind.c \
 	src/login/logind.h
@@ -6730,7 +6765,7 @@ test-libsystemd-sym.c: \
 		src/systemd/sd-event.h
 	$(generate-sym-test)
 
-#@src/libudev/src/Makefile
+#@src/libudev/Makefile
 test-libudev-sym.c: \
 		src/libudev/libudev.sym \
 		src/udev/udev.h
@@ -6742,7 +6777,7 @@ nodist_test_libsystemd_sym_SOURCES = \
 test_libsystemd_sym_LDADD = \
 	libsystemd.la
 
-#@src/libudev/src/Makefile
+#@src/libudev/Makefile
 nodist_test_libudev_sym_SOURCES = \
 	test-libudev-sym.c
 test_libudev_sym_CFLAGS = \
