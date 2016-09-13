@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include "basic/util.h"
 #include "hostname-setup.h"
-#include "util.h"
 
 int main(int argc, char* argv[]) {
         int r;
