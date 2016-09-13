@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "macro.h"
-#include "string-util.h"
-#include "strv.h"
+#include "basic/alloc-util.h"
+#include "basic/macro.h"
+#include "basic/string-util.h"
+#include "basic/strv.h"
 
 static void test_string_erase(void) {
         char *x;

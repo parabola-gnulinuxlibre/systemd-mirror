@@ -20,10 +20,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "macro.h"
+#include "basic/alloc-util.h"
+#include "basic/fd-util.h"
+#include "basic/fileio.h"
+#include "basic/macro.h"
 
 static void test_close_many(void) {
         int fds[3];
