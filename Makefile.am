@@ -739,9 +739,8 @@ EXTRA_DIST += \
 
 @INTLTOOL_POLICY_RULE@
 
-# ------------------------------------------------------------------------------
+#@build-aux/Makefile.each.tail/70-man.mk ---------------------------------------
 
-#@build-aux/Makefile.each.tail/70-sd.mk
 MANPAGES =
 MANPAGES_ALIAS =
 
@@ -768,7 +767,6 @@ noinst_DATA += \
 	docs/html/man
 endif # ENABLE_MANPAGES
 
-#@discard.mk
 CLEANFILES += \
 	$(man_MANS) \
 	$(HTML_FILES) \
@@ -2603,10 +2601,12 @@ nodist_sysusers_DATA = \
 	sysusers.d/systemd.conf \
 	sysusers.d/basic.conf
 
+#@discard.mk
 if HAVE_REMOTE
 nodist_sysusers_DATA += \
 	sysusers.d/systemd-remote.conf
 endif # HAVE_REMOTE
+#@auto/systemd-sysusers/Makefile
 
 INSTALL_DIRS += \
 	$(sysusersdir)
@@ -4082,6 +4082,7 @@ systemd_journald_LDADD = \
 	libjournal-core.la \
 	libshared.la
 
+#@auto/systemd-cat/Makefile
 systemd_cat_SOURCES = \
 	src/journal/cat.c
 
@@ -4460,12 +4461,15 @@ noinst_LTLIBRARIES += \
 rootlibexec_PROGRAMS += \
 	systemd-journald
 
+#@auto/journalctl/Makefile
 rootbin_PROGRAMS += \
 	journalctl
 
+#@auto/systemd-cat/Makefile
 bin_PROGRAMS += \
 	systemd-cat
 
+#@auto/systemd-journald/Makefile
 dist_systemunit_DATA += \
 	units/systemd-journald.socket \
 	units/systemd-journald-dev-log.socket \
@@ -4874,7 +4878,7 @@ dist_systemunit_DATA_busnames += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.systemd1.busname
 
-#@src/grp-locale/Makefile ------------------------------------------------------
+#@auto/systemd-localed/Makefile ------------------------------------------------
 if ENABLE_LOCALED
 systemd_localed_SOURCES = \
 	src/locale/localed.c
@@ -4915,6 +4919,9 @@ dist_pkgdata_DATA = \
 	src/locale/kbd-model-map \
 	src/locale/language-fallback-map
 
+endif # ENABLE_LOCALED
+#@auto/localectl/Makefile
+if ENABLE_LOCALED
 localectl_SOURCES = \
 	src/locale/localectl.c
 
@@ -4930,6 +4937,7 @@ dist_bashcompletion_data += \
 dist_zshcompletion_data += \
 	shell-completion/zsh/_localectl
 endif # ENABLE_LOCALED
+#@auto/systemd-localed/Makefile
 
 .PHONY: update-kbd-model-map
 
@@ -5473,7 +5481,7 @@ libnss_resolve_la_LIBADD = \
 lib_LTLIBRARIES += \
 	libnss_resolve.la
 
-#@auto/systemd-resolved/Makefile
+#@auto/systemd-resolve/Makefile
 systemd_resolve_SOURCES = \
 	src/resolve/resolve-tool.c \
 	$(basic_dns_sources) \
@@ -5903,7 +5911,7 @@ dist_pamconf_DATA = \
 EXTRA_DIST += \
 	src/login/systemd-user.m4
 endif # HAVE_PAM
-#@src/grp-login/Makefile
+#@auto/systemd-logind/Makefile
 
 nodist_systemunit_DATA += \
 	units/systemd-logind.service
@@ -6232,28 +6240,36 @@ EXTRA_DIST += \
 	man/custom-man.xsl
 
 # ------------------------------------------------------------------------------
+#@auto/systemd-sysv-generator/Makefile
 if HAVE_SYSV_COMPAT
 sysvinit_DATA = \
 	docs/sysvinit/README
 
-varlog_DATA = \
-	docs/var-log/README
-
 docs/sysvinit/README: docs/sysvinit/README.in
 	$(SED_PROCESS)
+
+CLEANFILES += \
+	docs/sysvinit/README
+endif # HAVE_SYSV_COMPAT
+
+EXTRA_DIST += \
+	docs/sysvinit/README.in
+#@src/grp-journal/Makefile
+if HAVE_SYSV_COMPAT
+
+varlog_DATA = \
+	docs/var-log/README
 
 docs/var-log/README: docs/var-log/README.in
 	$(SED_PROCESS)
 
 CLEANFILES += \
-	docs/sysvinit/README \
 	docs/var-log/README
 endif # HAVE_SYSV_COMPAT
 
 EXTRA_DIST += \
-	docs/sysvinit/README.in \
 	docs/var-log/README.in
-
+#@discard.mk
 SOCKETS_TARGET_WANTS += \
 	systemd-initctl.socket
 
@@ -6590,8 +6606,6 @@ list-keys:
 add-key:
 	gpg --verbose --no-options --no-default-keyring --no-auto-key-locate --batch --trust-model=always --keyring=$(srcdir)/src/import/import-pubring.gpg --import -
 #@Makefile
-nested.subdirs += src
-
 # intltoolize
 files.src.gen += m4/intltool.m4
 files.src.gen += po/Makefile.in.in
@@ -6611,108 +6625,28 @@ files.src.gen += m4/ltversion.m4
 files.src.gen += m4/lt~obsolete.m4
 files.src.gen += config.h.in
 files.src.gen += configure
-
-#@src/Makefile
-nested.subdirs += busctl
-nested.subdirs += grp-boot
-nested.subdirs += grp-coredump
-nested.subdirs += grp-hostname
-nested.subdirs += grp-initprogs
-nested.subdirs += grp-journal
-nested.subdirs += grp-locale
-nested.subdirs += grp-login
-nested.subdirs += grp-machine
-nested.subdirs += grp-network
-nested.subdirs += grp-resolve
-nested.subdirs += grp-system
-nested.subdirs += grp-timedate
-nested.subdirs += grp-udev
-nested.subdirs += grp-utils
-nested.subdirs += libbasic
-nested.subdirs += libfirewall
-nested.subdirs += libshared
-nested.subdirs += libsystemd
-nested.subdirs += libsystemd-network
-nested.subdirs += libudev
-nested.subdirs += nss-myhostname
-nested.subdirs += systemd-ask-password
-nested.subdirs += systemd-cgls
-nested.subdirs += systemd-cgroups-agent
-nested.subdirs += systemd-cgtop
-nested.subdirs += systemd-cryptsetup
-nested.subdirs += systemd-dbus1-generator
-nested.subdirs += systemd-debug-generator
-nested.subdirs += systemd-getty-generator
-nested.subdirs += systemd-gpt-auto-generator
-nested.subdirs += systemd-initctl
-nested.subdirs += systemd-machine-id-setup
-nested.subdirs += systemd-nspawn
-nested.subdirs += systemd-rc-local-generator
-nested.subdirs += systemd-remount-fs
-nested.subdirs += systemd-reply-password
-nested.subdirs += systemd-socket-proxyd
-nested.subdirs += systemd-stdio-bridge
-nested.subdirs += systemd-system-update-generator
-nested.subdirs += systemd-timesyncd
-nested.subdirs += systemd-tty-ask-password-agent
-
-#@src/grp-initprogs/Makefile
-nested.subdirs += grp-sleep
-nested.subdirs += systemd-backlight
-nested.subdirs += systemd-binfmt
-nested.subdirs += systemd-detect-virt
-nested.subdirs += systemd-firstboot
-nested.subdirs += systemd-fsck
-nested.subdirs += systemd-modules-load
-nested.subdirs += systemd-quotacheck
-nested.subdirs += systemd-random-seed
-nested.subdirs += systemd-rfkill
-nested.subdirs += systemd-sysctl
-nested.subdirs += systemd-sysusers
-nested.subdirs += systemd-tmpfiles
-nested.subdirs += systemd-update-done
-nested.subdirs += systemd-update-utmp
-nested.subdirs += systemd-user-sessions
-nested.subdirs += systemd-vconsole-setup
-
-#@src/grp-initprogs/grp-sleep/Makefile
-nested.subdirs += systemd-hibernate-resume
-nested.subdirs += systemd-hibernate-resume-generator
-nested.subdirs += systemd-sleep
-
-#@src/libudev/Makefile
-nested.subdirs += src
-
 #@src/libsystemd/src/subdir.mk
-systemd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
-systemd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
-
+sd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
+sd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
+#@src/grp-udev/libudev-core/net/Makefile
+sd.CPPFLAGS += $(libshared.CPPFLAGS)
+sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
+#@src/Makefile
 #@src/grp-boot/Makefile
-nested.subdirs += bootctl systemd-boot kernel-install
-
 #@src/grp-coredump/Makefile
-nested.subdirs += coredumpctl systemd-coredump
-
-#@src/grp-machine/Makefile
-nested.subdirs += machinectl systemd-machined
-nested.subdirs += nss-mymachines
-
-#@src/grp-journal/grp-remote/Makefile
-nested.subdirs += systemd-journa-gatewayd
-nested.subdirs += systemd-journa-remote
-nested.subdirs += systemd-journa-upload
-
-#@src/grp-resolve/Makefile
-nested.subdirs += systemd-resolved nss-resolve
-
-#@src/grp-system/Makefile
-nested.subdirs += systemctl systemd
-
-#@src/grp-timedate/Makefile
-nested.subdirs += timedatectl systemd-timedated
-
 #@src/grp-hostname/Makefile
-nested.subdirs += systemd-hostnamed hostnamectl
-
+#@src/grp-initprogs/Makefile
+#@src/grp-initprogs/grp-sleep/Makefile
+#@src/grp-journal/grp-remote/Makefile
+#@src/grp-machine/Makefile
+#@src/grp-machine/grp-import/Makefile
+#@src/grp-machine/grp-import/libimport/Makefile
+#@src/grp-resolve/Makefile
+#@src/grp-resolve/libbasic-dns/Makefile
+#@src/grp-system/Makefile
+#@src/grp-timedate/Makefile
+#@src/grp-utils/Makefile
+#@src/libudev/Makefile
 #@all
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk
