@@ -33,8 +33,14 @@ nodist_systemd_resolve_SOURCES = \
 	src/resolve/dns_type-from-name.h \
 	src/resolve/dns_type-to-name.h
 
+systemd_resolve_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(GCRYPT_CFLAGS)
+
 systemd_resolve_LDADD = \
-	libshared.la
+	libsystemd-shared.la \
+	$(GCRYPT_LIBS) \
+	-lm
 
 bin_PROGRAMS += \
 	systemd-resolve

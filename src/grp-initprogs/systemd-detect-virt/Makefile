@@ -28,7 +28,7 @@ systemd_detect_virt_SOURCES = \
 	src/detect-virt/detect-virt.c
 
 systemd_detect_virt_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 INSTALL_EXEC_HOOKS += \
 	systemd-detect-virt-install-hook

@@ -36,6 +36,8 @@ systemd_nspawn_SOURCES = \
 	src/nspawn/nspawn-expose-ports.h \
 	src/nspawn/nspawn-cgroup.c \
 	src/nspawn/nspawn-cgroup.h \
+	src/nspawn/nspawn-seccomp.c \
+	src/nspawn/nspawn-seccomp.h \
 	src/nspawn/nspawn-register.c \
 	src/nspawn/nspawn-register.h \
 	src/nspawn/nspawn-setuid.c \
@@ -47,9 +49,7 @@ systemd_nspawn_SOURCES = \
 	src/core/mount-setup.c \
 	src/core/mount-setup.h \
 	src/core/loopback-setup.c \
-	src/core/loopback-setup.h \
-	src/core/machine-id-setup.c \
-	src/core/machine-id-setup.h
+	src/core/loopback-setup.h
 
 nodist_systemd_nspawn_SOURCES = \
 	src/nspawn/nspawn-gperf.c
@@ -59,12 +59,17 @@ gperf_gperf_sources += \
 
 systemd_nspawn_CFLAGS = \
 	$(AM_CFLAGS) \
+	$(ACL_CFLAGS) \
 	$(BLKID_CFLAGS) \
-	$(SECCOMP_CFLAGS)
+	$(SECCOMP_CFLAGS) \
+	$(SELINUX_CFLAGS)
 
 systemd_nspawn_LDADD = \
-	libshared.la \
-	$(BLKID_LIBS)
+	libsystemd-shared.la \
+	$(ACL_LIBS) \
+	$(BLKID_LIBS) \
+	$(SECCOMP_LIBS) \
+	$(SELINUX_LIBS)
 
 ifneq ($(HAVE_LIBIPTC),)
 systemd_nspawn_LDADD += \
@@ -76,8 +81,13 @@ test_patch_uid_SOURCES = \
 	src/nspawn/nspawn-patch-uid.h \
 	src/nspawn/test-patch-uid.c
 
+test_patch_uid_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(ACL_CFLAGS)
+
 test_patch_uid_LDADD = \
-	libshared.la
+	libsystemd-shared.la \
+	$(ACL_LIBS)
 
 manual_tests += \
 	test-patch-uid

@@ -50,7 +50,6 @@ nested.subdirs += systemd-cgls
 nested.subdirs += systemd-cgroups-agent
 nested.subdirs += systemd-cgtop
 nested.subdirs += systemd-cryptsetup
-nested.subdirs += systemd-dbus1-generator
 nested.subdirs += systemd-debug-generator
 nested.subdirs += systemd-getty-generator
 nested.subdirs += systemd-gpt-auto-generator

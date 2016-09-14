@@ -66,6 +66,9 @@ EXTRA_DIST += \
 	src/core/macros.systemd.in \
 	src/core/triggers.systemd.in
 
+dist_xinitrc_SCRIPTS = \
+	xorg/50-systemd-user.sh
+
 dist_systemunit_DATA_busnames += \
 	units/org.freedesktop.systemd1.busname
 

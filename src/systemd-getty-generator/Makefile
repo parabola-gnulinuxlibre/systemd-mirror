@@ -28,7 +28,7 @@ systemd_getty_generator_SOURCES = \
 	src/getty-generator/getty-generator.c
 
 systemd_getty_generator_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 sd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
 

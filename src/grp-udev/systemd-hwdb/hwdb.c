@@ -27,7 +27,9 @@
 #include "basic/fd-util.h"
 #include "basic/fileio.h"
 #include "basic/fs-util.h"
+#include "basic/label.h"
 #include "basic/mkdir.h"
+#include "basic/selinux-util.h"
 #include "basic/strbuf.h"
 #include "basic/string-util.h"
 #include "basic/strv.h"
@@ -643,12 +645,12 @@ static int hwdb_update(int argc, char *argv[], void *userdata) {
         if (!hwdb_bin)
                 return -ENOMEM;
 
-        mkdir_parents(hwdb_bin, 0755);
+        mkdir_parents_label(hwdb_bin, 0755);
         r = trie_store(trie, hwdb_bin);
         if (r < 0)
                 return log_error_errno(r, "Failure writing database %s: %m", hwdb_bin);
 
-        return 0;
+        return label_fix(hwdb_bin, false, false);
 }
 
 static void help(void) {
@@ -731,6 +733,8 @@ int main (int argc, char *argv[]) {
         r = parse_argv(argc, argv);
         if (r <= 0)
                 goto finish;
+
+        mac_selinux_init();
 
         r = hwdb_main(argc, argv);
 

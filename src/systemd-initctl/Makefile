@@ -28,6 +28,6 @@ systemd_initctl_SOURCES = \
 	src/initctl/initctl.c
 
 systemd_initctl_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

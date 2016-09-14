@@ -28,6 +28,6 @@ systemd_run_SOURCES = \
 	src/run/run.c
 
 systemd_run_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

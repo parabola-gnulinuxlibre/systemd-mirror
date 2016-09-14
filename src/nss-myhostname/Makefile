@@ -38,7 +38,8 @@ libnss_myhostname_la_LDFLAGS = \
 	-Wl,--version-script=$(srcdir)/nss-myhostname.sym
 
 libnss_myhostname_la_LIBADD = \
-	libsystemd-internal.la
+	libsystemd-internal.la \
+	libbasic.la
 
 lib_LTLIBRARIES += \
 	libnss_myhostname.la

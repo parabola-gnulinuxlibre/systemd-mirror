@@ -29,7 +29,7 @@ systemd_user_sessions_SOURCES = \
 	src/user-sessions/user-sessions.c
 
 systemd_user_sessions_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 rootlibexec_PROGRAMS += \
 	systemd-user-sessions

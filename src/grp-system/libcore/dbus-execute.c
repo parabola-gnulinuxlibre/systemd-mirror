@@ -696,9 +696,12 @@ const sd_bus_vtable bus_exec_vtable[] = {
         SD_BUS_PROPERTY("Group", "s", NULL, offsetof(ExecContext, group), SD_BUS_VTABLE_PROPERTY_CONST),
         SD_BUS_PROPERTY("SupplementaryGroups", "as", NULL, offsetof(ExecContext, supplementary_groups), SD_BUS_VTABLE_PROPERTY_CONST),
         SD_BUS_PROPERTY("PAMName", "s", NULL, offsetof(ExecContext, pam_name), SD_BUS_VTABLE_PROPERTY_CONST),
-        SD_BUS_PROPERTY("ReadWriteDirectories", "as", NULL, offsetof(ExecContext, read_write_dirs), SD_BUS_VTABLE_PROPERTY_CONST),
-        SD_BUS_PROPERTY("ReadOnlyDirectories", "as", NULL, offsetof(ExecContext, read_only_dirs), SD_BUS_VTABLE_PROPERTY_CONST),
-        SD_BUS_PROPERTY("InaccessibleDirectories", "as", NULL, offsetof(ExecContext, inaccessible_dirs), SD_BUS_VTABLE_PROPERTY_CONST),
+        SD_BUS_PROPERTY("ReadWriteDirectories", "as", NULL, offsetof(ExecContext, read_write_paths), SD_BUS_VTABLE_PROPERTY_CONST|SD_BUS_VTABLE_HIDDEN),
+        SD_BUS_PROPERTY("ReadOnlyDirectories", "as", NULL, offsetof(ExecContext, read_only_paths), SD_BUS_VTABLE_PROPERTY_CONST|SD_BUS_VTABLE_HIDDEN),
+        SD_BUS_PROPERTY("InaccessibleDirectories", "as", NULL, offsetof(ExecContext, inaccessible_paths), SD_BUS_VTABLE_PROPERTY_CONST|SD_BUS_VTABLE_HIDDEN),
+        SD_BUS_PROPERTY("ReadWritePaths", "as", NULL, offsetof(ExecContext, read_write_paths), SD_BUS_VTABLE_PROPERTY_CONST),
+        SD_BUS_PROPERTY("ReadOnlyPaths", "as", NULL, offsetof(ExecContext, read_only_paths), SD_BUS_VTABLE_PROPERTY_CONST),
+        SD_BUS_PROPERTY("InaccessiblePaths", "as", NULL, offsetof(ExecContext, inaccessible_paths), SD_BUS_VTABLE_PROPERTY_CONST),
         SD_BUS_PROPERTY("MountFlags", "t", bus_property_get_ulong, offsetof(ExecContext, mount_flags), SD_BUS_VTABLE_PROPERTY_CONST),
         SD_BUS_PROPERTY("PrivateTmp", "b", bus_property_get_bool, offsetof(ExecContext, private_tmp), SD_BUS_VTABLE_PROPERTY_CONST),
         SD_BUS_PROPERTY("PrivateNetwork", "b", bus_property_get_bool, offsetof(ExecContext, private_network), SD_BUS_VTABLE_PROPERTY_CONST),
@@ -720,6 +723,8 @@ const sd_bus_vtable bus_exec_vtable[] = {
         SD_BUS_PROPERTY("RestrictAddressFamilies", "(bas)", property_get_address_families, 0, SD_BUS_VTABLE_PROPERTY_CONST),
         SD_BUS_PROPERTY("RuntimeDirectoryMode", "u", bus_property_get_mode, offsetof(ExecContext, runtime_directory_mode), SD_BUS_VTABLE_PROPERTY_CONST),
         SD_BUS_PROPERTY("RuntimeDirectory", "as", NULL, offsetof(ExecContext, runtime_directory), SD_BUS_VTABLE_PROPERTY_CONST),
+        SD_BUS_PROPERTY("MemoryDenyWriteExecute", "b", bus_property_get_bool, offsetof(ExecContext, memory_deny_write_execute), SD_BUS_VTABLE_PROPERTY_CONST),
+        SD_BUS_PROPERTY("RestrictRealtime", "b", bus_property_get_bool, offsetof(ExecContext, restrict_realtime), SD_BUS_VTABLE_PROPERTY_CONST),
         SD_BUS_VTABLE_END
 };
 
@@ -843,7 +848,7 @@ int bus_exec_context_set_transient_property(
                         else if (free_and_strdup(&c->user, uu) < 0)
                                 return -ENOMEM;
 
-                        unit_write_drop_in_private_format(u, mode, name, "User=%s\n", uu);
+                        unit_write_drop_in_private_format(u, mode, name, "User=%s", uu);
                 }
 
                 return 1;
@@ -862,7 +867,7 @@ int bus_exec_context_set_transient_property(
                         else if (free_and_strdup(&c->group, gg) < 0)
                                 return -ENOMEM;
 
-                        unit_write_drop_in_private_format(u, mode, name, "Group=%s\n", gg);
+                        unit_write_drop_in_private_format(u, mode, name, "Group=%s", gg);
                 }
 
                 return 1;
@@ -880,7 +885,7 @@ int bus_exec_context_set_transient_property(
                         else if (free_and_strdup(&c->syslog_identifier, id) < 0)
                                 return -ENOMEM;
 
-                        unit_write_drop_in_private_format(u, mode, name, "SyslogIdentifier=%s\n", id);
+                        unit_write_drop_in_private_format(u, mode, name, "SyslogIdentifier=%s", id);
                 }
 
                 return 1;
@@ -896,7 +901,7 @@ int bus_exec_context_set_transient_property(
 
                 if (mode != UNIT_CHECK) {
                         c->syslog_priority = (c->syslog_priority & LOG_FACMASK) | level;
-                        unit_write_drop_in_private_format(u, mode, name, "SyslogLevel=%i\n", level);
+                        unit_write_drop_in_private_format(u, mode, name, "SyslogLevel=%i", level);
                 }
 
                 return 1;
@@ -912,7 +917,7 @@ int bus_exec_context_set_transient_property(
 
                 if (mode != UNIT_CHECK) {
                         c->syslog_priority = (facility << 3) | LOG_PRI(c->syslog_priority);
-                        unit_write_drop_in_private_format(u, mode, name, "SyslogFacility=%i\n", facility);
+                        unit_write_drop_in_private_format(u, mode, name, "SyslogFacility=%i", facility);
                 }
 
                 return 1;
@@ -928,7 +933,7 @@ int bus_exec_context_set_transient_property(
 
                 if (mode != UNIT_CHECK) {
                         c->nice = n;
-                        unit_write_drop_in_private_format(u, mode, name, "Nice=%i\n", n);
+                        unit_write_drop_in_private_format(u, mode, name, "Nice=%i", n);
                 }
 
                 return 1;
@@ -953,7 +958,7 @@ int bus_exec_context_set_transient_property(
                         if (r < 0)
                                 return r;
 
-                        unit_write_drop_in_private_format(u, mode, name, "%s=%s\n", name, s);
+                        unit_write_drop_in_private_format(u, mode, name, "%s=%s", name, s);
                 }
 
                 return 1;
@@ -1008,7 +1013,7 @@ int bus_exec_context_set_transient_property(
                 if (mode != UNIT_CHECK) {
                         c->std_input = p;
 
-                        unit_write_drop_in_private_format(u, mode, name, "StandardInput=%s\n", exec_input_to_string(p));
+                        unit_write_drop_in_private_format(u, mode, name, "StandardInput=%s", exec_input_to_string(p));
                 }
 
                 return 1;
@@ -1029,7 +1034,7 @@ int bus_exec_context_set_transient_property(
                 if (mode != UNIT_CHECK) {
                         c->std_output = p;
 
-                        unit_write_drop_in_private_format(u, mode, name, "StandardOutput=%s\n", exec_output_to_string(p));
+                        unit_write_drop_in_private_format(u, mode, name, "StandardOutput=%s", exec_output_to_string(p));
                 }
 
                 return 1;
@@ -1049,7 +1054,7 @@ int bus_exec_context_set_transient_property(
                 if (mode != UNIT_CHECK) {
                         c->std_error = p;
 
-                        unit_write_drop_in_private_format(u, mode, name, "StandardError=%s\n", exec_output_to_string(p));
+                        unit_write_drop_in_private_format(u, mode, name, "StandardError=%s", exec_output_to_string(p));
                 }
 
                 return 1;
@@ -1057,7 +1062,7 @@ int bus_exec_context_set_transient_property(
         } else if (STR_IN_SET(name,
                               "IgnoreSIGPIPE", "TTYVHangup", "TTYReset",
                               "PrivateTmp", "PrivateDevices", "PrivateNetwork",
-                              "NoNewPrivileges", "SyslogLevelPrefix")) {
+                              "NoNewPrivileges", "SyslogLevelPrefix", "MemoryDenyWriteExecute", "RestrictRealtime")) {
                 int b;
 
                 r = sd_bus_message_read(message, "b", &b);
@@ -1081,8 +1086,12 @@ int bus_exec_context_set_transient_property(
                                 c->no_new_privileges = b;
                         else if (streq(name, "SyslogLevelPrefix"))
                                 c->syslog_level_prefix = b;
+                        else if (streq(name, "MemoryDenyWriteExecute"))
+                                c->memory_deny_write_execute = b;
+                        else if (streq(name, "RestrictRealtime"))
+                                c->restrict_realtime = b;
 
-                        unit_write_drop_in_private_format(u, mode, name, "%s=%s\n", name, yes_no(b));
+                        unit_write_drop_in_private_format(u, mode, name, "%s=%s", name, yes_no(b));
                 }
 
                 return 1;
@@ -1100,7 +1109,7 @@ int bus_exec_context_set_transient_property(
                         else if (free_and_strdup(&c->utmp_id, id) < 0)
                                 return -ENOMEM;
 
-                        unit_write_drop_in_private_format(u, mode, name, "UtmpIdentifier=%s\n", strempty(id));
+                        unit_write_drop_in_private_format(u, mode, name, "UtmpIdentifier=%s", strempty(id));
                 }
 
                 return 1;
@@ -1120,7 +1129,7 @@ int bus_exec_context_set_transient_property(
                 if (mode != UNIT_CHECK) {
                         c->utmp_mode = m;
 
-                        unit_write_drop_in_private_format(u, mode, name, "UtmpMode=%s\n", exec_utmp_mode_to_string(m));
+                        unit_write_drop_in_private_format(u, mode, name, "UtmpMode=%s", exec_utmp_mode_to_string(m));
                 }
 
                 return 1;
@@ -1138,7 +1147,7 @@ int bus_exec_context_set_transient_property(
                         else if (free_and_strdup(&c->pam_name, n) < 0)
                                 return -ENOMEM;
 
-                        unit_write_drop_in_private_format(u, mode, name, "PAMName=%s\n", strempty(n));
+                        unit_write_drop_in_private_format(u, mode, name, "PAMName=%s", strempty(n));
                 }
 
                 return 1;
@@ -1160,7 +1169,7 @@ int bus_exec_context_set_transient_property(
 
                         if (strv_length(l) == 0) {
                                 c->environment = strv_free(c->environment);
-                                unit_write_drop_in_private_format(u, mode, name, "Environment=\n");
+                                unit_write_drop_in_private_format(u, mode, name, "Environment=");
                         } else {
                                 e = strv_env_merge(2, c->environment, l);
                                 if (!e)
@@ -1173,7 +1182,7 @@ int bus_exec_context_set_transient_property(
                                 if (!joined)
                                         return -ENOMEM;
 
-                                unit_write_drop_in_private_format(u, mode, name, "Environment=%s\n", joined);
+                                unit_write_drop_in_private_format(u, mode, name, "Environment=%s", joined);
                         }
                 }
 
@@ -1189,7 +1198,7 @@ int bus_exec_context_set_transient_property(
 
                 if (mode != UNIT_CHECK) {
                         c->timer_slack_nsec = n;
-                        unit_write_drop_in_private_format(u, mode, name, "TimerSlackNSec=" NSEC_FMT "\n", n);
+                        unit_write_drop_in_private_format(u, mode, name, "TimerSlackNSec=" NSEC_FMT, n);
                 }
 
                 return 1;
@@ -1207,7 +1216,7 @@ int bus_exec_context_set_transient_property(
                 if (mode != UNIT_CHECK) {
                         c->oom_score_adjust = oa;
                         c->oom_score_adjust_set = true;
-                        unit_write_drop_in_private_format(u, mode, name, "OOMScoreAdjust=%i\n", oa);
+                        unit_write_drop_in_private_format(u, mode, name, "OOMScoreAdjust=%i", oa);
                 }
 
                 return 1;
@@ -1229,7 +1238,7 @@ int bus_exec_context_set_transient_property(
                         return -ENOMEM;
 
                 STRV_FOREACH(i, c->environment_files)
-                        fprintf(f, "EnvironmentFile=%s\n", *i);
+                        fprintf(f, "EnvironmentFile=%s", *i);
 
                 while ((r = sd_bus_message_enter_container(message, 'r', "sb")) > 0) {
                         const char *path;
@@ -1253,7 +1262,7 @@ int bus_exec_context_set_transient_property(
                                 if (!buf)
                                         return -ENOMEM;
 
-                                fprintf(f, "EnvironmentFile=%s\n", buf);
+                                fprintf(f, "EnvironmentFile=%s", buf);
 
                                 r = strv_consume(&l, buf);
                                 if (r < 0)
@@ -1274,7 +1283,7 @@ int bus_exec_context_set_transient_property(
                 if (mode != UNIT_CHECK) {
                         if (strv_isempty(l)) {
                                 c->environment_files = strv_free(c->environment_files);
-                                unit_write_drop_in_private(u, mode, name, "EnvironmentFile=\n");
+                                unit_write_drop_in_private(u, mode, name, "EnvironmentFile=");
                         } else {
                                 r = strv_extend_strv(&c->environment_files, l, true);
                                 if (r < 0)
@@ -1300,7 +1309,7 @@ int bus_exec_context_set_transient_property(
                 if (mode != UNIT_CHECK) {
                         if (strv_isempty(l)) {
                                 c->pass_environment = strv_free(c->pass_environment);
-                                unit_write_drop_in_private_format(u, mode, name, "PassEnvironment=\n");
+                                unit_write_drop_in_private_format(u, mode, name, "PassEnvironment=");
                         } else {
                                 _cleanup_free_ char *joined = NULL;
 
@@ -1312,14 +1321,14 @@ int bus_exec_context_set_transient_property(
                                 if (!joined)
                                         return -ENOMEM;
 
-                                unit_write_drop_in_private_format(u, mode, name, "PassEnvironment=%s\n", joined);
+                                unit_write_drop_in_private_format(u, mode, name, "PassEnvironment=%s", joined);
                         }
                 }
 
                 return 1;
 
-        } else if (STR_IN_SET(name, "ReadWriteDirectories", "ReadOnlyDirectories", "InaccessibleDirectories")) {
-
+        } else if (STR_IN_SET(name, "ReadWriteDirectories", "ReadOnlyDirectories", "InaccessibleDirectories",
+                              "ReadWritePaths", "ReadOnlyPaths", "InaccessiblePaths")) {
                 _cleanup_strv_free_ char **l = NULL;
                 char ***dirs;
                 char **p;
@@ -1341,16 +1350,16 @@ int bus_exec_context_set_transient_property(
                 if (mode != UNIT_CHECK) {
                         _cleanup_free_ char *joined = NULL;
 
-                        if (streq(name, "ReadWriteDirectories"))
-                                dirs = &c->read_write_dirs;
-                        else if (streq(name, "ReadOnlyDirectories"))
-                                dirs = &c->read_only_dirs;
-                        else /* "InaccessibleDirectories" */
-                                dirs = &c->inaccessible_dirs;
+                        if (STR_IN_SET(name, "ReadWriteDirectories", "ReadWritePaths"))
+                                dirs = &c->read_write_paths;
+                        else if (STR_IN_SET(name, "ReadOnlyDirectories", "ReadOnlyPaths"))
+                                dirs = &c->read_only_paths;
+                        else /* "InaccessiblePaths" */
+                                dirs = &c->inaccessible_paths;
 
                         if (strv_length(l) == 0) {
                                 *dirs = strv_free(*dirs);
-                                unit_write_drop_in_private_format(u, mode, name, "%s=\n", name);
+                                unit_write_drop_in_private_format(u, mode, name, "%s=", name);
                         } else {
                                 r = strv_extend_strv(dirs, l, true);
 
@@ -1361,7 +1370,7 @@ int bus_exec_context_set_transient_property(
                                 if (!joined)
                                         return -ENOMEM;
 
-                                unit_write_drop_in_private_format(u, mode, name, "%s=%s\n", name, joined);
+                                unit_write_drop_in_private_format(u, mode, name, "%s=%s", name, joined);
                         }
 
                 }
@@ -1389,7 +1398,7 @@ int bus_exec_context_set_transient_property(
 
                 if (mode != UNIT_CHECK) {
                         c->protect_system = ps;
-                        unit_write_drop_in_private_format(u, mode, name, "%s=%s\n", name, s);
+                        unit_write_drop_in_private_format(u, mode, name, "%s=%s", name, s);
                 }
 
                 return 1;
@@ -1415,7 +1424,7 @@ int bus_exec_context_set_transient_property(
 
                 if (mode != UNIT_CHECK) {
                         c->protect_home = ph;
-                        unit_write_drop_in_private_format(u, mode, name, "%s=%s\n", name, s);
+                        unit_write_drop_in_private_format(u, mode, name, "%s=%s", name, s);
                 }
 
                 return 1;
@@ -1438,7 +1447,7 @@ int bus_exec_context_set_transient_property(
 
                         if (strv_isempty(l)) {
                                 c->runtime_directory = strv_free(c->runtime_directory);
-                                unit_write_drop_in_private_format(u, mode, name, "%s=\n", name);
+                                unit_write_drop_in_private_format(u, mode, name, "%s=", name);
                         } else {
                                 r = strv_extend_strv(&c->runtime_directory, l, true);
 
@@ -1449,7 +1458,7 @@ int bus_exec_context_set_transient_property(
                                 if (!joined)
                                         return -ENOMEM;
 
-                                unit_write_drop_in_private_format(u, mode, name, "%s=%s\n", name, joined);
+                                unit_write_drop_in_private_format(u, mode, name, "%s=%s", name, joined);
                         }
                 }
 
@@ -1468,7 +1477,7 @@ int bus_exec_context_set_transient_property(
                         else if (free_and_strdup(&c->selinux_context, s) < 0)
                                 return -ENOMEM;
 
-                        unit_write_drop_in_private_format(u, mode, name, "%s=%s\n", name, strempty(s));
+                        unit_write_drop_in_private_format(u, mode, name, "%s=%s", name, strempty(s));
                 }
 
                 return 1;
@@ -1536,7 +1545,7 @@ int bus_exec_context_set_transient_property(
                                         return -ENOMEM;
                         }
 
-                        unit_write_drop_in_private_format(u, mode, name, "%s=%s\n", name, f);
+                        unit_write_drop_in_private_format(u, mode, name, "%s=%s", name, f);
                 }
 
                 return 1;

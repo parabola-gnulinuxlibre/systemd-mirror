@@ -32,7 +32,7 @@ systemd_modules_load_CFLAGS = \
 	$(KMOD_CFLAGS)
 
 systemd_modules_load_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	$(KMOD_LIBS)
 
 rootlibexec_PROGRAMS += \

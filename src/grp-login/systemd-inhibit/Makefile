@@ -29,7 +29,7 @@ systemd_inhibit_SOURCES = \
 	src/login/inhibit.c
 
 systemd_inhibit_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 rootbin_PROGRAMS += \
 	systemd-inhibit

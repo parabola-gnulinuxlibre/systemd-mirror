@@ -29,7 +29,7 @@ systemd_journald_SOURCES = \
 
 systemd_journald_LDADD = \
 	libjournal-core.la \
-	libshared.la
+	libsystemd-shared.la
 
 rootlibexec_PROGRAMS += \
 	systemd-journald
@@ -45,8 +45,7 @@ nodist_systemunit_DATA += \
 dist_pkgsysconf_DATA += \
 	src/journal/journald.conf
 
-# TODO
-_dist_catalog_DATA = \
+nodist_catalog_DATA = \
 	catalog/systemd.bg.catalog \
 	catalog/systemd.be.catalog \
 	catalog/systemd.be@latin.catalog \
@@ -58,6 +57,16 @@ _dist_catalog_DATA = \
 	catalog/systemd.zh_CN.catalog \
 	catalog/systemd.zh_TW.catalog \
 	catalog/systemd.catalog
+
+EXTRA_DIST += \
+	$(nodist_catalog_DATA:.catalog=.catalog.in)
+
+# Note that we don't use @@ for replacement markers here, but %%. This is
+# because the catalog uses @@ already for its runtime replacement handling and
+# we don't want to conflict with that.
+$(outdir)/%.catalog: catalog/%.catalog.in
+	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
+	$(SED) -e 's~%SUPPORT_URL%~$(SUPPORT_URL)~' < $< > $@
 
 SOCKETS_TARGET_WANTS += \
 	systemd-journald.socket \

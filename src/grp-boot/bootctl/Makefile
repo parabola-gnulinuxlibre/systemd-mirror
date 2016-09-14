@@ -38,7 +38,7 @@ bootctl_CFLAGS = \
 	$(BLKID_CFLAGS)
 
 bootctl_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	$(BLKID_LIBS)
 
 bin_PROGRAMS += \

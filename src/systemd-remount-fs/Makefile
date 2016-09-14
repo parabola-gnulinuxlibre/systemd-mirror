@@ -30,7 +30,7 @@ systemd_remount_fs_SOURCES = \
 	src/core/mount-setup.h
 
 systemd_remount_fs_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 sd.CPPFLAGS += -DMOUNT_PATH=\"$(MOUNT_PATH)\"
 sd.CPPFLAGS += -DUMOUNT_PATH=\"$(UMOUNT_PATH)\"

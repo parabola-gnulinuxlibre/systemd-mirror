@@ -28,6 +28,6 @@ systemd_ac_power_SOURCES = \
 	src/ac-power/ac-power.c
 
 systemd_ac_power_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

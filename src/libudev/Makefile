@@ -24,7 +24,7 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 LIBUDEV_CURRENT=7
-LIBUDEV_REVISION=4
+LIBUDEV_REVISION=5
 LIBUDEV_AGE=6
 
 include_HEADERS += \
@@ -38,7 +38,9 @@ libudev_la_LDFLAGS = \
 	-version-info $(LIBUDEV_CURRENT):$(LIBUDEV_REVISION):$(LIBUDEV_AGE) \
 	-Wl,--version-script=$(srcdir)/libudev.sym
 
-libudev_la_LIBADD += $(libudev-internal.DEPENDS)
+libudev_la_LIBADD = \
+	libsystemd-internal.la \
+	libbasic.la
 
 pkgconfiglib_DATA += \
 	src/libudev/libudev.pc

@@ -27,19 +27,19 @@ test_login_SOURCES = \
 	src/libsystemd/sd-login/test-login.c
 
 test_login_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_login_shared_SOURCES = \
 	src/login/test-login-shared.c
 
 test_login_shared_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_inhibit_SOURCES = \
 	src/login/test-inhibit.c
 
 test_inhibit_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_login_tables_SOURCES = \
 	src/login/test-login-tables.c

@@ -38,7 +38,8 @@ nodist_systemd_timesyncd_SOURCES = \
 
 systemd_timesyncd_LDADD = \
 	libsystemd-network.la \
-	libshared.la
+	libsystemd-shared.la \
+	-lm
 
 rootlibexec_PROGRAMS += \
 	systemd-timesyncd

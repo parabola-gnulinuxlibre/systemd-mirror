@@ -62,9 +62,15 @@ test_resolve_tables_SOURCES = \
 	$(basic_dns_sources) \
 	src/shared/test-tables.h
 
+test_resolve_tables_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(GCRYPT_CFLAGS)
+
 test_resolve_tables_LDADD = \
         libbasic-dns.la \
-	libshared.la
+	libsystemd-shared.la \
+	$(GCRYPT_LIBS) \
+	-lm
 
 test_dns_packet_SOURCES = \
 	src/resolve/test-dns-packet.c \
@@ -74,9 +80,14 @@ test_dns_packet_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-DRESOLVE_TEST_DIR=\"$(abs_top_srcdir)/src/resolve/test-data\"
 
+test_dns_packet_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(GCRYPT_CFLAGS)
+
 test_dns_packet_LDADD = \
         libbasic-dns.la \
-	libshared.la
+	$(GCRYPT_LIBS) \
+	-lm
 
 EXTRA_DIST += \
 	src/resolve/test-data/_openpgpkey.fedoraproject.org.pkts \
@@ -95,9 +106,15 @@ test_dnssec_SOURCES = \
 	src/resolve/test-dnssec.c \
 	$(basic_dns_sources)
 
+test_dnssec_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(GCRYPT_CFLAGS)
+
 test_dnssec_LDADD = \
         libbasic-dns.la \
-	libshared.la
+	libsystemd-shared.la \
+	$(GCRYPT_LIBS) \
+	-lm
 
 test_dnssec_complex_SOURCES = \
 	src/resolve/test-dnssec-complex.c \
@@ -105,7 +122,7 @@ test_dnssec_complex_SOURCES = \
 	src/resolve/dns-type.h
 
 test_dnssec_complex_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 noinst_LTLIBRARIES = libbasic-dns.la
 libbasic_dns_la_LIBADD = libshared.la

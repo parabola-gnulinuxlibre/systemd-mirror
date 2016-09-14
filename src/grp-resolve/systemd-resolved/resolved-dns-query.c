@@ -155,6 +155,7 @@ static int dns_query_candidate_add_transaction(DnsQueryCandidate *c, DnsResource
                 goto gc;
         }
 
+        t->clamp_ttl = c->query->clamp_ttl;
         return 1;
 
 gc:
@@ -404,6 +405,16 @@ DnsQuery *dns_query_free(DnsQuery *q) {
         sd_bus_message_unref(q->request);
         sd_bus_track_unref(q->bus_track);
 
+        dns_packet_unref(q->request_dns_packet);
+
+        if (q->request_dns_stream) {
+                /* Detach the stream from our query, in case something else keeps a reference to it. */
+                q->request_dns_stream->complete = NULL;
+                q->request_dns_stream->on_packet = NULL;
+                q->request_dns_stream->query = NULL;
+                dns_stream_unref(q->request_dns_stream);
+        }
+
         free(q->request_address_string);
 
         if (q->manager) {
@@ -421,7 +432,8 @@ int dns_query_new(
                 DnsQuery **ret,
                 DnsQuestion *question_utf8,
                 DnsQuestion *question_idna,
-                int ifindex, uint64_t flags) {
+                int ifindex,
+                uint64_t flags) {
 
         _cleanup_(dns_query_freep) DnsQuery *q = NULL;
         DnsResourceKey *key;
@@ -509,7 +521,7 @@ int dns_query_make_auxiliary(DnsQuery *q, DnsQuery *auxiliary_for) {
         assert(q);
         assert(auxiliary_for);
 
-        /* Ensure that that the query is not auxiliary yet, and
+        /* Ensure that the query is not auxiliary yet, and
          * nothing else is auxiliary to it either */
         assert(!q->auxiliary_for);
         assert(!q->auxiliary_queries);

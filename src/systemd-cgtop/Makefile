@@ -28,6 +28,6 @@ systemd_cgtop_SOURCES = \
 	src/cgtop/cgtop.c
 
 systemd_cgtop_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

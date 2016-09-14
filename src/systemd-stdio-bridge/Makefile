@@ -28,6 +28,6 @@ systemd_stdio_bridge_SOURCES = \
 	src/stdio-bridge/stdio-bridge.c
 
 systemd_stdio_bridge_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

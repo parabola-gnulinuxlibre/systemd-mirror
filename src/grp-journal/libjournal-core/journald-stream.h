@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/fdset.h"
+#include "shared/fdset.h"
 
 typedef struct StdoutStream StdoutStream;
 

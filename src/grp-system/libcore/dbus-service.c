@@ -103,7 +103,7 @@ static int bus_service_set_transient_property(
 
                 if (mode != UNIT_CHECK) {
                         s->remain_after_exit = b;
-                        unit_write_drop_in_private_format(UNIT(s), mode, name, "RemainAfterExit=%s\n", yes_no(b));
+                        unit_write_drop_in_private_format(UNIT(s), mode, name, "RemainAfterExit=%s", yes_no(b));
                 }
 
                 return 1;
@@ -122,7 +122,7 @@ static int bus_service_set_transient_property(
 
                 if (mode != UNIT_CHECK) {
                         s->type = k;
-                        unit_write_drop_in_private_format(UNIT(s), mode, name, "Type=%s\n", service_type_to_string(s->type));
+                        unit_write_drop_in_private_format(UNIT(s), mode, name, "Type=%s", service_type_to_string(s->type));
                 }
 
                 return 1;
@@ -135,7 +135,7 @@ static int bus_service_set_transient_property(
 
                 if (mode != UNIT_CHECK) {
                         s->runtime_max_usec = u;
-                        unit_write_drop_in_private_format(UNIT(s), mode, name, "RuntimeMaxSec=" USEC_FMT "us\n", u);
+                        unit_write_drop_in_private_format(UNIT(s), mode, name, "RuntimeMaxSec=" USEC_FMT "us", u);
                 }
 
                 return 1;

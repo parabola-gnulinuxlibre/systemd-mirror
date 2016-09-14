@@ -65,6 +65,8 @@ systemd_resolved_SOURCES = \
 	src/resolve/resolved-dns-stream.c \
 	src/resolve/resolved-dns-trust-anchor.h \
 	src/resolve/resolved-dns-trust-anchor.c \
+	src/resolve/resolved-dns-stub.h \
+	src/resolve/resolved-dns-stub.c \
 	src/resolve/resolved-etc-hosts.h \
 	src/resolve/resolved-etc-hosts.c
 
@@ -73,9 +75,15 @@ nodist_systemd_resolved_SOURCES = \
 	src/resolve/dns_type-to-name.h \
 	src/resolve/resolved-gperf.c
 
+systemd_resolved_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(GCRYPT_CFLAGS)
+
 systemd_resolved_LDADD = \
 	libsystemd-network.la \
-	libshared.la
+	libsystemd-shared.la \
+	$(GCRYPT_LIBS) \
+	-lm
 
 rootlibexec_PROGRAMS += \
 	systemd-resolved
@@ -113,6 +121,9 @@ gperf_gperf_sources += \
 EXTRA_DIST += \
 	units/systemd-resolved.service.m4.in \
 	src/resolve/resolved.conf.in
+
+dist_rootlibexec_DATA += \
+	src/resolve/resolv.conf
 
 systemd_resolved_LDADD += libbasic-dns.la
 

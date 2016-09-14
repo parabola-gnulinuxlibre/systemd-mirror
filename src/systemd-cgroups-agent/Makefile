@@ -28,6 +28,6 @@ systemd_cgroups_agent_SOURCES = \
 	src/cgroups-agent/cgroups-agent.c
 
 systemd_cgroups_agent_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -57,8 +57,8 @@ static int dns_stream_complete(DnsStream *s, int error) {
 
         if (s->complete)
                 s->complete(s, error);
-        else
-                dns_stream_free(s);
+        else /* the default action if no completion function is set is to close the stream */
+                dns_stream_unref(s);
 
         return 0;
 }
@@ -324,8 +324,14 @@ static int on_stream_io(sd_event_source *es, int fd, uint32_t revents, void *use
         return 0;
 }
 
-DnsStream *dns_stream_free(DnsStream *s) {
+DnsStream *dns_stream_unref(DnsStream *s) {
         if (!s)
+                return NULL;
+
+        assert(s->n_ref > 0);
+        s->n_ref--;
+
+        if (s->n_ref > 0)
                 return NULL;
 
         dns_stream_stop(s);
@@ -340,13 +346,23 @@ DnsStream *dns_stream_free(DnsStream *s) {
 
         free(s);
 
-        return 0;
+        return NULL;
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(DnsStream*, dns_stream_free);
+DEFINE_TRIVIAL_CLEANUP_FUNC(DnsStream*, dns_stream_unref);
+
+DnsStream *dns_stream_ref(DnsStream *s) {
+        if (!s)
+                return NULL;
+
+        assert(s->n_ref > 0);
+        s->n_ref++;
+
+        return s;
+}
 
 int dns_stream_new(Manager *m, DnsStream **ret, DnsProtocol protocol, int fd) {
-        _cleanup_(dns_stream_freep) DnsStream *s = NULL;
+        _cleanup_(dns_stream_unrefp) DnsStream *s = NULL;
         int r;
 
         assert(m);
@@ -359,6 +375,7 @@ int dns_stream_new(Manager *m, DnsStream **ret, DnsProtocol protocol, int fd) {
         if (!s)
                 return -ENOMEM;
 
+        s->n_ref = 1;
         s->fd = -1;
         s->protocol = protocol;
 

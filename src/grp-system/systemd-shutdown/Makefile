@@ -34,7 +34,7 @@ systemd_shutdown_SOURCES = \
 	src/core/killall.c
 
 systemd_shutdown_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 sd.CPPFLAGS += -DSYSTEM_SHUTDOWN_PATH=\"$(systemshutdowndir)\"
 sd.CPPFLAGS += -DKEXEC=\"$(KEXEC)\"

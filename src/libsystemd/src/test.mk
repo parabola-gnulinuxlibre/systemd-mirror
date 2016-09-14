@@ -25,7 +25,7 @@ test_bus_marshal_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-marshal.c
 
 test_bus_marshal_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	$(GLIB_LIBS) \
 	$(DBUS_LIBS)
 
@@ -38,13 +38,13 @@ test_bus_signature_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-signature.c
 
 test_bus_signature_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_chat_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-chat.c
 
 test_bus_chat_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_cleanup_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-cleanup.c
@@ -54,23 +54,24 @@ test_bus_cleanup_CFLAGS = \
 	$(SECCOMP_CFLAGS)
 
 test_bus_cleanup_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_server_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-server.c
 
 test_bus_server_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_objects_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-objects.c
 
 test_bus_objects_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_error_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-error.c
 
+# Link statically because this test uses BUS_ERROR_MAP_ELF_REGISTER
 test_bus_error_LDADD = \
 	libshared.la
 
@@ -78,7 +79,7 @@ test_bus_gvariant_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-gvariant.c
 
 test_bus_gvariant_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	$(GLIB_LIBS)
 
 test_bus_gvariant_CFLAGS = \
@@ -89,64 +90,64 @@ test_bus_creds_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-creds.c
 
 test_bus_creds_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_match_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-match.c
 
 test_bus_match_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_kernel_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-kernel.c
 
 test_bus_kernel_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_kernel_bloom_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-kernel-bloom.c
 
 test_bus_kernel_bloom_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_benchmark_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-benchmark.c
 
 test_bus_benchmark_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_zero_copy_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-zero-copy.c
 
 test_bus_zero_copy_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_introspect_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-introspect.c
 
 test_bus_introspect_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_event_SOURCES = \
 	src/libsystemd/sd-event/test-event.c
 
 test_event_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_netlink_SOURCES = \
 	src/libsystemd/sd-netlink/test-netlink.c
 
 test_netlink_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_local_addresses_SOURCES = \
 	src/libsystemd/sd-netlink/test-local-addresses.c
 
 test_local_addresses_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_resolve_SOURCES = \
 	src/libsystemd/sd-resolve/test-resolve.c
 
 test_resolve_LDADD = \
-	libshared.la
+	libsystemd-shared.la

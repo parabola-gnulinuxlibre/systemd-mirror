@@ -28,7 +28,7 @@ systemd_sysusers_SOURCES = \
 	src/sysusers/sysusers.c
 
 systemd_sysusers_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 rootbin_PROGRAMS += \
 	systemd-sysusers

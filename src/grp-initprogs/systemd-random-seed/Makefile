@@ -34,7 +34,7 @@ systemd_random_seed_SOURCES = \
 	src/random-seed/random-seed.c
 
 systemd_random_seed_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 SYSINIT_TARGET_WANTS += \
 	systemd-random-seed.service

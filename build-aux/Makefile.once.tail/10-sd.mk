@@ -44,7 +44,7 @@ $(foreach f,$(config_headers),$(topoutdir)/$f.stamp): $(topoutdir)/%.stamp: $(to
 .PHONY: valgrind-tests
 valgrind-tests: $(TESTS)
 	$(AM_V_GEN)for f in $(filter-out %.pl %.py, $^); do \
-		if file $$f | grep -q shell; then \
+		if $(LIBTOOL) --mode=execute file $$f | grep -q shell; then \
 		echo -e "$${x}Skipping non-binary $$f"; else \
 		echo -e "$${x}Running $$f"; \
 		$(LIBTOOL) --mode=execute valgrind -q --leak-check=full --max-stackframe=5242880 --error-exitcode=55 $(builddir)/$$f ; fi; \

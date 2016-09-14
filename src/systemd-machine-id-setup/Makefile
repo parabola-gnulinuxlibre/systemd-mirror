@@ -30,7 +30,7 @@ systemd_machine_id_setup_SOURCES = \
 	src/core/machine-id-setup.h
 
 systemd_machine_id_setup_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 SYSINIT_TARGET_WANTS += \
 	systemd-machine-id-commit.service

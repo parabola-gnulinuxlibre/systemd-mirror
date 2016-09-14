@@ -253,7 +253,7 @@ test_device_nodes_SOURCES = \
 	src/test/test-device-nodes.c
 
 test_device_nodes_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_engine_SOURCES = \
 	src/test/test-engine.c
@@ -304,7 +304,7 @@ test_dns_domain_SOURCES = \
 
 test_dns_domain_LDADD = \
 	libsystemd-network.la \
-	libshared.la
+	libsystemd-shared.la
 
 ifneq ($(ENABLE_EFI),)
 tests += \
@@ -314,7 +314,7 @@ test_boot_timestamps_SOURCES = \
 	src/test/test-boot-timestamps.c
 
 test_boot_timestamps_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 endif # ENABLE_EFI
 
 test_unit_name_SOURCES = \
@@ -343,29 +343,35 @@ test_utf8_SOURCES = \
 	src/test/test-utf8.c
 
 test_utf8_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_capability_SOURCES = \
 	src/test/test-capability.c
 
+test_capability_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(CAP_CFLAGS)
+
 test_capability_LDADD = \
-	libshared.la
+	libsystemd-shared.la \
+	$(CAP_LIBS)
 
 test_async_SOURCES = \
 	src/test/test-async.c
 
 test_async_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_locale_util_SOURCES = \
 	src/test/test-locale-util.c
 
 test_locale_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_copy_SOURCES = \
 	src/test/test-copy.c
 
+# Link statically to ensure file is large
 test_copy_LDADD = \
 	libshared.la
 
@@ -373,187 +379,192 @@ test_sigbus_SOURCES = \
 	src/test/test-sigbus.c
 
 test_sigbus_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_condition_SOURCES = \
 	src/test/test-condition.c
 
 test_condition_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_fdset_SOURCES = \
 	src/test/test-fdset.c
 
 test_fdset_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_fstab_util_SOURCES = \
 	src/test/test-fstab-util.c
 
 test_fstab_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_ratelimit_SOURCES = \
 	src/test/test-ratelimit.c
 
 test_ratelimit_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_util_SOURCES = \
 	src/test/test-util.c
 
 test_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_hexdecoct_SOURCES = \
 	src/test/test-hexdecoct.c
 
 test_hexdecoct_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_alloc_util_SOURCES = \
 	src/test/test-alloc-util.c
 
 test_alloc_util_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_xattr_util_SOURCES = \
 	src/test/test-xattr-util.c
 
 test_xattr_util_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_io_util_SOURCES = \
 	src/test/test-io-util.c
 
 test_io_util_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_glob_util_SOURCES = \
 	src/test/test-glob-util.c
 
 test_glob_util_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_fs_util_SOURCES = \
 	src/test/test-fs-util.c
 
 test_fs_util_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_proc_cmdline_SOURCES = \
 	src/test/test-proc-cmdline.c
 
 test_proc_cmdline_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_fd_util_SOURCES = \
 	src/test/test-fd-util.c
 
 test_fd_util_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_web_util_SOURCES = \
 	src/test/test-web-util.c
 
 test_web_util_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_cpu_set_util_SOURCES = \
 	src/test/test-cpu-set-util.c
 
 test_cpu_set_util_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_stat_util_SOURCES = \
 	src/test/test-stat-util.c
 
 test_stat_util_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_escape_SOURCES = \
 	src/test/test-escape.c
 
 test_escape_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_string_util_SOURCES = \
 	src/test/test-string-util.c
 
 test_string_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_extract_word_SOURCES = \
 	src/test/test-extract-word.c
 
 test_extract_word_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_parse_util_SOURCES = \
 	src/test/test-parse-util.c
 
 test_parse_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_user_util_SOURCES = \
 	src/test/test-user-util.c
 
 test_user_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_hostname_util_SOURCES = \
 	src/test/test-hostname-util.c
 
 test_hostname_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_process_util_SOURCES = \
 	src/test/test-process-util.c
 
 test_process_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_terminal_util_SOURCES = \
 	src/test/test-terminal-util.c
 
 test_terminal_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_path_lookup_SOURCES = \
 	src/test/test-path-lookup.c
 
 test_path_lookup_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_uid_range_SOURCES = \
 	src/test/test-uid-range.c
 
 test_uid_range_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_cap_list_SOURCES = \
 	src/test/test-cap-list.c
 
+test_cap_list_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(CAP_CFLAGS)
+
 test_cap_list_LDADD = \
-	libshared.la
+	libsystemd-shared.la \
+	$(CAP_LIBS)
 
 test_socket_util_SOURCES = \
 	src/test/test-socket-util.c
 
 test_socket_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_barrier_SOURCES = \
 	src/test/test-barrier.c
 
 test_barrier_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_tmpfiles_SOURCES = \
 	src/test/test-tmpfiles.c
 
 test_tmpfiles_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_namespace_SOURCES = \
 	src/test/test-namespace.c
@@ -562,19 +573,19 @@ test_verbs_SOURCES = \
 	src/test/test-verbs.c
 
 test_verbs_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_install_root_SOURCES = \
 	src/test/test-install-root.c
 
 test_install_root_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_acl_util_SOURCES = \
 	src/test/test-acl-util.c
 
 test_acl_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_namespace_LDADD = \
 	libcore.la
@@ -583,31 +594,31 @@ test_rlimit_util_SOURCES = \
 	src/test/test-rlimit-util.c
 
 test_rlimit_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_ask_password_api_SOURCES = \
 	src/test/test-ask-password-api.c
 
 test_ask_password_api_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_signal_util_SOURCES = \
 	src/test/test-signal-util.c
 
 test_signal_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_selinux_SOURCES = \
 	src/test/test-selinux.c
 
 test_selinux_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_sizeof_SOURCES = \
 	src/test/test-sizeof.c
 
 test_sizeof_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 BUILT_SOURCES += \
 	src/test/test-hashmap-ordered.c
@@ -629,34 +640,34 @@ test_hashmap_SOURCES = \
 	src/test/test-hashmap-plain.c
 
 test_hashmap_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_set_SOURCES = \
 	src/test/test-set.c
 
 test_set_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bitmap_SOURCES = \
 	src/test/test-bitmap.c
 
 test_bitmap_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_xml_SOURCES = \
 	src/test/test-xml.c
 
 test_xml_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_list_SOURCES = \
 	src/test/test-list.c
 
 test_list_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_unaligned_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_unaligned_SOURCES = \
 	src/test/test-unaligned.c
@@ -684,49 +695,49 @@ test_prioq_SOURCES = \
 	src/test/test-prioq.c
 
 test_prioq_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_fileio_SOURCES = \
 	src/test/test-fileio.c
 
 test_fileio_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_time_SOURCES = \
 	src/test/test-time.c
 
 test_time_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_clock_SOURCES = \
 	src/test/test-clock.c
 
 test_clock_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_architecture_SOURCES = \
 	src/test/test-architecture.c
 
 test_architecture_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_log_SOURCES = \
 	src/test/test-log.c
 
 test_log_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_ipcrm_SOURCES = \
 	src/test/test-ipcrm.c
 
 test_ipcrm_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_btrfs_SOURCES = \
 	src/test/test-btrfs.c
 
 test_btrfs_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 ifneq ($(HAVE_LIBIPTC),)
 test_firewall_util_SOURCES = \
@@ -738,7 +749,7 @@ test_firewall_util_CFLAGS = \
 
 test_firewall_util_LDADD = \
 	libfirewall.la \
-	libshared.la \
+	libsystemd-shared.la \
 	$(LIBIPTC_LIBS)
 endif # HAVE_LIBIPTC
 
@@ -750,20 +761,20 @@ test_netlink_manual_CFLAGS = \
 	$(KMOD_CFLAGS)
 
 test_netlink_manual_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	$(KMOD_LIBS)
 
 test_ellipsize_SOURCES = \
 	src/test/test-ellipsize.c
 
 test_ellipsize_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_date_SOURCES = \
 	src/test/test-date.c
 
 test_date_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_sleep_SOURCES = \
 	src/test/test-sleep.c
@@ -775,31 +786,31 @@ test_replace_var_SOURCES = \
 	src/test/test-replace-var.c
 
 test_replace_var_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_calendarspec_SOURCES = \
 	src/test/test-calendarspec.c
 
 test_calendarspec_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_strip_tab_ansi_SOURCES = \
 	src/test/test-strip-tab-ansi.c
 
 test_strip_tab_ansi_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_daemon_SOURCES = \
 	src/test/test-daemon.c
 
 test_daemon_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_cgroup_SOURCES = \
 	src/test/test-cgroup.c
 
 test_cgroup_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_cgroup_mask_SOURCES = \
 	src/test/test-cgroup-mask.c
@@ -819,31 +830,31 @@ test_cgroup_util_SOURCES = \
 	src/test/test-cgroup-util.c
 
 test_cgroup_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_env_util_SOURCES = \
 	src/test/test-env-util.c
 
 test_env_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_strbuf_SOURCES = \
 	src/test/test-strbuf.c
 
 test_strbuf_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_strv_SOURCES = \
 	src/test/test-strv.c
 
 test_strv_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_path_util_SOURCES = \
 	src/test/test-path-util.c
 
 test_path_util_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_path_SOURCES = \
 	src/test/test-path.c
@@ -869,25 +880,25 @@ test_siphash24_SOURCES = \
 	src/test/test-siphash24.c
 
 test_siphash24_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_strxcpyx_SOURCES = \
 	src/test/test-strxcpyx.c
 
 test_strxcpyx_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_install_SOURCES = \
 	src/test/test-install.c
 
 test_install_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_watchdog_SOURCES = \
 	src/test/test-watchdog.c
 
 test_watchdog_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_sched_prio_SOURCES = \
 	src/test/test-sched-prio.c
@@ -907,24 +918,24 @@ test_conf_files_SOURCES = \
 	src/test/test-conf-files.c
 
 test_conf_files_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_conf_parser_SOURCES = \
 	src/test/test-conf-parser.c
 
 test_conf_parser_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_af_list_SOURCES = \
 	src/test/test-af-list.c
 
 test_af_list_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 test_arphrd_list_SOURCES = \
 	src/test/test-arphrd-list.c
 
 test_arphrd_list_LDADD = \
-	libbasic.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

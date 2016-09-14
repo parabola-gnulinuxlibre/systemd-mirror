@@ -28,7 +28,7 @@ systemd_vconsole_setup_SOURCES = \
 	src/vconsole/vconsole-setup.c
 
 systemd_vconsole_setup_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 rootlibexec_PROGRAMS += \
 	systemd-vconsole-setup

@@ -18,6 +18,7 @@
 ***/
 
 #include <errno.h>
+#include <net/if.h>
 #include <netinet/icmp6.h>
 #include <netinet/in.h>
 #include <netinet/ip6.h>
@@ -48,7 +49,9 @@ int icmp6_bind_router_solicitation(int index) {
                 .ipv6mr_interface = index,
         };
         _cleanup_close_ int s = -1;
-        int r, zero = 0, one = 1, hops = 255;
+        char ifname[IF_NAMESIZE] = "";
+        static const int zero = 0, one = 1, hops = 255;
+        int r;
 
         s = socket(AF_INET6, SOCK_RAW | SOCK_CLOEXEC | SOCK_NONBLOCK, IPPROTO_ICMPV6);
         if (s < 0)
@@ -81,6 +84,17 @@ int icmp6_bind_router_solicitation(int index) {
                 return -errno;
 
         r = setsockopt(s, SOL_IPV6, IPV6_RECVHOPLIMIT, &one, sizeof(one));
+        if (r < 0)
+                return -errno;
+
+        r = setsockopt(s, SOL_SOCKET, SO_TIMESTAMP, &one, sizeof(one));
+        if (r < 0)
+                return -errno;
+
+        if (if_indextoname(index, ifname) == 0)
+                return -errno;
+
+        r = setsockopt(s, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname));
         if (r < 0)
                 return -errno;
 

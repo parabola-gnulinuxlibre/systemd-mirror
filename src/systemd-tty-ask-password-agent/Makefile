@@ -28,6 +28,6 @@ systemd_tty_ask_password_agent_SOURCES = \
 	src/tty-ask-password-agent/tty-ask-password-agent.c
 
 systemd_tty_ask_password_agent_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

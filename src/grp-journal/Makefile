@@ -94,7 +94,7 @@ test_catalog_SOURCES = \
 
 test_catalog_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
-	-DCATALOG_DIR=\"$(abs_top_srcdir)/catalog\"
+	-DCATALOG_DIR=\"$(abs_top_builddir)/catalog\"
 
 test_catalog_LDADD = \
 	libjournal-core.la
@@ -103,13 +103,18 @@ test_compress_SOURCES = \
 	src/journal/test-compress.c
 
 test_compress_LDADD = \
-	libshared.la
+	libsystemd-shared.la
+
+ifneq ($(HAVE_LZ4),)
+test_compress_LDADD += \
+	-llz4
+endif
 
 test_compress_benchmark_SOURCES = \
 	src/journal/test-compress-benchmark.c
 
 test_compress_benchmark_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_audit_type_SOURCES = \
 	src/journal/test-audit-type.c

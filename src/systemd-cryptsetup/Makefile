@@ -42,14 +42,14 @@ systemd_cryptsetup_CFLAGS = \
 	$(LIBCRYPTSETUP_CFLAGS)
 
 systemd_cryptsetup_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	$(LIBCRYPTSETUP_LIBS)
 
 systemd_cryptsetup_generator_SOURCES = \
 	src/cryptsetup/cryptsetup-generator.c
 
 systemd_cryptsetup_generator_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 SYSINIT_TARGET_WANTS += \
 	cryptsetup.target

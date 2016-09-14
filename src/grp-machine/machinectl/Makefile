@@ -27,7 +27,7 @@ machinectl_SOURCES = \
 	src/machine/machinectl.c
 
 machinectl_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 rootbin_PROGRAMS += \
 	machinectl

@@ -59,6 +59,9 @@ _liblogind_core_la_SOURCES = \
 	src/login/logind-utmp.c \
 	src/login/logind-acl.h
 
+liblogind_core_la_LIBADD = \
+	libsystemd-shared.la
+
 ifneq ($(HAVE_ACL),)
 _liblogind_core_la_SOURCES += \
 	src/login/logind-acl.c

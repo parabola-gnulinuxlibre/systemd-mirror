@@ -34,9 +34,9 @@ systemd_importd_CFLAGS = \
 	-D SYSTEMD_EXPORT_PATH=\"$(rootlibexecdir)/systemd-export\"
 
 systemd_importd_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
-dist_rootlibexec_DATA = \
+dist_rootlibexec_DATA += \
 	src/import/import-pubring.gpg
 
 nodist_systemunit_DATA += \

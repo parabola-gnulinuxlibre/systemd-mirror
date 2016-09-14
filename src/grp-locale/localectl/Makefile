@@ -29,7 +29,7 @@ localectl_SOURCES = \
 	src/locale/localectl.c
 
 localectl_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 bin_PROGRAMS += \
 	localectl

@@ -38,6 +38,8 @@ libnetworkd_core_la_SOURCES = \
 	src/network/networkd-link.c \
 	src/network/networkd-netdev.h \
 	src/network/networkd-netdev.c \
+	src/network/networkd-netdev-vrf.h \
+	src/network/networkd-netdev-vrf.c \
 	src/network/networkd-netdev-tunnel.h \
 	src/network/networkd-netdev-tunnel.c \
 	src/network/networkd-netdev-veth.h \
@@ -62,6 +64,7 @@ libnetworkd_core_la_SOURCES = \
 	src/network/networkd-ipv4ll.c \
 	src/network/networkd-dhcp4.c \
 	src/network/networkd-dhcp6.c \
+	src/network/networkd-ndisc.h \
 	src/network/networkd-ndisc.c \
 	src/network/networkd-network.h \
 	src/network/networkd-network.c \
@@ -74,6 +77,8 @@ libnetworkd_core_la_SOURCES = \
 	src/network/networkd-manager-bus.c \
 	src/network/networkd-fdb.h \
 	src/network/networkd-fdb.c \
+	src/network/networkd-brvlan.h \
+	src/network/networkd-brvlan.c \
 	src/network/networkd-address-pool.h \
 	src/network/networkd-address-pool.c \
 	src/network/networkd-util.h \
@@ -90,7 +95,7 @@ libnetworkd_core_la_LIBADD = \
 	libsystemd-network.la \
 	libsystemd-internal.la \
 	libfirewall.la \
-	libshared.la
+	libsystemd-shared.la
 
 sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 

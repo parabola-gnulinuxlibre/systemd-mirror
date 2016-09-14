@@ -28,7 +28,7 @@ systemd_binfmt_SOURCES = \
 	src/binfmt/binfmt.c
 
 systemd_binfmt_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 rootlibexec_PROGRAMS += \
 	systemd-binfmt

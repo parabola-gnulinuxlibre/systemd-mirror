@@ -28,6 +28,6 @@ systemd_notify_SOURCES = \
 	src/notify/notify.c
 
 systemd_notify_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

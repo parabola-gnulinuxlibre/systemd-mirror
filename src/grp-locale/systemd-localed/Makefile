@@ -25,10 +25,12 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 
 ifneq ($(ENABLE_LOCALED),)
 systemd_localed_SOURCES = \
-	src/locale/localed.c
+	src/locale/localed.c \
+	src/locale/keymap-util.c \
+	src/locale/keymap-util.h
 
 systemd_localed_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	-ldl
 
 systemd_localed_CFLAGS = \
@@ -62,6 +64,18 @@ BUSNAMES_TARGET_WANTS += \
 dist_pkgdata_DATA = \
 	src/locale/kbd-model-map \
 	src/locale/language-fallback-map
+
+test_keymap_util_SOURCES = \
+	src/locale/test-keymap-util.c \
+	src/locale/keymap-util.c \
+	src/locale/keymap-util.h
+
+test_keymap_util_LDADD = \
+	libsystemd-shared.la \
+	-ldl
+
+tests += \
+	test-keymap-util
 
 endif # ENABLE_LOCALED
 

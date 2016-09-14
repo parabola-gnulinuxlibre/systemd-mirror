@@ -106,8 +106,12 @@ libshared_la_SOURCES = \
 	src/shared/resolve-util.h \
 	src/shared/bus-unit-util.c \
 	src/shared/bus-unit-util.h \
+	src/shared/vlan-util.h \
+	src/shared/vlan-util.c \
 	src/shared/tests.h \
-	src/shared/tests.c
+	src/shared/tests.c \
+	src/shared/fdset.c \
+	src/shared/fdset.h
 
 ifneq ($(HAVE_UTMP),)
 libshared_la_SOURCES += \
@@ -134,10 +138,49 @@ libshared_la_CFLAGS = \
 
 libshared_la_LIBADD = \
 	libsystemd-internal.la \
+	libbasic.la \
+	libsystemd-journal-internal.la \
 	libudev-internal.la \
 	$(ACL_LIBS) \
 	$(LIBIDN_LIBS) \
 	$(SECCOMP_LIBS)
+
+rootlibexec_LTLIBRARIES += \
+	libsystemd-shared.la
+
+libsystemd_shared_la_SOURCES = \
+	$(libbasic_la_SOURCES) \
+	$(libshared_la_SOURCES) \
+	$(libsystemd_internal_la_SOURCES) \
+	$(libsystemd_journal_internal_la_SOURCES) \
+	$(libudev_internal_la_SOURCES)
+
+libsystemd_shared_la_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(libbasic_la_CFLAGS) \
+	$(libshared_la_CFLAGS) \
+	$(libsystemd_internal_la_CFLAGS) \
+	$(libsystemd_journal_internal_la_CFLAGS) \
+	$(libudev_internal_la_CFLAGS) \
+	$(ACL_CFLAGS) \
+	$(LIBIDN_CFLAGS) \
+	$(SECCOMP_CFLAGS) \
+	-fvisibility=default
+
+# We can't use libshared_la_LIBADD here because it would
+# pull in libsystemd*-internal.la
+libsystemd_shared_la_LIBADD = \
+	$(libbasic_la_LIBADD) \
+	$(libsystemd_internal_la_LIBADD) \
+	$(libsystemd_journal_internal_la_LIBADD) \
+	$(libudev_internal_la_LIBADD) \
+	$(ACL_LIBS) \
+	$(LIBIDN_LIBS) \
+	$(SECCOMP_LIBS)
+
+libsystemd_shared_la_LDFLAGS = \
+	$(AM_LDFLAGS) \
+	-release $(PACKAGE_VERSION)
 
 sd.CPPFLAGS += $(addprefix -I,$(call at.path,$(srcdir)/../include $(srcdir)/../include/shared))
 sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"

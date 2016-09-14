@@ -38,8 +38,7 @@ systemd_import_CFLAGS = \
 	$(BZIP2_CFLAGS)
 
 systemd_import_LDADD = \
-	libshared.la \
-	libimport.la \
+	libsystemd-shared.la \
 	$(XZ_LIBS) \
 	$(ZLIB_LIBS) \
 	$(BZIP2_LIBS)

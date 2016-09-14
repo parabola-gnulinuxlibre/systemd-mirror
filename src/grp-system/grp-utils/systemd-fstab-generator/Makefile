@@ -29,6 +29,6 @@ systemd_fstab_generator_SOURCES = \
 	src/core/mount-setup.c
 
 systemd_fstab_generator_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

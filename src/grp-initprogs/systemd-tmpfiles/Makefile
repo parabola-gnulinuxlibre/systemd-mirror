@@ -27,8 +27,13 @@ ifneq ($(ENABLE_TMPFILES),)
 systemd_tmpfiles_SOURCES = \
 	src/tmpfiles/tmpfiles.c
 
+systemd_tmpfiles_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(ACL_CFLAGS)
+
 systemd_tmpfiles_LDADD = \
-	libshared.la
+	libsystemd-shared.la \
+	$(ACL_LIBS)
 
 rootbin_PROGRAMS += \
 	systemd-tmpfiles

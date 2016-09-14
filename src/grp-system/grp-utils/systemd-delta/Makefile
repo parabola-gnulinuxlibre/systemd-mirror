@@ -28,6 +28,6 @@ systemd_delta_SOURCES = \
 	src/delta/delta.c
 
 systemd_delta_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

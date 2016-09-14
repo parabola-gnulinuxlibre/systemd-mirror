@@ -28,7 +28,7 @@ systemd_hostnamed_SOURCES = \
 	src/hostname/hostnamed.c
 
 systemd_hostnamed_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 rootlibexec_PROGRAMS += \
 	systemd-hostnamed

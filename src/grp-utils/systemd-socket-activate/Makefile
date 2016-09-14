@@ -30,6 +30,6 @@ systemd_socket_activate_SOURCES = \
 	src/activate/activate.c
 
 systemd_socket_activate_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

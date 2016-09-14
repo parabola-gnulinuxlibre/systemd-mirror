@@ -36,7 +36,7 @@ systemd_update_utmp_CFLAGS = \
 	$(AUDIT_CFLAGS)
 
 systemd_update_utmp_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	$(AUDIT_LIBS)
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

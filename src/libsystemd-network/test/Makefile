@@ -30,7 +30,7 @@ test_dhcp_option_SOURCES = \
 
 test_dhcp_option_LDADD = \
 	libsystemd-network.la \
-	libshared.la
+	libsystemd-shared.la
 
 test_dhcp_client_SOURCES = \
 	src/systemd/sd-dhcp-client.h \
@@ -40,14 +40,14 @@ test_dhcp_client_SOURCES = \
 
 test_dhcp_client_LDADD = \
 	libsystemd-network.la \
-	libshared.la
+	libsystemd-shared.la
 
 test_dhcp_server_SOURCES = \
 	src/libsystemd-network/test-dhcp-server.c
 
 test_dhcp_server_LDADD = \
 	libsystemd-network.la \
-	libshared.la
+	libsystemd-shared.la
 
 test_ipv4ll_SOURCES = \
 	src/systemd/sd-ipv4ll.h \
@@ -56,7 +56,7 @@ test_ipv4ll_SOURCES = \
 
 test_ipv4ll_LDADD = \
 	libsystemd-network.la \
-	libshared.la
+	libsystemd-shared.la
 
 test_ipv4ll_manual_SOURCES = \
 	src/systemd/sd-ipv4ll.h \
@@ -64,7 +64,7 @@ test_ipv4ll_manual_SOURCES = \
 
 test_ipv4ll_manual_LDADD = \
 	libsystemd-network.la \
-	libshared.la
+	libsystemd-shared.la
 
 test_acd_SOURCES = \
 	src/systemd/sd-ipv4acd.h \
@@ -72,7 +72,7 @@ test_acd_SOURCES = \
 
 test_acd_LDADD = \
 	libsystemd-network.la \
-	libshared.la
+	libsystemd-shared.la
 
 test_ndisc_rs_SOURCES = \
 	src/systemd/sd-dhcp6-client.h \
@@ -85,7 +85,7 @@ test_ndisc_rs_SOURCES = \
 test_ndisc_rs_LDADD = \
 	libsystemd-network.la \
 	libudev.la \
-	libshared.la
+	libsystemd-shared.la
 
 test_dhcp6_client_SOURCES = \
 	src/systemd/sd-dhcp6-client.h \
@@ -97,14 +97,14 @@ test_dhcp6_client_SOURCES = \
 test_dhcp6_client_LDADD = \
 	libsystemd-network.la \
 	libudev.la \
-	libshared.la
+	libsystemd-shared.la
 
 test_lldp_SOURCES = \
 	src/libsystemd-network/test-lldp.c
 
 test_lldp_LDADD = \
 	libsystemd-network.la \
-	libshared.la
+	libsystemd-shared.la
 
 tests += \
 	test-dhcp-option \

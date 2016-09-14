@@ -32,6 +32,6 @@ busctl_SOURCES = \
 	src/libsystemd/sd-bus/busctl-introspect.h
 
 busctl_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

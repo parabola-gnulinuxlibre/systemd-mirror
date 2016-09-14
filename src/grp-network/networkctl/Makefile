@@ -30,7 +30,7 @@ networkctl_SOURCES = \
 	src/network/networkctl.c
 
 networkctl_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	libsystemd-network.la
 
 dist_bashcompletion_data += \

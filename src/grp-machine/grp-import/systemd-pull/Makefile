@@ -48,8 +48,8 @@ systemd_pull_CFLAGS = \
 	-D USER_KEYRING_PATH=\"$(pkgsysconfdir)/import-pubring.gpg\"
 
 systemd_pull_LDADD = \
+	libsystemd-shared.la \
 	libimport.la \
-	libshared.la \
 	$(LIBCURL_LIBS) \
 	$(XZ_LIBS) \
 	$(ZLIB_LIBS) \

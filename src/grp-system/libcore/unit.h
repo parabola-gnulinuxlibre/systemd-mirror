@@ -37,6 +37,7 @@ typedef struct UnitVTable UnitVTable;
 
 typedef enum KillOperation {
         KILL_TERMINATE,
+        KILL_TERMINATE_AND_LOG,
         KILL_KILL,
         KILL_ABORT,
         _KILL_OPERATION_MAX,
@@ -162,6 +163,9 @@ struct Unit {
          * more, but these are the ones we care enough about to
          * process SIGCHLD for */
         Set *pids;
+
+        /* Used in sigchld event invocation to avoid repeat events being invoked */
+        uint64_t sigchldgen;
 
         /* Used during GC sweeps */
         unsigned gc_marker;

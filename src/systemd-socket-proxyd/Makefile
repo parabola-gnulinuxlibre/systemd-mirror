@@ -29,6 +29,6 @@ systemd_socket_proxyd_SOURCES = \
 	src/socket-proxy/socket-proxyd.c
 
 systemd_socket_proxyd_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

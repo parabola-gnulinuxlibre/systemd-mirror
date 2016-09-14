@@ -28,7 +28,7 @@ systemd_firstboot_SOURCES = \
 	src/firstboot/firstboot.c
 
 systemd_firstboot_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	-lcrypt
 
 rootbin_PROGRAMS += \

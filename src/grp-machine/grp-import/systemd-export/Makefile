@@ -39,7 +39,7 @@ systemd_export_CFLAGS = \
 	$(BZIP2_CFLAGS)
 
 systemd_export_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	libimport.la \
 	$(XZ_LIBS) \
 	$(ZLIB_LIBS) \

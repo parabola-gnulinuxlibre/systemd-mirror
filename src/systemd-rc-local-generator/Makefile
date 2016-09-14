@@ -27,6 +27,6 @@ systemd_rc_local_generator_SOURCES = \
 	src/rc-local-generator/rc-local-generator.c
 
 systemd_rc_local_generator_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

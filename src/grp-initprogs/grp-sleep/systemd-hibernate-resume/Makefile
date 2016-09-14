@@ -32,7 +32,7 @@ systemd_hibernate_resume_SOURCES = \
 	src/hibernate-resume/hibernate-resume.c
 
 systemd_hibernate_resume_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 nodist_systemunit_DATA += \
 	units/systemd-hibernate-resume@.service

@@ -29,6 +29,6 @@ systemd_update_done_SOURCES = \
 	src/update-done/update-done.c
 
 systemd_update_done_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

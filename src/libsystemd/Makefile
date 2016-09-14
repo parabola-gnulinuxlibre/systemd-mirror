@@ -23,9 +23,9 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-LIBSYSTEMD_CURRENT=15
+LIBSYSTEMD_CURRENT=16
 LIBSYSTEMD_REVISION=0
-LIBSYSTEMD_AGE=15
+LIBSYSTEMD_AGE=16
 
 EXTRA_DIST += \
 	src/libsystemd/libsystemd.pc.in \
@@ -48,9 +48,10 @@ libsystemd_la_LDFLAGS = \
 	-version-info $(LIBSYSTEMD_CURRENT):$(LIBSYSTEMD_REVISION):$(LIBSYSTEMD_AGE) \
 	-Wl,--version-script=$(srcdir)/libsystemd.sym
 
-#libsystemd_la_LIBADD = \
-	$(libsystemd_internal_la_LIBADD) \
-	$(libsystemd_journal_internal_la_LIBADD)
+libsystemd_la_LIBADD = \
+	libsystemd-internal.la \
+	libbasic.la \
+	libsystemd-journal-internal.la
 
 libsystemd_la_LIBADD = $(libsystemd-internal.DEPENDS)
 

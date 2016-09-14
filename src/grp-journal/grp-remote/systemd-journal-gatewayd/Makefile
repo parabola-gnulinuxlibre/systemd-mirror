@@ -35,7 +35,7 @@ systemd_journal_gatewayd_SOURCES = \
 	src/journal-remote/microhttpd-util.c
 
 systemd_journal_gatewayd_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	$(MICROHTTPD_LIBS)
 
 ifneq ($(HAVE_GNUTLS),)

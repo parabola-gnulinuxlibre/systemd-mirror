@@ -28,7 +28,7 @@ systemctl_SOURCES = \
 	src/systemctl/systemctl.c
 
 systemctl_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 files.out.all += systemctl.completion.bash
 files.out.all += systemctl.completion.zsh

@@ -156,7 +156,7 @@ libcore_la_CFLAGS = \
 	$(SECCOMP_CFLAGS)
 
 libcore_la_LIBADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	$(PAM_LIBS) \
 	$(AUDIT_LIBS) \
 	$(KMOD_LIBS) \

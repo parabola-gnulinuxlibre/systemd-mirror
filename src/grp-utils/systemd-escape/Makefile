@@ -29,6 +29,6 @@ systemd_escape_SOURCES = \
 	src/escape/escape.c
 
 systemd_escape_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

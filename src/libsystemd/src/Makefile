@@ -92,6 +92,8 @@ _libsystemd_internal_la_SOURCES = \
 	src/libsystemd/sd-netlink/local-addresses.h \
 	src/libsystemd/sd-netlink/local-addresses.c \
 	src/libsystemd/sd-id128/sd-id128.c \
+	src/libsystemd/sd-id128/id128-util.h \
+	src/libsystemd/sd-id128/id128-util.c \
 	src/libsystemd/sd-daemon/sd-daemon.c \
 	src/libsystemd/sd-login/sd-login.c \
 	src/libsystemd/sd-network/sd-network.c \
@@ -110,7 +112,6 @@ _libsystemd_internal_la_SOURCES = \
 	src/libsystemd/sd-resolve/sd-resolve.c
 
 libsystemd_internal_la_LIBADD = \
-	libbasic.la \
 	-lresolv
 
 noinst_LTLIBRARIES += \

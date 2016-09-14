@@ -28,7 +28,7 @@ systemd_sleep_SOURCES = \
 	src/sleep/sleep.c
 
 systemd_sleep_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 ifneq ($(ENABLE_HIBERNATE),)
 

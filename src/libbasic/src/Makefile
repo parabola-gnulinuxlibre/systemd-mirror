@@ -29,6 +29,7 @@ noinst_LTLIBRARIES += \
 libbasic_la_SOURCES = \
 	src/basic/missing.h \
 	src/basic/missing_syscall.h \
+	src/basic/raw-clone.h \
 	src/basic/capability-util.c \
 	src/basic/capability-util.h \
 	src/basic/conf-files.c \
@@ -113,8 +114,6 @@ libbasic_la_SOURCES = \
 	src/basic/ordered-set.c \
 	src/basic/bitmap.c \
 	src/basic/bitmap.h \
-	src/basic/fdset.c \
-	src/basic/fdset.h \
 	src/basic/prioq.c \
 	src/basic/prioq.h \
 	src/basic/web-util.c \

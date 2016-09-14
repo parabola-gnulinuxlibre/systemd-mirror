@@ -28,6 +28,6 @@ systemd_cgls_SOURCES = \
 	src/cgls/cgls.c
 
 systemd_cgls_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

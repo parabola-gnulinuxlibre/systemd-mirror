@@ -48,7 +48,7 @@ nodist_libjournal_core_la_SOURCES = \
 	src/journal/journald-gperf.c
 
 libjournal_core_la_LIBADD = \
-	libshared.la
+	libsystemd-shared.la
 
 noinst_LTLIBRARIES += \
 	libjournal-core.la

@@ -34,6 +34,7 @@ CLEAN_LOCAL_HOOKS =
 pkginclude_HEADERS =
 noinst_LTLIBRARIES =
 lib_LTLIBRARIES =
+rootlibexec_LTLIBRARIES =
 include_HEADERS =
 noinst_DATA =
 pkgconfigdata_DATA =
@@ -51,6 +52,7 @@ dist_systemunit_DATA_busnames =
 dist_sysusers_DATA =
 check_PROGRAMS =
 check_DATA =
+dist_rootlibexec_DATA =
 tests=
 manual_tests =
 TEST_EXTENSIONS = .py
@@ -67,6 +69,10 @@ else
 noinst_PROGRAMS =
 TESTS =
 endif # ENABLE_TESTS
+AM_TESTS_ENVIRONMENT = \
+	export SYSTEMD_KBD_MODEL_MAP=$(abs_top_srcdir)/src/locale/kbd-model-map; \
+	export SYSTEMD_LANGUAGE_FALLBACK_MAP=$(abs_top_srcdir)/src/locale/language-fallback-map;
+
 ifneq ($(ENABLE_BASH_COMPLETION),)
 dist_bashcompletion_DATA = $(dist_bashcompletion_data)
 nodist_bashcompletion_DATA = $(nodist_bashcompletion_data)
@@ -139,6 +145,7 @@ AM_CPPFLAGS = \
 	-I $(top_srcdir)/src/shared \
 	-I $(top_builddir)/src/shared \
 	-I $(top_srcdir)/src/network \
+	-I $(top_srcdir)/src/locale \
 	-I $(top_srcdir)/src/login \
 	-I $(top_srcdir)/src/journal \
 	-I $(top_builddir)/src/journal \
@@ -161,6 +168,7 @@ AM_CPPFLAGS = \
 	-I $(top_srcdir)/src/libsystemd/sd-network \
 	-I $(top_srcdir)/src/libsystemd/sd-hwdb \
 	-I $(top_srcdir)/src/libsystemd/sd-device \
+	-I $(top_srcdir)/src/libsystemd/sd-id128 \
 	-I $(top_srcdir)/src/libsystemd-network \
 	$(OUR_CPPFLAGS)
 
@@ -690,15 +698,17 @@ test_libudev_SOURCES = \
 	src/test/test-libudev.c
 
 test_libudev_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_udev_SOURCES = \
 	src/test/test-udev.c
 
 test_udev_LDADD = \
 	libudev-core.la  \
+	libsystemd-shared.la \
 	$(BLKID_LIBS) \
-	$(KMOD_LIBS)
+	$(KMOD_LIBS) \
+	-lrt
 
 ifneq ($(ENABLE_TESTS),)
 check_DATA += \
@@ -728,6 +738,7 @@ test_nss_SOURCES = \
 
 test_nss_LDADD = \
 	libsystemd-internal.la \
+	libbasic.la \
 	-ldl
 
 manual_tests += \

@@ -39,7 +39,7 @@ systemd_networkd_wait_online_SOURCES = \
 
 systemd_networkd_wait_online_LDADD = \
 	libsystemd-network.la \
-	libshared.la
+	libsystemd-shared.la
 
 nodist_systemunit_DATA += \
 	units/systemd-networkd-wait-online.service

@@ -27,7 +27,7 @@ test_id128_SOURCES = \
 	src/test/test-id128.c
 
 test_id128_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 tests += \
 	test-id128

@@ -28,7 +28,7 @@ systemd_system_update_generator_SOURCES = \
 	src/system-update-generator/system-update-generator.c
 
 systemd_system_update_generator_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 sd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
 

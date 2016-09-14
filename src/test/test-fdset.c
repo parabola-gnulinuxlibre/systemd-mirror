@@ -21,10 +21,10 @@
 #include <unistd.h>
 
 #include "basic/fd-util.h"
-#include "basic/fdset.h"
 #include "basic/fileio.h"
 #include "basic/macro.h"
 #include "basic/util.h"
+#include "shared/fdset.h"
 
 static void test_fdset_new_fill(void) {
         int fd = -1;

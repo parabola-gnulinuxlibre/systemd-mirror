@@ -45,7 +45,7 @@ test_qcow2_CFLAGS = \
 	$(ZLIB_CFLAGS)
 
 test_qcow2_LDADD = \
-	libshared.la \
+	libsystemd-shared.la \
 	$(ZLIB_LIBS)
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

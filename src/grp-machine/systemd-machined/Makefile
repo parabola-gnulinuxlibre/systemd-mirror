@@ -24,19 +24,19 @@ include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
 systemd_machined_SOURCES = \
-	$(_libmachine_core_la_SOURCES) \
 	src/machine/machined.c \
 	src/machine/machined.h
 
 systemd_machined_LDADD = \
 	libsystemd-internal.la \
 	libshared.la \
-	libbasic.la
+	libbasic.la \
+	libmachine-core.la
 
 rootlibexec_PROGRAMS += \
 	systemd-machined
 
-_libmachine_core_la_SOURCES = \
+libmachine_core_la_SOURCES = \
 	src/machine/machine.c \
 	src/machine/machine.h \
 	src/machine/machined-dbus.c \
@@ -47,9 +47,17 @@ _libmachine_core_la_SOURCES = \
 	src/machine/operation.c \
 	src/machine/operation.h
 
+libmachine_core_la_LIBADD = \
+	libsystemd-shared.la
+
+noinst_LTLIBRARIES += \
+	libmachine-core.la
+
 test_machine_tables_SOURCES = \
-	$(_libmachine_core_la_SOURCES) \
 	src/machine/test-machine-tables.c
+
+test_machine_tables_LDADD = \
+	libmachine-core.la
 
 tests += \
 	test-machine-tables

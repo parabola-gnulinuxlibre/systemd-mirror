@@ -28,7 +28,7 @@ systemd_timedated_SOURCES = \
 	src/timedate/timedated.c
 
 systemd_timedated_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 rootlibexec_PROGRAMS += \
 	systemd-timedated

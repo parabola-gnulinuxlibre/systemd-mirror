@@ -28,6 +28,6 @@ systemd_reply_password_SOURCES = \
 	src/reply-password/reply-password.c
 
 systemd_reply_password_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

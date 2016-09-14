@@ -26,6 +26,8 @@
 #include "basic/conf-files.h"
 #include "basic/fileio.h"
 #include "basic/fs-util.h"
+#include "basic/label.h"
+#include "basic/mkdir.h"
 #include "basic/strbuf.h"
 #include "basic/string-util.h"
 #include "basic/util.h"
@@ -656,12 +658,16 @@ static int adm_hwdb(struct udev *udev, int argc, char *argv[]) {
                         rc = EXIT_FAILURE;
                         goto out;
                 }
-                mkdir_parents(hwdb_bin, 0755);
+
+                mkdir_parents_label(hwdb_bin, 0755);
+
                 err = trie_store(trie, hwdb_bin);
                 if (err < 0) {
                         log_error_errno(err, "Failure writing database %s: %m", hwdb_bin);
                         rc = EXIT_FAILURE;
                 }
+
+                label_fix(hwdb_bin, false, false);
         }
 
         if (test) {

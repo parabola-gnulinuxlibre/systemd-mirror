@@ -31,7 +31,7 @@ systemd_hibernate_resume_generator_SOURCES = \
 	src/hibernate-resume/hibernate-resume-generator.c
 
 systemd_hibernate_resume_generator_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 endif # ENABLE_HIBERNATE
 

@@ -29,7 +29,7 @@ systemd_debug_generator_SOURCES = \
 	src/debug-generator/debug-generator.c
 
 systemd_debug_generator_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 sd.CPPFLAGS += -DSYSTEM_DATA_UNIT_PATH=\"$(systemunitdir)\"
 

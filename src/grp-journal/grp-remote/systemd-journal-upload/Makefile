@@ -37,7 +37,7 @@ systemd_journal_upload_CFLAGS = \
         $(LIBCURL_CFLAGS)
 
 systemd_journal_upload_LDADD = \
-        libshared.la \
+        libsystemd-shared.la \
         $(LIBCURL_LIBS)
 
 nodist_systemunit_DATA += \

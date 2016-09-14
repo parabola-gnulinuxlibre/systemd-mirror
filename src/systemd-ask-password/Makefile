@@ -28,6 +28,6 @@ systemd_ask_password_SOURCES = \
 	src/ask-password/ask-password.c
 
 systemd_ask_password_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

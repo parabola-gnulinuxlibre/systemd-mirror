@@ -29,8 +29,13 @@ systemd_coredump_SOURCES = \
 	src/coredump/coredump-vacuum.c \
 	src/coredump/coredump-vacuum.h
 
+systemd_coredump_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(ACL_CFLAGS)
+
 systemd_coredump_LDADD = \
-	libshared.la
+	libsystemd-shared.la \
+	$(ACL_LIBS)
 
 ifneq ($(HAVE_ELFUTILS),)
 systemd_coredump_SOURCES += \
@@ -65,7 +70,7 @@ test_coredump_vacuum_SOURCES = \
 	src/coredump/coredump-vacuum.h
 
 test_coredump_vacuum_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 nodist_sysctl_DATA = \
 	sysctl.d/50-coredump.conf
