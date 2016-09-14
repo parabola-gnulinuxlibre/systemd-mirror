@@ -21,8 +21,8 @@
 #include <locale.h>
 #include <math.h>
 
-#include "log.h"
-#include "parse-util.h"
+#include "basic/log.h"
+#include "basic/parse-util.h"
 
 static void test_parse_boolean(void) {
         assert_se(parse_boolean("1") == 1);
