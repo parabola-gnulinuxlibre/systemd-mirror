@@ -697,10 +697,6 @@ breakup_makefile() (
 	rm .tmp.move.all
 
 	sed -ri \
-	    -e '/^	\$\(AM_V_at\)\$\(MKDIR_P\) \$\(dir \$@\)/d' \
-	    -e 's/ \$\(CFLAGS\) / /g' \
-	    -e 's/ \$\(CPPFLAGS\) / /g' \
-	    -e 's/ \$\(AM_CPPFLAGS\) / $(sd.ALL_CPPFLAGS) /g' \
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
 	    src/libbasic/include/basic/Makefile \
 	    src/libsystemd/src/Makefile \
@@ -745,8 +741,13 @@ breakup_makefile() (
 
 fixup_makefile() {
 	sed -r \
+	    -e '#### Specific complete strings #####' \
+	    -e 's|\$\(CPP\)·\$\(CFLAGS\)·\$\(AM_CPPFLAGS\)·\$\(CPPFLAGS\)·|$(CPP) $(sd.ALL_CPPFLAGS) |g' \
+	    -e '/^	\$\(AM_V_at\)\$\(MKDIR_P\) \$\(dir \$@\)/d' \
+	    -e '#### General cases #################' \
 	    -e '/^[^#	]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' \
 	    -e 's|^if (.*)|ifneq ($(\1),)|' \
+	    -e '/\bAM_(C|CPP|LD)FLAGS\b/d' \
 	    -e 's|--version-script=.*/([^/]+)\.sym|--version-script=$(srcdir)/\1.sym|g'
 }
 
