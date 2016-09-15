@@ -23,20 +23,14 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(HAVE_LIBIPTC),)
 noinst_LTLIBRARIES += \
-	libfirewall.la
+	libgcrypt.la
 
-libfirewall_la_SOURCES = \
-	src/shared/firewall-util.h \
-	src/shared/firewall-util.c
+libgcrypt_la_SOURCES = \
+	src/shared/gcrypt-util.h \
+	src/shared/gcrypt-util.c
 
-libfirewall_la_CFLAGS = \
-	$(LIBIPTC_CFLAGS)
-
-libfirewall_la_LIBADD = \
-	libbasic.la \
-	$(LIBIPTC_LIBS)
-endif # HAVE_LIBIPTC
+libgcrypt_la_LIBADD = \
+	libbasic.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

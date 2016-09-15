@@ -106,8 +106,10 @@ test_compress_LDADD = \
 	libsystemd-shared.la
 
 ifneq ($(HAVE_LZ4),)
+test_compress_CFLAGS += \
+	$(LZ4_CFLAGA)
 test_compress_LDADD += \
-	-llz4
+	$(LZ4_LIBS)
 endif
 
 test_compress_benchmark_SOURCES = \

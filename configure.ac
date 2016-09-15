@@ -59,7 +59,7 @@ SET_ARCH(IA32, i*86*)
 SET_ARCH(MIPS, mips*)
 SET_ARCH(AARCH64, aarch64*)
 
-# i18n stuff for the PolicyKit policy files, heck whether intltool can be found, disable NLS otherwise
+# i18n stuff for the PolicyKit policy files, check whether intltool can be found, disable NLS otherwise
 AC_CHECK_PROG(intltool_found, [intltool-merge], [yes], [no])
 AS_IF([test x"$intltool_found" != xyes],
       [AS_IF([test x"$enable_nls" = xyes],
@@ -1653,7 +1653,6 @@ AC_MSG_RESULT([
         nss-myhostname:                    ${have_myhostname}
         hwdb:                              ${enable_hwdb}
         tpm:                               ${have_tpm}
-        kdbus:                             ${have_kdbus}
         Python:                            ${have_python}
         man pages:                         ${have_manpages}
         test coverage:                     ${have_coverage}
