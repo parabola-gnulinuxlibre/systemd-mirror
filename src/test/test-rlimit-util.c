@@ -17,12 +17,12 @@
 
 #include <sys/resource.h>
 
-#include "alloc-util.h"
-#include "capability-util.h"
-#include "macro.h"
-#include "rlimit-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/capability-util.h"
+#include "basic/macro.h"
+#include "basic/rlimit-util.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 static void test_rlimit_parse_format(int resource, const char *string, rlim_t soft, rlim_t hard, int ret, const char *formatted) {
         _cleanup_free_ char *f = NULL;

@@ -17,13 +17,13 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "log.h"
-#include "macro.h"
-#include "proc-cmdline.h"
-#include "special.h"
-#include "string-util.h"
-#include "util.h"
+#include "basic/alloc-util.h"
+#include "basic/log.h"
+#include "basic/macro.h"
+#include "basic/proc-cmdline.h"
+#include "basic/special.h"
+#include "basic/string-util.h"
+#include "basic/util.h"
 
 static int parse_item(const char *key, const char *value) {
         assert_se(key);
