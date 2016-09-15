@@ -67,7 +67,6 @@ gperf_gperf_sources += \
 	src/udev/net/link-config-gperf.gperf
 
 libudev_core_la_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(BLKID_CFLAGS) \
 	$(KMOD_CFLAGS)
 

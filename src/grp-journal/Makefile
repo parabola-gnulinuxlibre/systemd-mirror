@@ -93,7 +93,6 @@ test_catalog_SOURCES = \
 	src/journal/test-catalog.c
 
 test_catalog_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
 	-DCATALOG_DIR=\"$(abs_top_builddir)/catalog\"
 
 test_catalog_LDADD = \

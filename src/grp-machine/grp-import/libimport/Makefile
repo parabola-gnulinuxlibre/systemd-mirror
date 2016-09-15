@@ -41,7 +41,6 @@ test_qcow2_SOURCES = \
 	src/import/qcow2-util.h
 
 test_qcow2_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(ZLIB_CFLAGS)
 
 test_qcow2_LDADD = \

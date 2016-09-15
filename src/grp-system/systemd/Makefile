@@ -28,7 +28,6 @@ systemd_SOURCES = \
 	src/core/main.c
 
 systemd_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SECCOMP_CFLAGS) \
 	$(MOUNT_CFLAGS)
 

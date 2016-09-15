@@ -150,7 +150,6 @@ gperf_txt_sources += \
 
 # using _CFLAGS = in the conditional below would suppress AM_CFLAGS
 libsystemd_journal_internal_la_CFLAGS = \
-	$(AM_CFLAGS)
 
 libsystemd_journal_internal_la_LIBADD =
 

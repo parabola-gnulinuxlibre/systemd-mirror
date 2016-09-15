@@ -36,7 +36,6 @@ systemd_gpt_auto_generator_LDADD = \
 	$(BLKID_LIBS)
 
 systemd_gpt_auto_generator_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(BLKID_CFLAGS)
 endif # HAVE_BLKID
 

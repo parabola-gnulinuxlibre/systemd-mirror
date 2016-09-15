@@ -30,7 +30,6 @@ systemd_analyze_SOURCES = \
 	src/analyze/analyze-verify.h
 
 systemd_analyze_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SECCOMP_CFLAGS) \
 	$(MOUNT_CFLAGS)
 

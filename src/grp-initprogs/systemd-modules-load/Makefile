@@ -28,7 +28,6 @@ systemd_modules_load_SOURCES = \
 	src/modules-load/modules-load.c
 
 systemd_modules_load_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(KMOD_CFLAGS)
 
 systemd_modules_load_LDADD = \

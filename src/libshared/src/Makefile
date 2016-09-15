@@ -131,7 +131,6 @@ libshared_la_SOURCES += \
 endif # HAVE_ACL
 
 libshared_la_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(ACL_CFLAGS) \
 	$(LIBIDN_CFLAGS) \
 	$(SECCOMP_CFLAGS)
@@ -156,7 +155,6 @@ libsystemd_shared_la_SOURCES = \
 	$(libudev_internal_la_SOURCES)
 
 libsystemd_shared_la_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(libbasic_la_CFLAGS) \
 	$(libshared_la_CFLAGS) \
 	$(libsystemd_internal_la_CFLAGS) \
@@ -179,7 +177,6 @@ libsystemd_shared_la_LIBADD = \
 	$(SECCOMP_LIBS)
 
 libsystemd_shared_la_LDFLAGS = \
-	$(AM_LDFLAGS) \
 	-release $(PACKAGE_VERSION)
 
 sd.CPPFLAGS += $(addprefix -I,$(call at.path,$(srcdir)/../include $(srcdir)/../include/shared))

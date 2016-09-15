@@ -34,7 +34,6 @@ rootlib_LTLIBRARIES += \
 	libudev.la
 
 libudev_la_LDFLAGS = \
-	$(AM_LDFLAGS) \
 	-version-info $(LIBUDEV_CURRENT):$(LIBUDEV_REVISION):$(LIBUDEV_AGE) \
 	-Wl,--version-script=$(srcdir)/libudev.sym
 
@@ -54,7 +53,6 @@ $(outdir)/test-libudev-sym.c: \
 nodist_test_libudev_sym_SOURCES = \
 	test-libudev-sym.c
 test_libudev_sym_CFLAGS = \
-	$(AM_CFLAGS) \
 	-Wno-deprecated-declarations
 test_libudev_sym_LDADD = \
 	libudev.la

@@ -43,7 +43,6 @@ systemd_journal_remote_SOURCES += \
 	src/journal-remote/microhttpd-util.c
 
 systemd_journal_remote_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(MICROHTTPD_CFLAGS)
 
 systemd_journal_remote_LDADD += \

@@ -718,7 +718,6 @@ endif # ENABLE_TESTS
 # packed sysfs test tree
 $(outdir)/sys: test/sys.tar.xz
 	-rm -rf test/sys
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)tar -C test/ -xJf $(top_srcdir)/test/sys.tar.xz
 	-touch test/sys
 
@@ -819,20 +818,16 @@ $(outdir)/%: shell-completion/%.in
 	$(SED_PROCESS)
 
 $(outdir)/%: sysusers.d/%.m4 $(top_builddir)/config.status
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
 
 $(outdir)/%: tmpfiles.d/%.m4 $(top_builddir)/config.status
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
 
 
 $(outdir)/%: units/%.m4 $(top_builddir)/config.status
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) -DFOR_SYSTEM=1 < $< > $@
 
 $(outdir)/%: units/user/%.m4 $(top_builddir)/config.status
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) -DFOR_USER=1 < $< > $@
 
 ifneq ($(ENABLE_POLKIT),)

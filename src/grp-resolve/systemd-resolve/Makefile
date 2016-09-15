@@ -34,7 +34,6 @@ nodist_systemd_resolve_SOURCES = \
 	src/resolve/dns_type-to-name.h
 
 systemd_resolve_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(GCRYPT_CFLAGS)
 
 systemd_resolve_LDADD = \

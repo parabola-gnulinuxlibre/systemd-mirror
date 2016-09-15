@@ -147,7 +147,6 @@ nodist_libcore_la_SOURCES = \
 	src/core/load-fragment-gperf-nulstr.c
 
 libcore_la_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(PAM_CFLAGS) \
 	$(AUDIT_CFLAGS) \
 	$(KMOD_CFLAGS) \

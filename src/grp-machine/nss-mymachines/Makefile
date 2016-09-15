@@ -28,7 +28,6 @@ libnss_mymachines_la_SOURCES = \
 	src/nss-mymachines/nss-mymachines.c
 
 libnss_mymachines_la_LDFLAGS = \
-	$(AM_LDFLAGS) \
 	-module \
 	-export-dynamic \
 	-avoid-version \

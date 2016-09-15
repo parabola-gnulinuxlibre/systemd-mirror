@@ -29,12 +29,10 @@ bootctl_SOURCES = \
 	src/boot/bootctl.c
 
 bootctl_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
 	-DEFI_MACHINE_TYPE_NAME=\"$(EFI_MACHINE_TYPE_NAME)\" \
 	-DBOOTLIBDIR=\"$(bootlibdir)\"
 
 bootctl_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(BLKID_CFLAGS)
 
 bootctl_LDADD = \

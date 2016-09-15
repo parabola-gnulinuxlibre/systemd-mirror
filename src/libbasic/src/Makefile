@@ -228,7 +228,6 @@ nodist_libbasic_la_SOURCES = \
 	src/basic/cap-to-name.h
 
 libbasic_la_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SELINUX_CFLAGS) \
 	$(CAP_CFLAGS) \
 	-pthread

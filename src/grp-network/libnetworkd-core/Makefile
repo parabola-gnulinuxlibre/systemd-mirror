@@ -27,7 +27,6 @@ noinst_LTLIBRARIES += \
 	libnetworkd-core.la
 
 libnetworkd_core_la_CFLAGS = \
-	$(AM_CFLAGS)
 
 libnetworkd_core_la_SOURCES = \
 	src/libsystemd-network/network-internal.h \

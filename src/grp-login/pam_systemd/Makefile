@@ -29,11 +29,9 @@ pam_systemd_la_SOURCES = \
 	src/login/pam_systemd.c
 
 pam_systemd_la_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(PAM_CFLAGS)
 
 pam_systemd_la_LDFLAGS = \
-	$(AM_LDFLAGS) \
 	-module \
 	-export-dynamic \
 	-avoid-version \

@@ -38,7 +38,6 @@ systemd_cryptsetup_SOURCES = \
 	src/cryptsetup/cryptsetup.c
 
 systemd_cryptsetup_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(LIBCRYPTSETUP_CFLAGS)
 
 systemd_cryptsetup_LDADD = \

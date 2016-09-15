@@ -259,7 +259,6 @@ test_engine_SOURCES = \
 	src/test/test-engine.c
 
 test_engine_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SECCOMP_CFLAGS) \
 	$(MOUNT_CFLAGS)
 
@@ -270,7 +269,6 @@ test_job_type_SOURCES = \
 	src/test/test-job-type.c
 
 test_job_type_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SECCOMP_CFLAGS) \
 	$(MOUNT_CFLAGS)
 
@@ -281,7 +279,6 @@ test_ns_SOURCES = \
 	src/test/test-ns.c
 
 test_ns_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SECCOMP_CFLAGS)
 
 test_ns_LDADD = \
@@ -321,7 +318,6 @@ test_unit_name_SOURCES = \
 	src/test/test-unit-name.c
 
 test_unit_name_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SECCOMP_CFLAGS) \
 	$(MOUNT_CFLAGS)
 
@@ -332,7 +328,6 @@ test_unit_file_SOURCES = \
 	src/test/test-unit-file.c
 
 test_unit_file_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SECCOMP_CFLAGS) \
 	$(MOUNT_CFLAGS)
 
@@ -349,7 +344,6 @@ test_capability_SOURCES = \
 	src/test/test-capability.c
 
 test_capability_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(CAP_CFLAGS)
 
 test_capability_LDADD = \
@@ -541,7 +535,6 @@ test_cap_list_SOURCES = \
 	src/test/test-cap-list.c
 
 test_cap_list_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(CAP_CFLAGS)
 
 test_cap_list_LDADD = \
@@ -624,7 +617,6 @@ BUILT_SOURCES += \
 	src/test/test-hashmap-ordered.c
 
 $(outdir)/test-hashmap-ordered.c: src/test/test-hashmap-plain.c
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN { print "/* GENERATED FILE */\n#define ORDERED" } \
 	                   { if (!match($$0, "^#include"))          \
 	                         gsub(/hashmap/, "ordered_hashmap"); \
@@ -679,10 +671,8 @@ test_tables_SOURCES = \
 	src/journal/journald-server.h
 
 test_tables_CPPFLAGS = \
-	$(AM_CPPFLAGS)
 
 test_tables_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SECCOMP_CFLAGS) \
 	$(MOUNT_CFLAGS)
 
@@ -744,7 +734,6 @@ test_firewall_util_SOURCES = \
 	src/test/test-firewall-util.c
 
 test_firewall_util_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(LIBIPTC_CFLAGS)
 
 test_firewall_util_LDADD = \
@@ -757,7 +746,6 @@ test_netlink_manual_SOURCES = \
 	src/test/test-netlink-manual.c
 
 test_netlink_manual_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(KMOD_CFLAGS)
 
 test_netlink_manual_LDADD = \
@@ -816,11 +804,9 @@ test_cgroup_mask_SOURCES = \
 	src/test/test-cgroup-mask.c
 
 test_cgroup_mask_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
 	$(MOUNT_CFLAGS)
 
 test_cgroup_mask_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SECCOMP_CFLAGS)
 
 test_cgroup_mask_LDADD = \
@@ -860,7 +846,6 @@ test_path_SOURCES = \
 	src/test/test-path.c
 
 test_path_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(MOUNT_CFLAGS)
 
 test_path_LDADD = \
@@ -870,7 +855,6 @@ test_execute_SOURCES = \
 	src/test/test-execute.c
 
 test_execute_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(MOUNT_CFLAGS)
 
 test_execute_LDADD = \
@@ -904,11 +888,9 @@ test_sched_prio_SOURCES = \
 	src/test/test-sched-prio.c
 
 test_sched_prio_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
 	$(MOUNT_CFLAGS)
 
 test_sched_prio_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SECCOMP_CFLAGS)
 
 test_sched_prio_LDADD = \

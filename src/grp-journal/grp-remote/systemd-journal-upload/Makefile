@@ -33,7 +33,6 @@ systemd_journal_upload_SOURCES = \
         src/journal-remote/journal-upload-journal.c
 
 systemd_journal_upload_CFLAGS = \
-        $(AM_CFLAGS) \
         $(LIBCURL_CFLAGS)
 
 systemd_journal_upload_LDADD = \

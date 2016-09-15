@@ -33,7 +33,6 @@ systemd_export_SOURCES = \
 	src/import/export-raw.h
 
 systemd_export_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(XZ_CFLAGS) \
 	$(ZLIB_CFLAGS) \
 	$(BZIP2_CFLAGS)

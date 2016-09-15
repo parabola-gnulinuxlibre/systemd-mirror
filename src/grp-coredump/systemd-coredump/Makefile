@@ -30,7 +30,6 @@ systemd_coredump_SOURCES = \
 	src/coredump/coredump-vacuum.h
 
 systemd_coredump_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(ACL_CFLAGS)
 
 systemd_coredump_LDADD = \

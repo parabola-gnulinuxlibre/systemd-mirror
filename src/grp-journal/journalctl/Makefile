@@ -25,7 +25,6 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 
 # using _CFLAGS = in the conditional below would suppress AM_CFLAGS
 journalctl_CFLAGS = \
-	$(AM_CFLAGS)
 
 journalctl_SOURCES = \
 	src/journal/journalctl.c

@@ -29,7 +29,6 @@ libnss_myhostname_la_SOURCES = \
 	src/nss-myhostname/nss-myhostname.c
 
 libnss_myhostname_la_LDFLAGS = \
-	$(AM_LDFLAGS) \
 	-module \
 	-export-dynamic \
 	-avoid-version \

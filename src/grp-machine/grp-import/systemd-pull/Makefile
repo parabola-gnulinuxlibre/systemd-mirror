@@ -38,7 +38,6 @@ systemd_pull_SOURCES = \
 	src/import/curl-util.h
 
 systemd_pull_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(LIBCURL_CFLAGS) \
 	$(XZ_CFLAGS) \
 	$(ZLIB_CFLAGS) \

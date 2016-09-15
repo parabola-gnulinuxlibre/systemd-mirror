@@ -28,7 +28,6 @@ libnss_resolve_la_SOURCES = \
 	src/nss-resolve/nss-resolve.c
 
 libnss_resolve_la_LDFLAGS = \
-	$(AM_LDFLAGS) \
 	-module \
 	-export-dynamic \
 	-avoid-version \

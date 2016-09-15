@@ -63,7 +63,6 @@ test_resolve_tables_SOURCES = \
 	src/shared/test-tables.h
 
 test_resolve_tables_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(GCRYPT_CFLAGS)
 
 test_resolve_tables_LDADD = \
@@ -77,11 +76,9 @@ test_dns_packet_SOURCES = \
 	$(basic_dns_sources)
 
 test_dns_packet_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
 	-DRESOLVE_TEST_DIR=\"$(abs_top_srcdir)/src/resolve/test-data\"
 
 test_dns_packet_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(GCRYPT_CFLAGS)
 
 test_dns_packet_LDADD = \
@@ -107,7 +104,6 @@ test_dnssec_SOURCES = \
 	$(basic_dns_sources)
 
 test_dnssec_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(GCRYPT_CFLAGS)
 
 test_dnssec_LDADD = \

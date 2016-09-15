@@ -27,7 +27,6 @@ noinst_LTLIBRARIES += \
 	libsystemd-network.la
 
 libsystemd_network_la_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(KMOD_CFLAGS)
 
 libsystemd_network_la_SOURCES = \

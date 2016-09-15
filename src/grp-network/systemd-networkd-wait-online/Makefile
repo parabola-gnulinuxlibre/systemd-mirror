@@ -27,7 +27,6 @@ rootlibexec_PROGRAMS += \
 	systemd-networkd-wait-online
 
 systemd_networkd_wait_online_CFLAGS = \
-	$(AM_CFLAGS)
 
 systemd_networkd_wait_online_SOURCES = \
 	src/libsystemd-network/network-internal.h \

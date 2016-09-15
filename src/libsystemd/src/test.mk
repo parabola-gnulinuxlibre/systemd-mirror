@@ -30,7 +30,6 @@ test_bus_marshal_LDADD = \
 	$(DBUS_LIBS)
 
 test_bus_marshal_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(DBUS_CFLAGS)
 
@@ -50,7 +49,6 @@ test_bus_cleanup_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-cleanup.c
 
 test_bus_cleanup_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(SECCOMP_CFLAGS)
 
 test_bus_cleanup_LDADD = \
@@ -83,7 +81,6 @@ test_bus_gvariant_LDADD = \
 	$(GLIB_LIBS)
 
 test_bus_gvariant_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS)
 
 test_bus_creds_SOURCES = \

@@ -58,7 +58,6 @@ gperf_gperf_sources += \
 	src/nspawn/nspawn-gperf.gperf
 
 systemd_nspawn_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(ACL_CFLAGS) \
 	$(BLKID_CFLAGS) \
 	$(SECCOMP_CFLAGS) \
@@ -82,7 +81,6 @@ test_patch_uid_SOURCES = \
 	src/nspawn/test-patch-uid.c
 
 test_patch_uid_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(ACL_CFLAGS)
 
 test_patch_uid_LDADD = \

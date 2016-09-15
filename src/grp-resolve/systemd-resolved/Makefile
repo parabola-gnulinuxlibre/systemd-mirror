@@ -76,7 +76,6 @@ nodist_systemd_resolved_SOURCES = \
 	src/resolve/resolved-gperf.c
 
 systemd_resolved_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(GCRYPT_CFLAGS)
 
 systemd_resolved_LDADD = \

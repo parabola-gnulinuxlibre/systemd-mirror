@@ -32,7 +32,6 @@ systemd_update_utmp_SOURCES = \
 	src/update-utmp/update-utmp.c
 
 systemd_update_utmp_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(AUDIT_CFLAGS)
 
 systemd_update_utmp_LDADD = \

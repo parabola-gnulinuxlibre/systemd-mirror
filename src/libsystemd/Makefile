@@ -44,7 +44,6 @@ EXTRA_DIST += \
 	$(libsystemd_journal_internal_la_CFLAGS)
 
 libsystemd_la_LDFLAGS = \
-	$(AM_LDFLAGS) \
 	-version-info $(LIBSYSTEMD_CURRENT):$(LIBSYSTEMD_REVISION):$(LIBSYSTEMD_AGE) \
 	-Wl,--version-script=$(srcdir)/libsystemd.sym
 

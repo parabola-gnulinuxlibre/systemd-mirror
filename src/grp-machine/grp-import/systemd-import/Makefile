@@ -32,7 +32,6 @@ systemd_import_SOURCES = \
 	src/import/import-tar.h
 
 systemd_import_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(XZ_CFLAGS) \
 	$(ZLIB_CFLAGS) \
 	$(BZIP2_CFLAGS)

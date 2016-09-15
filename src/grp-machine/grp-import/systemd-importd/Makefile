@@ -28,7 +28,6 @@ systemd_importd_SOURCES = \
 	src/import/importd.c
 
 systemd_importd_CFLAGS = \
-	$(AM_CFLAGS) \
 	-D SYSTEMD_PULL_PATH=\"$(rootlibexecdir)/systemd-pull\" \
 	-D SYSTEMD_IMPORT_PATH=\"$(rootlibexecdir)/systemd-import\" \
 	-D SYSTEMD_EXPORT_PATH=\"$(rootlibexecdir)/systemd-export\"

@@ -44,11 +44,9 @@ systemd_journal_gatewayd_LDADD += \
 endif # HAVE_GNUTLS
 
 systemd_journal_gatewayd_CFLAGS = \
-	$(AM_CFLAGS) \
 	$(MICROHTTPD_CFLAGS)
 
 systemd_journal_gatewayd_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
 	-DDOCUMENT_ROOT=\"$(gatewayddocumentrootdir)\"
 
 dist_systemunit_DATA += \
