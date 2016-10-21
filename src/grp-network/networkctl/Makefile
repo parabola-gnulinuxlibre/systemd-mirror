@@ -30,6 +30,7 @@ networkctl_SOURCES = \
 	src/network/networkctl.c
 
 networkctl_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la \
 	libsystemd-network.la
 

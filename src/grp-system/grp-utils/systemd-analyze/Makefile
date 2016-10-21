@@ -34,6 +34,7 @@ systemd_analyze_CFLAGS = \
 	$(MOUNT_CFLAGS)
 
 systemd_analyze_LDADD = \
+	libsystemd-internal.la \
 	libcore.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

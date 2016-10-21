@@ -30,6 +30,7 @@
 
 #include <linux/reboot.h>
 
+#include "core/killall.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/cgroup-util.h"
 #include "systemd-basic/def.h"
@@ -45,7 +46,6 @@
 #include "systemd-shared/switch-root.h"
 #include "systemd-shared/watchdog.h"
 
-#include "killall.h"
 #include "umount.h"
 
 #define FINALIZE_ATTEMPTS 50

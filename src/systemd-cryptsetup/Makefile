@@ -41,6 +41,7 @@ systemd_cryptsetup_CFLAGS = \
 	$(LIBCRYPTSETUP_CFLAGS)
 
 systemd_cryptsetup_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la \
 	$(LIBCRYPTSETUP_LIBS)
 

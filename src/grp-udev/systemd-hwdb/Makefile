@@ -32,6 +32,7 @@ systemd_hwdb_SOURCES = \
 	src/hwdb/hwdb.c
 
 systemd_hwdb_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la
 
 rootbin_PROGRAMS += \

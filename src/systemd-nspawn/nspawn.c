@@ -44,6 +44,8 @@
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-id128.h>
 
+#include "core/loopback-setup.h"
+#include "sd-id128/id128-util.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/barrier.h"
 #include "systemd-basic/btrfs-util.h"
@@ -68,6 +70,14 @@
 #include "systemd-basic/random-util.h"
 #include "systemd-basic/raw-clone.h"
 #include "systemd-basic/rm-rf.h"
+#include "systemd-basic/selinux-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/stat-util.h"
+#include "systemd-basic/stdio-util.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/umask-util.h"
+#include "systemd-basic/user-util.h"
 #include "systemd-blkid/blkid-util.h"
 #include "systemd-shared/base-filesystem.h"
 #include "systemd-shared/dev-setup.h"
@@ -77,7 +87,6 @@
 #include "systemd-shared/ptyfwd.h"
 #include "systemd-shared/udev-util.h"
 
-#include "loopback-setup.h"
 #include "nspawn-cgroup.h"
 #include "nspawn-expose-ports.h"
 #include "nspawn-mount.h"

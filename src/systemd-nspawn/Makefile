@@ -45,11 +45,7 @@ systemd_nspawn_SOURCES = \
 	src/nspawn/nspawn-stub-pid1.c \
 	src/nspawn/nspawn-stub-pid1.h \
 	src/nspawn/nspawn-patch-uid.c \
-	src/nspawn/nspawn-patch-uid.h \
-	src/core/mount-setup.c \
-	src/core/mount-setup.h \
-	src/core/loopback-setup.c \
-	src/core/loopback-setup.h
+	src/nspawn/nspawn-patch-uid.h
 
 nodist_systemd_nspawn_SOURCES = \
 	src/nspawn/nspawn-gperf.c
@@ -64,6 +60,9 @@ systemd_nspawn_CFLAGS = \
 	$(SELINUX_CFLAGS)
 
 systemd_nspawn_LDADD = \
+	libcore.la \
+	libsystemd-blkid.la \
+	libsystemd-internal.la \
 	libsystemd-shared.la \
 	$(ACL_LIBS) \
 	$(BLKID_LIBS) \

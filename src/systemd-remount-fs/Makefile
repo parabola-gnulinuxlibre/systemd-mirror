@@ -25,11 +25,10 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 
 rootlibexec_PROGRAMS += systemd-remount-fs
 systemd_remount_fs_SOURCES = \
-	src/remount-fs/remount-fs.c \
-	src/core/mount-setup.c \
-	src/core/mount-setup.h
+	src/remount-fs/remount-fs.c
 
 systemd_remount_fs_LDADD = \
+	libcore.la \
 	libsystemd-shared.la
 
 sd.CPPFLAGS += -DMOUNT_PATH=\"$(MOUNT_PATH)\"

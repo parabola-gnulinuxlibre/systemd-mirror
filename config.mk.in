@@ -104,7 +104,7 @@ rootlibdir=@rootlibdir@
 # Libraries we provide
 libsystemd.CPPFLAGS                  = -I$(topsrcdir)/src/libsystemd/include
 libsystemd.DEPENDS                   =   $(topoutdir)/src/libsystemd/libsystemd.la
-libsystemd-internal.CPPFLAGS         = -I$(topsrcdir)/src/libsystemd/src -I$(topoutdir)/src/libsystemd/src $(libsystemd.CPPFLAGS) $(libsystemd-basic.CPPFLAGS)
+libsystemd-internal.CPPFLAGS         = -I$(topsrcdir)/src/libsystemd/src -I$(topoutdir)/src/libsystemd/src $(libsystemd.CPPFLAGS) $(libsystemd-staging.CPPFLAGS) $(libsystemd-basic.CPPFLAGS)
 libsystemd-internal.DEPENDS          =   $(topoutdir)/src/libsystemd/src/libsystemd-internal.la
 libsystemd-staging.CPPFLAGS          = -I$(topsrcdir)/src/libsystemd/include-staging $(libsystemd.CPPFLAGS)
 libsystemd-staging.DEPENDS           = $(libsystemd-internal.DEPENDS)
@@ -130,8 +130,8 @@ libudev-internal.CPPFLAGS            = -I$(topsrcdir)/src/libudev/src $(libudev.
 libudev-internal.DEPENDS             =   $(topoutdir)/src/libudev/src/libudev-internal.la
 
 # -core libs
-libcore.CPPFLAGS                     = -I$(topsrcdir)/src/grp-system/libcore $(libsystemd-shared.CPPFLAGS)
-libcore.DEPENDS                      =   $(topoutdir)/src/grp-system/libcore/libcore.la
+libcore.CPPFLAGS                     = -I$(topsrcdir)/src/grp-system/libcore/include $(libsystemd-shared.CPPFLAGS)
+libcore.DEPENDS                      =   $(topoutdir)/src/grp-system/libcore/src/libcore.la
 #libbus-proxy-core.CPPFLAGS =
 #libbus-proxy-core.DEPENDS  =
 libjournal-core.CPPFLAGS   = -I$(topsrcdir)/src/grp-journal/libjournal-core/include $(libsystemd-internal.CPPFLAGS) $(libsystemd-basic.CPPFLAGS) $(libsystemd-shared.CPPFLAGS)

@@ -28,6 +28,7 @@ timedatectl_SOURCES = \
 	src/timedate/timedatectl.c
 
 timedatectl_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la
 
 bin_PROGRAMS += \

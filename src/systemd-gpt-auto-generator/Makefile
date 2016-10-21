@@ -32,6 +32,7 @@ systemd_gpt_auto_generator_SOURCES = \
 	src/basic/blkid-util.h
 
 systemd_gpt_auto_generator_LDADD = \
+	libsystemd-blkid.la \
 	libsystemd-shared.la \
 	$(BLKID_LIBS)
 

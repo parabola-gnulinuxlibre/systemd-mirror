@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 
-#include "manager.h"
+#include "core/manager.h"
 #include "sd-bus/bus-error.h"
 #include "sd-bus/bus-util.h"
 #include "systemd-basic/alloc-util.h"

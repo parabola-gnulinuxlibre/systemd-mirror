@@ -28,6 +28,7 @@
 
 #include <libudev.h>
 
+#include "core/mount-setup.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/escape.h"
 #include "systemd-basic/fd-util.h"
@@ -39,7 +40,6 @@
 #include "systemd-shared/fstab-util.h"
 #include "systemd-shared/udev-util.h"
 
-#include "mount-setup.h"
 #include "umount.h"
 
 typedef struct MountPoint {

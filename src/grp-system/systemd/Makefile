@@ -32,7 +32,8 @@ systemd_CFLAGS = \
 	$(MOUNT_CFLAGS)
 
 systemd_LDADD = \
-	libcore.la
+	libcore.la \
+	libsystemd-internal.la
 
 dist_tmpfiles_DATA = \
 	tmpfiles.d/systemd.conf \

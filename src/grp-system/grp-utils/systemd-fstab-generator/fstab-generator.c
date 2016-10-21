@@ -23,6 +23,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "core/mount-setup.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/fd-util.h"
 #include "systemd-basic/fileio.h"
@@ -41,8 +42,6 @@
 #include "systemd-basic/virt.h"
 #include "systemd-shared/fstab-util.h"
 #include "systemd-shared/generator.h"
-
-#include "mount-setup.h"
 
 static const char *arg_dest = "/tmp";
 static bool arg_fstab_enabled = true;

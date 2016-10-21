@@ -27,13 +27,10 @@ rootlibexec_PROGRAMS += systemd-shutdown
 systemd_shutdown_SOURCES = \
 	src/core/umount.c \
 	src/core/umount.h \
-	src/core/shutdown.c \
-	src/core/mount-setup.c \
-	src/core/mount-setup.h \
-	src/core/killall.h \
-	src/core/killall.c
+	src/core/shutdown.c
 
 systemd_shutdown_LDADD = \
+	libcore.la \
 	libsystemd-shared.la
 
 sd.CPPFLAGS += -DSYSTEM_SHUTDOWN_PATH=\"$(systemshutdowndir)\"

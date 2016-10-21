@@ -37,6 +37,7 @@ systemd_networkd_wait_online_SOURCES = \
 	src/network/networkd-wait-online-link.c
 
 systemd_networkd_wait_online_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-network.la \
 	libsystemd-shared.la
 

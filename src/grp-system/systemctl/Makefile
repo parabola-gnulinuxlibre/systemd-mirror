@@ -28,6 +28,7 @@ systemctl_SOURCES = \
 	src/systemctl/systemctl.c
 
 systemctl_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la
 
 files.out.all += systemctl.completion.bash

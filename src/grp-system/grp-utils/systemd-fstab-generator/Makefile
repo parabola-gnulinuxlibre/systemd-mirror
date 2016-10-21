@@ -25,10 +25,10 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 
 systemgenerator_PROGRAMS += systemd-fstab-generator
 systemd_fstab_generator_SOURCES = \
-	src/fstab-generator/fstab-generator.c \
-	src/core/mount-setup.c
+	src/fstab-generator/fstab-generator.c
 
 systemd_fstab_generator_LDADD = \
+	libcore.la \
 	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
