@@ -2,46 +2,67 @@
 
 [remote "r-systemd"]
 	url = https://github.com/systemd/systemd.git
-	tagopt = --no-tags
 	fetch = +refs/heads/*:refs/remotes/r-systemd/*
-	fetch = +refs/tags/*:refs/tags/systemd/*
+	# There are two tag formats coming from r-systemd:
+	#  - vXXX: systemd versions
+	#  - XXX: (001-182) udev versions, from before the
+	#    systemd/udev merge
+	# Let's put them each in their own namespace.
+	tagopt = --no-tags
+	fetch = +refs/tags/v*:refs/tags/systemd/v*
+	fetch = +refs/tags/0*:refs/tags/udev/v0*
+	fetch = +refs/tags/1*:refs/tags/udev/v1*
 [branch "systemd/master"]
 	remote = r-systemd
 	merge = refs/heads/master
 
 [remote "r-elogind"]
 	url = https://github.com/wingo/elogind.git
-	tagopt = --no-tags
 	fetch = +refs/heads/*:refs/remotes/r-elogind/*
-	fetch = +refs/tags/*:refs/tags/elogind/*
+	# There are 3 tag formats coming from r-elogind:
+	#  - XXX: legacy udev tags
+	#  - vXXX: upstream systemd tags
+	#  - vXXX.Y: elogind versions
+	# Unfortunately, git gives us no good way of filtering to only
+	# get tags containing a `.`
+	tagopt = --no-tags
+	fetch = +refs/tags/v*:refs/tags/elogind/v*
 [branch "elogind/master"]
 	remote = r-elogind
 	merge = refs/heads/master
 
 [remote "r-eudev"]
 	url = https://github.com/gentoo/eudev.git
-	tagopt = --no-tags
 	fetch = +refs/heads/*:refs/remotes/r-eudev/*
-	fetch = +refs/tags/*:refs/tags/eudev/*
+	# Similarly to how we have done, r-eudev has mapped systemd
+	# tags to `systemd-vXXX` and legacy udev tags to `udev-XXX`.
+	# The eudev tags are typically `vX.Y.Z`, but several of them
+	# are just `X.Y.Z`.  Fortunately 1.5.* are the only ones
+	# without a vX.Y.Z tag; the other has both forms.
+	tagopt = --no-tags
+	fetch = +refs/tags/v*:refs/tags/eudev/v*
+	fetch = +refs/tags/1*:refs/tags/eudev/v1*
 [branch "eudev/master"]
 	remote = r-eudev
 	merge = refs/heads/master
 
-[remote "r-parabola"]
+[remote "origin"]
 	url = https://git.parabola.nu/~lukeshu/systemd.git
 	pushUrl = ssh://git@git.parabola.nu/~git/~lukeshu/systemd.git
-	fetch = +refs/heads/*:refs/remotes/r-parabola/*
+	fetch = +refs/heads/*:refs/remotes/origin/*
+	tagopt = --no-tags
+	fetch = +refs/tags/*:refs/tags/*
 [branch "systemd/parabola"]
-	remote = r-parabola
+	remote = origin
 	merge = refs/heads/systemd/parabola
 [branch "notsystemd/premove"]
-	remote = r-parabola
+	remote = origin
 	merge = refs/heads/notsystemd/premove
 [branch "notsystemd/postmove"]
-	remote = r-parabola
+	remote = origin
 	merge = refs/heads/notsystemd/postmove
 [branch "notsystemd/master"]
-	remote = r-parabola
+	remote = origin
 	merge = refs/heads/notsystemd/postmove
 
 [remote "r-autothing"]
