@@ -1416,7 +1416,7 @@ CLEANFILES += \
 
 #@src/libbasic/include/Makefile
 nested.subdirs += basic
-#@src/libbasic/include/basic/Makefile
+#@src/libbasic/include/systemd-basic/Makefile
 src/basic/errno-list.txt:
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM -include errno.h - </dev/null | $(AWK) '/^#define[ \t]+E[^ _]+[ \t]+/ { print $$2; }' >$@
