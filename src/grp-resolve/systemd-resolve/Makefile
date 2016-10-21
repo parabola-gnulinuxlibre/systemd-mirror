@@ -37,6 +37,8 @@ systemd_resolve_CFLAGS = \
 	$(GCRYPT_CFLAGS)
 
 systemd_resolve_LDADD = \
+	libsystemd-internal.la \
+	libsystemd-gcrypt.la \
 	libsystemd-shared.la \
 	$(GCRYPT_LIBS) \
 	-lm

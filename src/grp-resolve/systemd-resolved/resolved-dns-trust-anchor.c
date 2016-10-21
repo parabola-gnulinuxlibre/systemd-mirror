@@ -19,7 +19,7 @@
 
 #include <systemd/sd-messages.h>
 
-#include "resolved-dns-dnssec.h"
+#include "basic-dns/resolved-dns-dnssec.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/conf-files.h"
 #include "systemd-basic/def.h"

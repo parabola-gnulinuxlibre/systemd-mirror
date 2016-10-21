@@ -19,8 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "resolved-dns-answer.h"
-#include "resolved-dns-rr.h"
+#include "basic-dns/resolved-dns-answer.h"
+#include "basic-dns/resolved-dns-rr.h"
 #include "systemd-basic/hashmap.h"
 
 typedef struct DnsTrustAnchor DnsTrustAnchor;

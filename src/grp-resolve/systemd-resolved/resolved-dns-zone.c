@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "resolved-dns-packet.h"
+#include "basic-dns/resolved-dns-packet.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/list.h"
 #include "systemd-basic/string-util.h"

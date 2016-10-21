@@ -20,6 +20,8 @@
 #include <glob.h>
 #include <net/if.h>
 
+#include "basic-dns/resolved-dns-packet.h"
+#include "basic-dns/resolved-dns-rr.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/fileio.h"
 #include "systemd-basic/glob-util.h"
@@ -28,9 +30,6 @@
 #include "systemd-basic/string-util.h"
 #include "systemd-basic/strv.h"
 #include "systemd-basic/unaligned.h"
-
-#include "resolved-dns-packet.h"
-#include "resolved-dns-rr.h"
 
 #define HASH_KEY SD_ID128_MAKE(d3,1e,48,90,4b,fa,4c,fe,af,9d,d5,a1,d7,2e,8a,b1)
 

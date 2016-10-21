@@ -57,9 +57,9 @@ enum DnsTransactionSource {
         _DNS_TRANSACTION_SOURCE_INVALID = -1
 };
 
-#include "resolved-dns-answer.h"
-#include "resolved-dns-packet.h"
-#include "resolved-dns-question.h"
+#include "basic-dns/resolved-dns-answer.h"
+#include "basic-dns/resolved-dns-packet.h"
+#include "basic-dns/resolved-dns-question.h"
 
 #include "resolved-dns-scope.h"
 

@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "dns-type.h"
+#include "basic-dns/dns-type.h"
 #include "sd-netlink/local-addresses.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/hostname-util.h"

@@ -144,8 +144,8 @@ libnetworkd-core.CPPFLAGS  = -I$(topsrcdir)/src/grp-network/libnetworkd-core $(l
 libnetworkd-core.DEPENDS   =   $(topoutdir)/src/grp-network/libnetworkd-core/libnetworkd-core.la
 libudev-core.CPPFLAGS      = -I$(topoutdir)/src/grp-udev/libudev-core $(libsystemd-network.CPPFLAGS) $(libsystemd-shared.CPPFLAGS)
 libudev-core.DEPENDS       =   $(topoutdir)/src/grp-udev/libudev-core/libudev-core.la
-libbasic-dns.CPPFLAGS      = -I$(topoutdir)/src/grp-resolve/libbasic-dns -I$(topsrcdir)/src/grp-resolve/libbasic-dns
-libbasic-dns.DEPENDS       =   $(topoutdir)/src/grp-resolve/libbasic-dns/libbasic-dns.la
+libbasic-dns.CPPFLAGS      = -I$(topsrcdir)/src/grp-resolve/libbasic-dns/include
+libbasic-dns.DEPENDS       =   $(topoutdir)/src/grp-resolve/libbasic-dns/src/libbasic-dns.la
 libimport.CPPFLAGS         = -I$(topsrcdir)/src/grp-machine/grp-import/libimport
 libimport.DEPENDS          =   $(topoutdir)/src/grp-machine/grp-import/libimport/libimport.la
 # NSS modules

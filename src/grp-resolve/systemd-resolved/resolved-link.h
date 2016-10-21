@@ -21,7 +21,7 @@
 
 #include <net/if.h>
 
-#include "resolved-dns-rr.h"
+#include "basic-dns/resolved-dns-rr.h"
 #include "systemd-basic/in-addr-util.h"
 #include "systemd-basic/ratelimit.h"
 #include "systemd-shared/resolve-util.h"

@@ -19,8 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "resolved-dns-dnssec.h"
-#include "resolved-dns-packet.h"
+#include "basic-dns/resolved-dns-dnssec.h"
+#include "basic-dns/resolved-dns-packet.h"
 #include "systemd-basic/list.h"
 
 typedef struct DnsScope DnsScope;

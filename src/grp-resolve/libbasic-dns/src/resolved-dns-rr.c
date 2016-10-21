@@ -19,6 +19,10 @@
 
 #include <math.h>
 
+#include "basic-dns/dns-type.h"
+#include "basic-dns/resolved-dns-dnssec.h"
+#include "basic-dns/resolved-dns-packet.h"
+#include "basic-dns/resolved-dns-rr.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/escape.h"
 #include "systemd-basic/hexdecoct.h"
@@ -27,11 +31,6 @@
 #include "systemd-basic/strv.h"
 #include "systemd-basic/terminal-util.h"
 #include "systemd-shared/dns-domain.h"
-
-#include "dns-type.h"
-#include "resolved-dns-dnssec.h"
-#include "resolved-dns-packet.h"
-#include "resolved-dns-rr.h"
 
 DnsResourceKey* dns_resource_key_new(uint16_t class, uint16_t type, const char *name) {
         DnsResourceKey *k;

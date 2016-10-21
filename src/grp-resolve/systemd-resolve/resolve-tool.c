@@ -22,8 +22,8 @@
 
 #include <systemd/sd-bus.h>
 
-#include "resolved-def.h"
-#include "resolved-dns-packet.h"
+#include "basic-dns/resolved-def.h"
+#include "basic-dns/resolved-dns-packet.h"
 #include "sd-bus/bus-error.h"
 #include "sd-bus/bus-util.h"
 #include "sd-netlink/netlink-util.h"

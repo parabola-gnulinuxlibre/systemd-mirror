@@ -79,6 +79,7 @@ systemd_resolved_CFLAGS = \
 	$(GCRYPT_CFLAGS)
 
 systemd_resolved_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-network.la \
 	libsystemd-shared.la \
 	$(GCRYPT_LIBS) \

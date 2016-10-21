@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "resolved-def.h"
+#include "basic-dns/resolved-def.h"
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-util.h"
 #include "systemd-basic/alloc-util.h"

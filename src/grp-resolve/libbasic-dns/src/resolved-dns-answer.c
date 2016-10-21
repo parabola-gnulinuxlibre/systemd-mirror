@@ -17,12 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include "basic-dns/resolved-dns-answer.h"
+#include "basic-dns/resolved-dns-dnssec.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/string-util.h"
 #include "systemd-shared/dns-domain.h"
-
-#include "resolved-dns-answer.h"
-#include "resolved-dns-dnssec.h"
 
 DnsAnswer *dns_answer_new(unsigned n) {
         DnsAnswer *a;

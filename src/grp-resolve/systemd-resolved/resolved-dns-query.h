@@ -22,8 +22,8 @@
 
 #include <systemd/sd-bus.h>
 
-#include "resolved-dns-answer.h"
-#include "resolved-dns-question.h"
+#include "basic-dns/resolved-dns-answer.h"
+#include "basic-dns/resolved-dns-question.h"
 #include "systemd-basic/set.h"
 
 typedef struct DnsQuery DnsQuery;

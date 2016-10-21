@@ -21,14 +21,13 @@
 #include <gcrypt.h>
 #endif
 
+#include "basic-dns/resolved-dns-dnssec.h"
+#include "basic-dns/resolved-dns-packet.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/hexdecoct.h"
 #include "systemd-basic/string-table.h"
 #include "systemd-gcrypt/gcrypt-util.h"
 #include "systemd-shared/dns-domain.h"
-
-#include "resolved-dns-dnssec.h"
-#include "resolved-dns-packet.h"
 
 #define VERIFY_RRS_MAX 256
 #define MAX_KEY_SIZE (32*1024)

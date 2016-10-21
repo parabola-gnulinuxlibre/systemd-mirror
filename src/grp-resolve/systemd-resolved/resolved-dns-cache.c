@@ -19,8 +19,8 @@
 
 #include <net/if.h>
 
-#include "resolved-dns-answer.h"
-#include "resolved-dns-packet.h"
+#include "basic-dns/resolved-dns-answer.h"
+#include "basic-dns/resolved-dns-packet.h"
 #include "systemd-basic/af-list.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/string-util.h"

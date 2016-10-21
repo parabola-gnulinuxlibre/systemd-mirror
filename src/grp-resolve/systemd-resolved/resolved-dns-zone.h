@@ -26,9 +26,9 @@ typedef struct DnsZone {
         Hashmap *by_name;
 } DnsZone;
 
-#include "resolved-dns-answer.h"
-#include "resolved-dns-question.h"
-#include "resolved-dns-rr.h"
+#include "basic-dns/resolved-dns-answer.h"
+#include "basic-dns/resolved-dns-question.h"
+#include "basic-dns/resolved-dns-rr.h"
 
 typedef enum DnsZoneItemState DnsZoneItemState;
 typedef struct DnsZoneItem DnsZoneItem;

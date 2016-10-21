@@ -31,10 +31,10 @@ typedef struct DnsCache {
         unsigned n_miss;
 } DnsCache;
 
-#include "resolved-dns-answer.h"
-#include "resolved-dns-packet.h"
-#include "resolved-dns-question.h"
-#include "resolved-dns-rr.h"
+#include "basic-dns/resolved-dns-answer.h"
+#include "basic-dns/resolved-dns-packet.h"
+#include "basic-dns/resolved-dns-question.h"
+#include "basic-dns/resolved-dns-rr.h"
 
 void dns_cache_flush(DnsCache *c);
 void dns_cache_prune(DnsCache *c);

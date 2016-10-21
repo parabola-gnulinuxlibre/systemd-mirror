@@ -17,9 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include "basic-dns/dns-type.h"
 #include "systemd-shared/test-tables.h"
-
-#include "dns-type.h"
 
 int main(int argc, char **argv) {
         uint16_t i;

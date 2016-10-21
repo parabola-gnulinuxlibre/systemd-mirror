@@ -17,11 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include "basic-dns/dns-type.h"
+#include "basic-dns/resolved-dns-question.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-shared/dns-domain.h"
-
-#include "dns-type.h"
-#include "resolved-dns-question.h"
 
 DnsQuestion *dns_question_new(unsigned n) {
         DnsQuestion *q;
