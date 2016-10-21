@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 outfile=$1
-tmpfile="$(dirname "$outfile")/.tmp${outfile##*/}"
+tmpfile="$(dirname "$outfile")/.tmp.${outfile##*/}.tmp"
 
 cat > "$tmpfile" || { r=$?; rm -f "$tmpfile"; exit $r; }
 mv -f "$tmpfile" "$outfile"
