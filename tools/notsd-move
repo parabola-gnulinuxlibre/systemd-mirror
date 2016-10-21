@@ -119,21 +119,22 @@ move_files() (
 	   src/core/umount*
 	mv -T src/{,lib}core
 
-	mv -T src/{,lib}basic
-	mv -T src/{,lib}shared
+	mv -T src/{,libsystemd-}basic
+	mv -T src/{,libsystemd-}shared
 
-	mv -T src/lib{shared,core}/linux
+	mv -T src/lib{systemd-shared,core}/linux
 
 	mkdir src/libfirewall
-	mv -T src/lib{shared,firewall}/firewall-util.c
-	mv -T src/lib{shared,firewall}/firewall-util.h
+	mv -T src/lib{systemd-shared,firewall}/firewall-util.c
+	mv -T src/lib{systemd-shared,firewall}/firewall-util.h
 
-	split_lib src/libbasic
+	split_lib src/libcore
+	split_lib src/libsystemd-basic
+	split_lib src/libsystemd-shared
 	split_lib src/libsystemd-network
 
-	split_lib src/libshared
-	mv src/libshared/{test,include/shared}/test-tables.h
-	rmdir src/libshared/test
+	mv src/libsystemd-shared/{test,include/systemd-shared}/test-tables.h
+	rmdir src/libsystemd-shared/test
 
 	mkdir src/systemd-hibernate-resume-generator
 	mv -t src/systemd-hibernate-resume-generator \
@@ -441,7 +442,7 @@ move_files() (
 	   units/machine.slice*
 
 	# muck
-	mv -t src/libbasic/include/basic src/libbasic/.gitignore
+	mv -t src/libsystemd-basic/include/systemd-basic src/libsystemd-basic/.gitignore
 	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
 	mv -t src/systemd-tmpfiles units/systemd-tmpfiles*
 	mv -t src/systemd-tmpfiles \
@@ -698,7 +699,7 @@ breakup_makefile() (
 
 	sed -ri \
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
-	    src/libbasic/include/basic/Makefile \
+	    src/libsystemd-basic/include/systemd-basic/Makefile \
 	    src/libsystemd/src/Makefile \
 	    src/libsystemd/src/sd-journal/Makefile \
 	    src/grp-udev/libudev-core/Makefile
@@ -722,8 +723,8 @@ breakup_makefile() (
 	ln -sT ../../grp-login/systemd-logind/logind-acl.h src/grp-udev/libudev-core/logind-acl.h
 	ln -sT ../../libsystemd/src/sd-login/sd-login.c src/grp-udev/libudev-core/sd-login.c
 	ln -sT ../../grp-login/systemd-logind/logind-acl.c src/grp-udev/libudev-core/logind-acl.c
-	ln -sT ../../../libshared/include/shared/gcrypt-util.h src/libsystemd/src/sd-journal/gcrypt-util.h
-	ln -sT ../../../libshared/src/gcrypt-util.c src/libsystemd/src/sd-journal/gcrypt-util.c
+	ln -sT ../../../libsystemd-shared/include/systemd-shared/gcrypt-util.h src/libsystemd/src/sd-journal/gcrypt-util.h
+	ln -sT ../../../libsystemd-shared/src/gcrypt-util.c src/libsystemd/src/sd-journal/gcrypt-util.c
 	ln -sT ../grp-system/libcore/machine-id-setup.h src/systemd-machine-id-setup/machine-id-setup.h
 	ln -sT ../grp-system/libcore/machine-id-setup.c src/systemd-machine-id-setup/machine-id-setup.c
 
@@ -748,7 +749,13 @@ fixup_makefile() {
 	    -e '/^[^#	]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' \
 	    -e 's|^if (.*)|ifneq ($(\1),)|' \
 	    -e '/^\s*\$\(AM_(C|CPP|LD)FLAGS\b/d' \
-	    -e 's|--version-script=.*/([^/]+)\.sym|--version-script=$(srcdir)/\1.sym|g'
+	    -e 's|--version-script=.*/([^/]+)\.sym|--version-script=$(srcdir)/\1.sym|g' \
+	    -e '#### Rename helpers ################' \
+	    -e 's|libbasic_la|libsystemd_basic_la|g' \
+	    -e 's|libshared_la|libsystemd_shared_la|g' \
+	    -e 's|libbasic|libsystemd-basic|g' \
+	    -e 's|libshared|libsystemd-shared|g' \
+	    -e 's|libsystemd-basic-dns|libbasic-dns|g'
 }
 
 breakup_zshcompletion() (
