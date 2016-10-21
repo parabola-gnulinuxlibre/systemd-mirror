@@ -4,7 +4,7 @@
   Copyright 2012 Lennart Poettering
   Copyright 2012 Zbigniew Jędrzejewski-Szmek
 
-  systemd is free software; you can redistribute it anor modify it
+  systemd is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation; either version 2.1 of the License, or
   (at your option) any later version.
@@ -15,25 +15,25 @@
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http/www.gnu.org/licenses/>.
-**
+  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+***/
 
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
 #ifdef HAVE_GNUTLS
-#include <gnutlgnutls.h>
-#include <gnutlx509.h>
+#include <gnutls/gnutls.h>
+#include <gnutls/x509.h>
 #endif
 
-#include "systemd-basialloc-util.h"
-#include "systemd-basilog.h"
-#include "systemd-basimacro.h"
-#include "systemd-basistring-util.h"
-#include "systemd-basistrv.h"
-#include "systemd-basiutil.h"
-#include "systemd-microhttpmicrohttpd-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
+#include "systemd-microhttpd/microhttpd-util.h"
 
 void microhttpd_logger(void *arg, const char *fmt, va_list ap) {
         char *f;
@@ -61,7 +61,7 @@ static int mhd_respond_internal(struct MHD_Connection *connection,
                 return MHD_NO;
 
         log_debug("Queueing response %u: %s", code, buffer);
-        MHD_add_response_header(response, "Content-Type", "texplain");
+        MHD_add_response_header(response, "Content-Type", "text/plain");
         r = MHD_queue_response(connection, code, response);
         MHD_destroy_response(response);
 
@@ -110,11 +110,11 @@ static struct {
         bool enabled;
 } gnutls_log_map[] = {
         { {"0"},                  LOG_DEBUG },
-        { {"1", "audit"},         LOG_WARNING, true},* gnutls session audit */
-        { {"2", "assert"},        LOG_DEBUG },       * gnutls assert log */
-        { {"3", "hsk", "ext"},    LOG_DEBUG },       * gnutls handshake log */
-        { {"4", "rec"},           LOG_DEBUG },       * gnutls record log */
-        { {"5", "dtls"},          LOG_DEBUG },       * gnutls DTLS log */
+        { {"1", "audit"},         LOG_WARNING, true}, /* gnutls session audit */
+        { {"2", "assert"},        LOG_DEBUG },        /* gnutls assert log */
+        { {"3", "hsk", "ext"},    LOG_DEBUG },        /* gnutls handshake log */
+        { {"4", "rec"},           LOG_DEBUG },        /* gnutls record log */
+        { {"5", "dtls"},          LOG_DEBUG },        /* gnutls DTLS log */
         { {"6", "buf"},           LOG_DEBUG },
         { {"7", "write", "read"}, LOG_DEBUG },
         { {"8"},                  LOG_DEBUG },
@@ -126,7 +126,7 @@ static void log_func_gnutls(int level, const char *message) {
 
         if (0 <= level && level < (int) ELEMENTSOF(gnutls_log_map)) {
                 if (gnutls_log_map[level].enabled)
-                        log_internal(gnutls_log_map[level].level, 0, NULL, 0, NULL, "gnutls %%s: %s", level, gnutls_log_map[level].names[1], message);
+                        log_internal(gnutls_log_map[level].level, 0, NULL, 0, NULL, "gnutls %d/%s: %s", level, gnutls_log_map[level].names[1], message);
         } else {
                 log_debug("Received GNUTLS message with unknown level %d.", level);
                 log_internal(LOG_DEBUG, 0, NULL, 0, NULL, "gnutls: %s", message);
@@ -223,8 +223,8 @@ static int get_client_cert(gnutls_session_t session, gnutls_x509_crt_t *client_c
                 return r;
         }
 
-       * Note that by passing values between 0 and listsize here, you
-           can get access to the CA's certs 
+        /* Note that by passing values between 0 and listsize here, you
+           can get access to the CA's certs */
         r = gnutls_x509_crt_import(cert, &pcert[0], GNUTLS_X509_FMT_DER);
         if (r < 0) {
                 log_error("Failed to import client certificate");

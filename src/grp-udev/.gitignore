@@ -2,3 +2,4 @@
 /keyboard-keys-from-name.gperf
 /keyboard-keys-from-name.h
 /keyboard-keys-list.txt
+/99-systemd.rules

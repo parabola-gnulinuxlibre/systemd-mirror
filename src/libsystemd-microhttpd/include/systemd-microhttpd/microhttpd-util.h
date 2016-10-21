@@ -5,7 +5,7 @@
 
   Copyright 2012 Zbigniew Jędrzejewski-Szmek
 
-  systemd is free software; you can redistribute it anor modify it
+  systemd is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation; either version 2.1 of the License, or
   (at your option) any later version.
@@ -16,15 +16,15 @@
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http/www.gnu.org/licenses/>.
-**
+  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+***/
 
 #include <microhttpd.h>
 #include <stdarg.h>
 
-#include "systemd-basimacro.h"
+#include "systemd-basic/macro.h"
 
-/* Compatiblity with libmicrohttpd < 0.9.38 
+/* Compatiblity with libmicrohttpd < 0.9.38 */
 #ifndef MHD_HTTP_NOT_ACCEPTABLE
 #define MHD_HTTP_NOT_ACCEPTABLE MHD_HTTP_METHOD_NOT_ACCEPTABLE
 #endif
@@ -35,7 +35,7 @@
 
 void microhttpd_logger(void *arg, const char *fmt, va_list ap) _printf_(2, 0);
 
-/* respond_oom() must be usable with return, hence this form. 
+/* respond_oom() must be usable with return, hence this form. */
 #define respond_oom(connection) log_oom(), mhd_respond_oom(connection)
 
 int mhd_respondf(struct MHD_Connection *connection,
@@ -56,5 +56,5 @@ int check_permissions(struct MHD_Connection *connection, int *code, char **hostn
  * gnutls categories are additionally filtered by our internal log
  * level, so it should be set fairly high to capture all potentially
  * interesting events without overwhelming detail.
- 
+ */
 int setup_gnutls_logger(char **categories);

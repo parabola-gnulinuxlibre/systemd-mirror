@@ -19,10 +19,10 @@
 #  Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with systemd; If not, see <http/www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST))../../config.mk
-include $(topsrcdirbuild-aux/Makefile.head.mk
+#  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(topsrcdir)/build-aux/Makefile.head.mk
 
 nested.subdirs += src
 
-include $(topsrcdirbuild-aux/Makefile.tail.mk
+include $(topsrcdir)/build-aux/Makefile.tail.mk
