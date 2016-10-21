@@ -23,12 +23,12 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include "basic/fd-util.h"
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/socket-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 static int send_on_socket(int fd, const char *socket_name, const void *packet, size_t size) {
         union sockaddr_union sa = {

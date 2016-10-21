@@ -19,7 +19,7 @@
 
 #include <sched.h>
 
-#include "manager.h"
+#include "core/manager.h"
 #include "systemd-basic/macro.h"
 #include "systemd-basic/rm-rf.h"
 #include "systemd-shared/tests.h"

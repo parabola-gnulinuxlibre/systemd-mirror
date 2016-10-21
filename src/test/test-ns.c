@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "namespace.h"
+#include "core/namespace.h"
 #include "systemd-basic/log.h"
 
 int main(int argc, char *argv[]) {

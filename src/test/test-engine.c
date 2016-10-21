@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "manager.h"
+#include "core/manager.h"
 #include "sd-bus/bus-util.h"
 #include "systemd-basic/rm-rf.h"
 #include "systemd-shared/tests.h"

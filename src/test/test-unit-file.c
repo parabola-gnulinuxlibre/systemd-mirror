@@ -25,7 +25,7 @@
 #include <sys/capability.h>
 #include <unistd.h>
 
-#include "load-fragment.h"
+#include "core/load-fragment.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/capability-util.h"
 #include "systemd-basic/fd-util.h"

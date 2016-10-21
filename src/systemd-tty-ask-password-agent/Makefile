@@ -30,4 +30,6 @@ systemd_tty_ask_password_agent_SOURCES = \
 systemd_tty_ask_password_agent_LDADD = \
 	libsystemd-shared.la
 
+sd.CPPFLAGS += -DSYSTEMD_TTY_ASK_PASSWORD_AGENT_BINARY_PATH=\"$(rootbindir)/systemd-tty-ask-password-agent\"
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

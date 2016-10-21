@@ -23,7 +23,8 @@
 #include <sys/prctl.h>
 #include <sys/types.h>
 
-#include "manager.h"
+#include "core/manager.h"
+#include "core/unit.h"
 #include "systemd-basic/fileio.h"
 #include "systemd-basic/fs-util.h"
 #include "systemd-basic/macro.h"
@@ -31,7 +32,6 @@
 #include "systemd-basic/path-util.h"
 #include "systemd-basic/rm-rf.h"
 #include "systemd-basic/util.h"
-#include "unit.h"
 
 #include "test-helper.h"
 

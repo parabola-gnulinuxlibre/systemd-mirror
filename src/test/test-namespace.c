@@ -19,7 +19,7 @@
 
 #include <sys/socket.h>
 
-#include "namespace.h"
+#include "core/namespace.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/fd-util.h"
 #include "systemd-basic/process-util.h"

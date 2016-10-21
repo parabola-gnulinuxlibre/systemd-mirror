@@ -19,11 +19,11 @@
 
 #include <stdio.h>
 
-#include "manager.h"
+#include "core/manager.h"
+#include "core/unit.h"
 #include "systemd-basic/macro.h"
 #include "systemd-basic/rm-rf.h"
 #include "systemd-shared/tests.h"
-#include "unit.h"
 
 #include "test-helper.h"
 

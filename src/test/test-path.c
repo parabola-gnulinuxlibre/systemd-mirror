@@ -20,7 +20,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "manager.h"
+#include "core/manager.h"
+#include "core/unit.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/fd-util.h"
 #include "systemd-basic/fs-util.h"
@@ -31,7 +32,6 @@
 #include "systemd-basic/strv.h"
 #include "systemd-basic/util.h"
 #include "systemd-shared/tests.h"
-#include "unit.h"
 
 #include "test-helper.h"
 

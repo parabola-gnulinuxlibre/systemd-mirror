@@ -37,6 +37,7 @@ nodist_systemd_timesyncd_SOURCES = \
 	src/timesync/timesyncd-gperf.c
 
 systemd_timesyncd_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-network.la \
 	libsystemd-shared.la \
 	-lm
