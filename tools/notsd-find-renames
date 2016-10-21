@@ -1,0 +1,2 @@
+#!/bin/sh
+git diff --find-renames -l1000 --stat=300,290 "${1:-notsystemd/postmove}" "${2:-notsystemd/master}" |sed -n '/=>/s/\s*|.*//p'
