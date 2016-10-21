@@ -33,7 +33,7 @@ classify() {
 				case "$base" in
 					dns_type)	     d=src/grp-resolve/systemd-resolved;;
 					keyboard-keys)	     d=src/grp-udev/libudev-core;;
-					af|arphrd|cap|errno) d=src/libbasic/include/basic;;
+					af|arphrd|cap|errno) d=src/libsystemd-basic/src;;
 					audit_type)	     d=src/libsystemd/src/sd-journal;;
 					*)
 						>&2 printf 'Unknown gperf base: %q\n' "$base"
@@ -57,7 +57,7 @@ classify() {
 				if [[ "$current_file" = */systemd-boot/* ]]; then
 					out private util.h
 				else
-					out protected basic/util.h
+					out protected systemd-basic/util.h
 				fi
 				;;
 			*)
@@ -76,6 +76,9 @@ classify() {
 							;;
 						*/include/*)
 							out protected "${file##*/include/}"
+							;;
+						*/include-staging/*)
+							out protected "${file##*/include-staging/}"
 							;;
 						*)
 							if [[ "${current_file%/*}" = "${file%/*}" ]]; then
@@ -219,7 +222,6 @@ main() {
 	current_file="$1"
 	printf ' => %q %q\n' "$0" "$current_file"
 	set -o pipefail
-	trap 'rm -f -- "$current_file.tmp"' EXIT
 	{
 		IFS=''
 		while read -r line; do
@@ -227,14 +229,7 @@ main() {
 			IFS=''
 		done
 		"$hook"
-	} < "$current_file" > "$current_file.tmp"
-	# I specificially don't use write-ifchanged because I don't want the
-	# temporary file to have the .c suffix.
-	if cmp -s "$current_file.tmp" "$current_file"; then
-		rm -f "$current_file.tmp" || :
-	else
-		mv -Tf "$current_file.tmp" "$current_file"
-	fi
+	} < "$current_file" | build-aux/write-ifchanged "$current_file"
 }
 
 main "$@"
