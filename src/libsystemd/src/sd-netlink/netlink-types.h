@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/macro.h"
+#include "systemd-basic/macro.h"
 
 enum {
         NETLINK_TYPE_UNSPEC,

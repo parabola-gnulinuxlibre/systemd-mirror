@@ -22,13 +22,13 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/fs-util.h"
-#include "basic/macro.h"
-#include "basic/terminal-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/util.h"
 
 #include "compress.h"
 #include "journal-authenticate.h"

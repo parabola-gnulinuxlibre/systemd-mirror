@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/in-addr-util.h"
+#include "systemd-basic/in-addr-util.h"
 
 #include "networkd-netdev.h"
 

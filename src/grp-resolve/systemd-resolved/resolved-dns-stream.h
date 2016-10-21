@@ -19,8 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/socket-util.h"
 #include "resolved-dns-packet.h"
+#include "systemd-basic/socket-util.h"
 
 typedef struct DnsStream DnsStream;
 

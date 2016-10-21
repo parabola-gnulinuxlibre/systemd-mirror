@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "basic/string-util.h"
+#include "systemd-basic/string-util.h"
 #include "udev.h"
 
 static void help(struct udev *udev) {

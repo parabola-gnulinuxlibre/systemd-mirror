@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/log.h"
-#include "shared/ask-password-api.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-shared/ask-password-api.h"
 
 static void ask_password(void) {
         int r;

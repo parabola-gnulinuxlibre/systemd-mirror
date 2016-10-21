@@ -27,18 +27,18 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/def.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/locale-util.h"
-#include "basic/set.h"
-#include "basic/strv.h"
-#include "basic/util.h"
-#include "basic/virt.h"
 #include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "shared/pager.h"
-#include "shared/spawn-polkit-agent.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/locale-util.h"
+#include "systemd-basic/set.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
+#include "systemd-basic/virt.h"
+#include "systemd-shared/pager.h"
+#include "systemd-shared/spawn-polkit-agent.h"
 
 static bool arg_no_pager = false;
 static bool arg_ask_password = true;

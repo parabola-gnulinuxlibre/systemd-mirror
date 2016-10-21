@@ -22,11 +22,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "basic/btrfs-util.h"
-#include "basic/capability-util.h"
-#include "basic/fd-util.h"
-#include "basic/signal-util.h"
-#include "basic/util.h"
+#include "systemd-basic/btrfs-util.h"
+#include "systemd-basic/capability-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/util.h"
 
 #include "import-common.h"
 

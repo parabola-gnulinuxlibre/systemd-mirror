@@ -19,15 +19,15 @@
 
 #include <sys/statvfs.h>
 
-#include "basic/alloc-util.h"
-#include "basic/dirent-util.h"
-#include "basic/fd-util.h"
-#include "basic/hashmap.h"
-#include "basic/macro.h"
-#include "basic/string-util.h"
-#include "basic/time-util.h"
-#include "basic/user-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/dirent-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/time-util.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
 
 #include "coredump-vacuum.h"
 

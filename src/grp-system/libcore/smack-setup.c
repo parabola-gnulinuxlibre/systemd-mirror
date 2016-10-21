@@ -26,14 +26,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "basic/alloc-util.h"
-#include "basic/dirent-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/dirent-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 #include "smack-setup.h"
 

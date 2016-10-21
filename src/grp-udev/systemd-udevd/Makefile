@@ -31,6 +31,6 @@ systemd_udevd_SOURCES = \
 
 systemd_udevd_LDADD = \
 	libudev-core.la \
-	libbasic.la
+	libsystemd-basic.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

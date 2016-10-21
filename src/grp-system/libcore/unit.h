@@ -23,10 +23,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "basic/list.h"
-#include "basic/unit-name.h"
-#include "shared/condition.h"
-#include "shared/install.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/unit-name.h"
+#include "systemd-shared/condition.h"
+#include "systemd-shared/install.h"
 
 typedef struct Unit Unit;
 typedef struct UnitRef UnitRef;

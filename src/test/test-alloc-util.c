@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/macro.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/util.h"
 
 static void test_alloca(void) {
         static const uint8_t zero[997] = { };

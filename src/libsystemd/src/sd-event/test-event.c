@@ -19,11 +19,11 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/fd-util.h"
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/signal-util.h"
-#include "basic/util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/util.h"
 
 static int prepare_handler(sd_event_source *s, void *userdata) {
         log_info("preparing %c", PTR_TO_INT(userdata));

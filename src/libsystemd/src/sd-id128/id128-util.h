@@ -23,7 +23,7 @@
 
 #include <systemd/sd-id128.h>
 
-#include "basic/macro.h"
+#include "systemd-basic/macro.h"
 
 char *id128_to_uuid_string(sd_id128_t id, char s[37]);
 

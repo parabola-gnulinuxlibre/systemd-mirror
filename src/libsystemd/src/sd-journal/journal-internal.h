@@ -26,9 +26,9 @@
 #include <systemd/sd-id128.h>
 #include <systemd/sd-journal.h>
 
-#include "basic/hashmap.h"
-#include "basic/list.h"
-#include "basic/set.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/set.h"
 
 #include "journal-def.h"
 #include "journal-file.h"

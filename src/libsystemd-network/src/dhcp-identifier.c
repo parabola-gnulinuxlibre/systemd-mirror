@@ -20,13 +20,13 @@
 #include <libudev.h>
 #include <systemd/sd-id128.h>
 
-#include "basic/siphash24.h"
-#include "basic/sparse-endian.h"
-#include "basic/virt.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/siphash24.h"
+#include "systemd-basic/sparse-endian.h"
+#include "systemd-basic/virt.h"
 #include "systemd-network/dhcp-identifier.h"
 #include "systemd-network/dhcp6-protocol.h"
 #include "systemd-network/network-internal.h"
+#include "systemd-shared/udev-util.h"
 
 #define SYSTEMD_PEN 43793
 #define HASH_KEY SD_ID128_MAKE(80,11,8c,c2,fe,4a,03,ee,3e,d6,0c,6f,36,39,14,09)

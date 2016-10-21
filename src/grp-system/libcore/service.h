@@ -19,8 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/exit-status.h"
-#include "basic/ratelimit.h"
+#include "systemd-basic/exit-status.h"
+#include "systemd-basic/ratelimit.h"
 
 typedef struct Service Service;
 typedef struct ServiceFDStore ServiceFDStore;

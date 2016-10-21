@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/calendarspec.h"
+#include "systemd-basic/calendarspec.h"
 
 typedef struct Timer Timer;
 

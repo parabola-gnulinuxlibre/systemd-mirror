@@ -40,10 +40,10 @@
 
 #include <libudev.h>
 
-#include "basic/fd-util.h"
-#include "basic/log.h"
 #include "libudev-private.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-shared/udev-util.h"
 
 #define COMMAND_TIMEOUT_MSEC (30 * 1000)
 

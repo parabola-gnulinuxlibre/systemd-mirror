@@ -99,10 +99,10 @@
 
 #include <linux/pci_regs.h>
 
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/stdio-util.h"
-#include "basic/string-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/stdio-util.h"
+#include "systemd-basic/string-util.h"
 #include "udev.h"
 
 #define ONBOARD_INDEX_MAX (16*1024-1)

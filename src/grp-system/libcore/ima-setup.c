@@ -22,10 +22,10 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/log.h"
-#include "basic/util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/util.h"
 
 #include "ima-setup.h"
 

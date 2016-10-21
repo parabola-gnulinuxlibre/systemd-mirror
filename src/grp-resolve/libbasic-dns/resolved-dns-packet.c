@@ -17,13 +17,13 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
  ***/
 
-#include "basic/alloc-util.h"
-#include "basic/string-table.h"
-#include "basic/strv.h"
-#include "basic/unaligned.h"
-#include "basic/utf8.h"
-#include "basic/util.h"
-#include "shared/dns-domain.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/unaligned.h"
+#include "systemd-basic/utf8.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/dns-domain.h"
 
 #include "resolved-dns-packet.h"
 

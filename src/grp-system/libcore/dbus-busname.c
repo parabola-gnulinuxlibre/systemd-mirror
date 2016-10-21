@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/string-util.h"
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/string-util.h"
 
 #include "busname.h"
 #include "dbus-busname.h"

@@ -26,11 +26,11 @@
 
 #include <systemd/sd-journal.h>
 
-#include "basic/fd-util.h"
-#include "basic/parse-util.h"
-#include "basic/string-util.h"
-#include "basic/syslog-util.h"
-#include "basic/util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/syslog-util.h"
+#include "systemd-basic/util.h"
 
 static const char *arg_identifier = NULL;
 static int arg_priority = LOG_INFO;

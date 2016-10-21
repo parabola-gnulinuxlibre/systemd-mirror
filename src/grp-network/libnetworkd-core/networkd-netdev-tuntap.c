@@ -26,9 +26,9 @@
 
 #include <linux/if_tun.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/user-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/user-util.h"
 
 #include "networkd-netdev-tuntap.h"
 

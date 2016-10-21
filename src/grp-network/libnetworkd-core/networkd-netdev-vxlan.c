@@ -19,12 +19,12 @@
 
 #include <net/if.h>
 
-#include "basic/alloc-util.h"
-#include "basic/extract-word.h"
-#include "basic/missing.h"
-#include "basic/parse-util.h"
-#include "sd-netlink/sd-netlink.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/extract-word.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-shared/conf-parser.h"
+#include "systemd-staging/sd-netlink.h"
 
 #include "networkd-link.h"
 #include "networkd-netdev-vxlan.h"

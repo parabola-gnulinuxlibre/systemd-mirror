@@ -24,15 +24,15 @@
 
 #include <linux/vt.h>
 
-#include "basic/alloc-util.h"
-#include "basic/cgroup-util.h"
-#include "basic/fd-util.h"
-#include "basic/strv.h"
-#include "basic/terminal-util.h"
-#include "basic/user-util.h"
 #include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "shared/udev-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-shared/udev-util.h"
 
 #include "logind.h"
 

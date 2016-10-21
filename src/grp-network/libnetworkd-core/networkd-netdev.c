@@ -19,17 +19,17 @@
 
 #include <net/if.h>
 
-#include "basic/alloc-util.h"
-#include "basic/conf-files.h"
-#include "basic/fd-util.h"
-#include "basic/list.h"
-#include "basic/siphash24.h"
-#include "basic/stat-util.h"
-#include "basic/string-table.h"
-#include "basic/string-util.h"
 #include "sd-netlink/netlink-util.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/conf-files.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/siphash24.h"
+#include "systemd-basic/stat-util.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/string-util.h"
 #include "systemd-network/network-internal.h"
+#include "systemd-shared/conf-parser.h"
 
 #include "networkd-netdev.h"
 #include "networkd.h"

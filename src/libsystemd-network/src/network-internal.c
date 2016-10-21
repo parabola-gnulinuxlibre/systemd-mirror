@@ -22,22 +22,22 @@
 
 #include <linux/if.h>
 
-#include "basic/alloc-util.h"
-#include "basic/ether-addr-util.h"
-#include "basic/hexdecoct.h"
-#include "basic/log.h"
-#include "basic/parse-util.h"
-#include "basic/siphash24.h"
-#include "basic/socket-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/utf8.h"
-#include "basic/util.h"
-#include "shared/condition.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/ether-addr-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/siphash24.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/utf8.h"
+#include "systemd-basic/util.h"
 #include "systemd-network/dhcp-lease-internal.h"
 #include "systemd-network/network-internal.h"
 #include "systemd-network/sd-ndisc.h"
+#include "systemd-shared/condition.h"
+#include "systemd-shared/conf-parser.h"
 
 const char *net_get_name(struct udev_device *device) {
         const char *name, *field;

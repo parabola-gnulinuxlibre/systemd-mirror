@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/time-util.h"
+#include "systemd-basic/time-util.h"
 
 #include "sd-ndisc.h"
 

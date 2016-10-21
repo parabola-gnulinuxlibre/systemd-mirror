@@ -30,6 +30,7 @@ systemd_localed_SOURCES = \
 	src/locale/keymap-util.h
 
 systemd_localed_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la \
 	-ldl
 

@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/util.h"
+#include "systemd-basic/util.h"
 
 #define FOREACH_DEVICE_PROPERTY(device, key, value)                \
         for (key = sd_device_get_property_first(device, &(value)); \

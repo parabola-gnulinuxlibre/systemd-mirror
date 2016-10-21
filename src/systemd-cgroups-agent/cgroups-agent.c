@@ -20,9 +20,9 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 
-#include "basic/fd-util.h"
-#include "basic/log.h"
-#include "basic/socket-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/socket-util.h"
 
 int main(int argc, char *argv[]) {
 

@@ -35,7 +35,7 @@ files.src.gen += Makefile-man.mk
 
 man.MANPAGES =
 man.MANPAGES_ALIAS =
--include $(srcdir)/Makefile-man.mk
+#-include $(srcdir)/Makefile-man.mk
 
 _man.XML_FILES = \
 	${patsubst %.1,%.xml,${patsubst %.3,%.xml,${patsubst %.5,%.xml,${patsubst %.7,%.xml,${patsubst %.8,%.xml,$(man.MANPAGES)}}}}}

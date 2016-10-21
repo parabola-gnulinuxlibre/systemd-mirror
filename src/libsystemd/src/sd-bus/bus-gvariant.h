@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/macro.h"
+#include "systemd-basic/macro.h"
 
 int bus_gvariant_get_size(const char *signature) _pure_;
 int bus_gvariant_get_alignment(const char *signature) _pure_;

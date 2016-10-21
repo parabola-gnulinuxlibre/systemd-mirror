@@ -22,13 +22,13 @@
 
 #include <libudev.h>
 
-#include "basic/alloc-util.h"
-#include "basic/locale-util.h"
-#include "basic/path-util.h"
-#include "basic/string-util.h"
-#include "basic/terminal-util.h"
-#include "basic/util.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/locale-util.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/udev-util.h"
 
 #include "sysfs-show.h"
 

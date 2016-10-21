@@ -22,8 +22,8 @@
 
 #include <linux/filter.h>
 
-#include "basic/fd-util.h"
-#include "basic/util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/util.h"
 #include "systemd-network/arp-util.h"
 
 int arp_network_bind_raw_socket(int ifindex, be32_t address, const struct ether_addr *eth_mac) {

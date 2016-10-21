@@ -19,22 +19,22 @@
 
 #include <errno.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/hashmap.h"
-#include "basic/log.h"
-#include "basic/mkdir.h"
-#include "basic/parse-util.h"
-#include "basic/path-util.h"
-#include "basic/proc-cmdline.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/unit-name.h"
-#include "basic/util.h"
-#include "shared/dropin.h"
-#include "shared/fstab-util.h"
-#include "shared/generator.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/proc-cmdline.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/unit-name.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/dropin.h"
+#include "systemd-shared/fstab-util.h"
+#include "systemd-shared/generator.h"
 
 typedef struct crypto_device {
         char *uuid;

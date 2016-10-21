@@ -27,7 +27,7 @@ v4l_id_SOURCES = \
 	src/udev/v4l_id/v4l_id.c
 
 v4l_id_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 udevlibexec_PROGRAMS += \
 	v4l_id

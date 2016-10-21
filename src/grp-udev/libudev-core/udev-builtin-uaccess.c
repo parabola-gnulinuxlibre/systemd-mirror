@@ -24,8 +24,8 @@
 
 #include <systemd/sd-login.h>
 
-#include "basic/login-util.h"
-#include "basic/util.h"
+#include "systemd-basic/login-util.h"
+#include "systemd-basic/util.h"
 #include "udev.h"
 
 #include "logind-acl.h"

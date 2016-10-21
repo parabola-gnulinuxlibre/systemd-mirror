@@ -17,17 +17,17 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/cap-list.h"
-#include "basic/capability-util.h"
-#include "basic/fileio.h"
-#include "basic/formats-util.h"
-#include "basic/locale-util.h"
-#include "basic/macro.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/terminal-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/cap-list.h"
+#include "systemd-basic/capability-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/locale-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/util.h"
 
 #include "bus-dump.h"
 #include "bus-internal.h"

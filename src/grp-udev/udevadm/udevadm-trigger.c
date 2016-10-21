@@ -23,9 +23,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "basic/string-util.h"
-#include "basic/util.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/udev-util.h"
 #include "udev.h"
 
 #include "udevadm-util.h"

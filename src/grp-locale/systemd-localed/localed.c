@@ -29,18 +29,18 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/alloc-util.h"
-#include "basic/def.h"
-#include "basic/locale-util.h"
-#include "basic/macro.h"
-#include "basic/path-util.h"
-#include "basic/selinux-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/user-util.h"
 #include "sd-bus/bus-error.h"
 #include "sd-bus/bus-message.h"
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/locale-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/selinux-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/user-util.h"
 
 #include "keymap-util.h"
 

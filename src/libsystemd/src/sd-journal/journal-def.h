@@ -21,8 +21,8 @@
 
 #include <systemd/sd-id128.h>
 
-#include "basic/macro.h"
-#include "basic/sparse-endian.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/sparse-endian.h"
 
 /*
  * If you change this file you probably should also change its documentation:
@@ -32,20 +32,16 @@
  */
 
 typedef struct Header Header;
-
 typedef struct ObjectHeader ObjectHeader;
 typedef union Object Object;
-
 typedef struct DataObject DataObject;
 typedef struct FieldObject FieldObject;
 typedef struct EntryObject EntryObject;
 typedef struct HashTableObject HashTableObject;
 typedef struct EntryArrayObject EntryArrayObject;
 typedef struct TagObject TagObject;
-
 typedef struct EntryItem EntryItem;
 typedef struct HashItem HashItem;
-
 typedef struct FSSHeader FSSHeader;
 
 /* Object types */

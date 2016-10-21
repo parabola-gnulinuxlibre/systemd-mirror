@@ -24,13 +24,13 @@
 #include <linux/if_tunnel.h>
 #include <linux/ip6_tunnel.h>
 
-#include "basic/missing.h"
-#include "basic/parse-util.h"
-#include "basic/string-table.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
-#include "sd-netlink/sd-netlink.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/conf-parser.h"
+#include "systemd-staging/sd-netlink.h"
 
 #include "networkd-link.h"
 #include "networkd-netdev-tunnel.h"

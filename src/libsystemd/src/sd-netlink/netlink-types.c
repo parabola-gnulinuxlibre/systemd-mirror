@@ -31,10 +31,10 @@
 #include <linux/if_link.h>
 #include <linux/if_tunnel.h>
 
-#include "basic/macro.h"
-#include "basic/missing.h"
-#include "basic/string-table.h"
-#include "basic/util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/util.h"
 
 #include "netlink-types.h"
 

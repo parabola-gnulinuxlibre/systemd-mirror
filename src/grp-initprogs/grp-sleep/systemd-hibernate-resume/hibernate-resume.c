@@ -21,10 +21,10 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fileio.h"
-#include "basic/log.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/util.h"
 
 int main(int argc, char *argv[]) {
         struct stat st;

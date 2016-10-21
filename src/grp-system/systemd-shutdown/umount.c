@@ -28,16 +28,16 @@
 
 #include <libudev.h>
 
-#include "basic/alloc-util.h"
-#include "basic/escape.h"
-#include "basic/fd-util.h"
-#include "basic/list.h"
-#include "basic/path-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
-#include "basic/virt.h"
-#include "shared/fstab-util.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/escape.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-basic/virt.h"
+#include "systemd-shared/fstab-util.h"
+#include "systemd-shared/udev-util.h"
 
 #include "mount-setup.h"
 #include "umount.h"

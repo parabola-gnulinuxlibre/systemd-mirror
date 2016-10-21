@@ -19,11 +19,11 @@
 
 #include <systemd/sd-daemon.h>
 
-#include "basic/capability-util.h"
-#include "basic/signal-util.h"
-#include "basic/user-util.h"
 #include "networkd-conf.h"
 #include "networkd.h"
+#include "systemd-basic/capability-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/user-util.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_manager_free_ Manager *m = NULL;

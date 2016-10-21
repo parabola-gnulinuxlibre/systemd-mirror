@@ -26,9 +26,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "basic/fd-util.h"
-#include "basic/string-util.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-shared/udev-util.h"
 #include "udev.h"
 
 #include "udevadm-util.h"

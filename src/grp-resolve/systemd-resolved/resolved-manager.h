@@ -21,12 +21,12 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/hashmap.h"
-#include "basic/list.h"
-#include "basic/ordered-set.h"
-#include "sd-netlink/sd-netlink.h"
-#include "sd-network/sd-network.h"
-#include "shared/resolve-util.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/ordered-set.h"
+#include "systemd-shared/resolve-util.h"
+#include "systemd-staging/sd-netlink.h"
+#include "systemd-staging/sd-network.h"
 
 typedef struct Manager Manager;
 

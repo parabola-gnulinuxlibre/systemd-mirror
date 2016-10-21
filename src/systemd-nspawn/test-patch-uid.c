@@ -19,9 +19,9 @@
 
 #include <stdlib.h>
 
-#include "basic/log.h"
-#include "basic/user-util.h"
-#include "basic/util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
 
 #include "nspawn-patch-uid.h"
 

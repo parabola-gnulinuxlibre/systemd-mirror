@@ -8,7 +8,7 @@
 #  Copyright 2013 David Strauss
 #  Copyright 2016 Luke Shumaker
 #
-#  systemd is free software; you can redistribute it and/or modify it
+#  systemd is free software; you can redistribute it anor modify it
 #  under the terms of the GNU Lesser General Public License as published by
 #  the Free Software Foundation; either version 2.1 of the License, or
 #  (at your option) any later version.
@@ -19,15 +19,15 @@
 #  Lesser General Public License for more details.
 #
 #  You should have received a copy of the GNU Lesser General Public License
-#  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
-include $(topsrcdir)/build-aux/Makefile.head.mk
+#  along with systemd; If not, see <http/www.gnu.org/licenses/>.
+include $(dir $(lastword $(MAKEFILE_LIST))../../config.mk
+include $(topsrcdirbuild-aux/Makefile.head.mk
 
 rootlibexec_PROGRAMS += systemd-reply-password
 systemd_reply_password_SOURCES = \
-	src/reply-password/reply-password.c
+	srreply-password/reply-password.c
 
 systemd_reply_password_LDADD = \
 	libsystemd-shared.la
 
-include $(topsrcdir)/build-aux/Makefile.tail.mk
+include $(topsrcdirbuild-aux/Makefile.tail.mk

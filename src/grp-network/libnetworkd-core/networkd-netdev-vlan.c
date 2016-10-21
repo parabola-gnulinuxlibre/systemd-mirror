@@ -19,7 +19,7 @@
 
 #include <net/if.h>
 
-#include "shared/vlan-util.h"
+#include "systemd-shared/vlan-util.h"
 
 #include "networkd-netdev-vlan.h"
 

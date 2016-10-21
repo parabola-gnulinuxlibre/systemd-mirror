@@ -34,6 +34,6 @@ dist_udevrules_DATA += \
 udevlibexec_PROGRAMS += \
 	mtd_probe
 
-mtd_probe_LDADD += libbasic.la
+mtd_probe_LDADD += libsystemd-basic.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

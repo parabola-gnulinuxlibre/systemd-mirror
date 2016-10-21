@@ -19,13 +19,13 @@
 
 #include <systemd/sd-messages.h>
 
-#include "basic/af-list.h"
-#include "basic/alloc-util.h"
-#include "basic/errno-list.h"
-#include "basic/fd-util.h"
-#include "basic/random-util.h"
-#include "basic/string-table.h"
-#include "shared/dns-domain.h"
+#include "systemd-basic/af-list.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/errno-list.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/random-util.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-shared/dns-domain.h"
 
 #include "resolved-dns-cache.h"
 #include "resolved-dns-transaction.h"

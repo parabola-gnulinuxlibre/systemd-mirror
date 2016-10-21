@@ -21,8 +21,8 @@
 
 #include <libudev.h>
 
-#include "basic/list.h"
-#include "shared/condition.h"
+#include "systemd-basic/list.h"
+#include "systemd-shared/condition.h"
 
 #include "ethtool-util.h"
 

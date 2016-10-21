@@ -28,9 +28,9 @@
 #include <systemd/sd-event.h>
 #include <systemd/sd-id128.h>
 
-#include "basic/hashmap.h"
-#include "basic/macro.h"
-#include "basic/sparse-endian.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/sparse-endian.h"
 
 #include "journal-def.h"
 #include "mmap-cache.h"

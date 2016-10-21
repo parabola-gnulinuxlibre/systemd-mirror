@@ -21,6 +21,6 @@
 
 #include <stdbool.h>
 
-#include "sd-network.h"
+#include "systemd-staging/sd-network.h"
 
 bool network_is_online(void);

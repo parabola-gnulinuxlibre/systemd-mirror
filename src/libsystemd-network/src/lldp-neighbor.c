@@ -17,12 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/escape.h"
-#include "basic/ether-addr-util.h"
-#include "basic/hexdecoct.h"
-#include "basic/in-addr-util.h"
-#include "basic/unaligned.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/escape.h"
+#include "systemd-basic/ether-addr-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/unaligned.h"
 #include "systemd-network/lldp-internal.h"
 #include "systemd-network/lldp-neighbor.h"
 

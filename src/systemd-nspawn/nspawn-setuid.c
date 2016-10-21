@@ -21,14 +21,14 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/mkdir.h"
-#include "basic/process-util.h"
-#include "basic/signal-util.h"
-#include "basic/string-util.h"
-#include "basic/user-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/process-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
 
 #include "nspawn-setuid.h"
 

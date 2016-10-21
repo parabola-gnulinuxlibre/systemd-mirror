@@ -23,12 +23,12 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-audit_list_includes = -include linux/audit.h -include $(topsrcdir)/src/libbasic/include/basic/missing.h
+audit_list_includes = -include linux/audit.h -include $(topsrcdir)/src/libsystemd-basic/include/systemd-basic/missing.h
 ifneq ($(HAVE_AUDIT),)
 audit_list_includes += -include libaudit.h
 endif # HAVE_AUDIT
 
-$(outdir)/audit_type-list.txt: $(call at.path,$(topsrcdir)/src/libbasic/include/basic/missing.h)
+$(outdir)/audit_type-list.txt: $(call at.path,$(topsrcdir)/src/libsystemd-basic/include/systemd-basic/missing.h)
 	$(AM_V_GEN)$(CPP) $(sd.ALL_CPPFLAGS) -dM $(audit_list_includes) - </dev/null | grep -vE 'AUDIT_.*(FIRST|LAST)_' | $(SED) -r -n 's/^#define\s+AUDIT_(\w+)\s+([0-9]{4})\s*$$/\1\t\2/p' | sort -k2 >$@
 
 $(outdir)/audit_type-to-name.h: $(outdir)/audit_type-list.txt
@@ -37,8 +37,11 @@ $(outdir)/audit_type-to-name.h: $(outdir)/audit_type-list.txt
 # fsprg.c is a drop-in file using void pointer arithmetic
 $(outdir)/fsprg.lo: sd.ALL_CFLAGS += -Wno-pointer-arith
 
-sd.CPPFLAGS += $(libbasic.CPPFLAGS)
-sd.CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"
 $(outdir)/audit-type.lo: $(outdir)/audit_type-to-name.h
+
+sd.CPPFLAGS += $(libsystemd.CPPFLAGS)
+sd.CPPFLAGS += $(libsystemd-basic.CPPFLAGS)
+sd.CPPFLAGS += $(libsystemd-gcrypt.CPPFLAGS)
+sd.CPPFLAGS += -DCATALOG_DATABASE=\"$(catalogstatedir)/database\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

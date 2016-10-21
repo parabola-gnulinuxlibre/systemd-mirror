@@ -22,16 +22,16 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "basic/def.h"
-#include "basic/env-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio-label.h"
-#include "basic/fileio.h"
-#include "basic/locale-util.h"
-#include "basic/macro.h"
-#include "basic/mkdir.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/env-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio-label.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/locale-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
 
 #include "keymap-util.h"
 

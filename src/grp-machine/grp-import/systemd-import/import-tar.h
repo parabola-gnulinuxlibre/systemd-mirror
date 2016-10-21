@@ -21,11 +21,10 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/macro.h"
-#include "shared/import-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-shared/import-util.h"
 
 typedef struct TarImport TarImport;
-
 typedef void (*TarImportFinished)(TarImport *import, int error, void *userdata);
 
 int tar_import_new(TarImport **import, sd_event *event, const char *image_root, TarImportFinished on_finished, void *userdata);

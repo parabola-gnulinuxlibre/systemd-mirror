@@ -31,14 +31,14 @@
 
 #include <libudev.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/formats-util.h"
-#include "basic/missing.h"
-#include "basic/mount-util.h"
-#include "basic/socket-util.h"
-#include "basic/string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/mount-util.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-util.h"
 
 #include "libudev-private.h"
 

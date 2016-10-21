@@ -121,7 +121,7 @@ test_dnssec_complex_LDADD = \
 	libsystemd-shared.la
 
 noinst_LTLIBRARIES = libbasic-dns.la
-libbasic_dns_la_LIBADD = libshared.la
+libbasic_dns_la_LIBADD = libsystemd-shared.la
 $(outdir)/dns-type.lo: $(outdir)/dns_type-from-name.h $(outdir)/dns_type-to-name.h
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

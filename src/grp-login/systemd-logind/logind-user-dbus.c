@@ -20,12 +20,12 @@
 #include <errno.h>
 #include <string.h>
 
-#include "basic/alloc-util.h"
-#include "basic/formats-util.h"
-#include "basic/signal-util.h"
-#include "basic/strv.h"
-#include "basic/user-util.h"
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/user-util.h"
 
 #include "logind-user.h"
 #include "logind.h"

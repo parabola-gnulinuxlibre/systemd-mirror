@@ -24,12 +24,12 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/hashmap.h"
-#include "basic/list.h"
-#include "basic/prioq.h"
-#include "basic/refcnt.h"
-#include "basic/socket-util.h"
-#include "basic/util.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/prioq.h"
+#include "systemd-basic/refcnt.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/util.h"
 
 #include "bus-error.h"
 #include "bus-kernel.h"

@@ -19,18 +19,18 @@
 
 #include <systemd/sd-id128.h>
 
-#include "basic/alloc-util.h"
-#include "basic/architecture.h"
-#include "basic/audit-util.h"
-#include "basic/hostname-util.h"
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/selinux-util.h"
-#include "basic/smack-util.h"
-#include "basic/util.h"
-#include "shared/apparmor-util.h"
-#include "shared/condition.h"
-#include "shared/ima-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/architecture.h"
+#include "systemd-basic/audit-util.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/selinux-util.h"
+#include "systemd-basic/smack-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/apparmor-util.h"
+#include "systemd-shared/condition.h"
+#include "systemd-shared/ima-util.h"
 
 static void test_condition_test_path(void) {
         Condition *condition;

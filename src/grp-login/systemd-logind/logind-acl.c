@@ -20,16 +20,16 @@
 #include <errno.h>
 #include <string.h>
 
-#include "basic/alloc-util.h"
-#include "basic/dirent-util.h"
-#include "basic/escape.h"
-#include "basic/fd-util.h"
-#include "basic/formats-util.h"
-#include "basic/set.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
-#include "shared/acl-util.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/dirent-util.h"
+#include "systemd-basic/escape.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/set.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/acl-util.h"
+#include "systemd-shared/udev-util.h"
 
 #include "logind-acl.h"
 

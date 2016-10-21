@@ -21,10 +21,10 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/fd-util.h"
-#include "basic/macro.h"
-#include "basic/util.h"
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/util.h"
 
 static int inhibit(sd_bus *bus, const char *what) {
         _cleanup_(sd_bus_message_unrefp) sd_bus_message *reply = NULL;

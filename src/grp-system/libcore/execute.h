@@ -24,10 +24,10 @@
 #include <stdio.h>
 #include <sys/capability.h>
 
-#include "basic/cgroup-util.h"
-#include "basic/list.h"
-#include "basic/missing.h"
-#include "shared/fdset.h"
+#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/missing.h"
+#include "systemd-shared/fdset.h"
 
 typedef struct ExecCommand ExecCommand;
 typedef struct ExecContext ExecContext;

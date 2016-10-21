@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-#include "basic/macro.h"
+#include "systemd-basic/macro.h"
 
 typedef enum ProtectHome {
         PROTECT_HOME_NO,

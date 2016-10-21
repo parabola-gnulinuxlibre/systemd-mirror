@@ -26,10 +26,10 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/alloc-util.h"
-#include "basic/errno-list.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/errno-list.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 #include "bus-error.h"
 

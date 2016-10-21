@@ -19,9 +19,9 @@
 
 #include <string.h>
 
-#include "basic/alloc-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 static void test_should_pass(const char *p) {
         usec_t t, q;

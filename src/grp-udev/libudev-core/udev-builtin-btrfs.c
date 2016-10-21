@@ -25,9 +25,9 @@
 #include <linux/btrfs.h>
 #endif
 
-#include "basic/fd-util.h"
-#include "basic/missing.h"
-#include "basic/string-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/string-util.h"
 #include "udev.h"
 
 static int builtin_btrfs(struct udev_device *dev, int argc, char *argv[], bool test) {

@@ -17,11 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/parse-util.h"
-#include "basic/string-util.h"
-#include "journald-native.h"
+#include "journal-core/journald-native.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/string-util.h"
 
 #include "journal-remote-parse.h"
 

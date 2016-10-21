@@ -25,8 +25,8 @@
 #include <sys/signalfd.h>
 #include <unistd.h>
 
-#include "basic/string-util.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-shared/udev-util.h"
 #include "udev.h"
 
 static void help(void) {

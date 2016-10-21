@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/string-table.h"
-#include "basic/util.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/util.h"
 
 #include "import-compress.h"
 

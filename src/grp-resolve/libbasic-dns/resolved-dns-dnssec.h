@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "shared/dns-domain.h"
+#include "systemd-shared/dns-domain.h"
 
 typedef enum DnssecResult DnssecResult;
 typedef enum DnssecVerdict DnssecVerdict;

@@ -23,7 +23,7 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/macro.h"
+#include "systemd-basic/macro.h"
 
 bool bus_error_is_dirty(sd_bus_error *e);
 

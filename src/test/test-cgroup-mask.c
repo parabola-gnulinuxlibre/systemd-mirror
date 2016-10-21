@@ -19,10 +19,10 @@
 
 #include <stdio.h>
 
-#include "basic/macro.h"
-#include "basic/rm-rf.h"
 #include "manager.h"
-#include "shared/tests.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-shared/tests.h"
 #include "unit.h"
 
 #include "test-helper.h"

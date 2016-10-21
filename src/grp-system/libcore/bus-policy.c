@@ -19,12 +19,12 @@
 
 #include <stdlib.h>
 
-#include "basic/alloc-util.h"
-#include "basic/string-table.h"
-#include "basic/user-util.h"
-#include "basic/util.h"
 #include "sd-bus/bus-kernel.h"
 #include "sd-bus/kdbus.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
 
 #include "bus-policy.h"
 

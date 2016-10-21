@@ -32,7 +32,8 @@ nodist_systemd_logind_SOURCES = \
 	src/login/logind-gperf.c
 
 systemd_logind_LDADD = \
-	libshared.la
+	libsystemd-internal.la \
+	libsystemd-shared.la
 
 _liblogind_core_la_SOURCES = \
 	src/login/logind-core.c \

@@ -21,10 +21,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/io-util.h"
-#include "basic/macro.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/io-util.h"
+#include "systemd-basic/macro.h"
 
 static void test_sparse_write_one(int fd, const char *buffer, size_t n) {
         char check[n];

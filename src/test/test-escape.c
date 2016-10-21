@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/escape.h"
-#include "basic/macro.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/escape.h"
+#include "systemd-basic/macro.h"
 
 static void test_cescape(void) {
         _cleanup_free_ char *escaped;

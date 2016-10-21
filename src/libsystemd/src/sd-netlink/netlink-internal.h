@@ -21,12 +21,12 @@
 
 #include <linux/netlink.h>
 
-#include "basic/list.h"
-#include "basic/prioq.h"
-#include "basic/refcnt.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/prioq.h"
+#include "systemd-basic/refcnt.h"
+#include "systemd-staging/sd-netlink.h"
 
 #include "netlink-types.h"
-#include "sd-netlink.h"
 
 #define RTNL_DEFAULT_TIMEOUT ((usec_t) (25 * USEC_PER_SEC))
 

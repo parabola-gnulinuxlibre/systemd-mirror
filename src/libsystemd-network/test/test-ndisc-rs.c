@@ -20,10 +20,10 @@
 #include <arpa/inet.h>
 #include <netinet/icmp6.h>
 
-#include "basic/alloc-util.h"
-#include "basic/hexdecoct.h"
-#include "basic/socket-util.h"
-#include "basic/strv.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/strv.h"
 #include "systemd-network/icmp6-util.h"
 #include "systemd-network/sd-ndisc.h"
 

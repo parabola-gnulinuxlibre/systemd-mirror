@@ -19,10 +19,10 @@
 
 #include <zlib.h>
 
-#include "basic/alloc-util.h"
-#include "basic/btrfs-util.h"
-#include "basic/sparse-endian.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/btrfs-util.h"
+#include "systemd-basic/sparse-endian.h"
+#include "systemd-basic/util.h"
 
 #include "qcow2-util.h"
 

@@ -29,38 +29,12 @@ systemd_machined_SOURCES = \
 
 systemd_machined_LDADD = \
 	libsystemd-internal.la \
-	libshared.la \
-	libbasic.la \
+	libsystemd-shared.la \
+	libsystemd-basic.la \
 	libmachine-core.la
 
 rootlibexec_PROGRAMS += \
 	systemd-machined
-
-libmachine_core_la_SOURCES = \
-	src/machine/machine.c \
-	src/machine/machine.h \
-	src/machine/machined-dbus.c \
-	src/machine/machine-dbus.c \
-	src/machine/machine-dbus.h \
-	src/machine/image-dbus.c \
-	src/machine/image-dbus.h \
-	src/machine/operation.c \
-	src/machine/operation.h
-
-libmachine_core_la_LIBADD = \
-	libsystemd-shared.la
-
-noinst_LTLIBRARIES += \
-	libmachine-core.la
-
-test_machine_tables_SOURCES = \
-	src/machine/test-machine-tables.c
-
-test_machine_tables_LDADD = \
-	libmachine-core.la
-
-tests += \
-	test-machine-tables
 
 nodist_systemunit_DATA += \
 	units/systemd-machined.service

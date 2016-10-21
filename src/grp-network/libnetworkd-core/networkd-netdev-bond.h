@@ -19,8 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/in-addr-util.h"
-#include "basic/list.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/list.h"
 
 #include "networkd-netdev.h"
 

@@ -35,16 +35,16 @@
 #include <sys/statfs.h>
 #include <unistd.h>
 
-#include "basic/alloc-util.h"
-#include "basic/blkid-util.h"
-#include "basic/dirent-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/locale-util.h"
-#include "basic/rm-rf.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
-#include "shared/efivars.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/dirent-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/locale-util.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-blkid/blkid-util.h"
+#include "systemd-shared/efivars.h"
 
 static int verify_esp(const char *p, uint32_t *part, uint64_t *pstart, uint64_t *psize, sd_id128_t *uuid) {
         struct statfs sfs;

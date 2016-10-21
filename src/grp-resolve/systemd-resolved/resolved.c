@@ -20,11 +20,11 @@
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-event.h>
 
-#include "basic/capability-util.h"
-#include "basic/mkdir.h"
-#include "basic/selinux-util.h"
-#include "basic/signal-util.h"
-#include "basic/user-util.h"
+#include "systemd-basic/capability-util.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/selinux-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/user-util.h"
 
 #include "resolved-conf.h"
 #include "resolved-manager.h"

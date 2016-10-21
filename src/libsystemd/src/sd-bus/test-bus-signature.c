@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/log.h"
-#include "basic/string-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/string-util.h"
 
 #include "bus-internal.h"
 #include "bus-signature.h"

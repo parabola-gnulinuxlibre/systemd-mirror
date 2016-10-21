@@ -33,7 +33,7 @@ MANPAGES_ALIAS += \\
 '''
 
 CONDITIONAL = '''\
-if {conditional}
+ifneq ($({conditional}),)
 ''' \
 + SECTION + \
 '''\

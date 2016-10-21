@@ -30,10 +30,10 @@
 
 #include <libudev.h>
 
-#include "basic/alloc-util.h"
 #include "sd-device/device-enumerator-private.h"
 #include "sd-device/device-util.h"
-#include "sd-device/sd-device.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-staging/sd-device.h"
 
 #include "libudev-device-internal.h"
 

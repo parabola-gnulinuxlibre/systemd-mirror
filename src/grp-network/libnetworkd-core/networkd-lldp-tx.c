@@ -21,15 +21,15 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/hostname-util.h"
-#include "basic/parse-util.h"
-#include "basic/random-util.h"
-#include "basic/socket-util.h"
-#include "basic/string-util.h"
-#include "basic/unaligned.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/random-util.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/unaligned.h"
 
 #include "networkd-lldp-tx.h"
 #include "networkd.h"

@@ -24,15 +24,15 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "basic/conf-files.h"
-#include "basic/def.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/log.h"
-#include "basic/proc-cmdline.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/util.h"
+#include "systemd-basic/conf-files.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/proc-cmdline.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
 
 static char **arg_proc_cmdline_modules = NULL;
 

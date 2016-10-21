@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "basic/string-util.h"
+#include "systemd-basic/string-util.h"
 
 #include "udevadm-util.h"
 

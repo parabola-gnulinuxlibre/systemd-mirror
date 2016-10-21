@@ -71,8 +71,11 @@ libudev_core_la_CFLAGS = \
 	$(KMOD_CFLAGS)
 
 libudev_core_la_LIBADD = \
+	libsystemd-internal.la \
+	libsystemd-basic.la \
+	libsystemd-shared.la \
 	libsystemd-network.la \
-	libshared.la \
+	libsystemd-staging.la \
 	$(BLKID_LIBS) \
 	$(KMOD_LIBS)
 

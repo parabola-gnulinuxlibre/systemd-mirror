@@ -32,7 +32,7 @@ typedef enum FailureAction {
         _FAILURE_ACTION_INVALID = -1
 } FailureAction;
 
-#include "basic/macro.h"
+#include "systemd-basic/macro.h"
 
 #include "manager.h"
 

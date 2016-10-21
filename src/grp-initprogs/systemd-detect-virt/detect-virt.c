@@ -22,8 +22,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "basic/util.h"
-#include "basic/virt.h"
+#include "systemd-basic/util.h"
+#include "systemd-basic/virt.h"
 
 static bool arg_quiet = false;
 static enum {

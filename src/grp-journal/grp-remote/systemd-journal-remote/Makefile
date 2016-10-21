@@ -36,27 +36,13 @@ systemd_journal_remote_SOURCES = \
 	src/journal-remote/journal-remote.c
 
 systemd_journal_remote_LDADD = \
+	libsystemd-microhttpd.la \
 	libjournal-core.la
-
-systemd_journal_remote_SOURCES += \
-	src/journal-remote/microhttpd-util.h \
-	src/journal-remote/microhttpd-util.c
-
-systemd_journal_remote_CFLAGS = \
-	$(MICROHTTPD_CFLAGS)
-
-systemd_journal_remote_LDADD += \
-	$(MICROHTTPD_LIBS)
 
 ifneq ($(ENABLE_TMPFILES),)
 dist_tmpfiles_DATA += \
 	tmpfiles.d/systemd-remote.conf
 endif # ENABLE_TMPFILES
-
-ifneq ($(HAVE_GNUTLS),)
-systemd_journal_remote_LDADD += \
-	$(GNUTLS_LIBS)
-endif # HAVE_GNUTLS
 
 # systemd-journal-remote make sense mostly with full crypto stack
 dist_systemunit_DATA += \
@@ -80,5 +66,8 @@ EXTRA_DIST += \
 	src/journal-remote/journal-remote.conf.in \
 	src/journal-remote/log-generator.py
 endif # HAVE_MICROHTTPD
+
+sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
+sd.CPPFLAGS += -DCERTIFICATE_ROOT=\"$(CERTIFICATEROOT)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -19,8 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/list.h"
-#include "basic/login-util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/login-util.h"
 
 typedef enum KillWho KillWho;
 typedef struct Session Session;

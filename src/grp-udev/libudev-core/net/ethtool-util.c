@@ -23,11 +23,11 @@
 #include <linux/ethtool.h>
 #include <linux/sockios.h>
 
-#include "basic/log.h"
-#include "basic/string-table.h"
-#include "basic/strxcpyx.h"
-#include "basic/util.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/strxcpyx.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/conf-parser.h"
 
 #include "ethtool-util.h"
 

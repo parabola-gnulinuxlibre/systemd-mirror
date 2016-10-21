@@ -21,15 +21,15 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fs-util.h"
-#include "basic/hostname-util.h"
-#include "basic/signal-util.h"
-#include "basic/string-util.h"
-#include "basic/verbs.h"
-#include "shared/import-util.h"
-#include "shared/machine-image.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/verbs.h"
+#include "systemd-shared/import-util.h"
+#include "systemd-shared/machine-image.h"
 
 #include "import-raw.h"
 #include "import-tar.h"

@@ -22,21 +22,21 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/af-list.h"
-#include "basic/alloc-util.h"
-#include "basic/escape.h"
-#include "basic/in-addr-util.h"
-#include "basic/parse-util.h"
-#include "basic/strv.h"
-#include "basic/terminal-util.h"
 #include "resolved-def.h"
 #include "resolved-dns-packet.h"
 #include "sd-bus/bus-error.h"
+#include "sd-bus/bus-util.h"
 #include "sd-netlink/netlink-util.h"
-#include "sd-netlink/sd-netlink.h"
-#include "shared/bus-util.h"
-#include "shared/gcrypt-util.h"
-#include "shared/pager.h"
+#include "systemd-basic/af-list.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/escape.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-gcrypt/gcrypt-util.h"
+#include "systemd-shared/pager.h"
+#include "systemd-staging/sd-netlink.h"
 
 #define DNS_CALL_TIMEOUT_USEC (45*USEC_PER_SEC)
 

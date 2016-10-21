@@ -19,15 +19,15 @@
 
 #include <sys/xattr.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/hexdecoct.h"
-#include "basic/io-util.h"
-#include "basic/parse-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/xattr-util.h"
-#include "shared/machine-pool.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/io-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/xattr-util.h"
+#include "systemd-shared/machine-pool.h"
 
 #include "pull-job.h"
 

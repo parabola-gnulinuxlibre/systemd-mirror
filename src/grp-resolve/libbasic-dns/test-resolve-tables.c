@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "shared/test-tables.h"
+#include "systemd-shared/test-tables.h"
 
 #include "dns-type.h"
 

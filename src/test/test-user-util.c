@@ -17,11 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/macro.h"
-#include "basic/string-util.h"
-#include "basic/user-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
 
 static void test_uid_to_name_one(uid_t uid, const char *name) {
         _cleanup_free_ char *t = NULL;

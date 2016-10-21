@@ -26,15 +26,15 @@
 
 #include <systemd/sd-daemon.h>
 
-#include "basic/alloc-util.h"
-#include "basic/escape.h"
-#include "basic/fd-util.h"
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/signal-util.h"
-#include "basic/socket-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/escape.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
 
 static char** arg_listen = NULL;
 static bool arg_accept = false;

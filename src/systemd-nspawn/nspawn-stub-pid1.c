@@ -21,12 +21,12 @@
 #include <sys/unistd.h>
 #include <sys/wait.h>
 
-#include "basic/def.h"
-#include "basic/fd-util.h"
-#include "basic/log.h"
-#include "basic/process-util.h"
-#include "basic/signal-util.h"
-#include "basic/time-util.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/process-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/time-util.h"
 
 #include "nspawn-stub-pid1.h"
 

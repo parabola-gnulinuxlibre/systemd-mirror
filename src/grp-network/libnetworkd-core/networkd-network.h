@@ -21,10 +21,10 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/hashmap.h"
-#include "shared/condition.h"
-#include "shared/resolve-util.h"
+#include "systemd-basic/hashmap.h"
 #include "systemd-network/dhcp-identifier.h"
+#include "systemd-shared/condition.h"
+#include "systemd-shared/resolve-util.h"
 #include "udev.h"
 
 #include "networkd-address.h"

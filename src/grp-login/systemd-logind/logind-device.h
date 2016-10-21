@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/list.h"
+#include "systemd-basic/list.h"
 
 typedef struct Device Device;
 

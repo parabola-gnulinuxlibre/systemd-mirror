@@ -39,7 +39,7 @@ libudev_la_LDFLAGS = \
 
 libudev_la_LIBADD = \
 	libsystemd-internal.la \
-	libbasic.la
+	libsystemd-basic.la
 
 pkgconfiglib_DATA += \
 	src/libudev/libudev.pc

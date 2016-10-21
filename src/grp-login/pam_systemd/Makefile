@@ -39,7 +39,8 @@ pam_systemd_la_LDFLAGS = \
 	-Wl,--version-script=$(srcdir)/pam_systemd.sym
 
 pam_systemd_la_LIBADD = \
-	libshared.la \
+	libsystemd-internal.la \
+	libsystemd-shared.la \
 	$(PAM_LIBS)
 
 pamlib_LTLIBRARIES = \

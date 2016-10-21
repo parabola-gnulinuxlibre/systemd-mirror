@@ -22,11 +22,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "basic/alloc-util.h"
-#include "basic/string-util.h"
 #include "sd-hwdb/hwdb-util.h"
-#include "sd-hwdb/sd-hwdb.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-shared/udev-util.h"
+#include "systemd-staging/sd-hwdb.h"
 #include "udev.h"
 
 static sd_hwdb *hwdb;

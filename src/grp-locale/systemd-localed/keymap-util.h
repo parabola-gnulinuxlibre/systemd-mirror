@@ -18,7 +18,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/locale-util.h"
+#include "systemd-basic/locale-util.h"
 
 typedef struct Context {
         char *locale[_VARIABLE_LC_MAX];

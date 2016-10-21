@@ -27,15 +27,15 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/hashmap.h"
-#include "basic/refcnt.h"
-#include "basic/string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/refcnt.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-staging/sd-hwdb.h"
 
 #include "hwdb-internal.h"
 #include "hwdb-util.h"
-#include "sd-hwdb.h"
 
 struct sd_hwdb {
         RefCount n_ref;

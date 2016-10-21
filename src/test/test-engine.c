@@ -21,10 +21,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "basic/rm-rf.h"
 #include "manager.h"
-#include "shared/bus-util.h"
-#include "shared/tests.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-shared/tests.h"
 
 #include "test-helper.h"
 

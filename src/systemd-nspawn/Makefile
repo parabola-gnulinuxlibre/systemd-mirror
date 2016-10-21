@@ -72,7 +72,7 @@ systemd_nspawn_LDADD = \
 
 ifneq ($(HAVE_LIBIPTC),)
 systemd_nspawn_LDADD += \
-	libfirewall.la
+	libsystemd-firewall.la
 endif # HAVE_LIBIPTC
 
 test_patch_uid_SOURCES = \

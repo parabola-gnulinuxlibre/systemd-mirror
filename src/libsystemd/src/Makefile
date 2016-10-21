@@ -79,6 +79,8 @@ _libsystemd_internal_la_SOURCES = \
 	src/libsystemd/sd-bus/kdbus.h \
 	src/libsystemd/sd-bus/bus-dump.c \
 	src/libsystemd/sd-bus/bus-dump.h \
+	src/libsystemd/sd-bus/bus-util.c \
+	src/libsystemd/sd-bus/bus-util.h \
 	src/libsystemd/sd-event/sd-event.c \
 	src/libsystemd/sd-netlink/sd-netlink.c \
 	src/libsystemd/sd-netlink/netlink-internal.h \
@@ -114,7 +116,7 @@ _libsystemd_internal_la_SOURCES = \
 libsystemd_internal_la_LIBADD = \
 	-lresolv
 
-noinst_LTLIBRARIES += \
+rootlibexec_LTLIBRARIES += \
 	libsystemd-internal.la
 
 _libsystemd_journal_internal_la_SOURCES = \
@@ -138,9 +140,7 @@ _libsystemd_journal_internal_la_SOURCES = \
 	src/journal/mmap-cache.h \
 	src/journal/compress.c \
 	src/journal/audit-type.h \
-	src/journal/audit-type.c \
-	src/shared/gcrypt-util.h \
-	src/shared/gcrypt-util.c
+	src/journal/audit-type.c
 
 #nodist_libsystemd_journal_internal_la_SOURCES = \
 	src/journal/audit_type-to-name.h
@@ -198,6 +198,10 @@ sd.libsystemd_SOURCES =
 sd.libsystemd_SOURCES += $(patsubst src/libsystemd/%,%,$(filter %.c,$(_libsystemd_internal_la_SOURCES)))
 sd.libsystemd_SOURCES += $(addprefix sd-journal/,$(notdir $(filter %.c,$(_libsystemd_journal_internal_la_SOURCES))))
 $(outdir)/libsystemd-internal.la: $(addprefix $(outdir)/,$(sd.libsystemd_SOURCES:.c=.lo))
+
+libsystemd_internal_la_LIBADD += \
+	libsystemd-basic.la \
+	libsystemd-gcrypt.la
 
 nested.subdirs += sd-bus
 nested.subdirs += sd-daemon

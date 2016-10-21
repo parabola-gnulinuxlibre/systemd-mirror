@@ -28,8 +28,8 @@
 #include <linux/if_infiniband.h>
 #include <linux/if_packet.h>
 
-#include "basic/fd-util.h"
-#include "basic/socket-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/socket-util.h"
 #include "systemd-network/dhcp-internal.h"
 
 static int _bind_raw_socket(int ifindex, union sockaddr_union *link,

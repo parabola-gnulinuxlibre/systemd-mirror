@@ -30,21 +30,12 @@ rootlibexec_PROGRAMS += \
 	systemd-journal-gatewayd
 
 systemd_journal_gatewayd_SOURCES = \
-	src/journal-remote/journal-gatewayd.c \
-	src/journal-remote/microhttpd-util.h \
-	src/journal-remote/microhttpd-util.c
+	src/journal-remote/journal-gatewayd.c
 
 systemd_journal_gatewayd_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la \
-	$(MICROHTTPD_LIBS)
-
-ifneq ($(HAVE_GNUTLS),)
-systemd_journal_gatewayd_LDADD += \
-	$(GNUTLS_LIBS)
-endif # HAVE_GNUTLS
-
-systemd_journal_gatewayd_CFLAGS = \
-	$(MICROHTTPD_CFLAGS)
+	libsystemd-microhttpd.la
 
 systemd_journal_gatewayd_CPPFLAGS = \
 	-DDOCUMENT_ROOT=\"$(gatewayddocumentrootdir)\"

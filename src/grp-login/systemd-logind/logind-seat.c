@@ -24,16 +24,16 @@
 
 #include <systemd/sd-messages.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/formats-util.h"
-#include "basic/mkdir.h"
-#include "basic/parse-util.h"
-#include "basic/stdio-util.h"
-#include "basic/string-util.h"
-#include "basic/terminal-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/stdio-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/util.h"
 
 #include "logind-acl.h"
 #include "logind-seat.h"

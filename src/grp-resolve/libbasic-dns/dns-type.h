@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/macro.h"
+#include "systemd-basic/macro.h"
 
 /* DNS record types, taken from
  * http://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml.

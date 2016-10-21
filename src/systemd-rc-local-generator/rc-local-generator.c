@@ -22,11 +22,11 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "basic/alloc-util.h"
-#include "basic/log.h"
-#include "basic/mkdir.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 #ifndef RC_LOCAL_SCRIPT_PATH_START
 #define RC_LOCAL_SCRIPT_PATH_START "/etc/rc.d/rc.local"

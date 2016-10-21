@@ -71,7 +71,7 @@ test_bus_error_SOURCES = \
 
 # Link statically because this test uses BUS_ERROR_MAP_ELF_REGISTER
 test_bus_error_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_bus_gvariant_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-gvariant.c

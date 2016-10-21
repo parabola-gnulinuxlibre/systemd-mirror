@@ -21,14 +21,14 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/hashmap.h"
-#include "basic/list.h"
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/sigbus.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/sigbus.h"
+#include "systemd-basic/util.h"
 
 #include "mmap-cache.h"
 

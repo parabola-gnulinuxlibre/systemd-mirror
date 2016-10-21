@@ -19,9 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/util.h"
-
-#include "sd-netlink.h"
+#include "systemd-basic/util.h"
+#include "systemd-staging/sd-netlink.h"
 
 int rtnl_message_new_synthetic_error(int error, uint32_t serial, sd_netlink_message **ret);
 uint32_t rtnl_message_get_serial(sd_netlink_message *m);

@@ -20,10 +20,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "basic/fd-util.h"
-#include "basic/hexdecoct.h"
-#include "basic/io-util.h"
-#include "basic/stdio-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/io-util.h"
+#include "systemd-basic/stdio-util.h"
 
 #include "id128-util.h"
 

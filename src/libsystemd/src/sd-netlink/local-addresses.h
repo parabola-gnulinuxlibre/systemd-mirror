@@ -20,9 +20,8 @@
 ***/
 
 
-#include "basic/in-addr-util.h"
-
-#include "sd-netlink.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-staging/sd-netlink.h"
 
 struct local_address {
         int family, ifindex;

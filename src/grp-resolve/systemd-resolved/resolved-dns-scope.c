@@ -19,15 +19,15 @@
 
 #include <netinet/tcp.h>
 
-#include "basic/af-list.h"
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/hostname-util.h"
-#include "basic/missing.h"
-#include "basic/random-util.h"
-#include "basic/socket-util.h"
-#include "basic/strv.h"
-#include "shared/dns-domain.h"
+#include "systemd-basic/af-list.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/random-util.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-shared/dns-domain.h"
 
 #include "resolved-dns-scope.h"
 #include "resolved-llmnr.h"

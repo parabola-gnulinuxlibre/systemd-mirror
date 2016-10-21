@@ -17,11 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/list.h"
-#include "basic/string-util.h"
 #include "resolved-dns-packet.h"
-#include "shared/dns-domain.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-shared/dns-domain.h"
 
 #include "resolved-dns-zone.h"
 

@@ -27,10 +27,10 @@
 #include <seccomp.h>
 #endif
 
-#include "basic/log.h"
+#include "systemd-basic/log.h"
 
 #ifdef HAVE_SECCOMP
-#include "shared/seccomp-util.h"
+#include "systemd-shared/seccomp-util.h"
 #endif
 
 #include "nspawn-seccomp.h"

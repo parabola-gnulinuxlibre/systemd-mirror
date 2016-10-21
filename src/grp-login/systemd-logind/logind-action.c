@@ -19,17 +19,17 @@
 
 #include <unistd.h>
 
-#include "basic/alloc-util.h"
-#include "basic/formats-util.h"
-#include "basic/process-util.h"
-#include "basic/special.h"
-#include "basic/string-table.h"
-#include "basic/terminal-util.h"
-#include "basic/user-util.h"
 #include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "shared/conf-parser.h"
-#include "shared/sleep-config.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/process-util.h"
+#include "systemd-basic/special.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-shared/conf-parser.h"
+#include "systemd-shared/sleep-config.h"
 
 #include "logind-action.h"
 

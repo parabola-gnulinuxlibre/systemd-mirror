@@ -23,7 +23,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "sd-device.h"
+#include "systemd-staging/sd-device.h"
 
 int device_new_from_nulstr(sd_device **ret, uint8_t *nulstr, size_t len);
 int device_new_from_strv(sd_device **ret, char **strv);

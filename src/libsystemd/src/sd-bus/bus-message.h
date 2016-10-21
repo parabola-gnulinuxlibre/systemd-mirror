@@ -25,8 +25,8 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/macro.h"
-#include "basic/time-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/time-util.h"
 
 #include "bus-creds.h"
 #include "bus-protocol.h"

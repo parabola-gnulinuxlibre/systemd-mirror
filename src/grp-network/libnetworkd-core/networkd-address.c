@@ -19,16 +19,16 @@
 
 #include <net/if.h>
 
-#include "basic/alloc-util.h"
-#include "basic/parse-util.h"
-#include "basic/set.h"
-#include "basic/socket-util.h"
-#include "basic/string-util.h"
-#include "basic/utf8.h"
-#include "basic/util.h"
-#include "firewall-util.h"
 #include "sd-netlink/netlink-util.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/set.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/utf8.h"
+#include "systemd-basic/util.h"
+#include "systemd-firewall/firewall-util.h"
+#include "systemd-shared/conf-parser.h"
 
 #include "networkd-address.h"
 #include "networkd.h"

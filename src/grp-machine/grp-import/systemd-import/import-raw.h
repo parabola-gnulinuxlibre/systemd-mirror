@@ -21,11 +21,10 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/macro.h"
-#include "shared/import-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-shared/import-util.h"
 
 typedef struct RawImport RawImport;
-
 typedef void (*RawImportFinished)(RawImport *import, int error, void *userdata);
 
 int raw_import_new(RawImport **import, sd_event *event, const char *image_root, RawImportFinished on_finished, void *userdata);

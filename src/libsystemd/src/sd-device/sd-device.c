@@ -22,25 +22,25 @@
 #include <net/if.h>
 #include <sys/types.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/fs-util.h"
-#include "basic/hashmap.h"
-#include "basic/macro.h"
-#include "basic/parse-util.h"
-#include "basic/path-util.h"
-#include "basic/set.h"
-#include "basic/stat-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/strxcpyx.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/set.h"
+#include "systemd-basic/stat-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/strxcpyx.h"
+#include "systemd-basic/util.h"
+#include "systemd-staging/sd-device.h"
 
 #include "device-internal.h"
 #include "device-private.h"
 #include "device-util.h"
-#include "sd-device.h"
 
 int device_new_aux(sd_device **ret) {
         _cleanup_(sd_device_unrefp) sd_device *device = NULL;

@@ -22,8 +22,8 @@
 
 #include <linux/filter.h>
 
-#include "basic/fd-util.h"
-#include "basic/socket-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/socket-util.h"
 #include "systemd-network/lldp-network.h"
 
 int lldp_network_bind_raw_socket(int ifindex) {

@@ -19,11 +19,11 @@
 
 #include <ctype.h>
 
-#include "basic/def.h"
-#include "basic/hexdecoct.h"
-#include "basic/string-table.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/string-table.h"
 #include "systemd-network/dhcp-identifier.h"
+#include "systemd-shared/conf-parser.h"
 
 #include "networkd-conf.h"
 

@@ -17,16 +17,16 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/architecture.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/missing.h"
-#include "basic/path-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/user-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/architecture.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
 
 #include "sd-path.h"
 

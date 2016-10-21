@@ -45,7 +45,7 @@ test_network_LDADD = \
 
 ifneq ($(HAVE_LIBIPTC),)
 test_network_LDADD += \
-	libfirewall.la
+	libsystemd-firewall.la
 endif # HAVE_LIBIPTC
 
 test_network_tables_SOURCES = \
@@ -58,7 +58,7 @@ test_network_tables_LDADD = \
 
 ifneq ($(HAVE_LIBIPTC),)
 test_network_tables_LDADD += \
-	libfirewall.la
+	libsystemd-firewall.la
 endif # HAVE_LIBIPTC
 
 tests += \

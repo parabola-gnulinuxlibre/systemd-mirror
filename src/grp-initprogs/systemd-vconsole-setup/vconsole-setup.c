@@ -30,19 +30,19 @@
 #include <linux/tiocl.h>
 #include <linux/vt.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/io-util.h"
-#include "basic/locale-util.h"
-#include "basic/log.h"
-#include "basic/process-util.h"
-#include "basic/signal-util.h"
-#include "basic/stdio-util.h"
-#include "basic/string-util.h"
-#include "basic/terminal-util.h"
-#include "basic/util.h"
-#include "basic/virt.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/io-util.h"
+#include "systemd-basic/locale-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/process-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/stdio-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-basic/virt.h"
 
 static bool is_vconsole(int fd) {
         unsigned char data[1];

@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/fd-util.h"
-#include "basic/socket-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/socket-util.h"
 
 #include "resolved-dns-stub.h"
 

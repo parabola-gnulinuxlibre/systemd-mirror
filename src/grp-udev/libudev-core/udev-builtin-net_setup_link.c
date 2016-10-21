@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/log.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/log.h"
 #include "udev.h"
 
 #include "net/link-config.h"

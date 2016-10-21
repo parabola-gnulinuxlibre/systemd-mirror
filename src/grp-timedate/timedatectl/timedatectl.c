@@ -25,14 +25,14 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/parse-util.h"
-#include "basic/strv.h"
-#include "basic/terminal-util.h"
-#include "basic/util.h"
 #include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "shared/pager.h"
-#include "shared/spawn-polkit-agent.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/pager.h"
+#include "systemd-shared/spawn-polkit-agent.h"
 
 static bool arg_no_pager = false;
 static bool arg_ask_password = true;

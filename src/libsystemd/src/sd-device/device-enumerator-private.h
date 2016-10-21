@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-device.h"
+#include "systemd-staging/sd-device.h"
 
 int device_enumerator_scan_devices(sd_device_enumerator *enumeartor);
 int device_enumerator_scan_subsystems(sd_device_enumerator *enumeartor);

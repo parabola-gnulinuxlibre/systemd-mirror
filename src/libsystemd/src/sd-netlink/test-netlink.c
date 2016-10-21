@@ -20,15 +20,15 @@
 #include <net/if.h>
 #include <netinet/ether.h>
 
-#include "basic/ether-addr-util.h"
-#include "basic/macro.h"
-#include "basic/missing.h"
-#include "basic/socket-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/ether-addr-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-staging/sd-netlink.h"
 
 #include "netlink-util.h"
-#include "sd-netlink.h"
 
 static void test_message_link_bridge(sd_netlink *rtnl) {
         _cleanup_(sd_netlink_message_unrefp) sd_netlink_message *message = NULL;

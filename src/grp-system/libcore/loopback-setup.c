@@ -20,8 +20,8 @@
 #include <net/if.h>
 #include <stdlib.h>
 
-#include "basic/missing.h"
-#include "sd-netlink/sd-netlink.h"
+#include "systemd-basic/missing.h"
+#include "systemd-staging/sd-netlink.h"
 
 #include "loopback-setup.h"
 

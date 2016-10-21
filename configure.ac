@@ -193,7 +193,6 @@ CC_CHECK_FLAGS_APPEND([with_cflags], [CFLAGS], [\
         -fno-common \
         -fdiagnostics-show-option \
         -fno-strict-aliasing \
-        -fvisibility=hidden \
         -fstack-protector \
         -fstack-protector-strong \
         -fPIE \

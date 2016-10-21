@@ -33,6 +33,7 @@ systemd_importd_CFLAGS = \
 	-D SYSTEMD_EXPORT_PATH=\"$(rootlibexecdir)/systemd-export\"
 
 systemd_importd_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la
 
 dist_rootlibexec_DATA += \

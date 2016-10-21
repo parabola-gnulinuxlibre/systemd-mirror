@@ -26,13 +26,13 @@
 #include <sys/signalfd.h>
 #include <unistd.h>
 
-#include "basic/fs-util.h"
-#include "basic/log.h"
-#include "basic/missing.h"
-#include "basic/selinux-util.h"
-#include "basic/signal-util.h"
-#include "basic/string-util.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/selinux-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-shared/udev-util.h"
 #include "udev.h"
 
 static int fake_filesystems(void) {

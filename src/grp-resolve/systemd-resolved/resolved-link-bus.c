@@ -17,12 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/parse-util.h"
-#include "basic/strv.h"
 #include "sd-bus/bus-common-errors.h"
-#include "shared/bus-util.h"
-#include "shared/resolve-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-shared/resolve-util.h"
 
 #include "resolved-bus.h"
 #include "resolved-link-bus.h"

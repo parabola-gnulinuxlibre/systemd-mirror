@@ -17,16 +17,16 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/cap-list.h"
-#include "basic/parse-util.h"
-#include "basic/process-util.h"
-#include "basic/socket-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/user-util.h"
-#include "basic/util.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/cap-list.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/process-util.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/conf-parser.h"
 
 #include "nspawn-network.h"
 #include "nspawn-settings.h"

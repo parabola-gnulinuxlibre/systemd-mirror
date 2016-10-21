@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "basic/macro.h"
+#include "systemd-basic/macro.h"
 
 typedef struct KillContext KillContext;
 

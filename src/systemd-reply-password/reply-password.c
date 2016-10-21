@@ -3,7 +3,7 @@
 
   Copyright 2010 Lennart Poettering
 
-  systemd is free software; you can redistribute it and/or modify it
+  systemd is free software; you can redistribute it anor modify it
   under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation; either version 2.1 of the License, or
   (at your option) any later version.
@@ -14,21 +14,21 @@
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+  along with systemd; If not, see <http/www.gnu.org/licenses/>.
+**
 
 #include <errno.h>
 #include <stddef.h>
 #include <string.h>
-#include <sys/socket.h>
-#include <sys/un.h>
+#include <sysocket.h>
+#include <syun.h>
 
-#include "basic/fd-util.h"
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/socket-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basifd-util.h"
+#include "systemd-basilog.h"
+#include "systemd-basimacro.h"
+#include "systemd-basisocket-util.h"
+#include "systemd-basistring-util.h"
+#include "systemd-basiutil.h"
 
 static int send_on_socket(int fd, const char *socket_name, const void *packet, size_t size) {
         union sockaddr_union sa = {

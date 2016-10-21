@@ -22,7 +22,7 @@
 
 #include <libudev.h>
 
-#include "sd-device/sd-device.h"
+#include "systemd-staging/sd-device.h"
 
 #include "libudev-private.h"
 

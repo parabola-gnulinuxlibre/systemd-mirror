@@ -23,7 +23,7 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/set.h"
+#include "systemd-basic/set.h"
 
 struct introspect {
         FILE *f;

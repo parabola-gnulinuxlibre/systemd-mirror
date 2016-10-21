@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/log.h"
-#include "basic/special.h"
-#include "basic/string-util.h"
-#include "basic/unit-name.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/special.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/unit-name.h"
 
 #include "dbus-target.h"
 #include "unit.h"

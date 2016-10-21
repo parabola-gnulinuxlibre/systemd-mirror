@@ -23,19 +23,19 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#include "basic/alloc-util.h"
-#include "basic/escape.h"
-#include "basic/fileio.h"
-#include "basic/log.h"
-#include "basic/mount-util.h"
-#include "basic/parse-util.h"
-#include "basic/path-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/util.h"
 #include "sd-device/device-util.h"
-#include "sd-device/sd-device.h"
-#include "shared/ask-password-api.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/escape.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/mount-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/ask-password-api.h"
+#include "systemd-staging/sd-device.h"
 
 static const char *arg_type = NULL; /* CRYPT_LUKS1, CRYPT_TCRYPT or CRYPT_PLAIN */
 static char *arg_cipher = NULL;

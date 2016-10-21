@@ -48,9 +48,7 @@ libsystemd_la_LDFLAGS = \
 	-Wl,--version-script=$(srcdir)/libsystemd.sym
 
 libsystemd_la_LIBADD = \
-	libsystemd-internal.la \
-	libbasic.la \
-	libsystemd-journal-internal.la
+	libsystemd-internal.la
 
 libsystemd_la_LIBADD = $(libsystemd-internal.DEPENDS)
 

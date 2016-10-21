@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "basic/alloc-util.h"
+#include "systemd-basic/alloc-util.h"
 
 #include "libudev-private.h"
 

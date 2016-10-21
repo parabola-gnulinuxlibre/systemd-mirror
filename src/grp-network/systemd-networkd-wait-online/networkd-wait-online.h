@@ -21,9 +21,9 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/hashmap.h"
-#include "sd-netlink/sd-netlink.h"
-#include "sd-network/sd-network.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-staging/sd-netlink.h"
+#include "systemd-staging/sd-network.h"
 
 typedef struct Manager Manager;
 

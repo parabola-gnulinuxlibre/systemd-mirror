@@ -37,7 +37,7 @@ libnss_resolve_la_LDFLAGS = \
 
 libnss_resolve_la_LIBADD = \
 	libsystemd-internal.la \
-	libbasic.la \
+	libsystemd-basic.la \
         -ldl
 
 lib_LTLIBRARIES += \

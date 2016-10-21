@@ -27,6 +27,7 @@ coredumpctl_SOURCES = \
 	src/coredump/coredumpctl.c
 
 coredumpctl_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la
 
 bin_PROGRAMS += \

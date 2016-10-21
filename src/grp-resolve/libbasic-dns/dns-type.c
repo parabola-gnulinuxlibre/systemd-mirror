@@ -19,8 +19,8 @@
 
 #include <sys/socket.h>
 
-#include "basic/parse-util.h"
-#include "basic/string-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/string-util.h"
 
 #include "dns-type.h"
 

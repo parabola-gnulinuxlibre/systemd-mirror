@@ -24,16 +24,16 @@
 #include <libudev.h>
 #include <systemd/sd-id128.h>
 
-#include "basic/alloc-util.h"
-#include "basic/ether-addr-util.h"
-#include "basic/lockfile-util.h"
-#include "basic/siphash24.h"
-#include "basic/socket-util.h"
-#include "basic/stat-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
-#include "sd-netlink/sd-netlink.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/ether-addr-util.h"
+#include "systemd-basic/lockfile-util.h"
+#include "systemd-basic/siphash24.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/stat-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/udev-util.h"
+#include "systemd-staging/sd-netlink.h"
 
 #include "nspawn-network.h"
 

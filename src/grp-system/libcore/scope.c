@@ -20,13 +20,13 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "basic/alloc-util.h"
-#include "basic/log.h"
-#include "basic/special.h"
-#include "basic/string-table.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/unit-name.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/special.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/unit-name.h"
 
 #include "dbus-scope.h"
 #include "load-dropin.h"

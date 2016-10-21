@@ -30,8 +30,8 @@
 
 #include <linux/if_packet.h>
 
-#include "basic/fd-util.h"
-#include "basic/socket-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/socket-util.h"
 #include "systemd-network/icmp6-util.h"
 
 #define IN6ADDR_ALL_ROUTERS_MULTICAST_INIT \

@@ -28,8 +28,8 @@
 
 #include <linux/if_packet.h>
 
-#include "basic/fd-util.h"
-#include "basic/socket-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/socket-util.h"
 #include "systemd-network/dhcp6-internal.h"
 #include "systemd-network/dhcp6-protocol.h"
 

@@ -27,7 +27,7 @@ collect_SOURCES = \
 	src/udev/collect/collect.c
 
 collect_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 udevlibexec_PROGRAMS += \
 	collect

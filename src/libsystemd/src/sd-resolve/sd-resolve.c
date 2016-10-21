@@ -29,15 +29,14 @@
 #include <sys/prctl.h>
 #include <unistd.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/io-util.h"
-#include "basic/list.h"
-#include "basic/missing.h"
-#include "basic/socket-util.h"
-#include "basic/util.h"
-
-#include "sd-resolve.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/io-util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-staging/sd-resolve.h"
 
 #define WORKERS_MIN 1U
 #define WORKERS_MAX 16U

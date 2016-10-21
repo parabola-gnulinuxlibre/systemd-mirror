@@ -19,8 +19,8 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/alloc-util.h"
-#include "basic/string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/string-util.h"
 
 #include "bus-control.h"
 #include "bus-objects.h"

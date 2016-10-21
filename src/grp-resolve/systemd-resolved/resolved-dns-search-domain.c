@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "shared/dns-domain.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-shared/dns-domain.h"
 
 #include "resolved-dns-search-domain.h"
 

@@ -18,18 +18,18 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/dirent-util.h"
-#include "basic/fd-util.h"
-#include "basic/prioq.h"
-#include "basic/set.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/dirent-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/prioq.h"
+#include "systemd-basic/set.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
+#include "systemd-staging/sd-device.h"
 
 #include "device-enumerator-private.h"
 #include "device-util.h"
-#include "sd-device.h"
 
 #define DEVICE_ENUMERATE_MAX_DEPTH 256
 

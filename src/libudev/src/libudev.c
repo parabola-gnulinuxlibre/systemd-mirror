@@ -26,10 +26,10 @@
 
 #include <libudev.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/missing.h"
-#include "basic/string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/string-util.h"
 
 #include "libudev-private.h"
 

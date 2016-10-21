@@ -24,15 +24,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "basic/alloc-util.h"
-#include "basic/ether-addr-util.h"
-#include "basic/in-addr-util.h"
-#include "basic/list.h"
-#include "basic/random-util.h"
-#include "basic/siphash24.h"
-#include "basic/sparse-endian.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/ether-addr-util.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/random-util.h"
+#include "systemd-basic/siphash24.h"
+#include "systemd-basic/sparse-endian.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 #include "systemd-network/sd-ipv4acd.h"
 #include "systemd-network/sd-ipv4ll.h"
 

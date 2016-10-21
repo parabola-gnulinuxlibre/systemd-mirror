@@ -19,12 +19,12 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/stat-util.h"
-#include "basic/strv.h"
-#include "basic/util.h"
 #include "sd-bus/bus-error.h" /* for bus_error_message */
-#include "shared/bus-unit-util.h"
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/stat-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/bus-unit-util.h"
 
 #include "nspawn-register.h"
 

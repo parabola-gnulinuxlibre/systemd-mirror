@@ -21,7 +21,7 @@
 
 #include <stdbool.h>
 
-#include "shared/import-util.h"
+#include "systemd-shared/import-util.h"
 
 #include "pull-job.h"
 

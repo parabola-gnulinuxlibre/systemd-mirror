@@ -19,14 +19,14 @@
 
 #include <netinet/icmp6.h>
 
-#include "basic/alloc-util.h"
-#include "basic/hostname-util.h"
-#include "basic/missing.h"
-#include "basic/strv.h"
-#include "shared/dns-domain.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/strv.h"
 #include "systemd-network/ndisc-internal.h"
 #include "systemd-network/ndisc-router.h"
 #include "systemd-network/sd-ndisc.h"
+#include "systemd-shared/dns-domain.h"
 
 _public_ sd_ndisc_router* sd_ndisc_router_ref(sd_ndisc_router *rt) {
         if (!rt)

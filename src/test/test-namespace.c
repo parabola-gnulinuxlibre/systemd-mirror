@@ -19,12 +19,12 @@
 
 #include <sys/socket.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/process-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
 #include "namespace.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/process-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 static void test_tmpdir(const char *id, const char *A, const char *B) {
         _cleanup_free_ char *a, *b;

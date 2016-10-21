@@ -25,11 +25,11 @@
 #include <selinux/selinux.h>
 #endif
 
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/selinux-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/selinux-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 #include "selinux-setup.h"
 

@@ -19,9 +19,9 @@
 
 #include <string.h>
 
-#include "basic/string-util.h"
-#include "basic/strxcpyx.h"
-#include "basic/util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strxcpyx.h"
+#include "systemd-basic/util.h"
 
 static void test_strpcpy(void) {
         char target[25];

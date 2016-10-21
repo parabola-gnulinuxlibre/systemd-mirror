@@ -28,6 +28,7 @@ systemd_fsck_SOURCES = \
 	src/fsck/fsck.c
 
 systemd_fsck_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

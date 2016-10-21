@@ -19,10 +19,10 @@
 
 #include <sys/types.h>
 
-#include "basic/alloc-util.h"
-#include "basic/device-nodes.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/device-nodes.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 /* helpers for test_encode_devnode_name */
 static char *do_encode_string(const char *in) {

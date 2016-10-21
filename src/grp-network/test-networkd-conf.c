@@ -17,13 +17,13 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/ether-addr-util.h"
-#include "basic/hexdecoct.h"
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/string-util.h"
 #include "networkd-conf.h"
 #include "networkd-network.h"
+#include "systemd-basic/ether-addr-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
 #include "systemd-network/network-internal.h"
 
 static void test_config_parse_duid_type_one(const char *rvalue, int ret, DUIDType expected) {

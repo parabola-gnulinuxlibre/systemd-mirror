@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
 #include "networkd.h"
+#include "systemd-basic/alloc-util.h"
 #include "systemd-network/dhcp-lease-internal.h"
 #include "systemd-network/network-internal.h"
 

@@ -30,7 +30,7 @@ systemd_path_SOURCES = \
 	src/path/path.c
 
 systemd_path_LDADD = \
-	libbasic.la
+	libsystemd-basic.la
 
 sd.CPPFLAGS += -DLIBDIR=\"$(libdir)\"
 sd.CPPFLAGS += -DROOTLIBDIR=\"$(rootlibdir)\"

@@ -41,7 +41,7 @@ udevadm_SOURCES = \
 
 udevadm_LDADD = \
 	libudev-core.la \
-	libbasic.la
+	libsystemd-basic.la
 
 sd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 

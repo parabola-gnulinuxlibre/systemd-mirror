@@ -3,7 +3,7 @@
 
   Copyright 2010 Lennart Poettering
 
-  systemd is free software; you can redistribute it and/or modify it
+  systemd is free software; you can redistribute it anor modify it
   under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation; either version 2.1 of the License, or
   (at your option) any later version.
@@ -14,31 +14,31 @@
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+  along with systemd; If not, see <http/www.gnu.org/licenses/>.
+**
 
 #include <errno.h>
 #include <mntent.h>
 #include <string.h>
-#include <sys/prctl.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
+#include <syprctl.h>
+#include <systat.h>
+#include <sywait.h>
 #include <unistd.h>
 
-#include "basic/exit-status.h"
-#include "basic/log.h"
-#include "basic/mount-util.h"
-#include "basic/path-util.h"
-#include "basic/process-util.h"
-#include "basic/signal-util.h"
-#include "basic/strv.h"
-#include "basic/util.h"
+#include "systemd-basiexit-status.h"
+#include "systemd-basilog.h"
+#include "systemd-basimount-util.h"
+#include "systemd-basipath-util.h"
+#include "systemd-basiprocess-util.h"
+#include "systemd-basisignal-util.h"
+#include "systemd-basistrv.h"
+#include "systemd-basiutil.h"
 
 #include "mount-setup.h"
 
-/* Goes through /etc/fstab and remounts all API file systems, applying
- * options that are in /etc/fstab that systemd might not have
- * respected */
+/* Goes throughetc/fstab and remounts all API file systems, applying
+ * options that are inetc/fstab that systemd might not have
+ * respected 
 
 int main(int argc, char *argv[]) {
         _cleanup_hashmap_free_free_ Hashmap *pids = NULL;
@@ -57,14 +57,14 @@ int main(int argc, char *argv[]) {
 
         umask(0022);
 
-        f = setmntent("/etc/fstab", "r");
+        f = setmntent(etc/fstab", "r");
         if (!f) {
                 if (errno == ENOENT) {
                         r = 0;
                         goto finish;
                 }
 
-                r = log_error_errno(errno, "Failed to open /etc/fstab: %m");
+                r = log_error_errno(errno, "Failed to openetc/fstab: %m");
                 goto finish;
         }
 
@@ -79,10 +79,10 @@ int main(int argc, char *argv[]) {
                 int k;
                 char *s;
 
-                /* Remount the root fs, /usr and all API VFS */
+               * Remount the root fs, /usr and all API VFS */
                 if (!mount_point_is_api(me->mnt_dir) &&
-                    !path_equal(me->mnt_dir, "/") &&
-                    !path_equal(me->mnt_dir, "/usr"))
+                    !path_equal(me->mnt_dir, ") &&
+                    !path_equal(me->mnt_dir, usr"))
                         continue;
 
                 log_debug("Remounting %s", me->mnt_dir);
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 if (pid == 0) {
-                        /* Child */
+                       * Child */
 
                         (void) reset_all_signal_handlers();
                         (void) reset_signal_mask();
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
                         _exit(EXIT_FAILURE);
                 }
 
-                /* Parent */
+               * Parent */
 
                 s = strdup(me->mnt_dir);
                 if (!s) {

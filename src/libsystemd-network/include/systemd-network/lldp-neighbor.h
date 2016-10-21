@@ -23,8 +23,8 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "basic/hash-funcs.h"
-#include "basic/time-util.h"
+#include "systemd-basic/hash-funcs.h"
+#include "systemd-basic/time-util.h"
 
 #include "lldp-internal.h"
 #include "sd-lldp.h"

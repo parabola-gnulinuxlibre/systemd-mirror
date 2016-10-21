@@ -19,8 +19,8 @@
 
 #include <net/if.h>
 
-#include "basic/missing.h"
-#include "sd-netlink/sd-netlink.h"
+#include "systemd-basic/missing.h"
+#include "systemd-staging/sd-netlink.h"
 
 #include "networkd-netdev-vrf.h"
 

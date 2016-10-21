@@ -21,6 +21,6 @@
 
 #include <stdbool.h>
 
-#include "shared/path-lookup.h"
+#include "systemd-shared/path-lookup.h"
 
 int verify_units(char **filenames, UnitFileScope scope, bool check_man);

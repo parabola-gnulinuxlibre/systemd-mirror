@@ -54,4 +54,7 @@ EXTRA_DIST += \
         units/systemd-journal-upload.service.in \
         src/journal-remote/journal-upload.conf.in
 
+sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
+sd.CPPFLAGS += -DCERTIFICATE_ROOT=\"$(CERTIFICATEROOT)\"
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -23,13 +23,13 @@
 
 #include <linux/if_infiniband.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/in-addr-util.h"
-#include "basic/random-util.h"
-#include "basic/socket-util.h"
-#include "basic/string-table.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/random-util.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/util.h"
 #include "systemd-network/dhcp-identifier.h"
 #include "systemd-network/dhcp6-internal.h"
 #include "systemd-network/dhcp6-lease-internal.h"

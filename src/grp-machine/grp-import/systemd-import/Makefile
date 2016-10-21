@@ -38,6 +38,7 @@ systemd_import_CFLAGS = \
 
 systemd_import_LDADD = \
 	libsystemd-shared.la \
+	libimport.la \
 	$(XZ_LIBS) \
 	$(ZLIB_LIBS) \
 	$(BZIP2_LIBS)

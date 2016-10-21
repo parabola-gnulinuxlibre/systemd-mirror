@@ -22,12 +22,17 @@ fixup_makefiles() (
 )
 
 fixup_includes() (
-	find $(find . -type d -name include) -type d | while read -r dir; do
-		lib="${dir##*/}"
-		pushd "$dir" >/dev/null
-		find . -type f -exec sed -ri -e "s|$lib/||" -- {} +
-		popd >/dev/null
-	done
+	dirs=($(find "$@" -type d -name include))
+	if [[ ${#dirs[@]} -gt 0 ]]; then
+		find "${dirs[@]}" -type d | while read -r dir; do
+			printf '=> libdir %q\n' "$dir"
+			lib="${dir##*/}"
+			find "$dir" -type f | while read -r filename; do
+				printf ' => sed -ir %q %q\n' "s|$lib/||" "$filename"
+				sed -r "s|$lib/||" < "$filename" | build-aux/write-ifchanged "$filename"
+			done
+		done
+	fi
 
 	find "$@" \( -name '*.h' -o -name '*.c' -o -name '*.gperf' \) -type f | while read -r filename; do
 		"$0"--includes "$filename"

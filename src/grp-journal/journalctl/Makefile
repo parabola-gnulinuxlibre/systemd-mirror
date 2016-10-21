@@ -30,6 +30,7 @@ journalctl_SOURCES = \
 	src/journal/journalctl.c
 
 journalctl_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la \
 	libudev-core.la
 

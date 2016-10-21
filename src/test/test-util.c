@@ -23,14 +23,14 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "basic/def.h"
-#include "basic/fileio.h"
-#include "basic/fs-util.h"
-#include "basic/parse-util.h"
-#include "basic/raw-clone.h"
-#include "basic/rm-rf.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/raw-clone.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 static void test_align_power2(void) {
         unsigned long i, p2;

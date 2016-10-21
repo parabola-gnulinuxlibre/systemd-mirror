@@ -29,8 +29,9 @@
 #include <gcrypt.h>
 #include <string.h>
 
+#include "systemd-gcrypt/gcrypt-util.h"
+
 #include "fsprg.h"
-#include "gcrypt-util.h"
 
 #define ISVALID_SECPAR(secpar) (((secpar) % 16 == 0) && ((secpar) >= 16) && ((secpar) <= 16384))
 #define VALIDATE_SECPAR(secpar) assert(ISVALID_SECPAR(secpar));

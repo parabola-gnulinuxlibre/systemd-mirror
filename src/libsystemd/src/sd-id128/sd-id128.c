@@ -23,12 +23,12 @@
 
 #include <systemd/sd-id128.h>
 
-#include "basic/fd-util.h"
-#include "basic/hexdecoct.h"
-#include "basic/io-util.h"
-#include "basic/macro.h"
-#include "basic/random-util.h"
-#include "basic/util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/io-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/random-util.h"
+#include "systemd-basic/util.h"
 
 #include "id128-util.h"
 

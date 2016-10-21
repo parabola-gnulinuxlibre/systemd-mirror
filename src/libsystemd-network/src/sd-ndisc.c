@@ -20,12 +20,12 @@
 #include <netinet/icmp6.h>
 #include <netinet/in.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/in-addr-util.h"
-#include "basic/socket-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 #include "systemd-network/icmp6-util.h"
 #include "systemd-network/ndisc-internal.h"
 #include "systemd-network/ndisc-router.h"

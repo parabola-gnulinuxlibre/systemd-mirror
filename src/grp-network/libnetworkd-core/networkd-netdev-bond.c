@@ -22,13 +22,13 @@
 
 #include <linux/if_bonding.h>
 
-#include "basic/alloc-util.h"
-#include "basic/extract-word.h"
-#include "basic/missing.h"
-#include "basic/string-table.h"
-#include "basic/string-util.h"
-#include "sd-netlink/sd-netlink.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/extract-word.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-shared/conf-parser.h"
+#include "systemd-staging/sd-netlink.h"
 
 #include "networkd-netdev-bond.h"
 

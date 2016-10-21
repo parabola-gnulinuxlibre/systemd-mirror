@@ -17,11 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
 #include "resolved-def.h"
 #include "sd-bus/bus-common-errors.h"
-#include "shared/bus-util.h"
-#include "shared/dns-domain.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-shared/dns-domain.h"
 
 #include "resolved-bus.h"
 #include "resolved-dns-synthesize.h"

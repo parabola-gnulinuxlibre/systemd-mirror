@@ -28,23 +28,23 @@
 #include <security/pam_modutil.h>
 #include <sys/file.h>
 
-#include "basic/alloc-util.h"
-#include "basic/audit-util.h"
-#include "basic/def.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/formats-util.h"
-#include "basic/hostname-util.h"
-#include "basic/login-util.h"
-#include "basic/macro.h"
-#include "basic/parse-util.h"
-#include "basic/socket-util.h"
-#include "basic/strv.h"
-#include "basic/terminal-util.h"
-#include "basic/util.h"
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/audit-util.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/login-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/util.h"
 
 static int parse_argv(
                 pam_handle_t *handle,

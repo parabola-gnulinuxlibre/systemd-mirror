@@ -21,7 +21,7 @@
 #include <netinet/in.h>
 #include <resolv.h>
 
-#include "basic/fd-util.h"
+#include "systemd-basic/fd-util.h"
 
 #include "resolved-manager.h"
 #include "resolved-mdns.h"

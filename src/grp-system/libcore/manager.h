@@ -26,11 +26,11 @@
 #include <systemd/sd-bus.h>
 #include <systemd/sd-event.h>
 
-#include "basic/cgroup-util.h"
-#include "basic/hashmap.h"
-#include "basic/list.h"
-#include "basic/ratelimit.h"
-#include "shared/fdset.h"
+#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/ratelimit.h"
+#include "systemd-shared/fdset.h"
 
 /* Enforce upper limit how many names we allow */
 #define MANAGER_MAX_NAMES 131072 /* 128K */
@@ -68,8 +68,8 @@ typedef enum StatusType {
         STATUS_TYPE_EMERGENCY,
 } StatusType;
 
-#include "basic/unit-name.h"
-#include "shared/path-lookup.h"
+#include "systemd-basic/unit-name.h"
+#include "systemd-shared/path-lookup.h"
 
 #include "execute.h"
 #include "job.h"

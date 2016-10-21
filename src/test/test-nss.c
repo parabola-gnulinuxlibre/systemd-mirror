@@ -21,19 +21,19 @@
 #include <net/if.h>
 #include <stdlib.h>
 
-#include "basic/af-list.h"
-#include "basic/alloc-util.h"
-#include "basic/errno-list.h"
-#include "basic/hexdecoct.h"
-#include "basic/hostname-util.h"
-#include "basic/in-addr-util.h"
-#include "basic/log.h"
-#include "basic/nss-util.h"
-#include "basic/path-util.h"
-#include "basic/stdio-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
 #include "sd-netlink/local-addresses.h"
+#include "systemd-basic/af-list.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/errno-list.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/nss-util.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/stdio-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
 
 static const char* nss_status_to_string(enum nss_status status, char *buf, size_t buf_len) {
         switch (status) {

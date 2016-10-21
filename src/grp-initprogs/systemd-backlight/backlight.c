@@ -19,16 +19,16 @@
 
 #include <libudev.h>
 
-#include "basic/alloc-util.h"
-#include "basic/def.h"
-#include "basic/escape.h"
-#include "basic/fileio.h"
-#include "basic/mkdir.h"
-#include "basic/parse-util.h"
-#include "basic/proc-cmdline.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/escape.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/proc-cmdline.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/udev-util.h"
 
 static struct udev_device *find_pci_or_platform_parent(struct udev_device *device) {
         struct udev_device *parent;

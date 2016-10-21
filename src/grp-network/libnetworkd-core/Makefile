@@ -93,7 +93,7 @@ nodist_libnetworkd_core_la_SOURCES = \
 libnetworkd_core_la_LIBADD = \
 	libsystemd-network.la \
 	libsystemd-internal.la \
-	libfirewall.la \
+	libsystemd-firewall.la \
 	libsystemd-shared.la
 
 sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"

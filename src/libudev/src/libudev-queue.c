@@ -24,9 +24,9 @@
 #include <sys/inotify.h>
 #include <unistd.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/io-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/io-util.h"
 
 #include "libudev-private.h"
 

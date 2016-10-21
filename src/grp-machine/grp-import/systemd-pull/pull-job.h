@@ -21,8 +21,8 @@
 
 #include <gcrypt.h>
 
-#include "basic/macro.h"
 #include "import-compress.h"
+#include "systemd-basic/macro.h"
 
 #include "curl-util.h"
 

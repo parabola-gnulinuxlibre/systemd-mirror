@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/signal-util.h"
-#include "basic/string-table.h"
-#include "basic/util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/util.h"
 
 #include "kill.h"
 

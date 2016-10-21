@@ -26,8 +26,8 @@
 #include <inttypes.h>
 #include <sys/types.h>
 
-#include "basic/macro.h"
-#include "basic/util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/util.h"
 
 #ifdef __cplusplus
 extern "C" {

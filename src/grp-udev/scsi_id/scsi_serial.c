@@ -36,9 +36,9 @@
 
 #include <libudev.h>
 
-#include "basic/random-util.h"
-#include "basic/string-util.h"
 #include "libudev-private.h"
+#include "systemd-basic/random-util.h"
+#include "systemd-basic/string-util.h"
 
 #include "scsi.h"
 #include "scsi_id.h"

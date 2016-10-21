@@ -22,17 +22,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "basic/alloc-util.h"
-#include "basic/conf-files.h"
-#include "basic/fileio.h"
-#include "basic/fs-util.h"
-#include "basic/label.h"
-#include "basic/mkdir.h"
-#include "basic/strbuf.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
 #include "sd-hwdb/hwdb-internal.h"
 #include "sd-hwdb/hwdb-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/conf-files.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/label.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/strbuf.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 #include "udev.h"
 
 /*

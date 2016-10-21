@@ -20,15 +20,15 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include "basic/alloc-util.h"
-#include "basic/log.h"
-#include "basic/mkdir.h"
-#include "basic/proc-cmdline.h"
-#include "basic/special.h"
-#include "basic/string-util.h"
-#include "basic/unit-name.h"
-#include "basic/util.h"
-#include "shared/fstab-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/proc-cmdline.h"
+#include "systemd-basic/special.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/unit-name.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/fstab-util.h"
 
 static const char *arg_dest = "/tmp";
 static char *arg_resume_dev = NULL;

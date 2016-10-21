@@ -30,16 +30,16 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/alloc-util.h"
-#include "basic/btrfs-util.h"
-#include "basic/chattr-util.h"
-#include "basic/fd-util.h"
-#include "basic/parse-util.h"
-#include "basic/path-util.h"
-#include "basic/random-util.h"
-#include "basic/set.h"
-#include "basic/string-util.h"
-#include "basic/xattr-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/btrfs-util.h"
+#include "systemd-basic/chattr-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/random-util.h"
+#include "systemd-basic/set.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/xattr-util.h"
 
 #include "compress.h"
 #include "journal-authenticate.h"

@@ -26,10 +26,10 @@
 
 #include <libudev.h>
 
-#include "basic/macro.h"
-#include "basic/mkdir.h"
-#include "basic/strxcpyx.h"
-#include "basic/util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/strxcpyx.h"
+#include "systemd-basic/util.h"
 
 #define READ_END  0
 #define WRITE_END 1

@@ -21,12 +21,12 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/af-list.h"
-#include "basic/alloc-util.h"
-#include "basic/random-util.h"
-#include "basic/string-util.h"
-#include "basic/time-util.h"
 #include "sd-bus/bus-common-errors.h"
+#include "systemd-basic/af-list.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/random-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/time-util.h"
 
 #include "dns-type.h"
 

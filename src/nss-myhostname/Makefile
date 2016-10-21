@@ -38,7 +38,7 @@ libnss_myhostname_la_LDFLAGS = \
 
 libnss_myhostname_la_LIBADD = \
 	libsystemd-internal.la \
-	libbasic.la
+	libsystemd-basic.la
 
 lib_LTLIBRARIES += \
 	libnss_myhostname.la

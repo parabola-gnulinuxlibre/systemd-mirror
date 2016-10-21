@@ -21,11 +21,10 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/macro.h"
-#include "shared/import-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-shared/import-util.h"
 
 typedef struct TarPull TarPull;
-
 typedef void (*TarPullFinished)(TarPull *pull, int error, void *userdata);
 
 int tar_pull_new(TarPull **pull, sd_event *event, const char *image_root, TarPullFinished on_finished, void *userdata);

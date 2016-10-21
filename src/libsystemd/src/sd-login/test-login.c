@@ -22,12 +22,12 @@
 
 #include <systemd/sd-login.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/formats-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
 
 static void test_login(void) {
         _cleanup_close_pair_ int pair[2] = { -1, -1 };

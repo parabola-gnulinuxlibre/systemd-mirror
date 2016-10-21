@@ -22,11 +22,11 @@
 
 #include <linux/reboot.h>
 
-#include "basic/special.h"
-#include "basic/string-table.h"
-#include "basic/terminal-util.h"
 #include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/special.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/terminal-util.h"
 
 #include "failure-action.h"
 

@@ -23,13 +23,13 @@
 
 #include <systemd/sd-id128.h>
 
-#include "basic/alloc-util.h"
-#include "basic/dirent-util.h"
-#include "basic/fd-util.h"
-#include "basic/parse-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
-#include "basic/xattr-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/dirent-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-basic/xattr-util.h"
 
 #include "journal-def.h"
 #include "journal-file.h"

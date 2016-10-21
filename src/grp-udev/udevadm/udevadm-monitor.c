@@ -25,9 +25,9 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include "basic/fd-util.h"
-#include "basic/formats-util.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-shared/udev-util.h"
 #include "udev.h"
 
 static bool udev_exit;

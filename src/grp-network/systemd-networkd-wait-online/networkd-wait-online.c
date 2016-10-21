@@ -22,8 +22,8 @@
 
 #include <systemd/sd-daemon.h>
 
-#include "basic/signal-util.h"
-#include "basic/strv.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/strv.h"
 
 #include "networkd-wait-online.h"
 

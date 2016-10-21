@@ -24,9 +24,9 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/util.h"
 #include "systemd-network/dhcp-identifier.h"
 #include "systemd-network/dhcp-internal.h"
 #include "systemd-network/dhcp-protocol.h"

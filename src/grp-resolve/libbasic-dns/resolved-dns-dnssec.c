@@ -21,11 +21,11 @@
 #include <gcrypt.h>
 #endif
 
-#include "basic/alloc-util.h"
-#include "basic/hexdecoct.h"
-#include "basic/string-table.h"
-#include "shared/dns-domain.h"
-#include "shared/gcrypt-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-gcrypt/gcrypt-util.h"
+#include "systemd-shared/dns-domain.h"
 
 #include "resolved-dns-dnssec.h"
 #include "resolved-dns-packet.h"

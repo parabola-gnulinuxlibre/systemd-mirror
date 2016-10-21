@@ -17,15 +17,15 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/cgroup-util.h"
-#include "basic/formats-util.h"
-#include "basic/macro.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/unit-name.h"
-#include "basic/user-util.h"
-#include "shared/specifier.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/unit-name.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-shared/specifier.h"
 
 #include "unit-printf.h"
 #include "unit.h"

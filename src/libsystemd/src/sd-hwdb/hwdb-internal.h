@@ -19,8 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/sparse-endian.h"
-#include "basic/util.h"
+#include "systemd-basic/sparse-endian.h"
+#include "systemd-basic/util.h"
 
 #define HWDB_SIG { 'K', 'S', 'L', 'P', 'H', 'H', 'R', 'H' }
 

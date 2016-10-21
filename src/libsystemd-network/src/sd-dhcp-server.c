@@ -20,12 +20,12 @@
 
 #include <sys/ioctl.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/in-addr-util.h"
-#include "basic/siphash24.h"
-#include "basic/string-util.h"
-#include "basic/unaligned.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/siphash24.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/unaligned.h"
 #include "systemd-network/dhcp-internal.h"
 #include "systemd-network/dhcp-server-internal.h"
 #include "systemd-network/sd-dhcp-server.h"

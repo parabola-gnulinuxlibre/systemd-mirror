@@ -22,9 +22,9 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/hashmap.h"
-#include "basic/log.h"
-#include "basic/util.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/util.h"
 
 #include "dhcp-internal.h"
 #include "sd-dhcp-server.h"

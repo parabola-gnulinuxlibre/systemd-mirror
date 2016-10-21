@@ -20,13 +20,13 @@
 #include <errno.h>
 #include <string.h>
 
-#include "basic/alloc-util.h"
-#include "basic/bus-label.h"
-#include "basic/strv.h"
-#include "basic/user-util.h"
-#include "basic/util.h"
 #include "sd-bus/bus-common-errors.h"
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/bus-label.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
 
 #include "logind-seat.h"
 #include "logind.h"

@@ -26,10 +26,10 @@
 
 #include <libudev.h>
 
-#include "basic/MurmurHash2.h"
-#include "basic/device-nodes.h"
-#include "basic/syslog-util.h"
-#include "basic/utf8.h"
+#include "systemd-basic/MurmurHash2.h"
+#include "systemd-basic/device-nodes.h"
+#include "systemd-basic/syslog-util.h"
+#include "systemd-basic/utf8.h"
 
 #include "libudev-private.h"
 

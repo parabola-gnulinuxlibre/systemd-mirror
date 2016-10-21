@@ -31,10 +31,10 @@
 
 #include <libudev.h>
 
-#include "basic/fd-util.h"
-#include "basic/string-util.h"
 #include "libudev-private.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-shared/udev-util.h"
 
 #include "scsi_id.h"
 

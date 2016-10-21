@@ -22,9 +22,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "basic/log.h"
-#include "basic/path-util.h"
-#include "basic/util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/util.h"
 
 #include "machine-id-setup.h"
 

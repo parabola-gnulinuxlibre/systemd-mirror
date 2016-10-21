@@ -1,7 +1,7 @@
 %{
 #include <stddef.h>
 
-#include "shared/conf-parser.h"
+#include "systemd-shared/conf-parser.h"
 
 #include "resolved-conf.h"
 %}

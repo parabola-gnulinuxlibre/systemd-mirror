@@ -17,12 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/hostname-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/time-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/time-util.h"
 
 #include "resolved-dns-synthesize.h"
 #include "resolved-etc-hosts.h"

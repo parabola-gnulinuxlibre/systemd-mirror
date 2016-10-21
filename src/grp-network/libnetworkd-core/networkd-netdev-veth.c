@@ -21,7 +21,7 @@
 
 #include <linux/veth.h>
 
-#include "sd-netlink/sd-netlink.h"
+#include "systemd-staging/sd-netlink.h"
 
 #include "networkd-netdev-veth.h"
 

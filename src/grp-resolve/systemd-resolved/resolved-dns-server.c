@@ -19,10 +19,10 @@
 
 #include <systemd/sd-messages.h>
 
-#include "basic/alloc-util.h"
-#include "basic/siphash24.h"
-#include "basic/string-table.h"
-#include "basic/string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/siphash24.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/string-util.h"
 
 #include "resolved-dns-server.h"
 #include "resolved-dns-stub.h"

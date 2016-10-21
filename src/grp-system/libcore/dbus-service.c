@@ -17,14 +17,14 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/async.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/path-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/async.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
 
 #include "dbus-cgroup.h"
 #include "dbus-execute.h"

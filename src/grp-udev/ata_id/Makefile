@@ -27,7 +27,7 @@ ata_id_SOURCES = \
 	src/udev/ata_id/ata_id.c
 
 ata_id_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 udevlibexec_PROGRAMS += \
 	ata_id

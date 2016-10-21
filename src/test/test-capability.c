@@ -25,10 +25,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "basic/capability-util.h"
-#include "basic/fd-util.h"
-#include "basic/macro.h"
-#include "basic/util.h"
+#include "systemd-basic/capability-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/util.h"
 
 static uid_t test_uid = -1;
 static gid_t test_gid = -1;

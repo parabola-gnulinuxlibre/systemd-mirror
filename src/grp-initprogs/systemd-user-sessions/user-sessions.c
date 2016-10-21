@@ -20,12 +20,12 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "basic/fileio-label.h"
-#include "basic/fileio.h"
-#include "basic/log.h"
-#include "basic/selinux-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/fileio-label.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/selinux-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 int main(int argc, char*argv[]) {
 

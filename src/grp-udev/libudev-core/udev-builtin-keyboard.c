@@ -24,10 +24,10 @@
 
 #include <linux/input.h>
 
-#include "basic/fd-util.h"
-#include "basic/parse-util.h"
-#include "basic/stdio-util.h"
-#include "basic/string-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/stdio-util.h"
+#include "systemd-basic/string-util.h"
 #include "udev.h"
 
 static const struct key *keyboard_lookup_key(const char *str, unsigned len);

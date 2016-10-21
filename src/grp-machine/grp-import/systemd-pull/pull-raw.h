@@ -21,11 +21,10 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/macro.h"
-#include "shared/import-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-shared/import-util.h"
 
 typedef struct RawPull RawPull;
-
 typedef void (*RawPullFinished)(RawPull *pull, int error, void *userdata);
 
 int raw_pull_new(RawPull **pull, sd_event *event, const char *image_root, RawPullFinished on_finished, void *userdata);

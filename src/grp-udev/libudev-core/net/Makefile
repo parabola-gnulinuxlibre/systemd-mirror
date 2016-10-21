@@ -24,7 +24,10 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-sd.CPPFLAGS += $(libshared.CPPFLAGS)
+sd.CPPFLAGS += $(libsystemd-internal.CPPFLAGS)
+sd.CPPFLAGS += $(libsystemd-basic.CPPFLAGS)
 sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
+sd.CPPFLAGS += $(libsystemd-shared.CPPFLAGS)
+sd.CPPFLAGS += $(libsystemd-staging.CPPFLAGS)
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -23,15 +23,15 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/list.h"
-#include "basic/set.h"
-#include "sd-netlink/sd-netlink.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/set.h"
 #include "systemd-network/sd-dhcp-client.h"
 #include "systemd-network/sd-dhcp-server.h"
 #include "systemd-network/sd-dhcp6-client.h"
 #include "systemd-network/sd-ipv4ll.h"
 #include "systemd-network/sd-lldp.h"
 #include "systemd-network/sd-ndisc.h"
+#include "systemd-staging/sd-netlink.h"
 
 typedef enum LinkState {
         LINK_STATE_PENDING,

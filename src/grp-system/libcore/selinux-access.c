@@ -31,14 +31,14 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/alloc-util.h"
-#include "basic/log.h"
-#include "basic/path-util.h"
-#include "basic/selinux-util.h"
-#include "basic/stdio-util.h"
-#include "basic/strv.h"
-#include "basic/util.h"
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/selinux-util.h"
+#include "systemd-basic/stdio-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
 
 #include "audit-fd.h"
 

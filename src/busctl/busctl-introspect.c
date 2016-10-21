@@ -19,10 +19,10 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/alloc-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
-#include "basic/xml.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-basic/xml.h"
 
 #include "busctl-introspect.h"
 

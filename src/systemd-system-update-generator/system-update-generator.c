@@ -20,10 +20,10 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "basic/fs-util.h"
-#include "basic/log.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 /*
  * Implements the logic described in

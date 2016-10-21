@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 #include "bus-internal.h"
 #include "bus-introspect.h"

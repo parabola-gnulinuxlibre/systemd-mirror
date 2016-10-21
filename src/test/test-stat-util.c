@@ -20,11 +20,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/macro.h"
-#include "basic/stat-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/stat-util.h"
 
 static void test_files_same(void) {
         _cleanup_close_ int fd = -1;

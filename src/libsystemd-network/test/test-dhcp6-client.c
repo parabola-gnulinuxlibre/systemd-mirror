@@ -26,10 +26,10 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/fd-util.h"
-#include "basic/macro.h"
-#include "basic/socket-util.h"
-#include "basic/virt.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/virt.h"
 #include "systemd-network/dhcp6-internal.h"
 #include "systemd-network/dhcp6-lease-internal.h"
 #include "systemd-network/dhcp6-protocol.h"

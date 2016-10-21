@@ -20,9 +20,9 @@
 
 #include <errno.h>
 
-#include "basic/alloc-util.h"
-#include "basic/strv.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
 #include "systemd-network/dhcp6-lease-internal.h"
 #include "systemd-network/dhcp6-protocol.h"
 

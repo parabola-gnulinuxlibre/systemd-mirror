@@ -20,9 +20,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "basic/fd-util.h"
-#include "basic/process-util.h"
-#include "basic/util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/process-util.h"
+#include "systemd-basic/util.h"
 
 #include "bus-container.h"
 #include "bus-internal.h"

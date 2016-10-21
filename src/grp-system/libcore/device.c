@@ -22,14 +22,14 @@
 
 #include <libudev.h>
 
-#include "basic/alloc-util.h"
-#include "basic/log.h"
-#include "basic/parse-util.h"
-#include "basic/path-util.h"
-#include "basic/stat-util.h"
-#include "basic/string-util.h"
-#include "basic/unit-name.h"
-#include "shared/udev-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/stat-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/unit-name.h"
+#include "systemd-shared/udev-util.h"
 
 #include "dbus-device.h"
 #include "device.h"

@@ -20,17 +20,17 @@
 #include <poll.h>
 #include <sys/socket.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/hashmap.h"
-#include "basic/macro.h"
-#include "basic/missing.h"
-#include "basic/socket-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-staging/sd-netlink.h"
 
 #include "netlink-internal.h"
 #include "netlink-util.h"
-#include "sd-netlink.h"
 
 static int sd_netlink_new(sd_netlink **ret) {
         _cleanup_(sd_netlink_unrefp) sd_netlink *rtnl = NULL;

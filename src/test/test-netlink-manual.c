@@ -24,9 +24,9 @@
 #include <linux/if_tunnel.h>
 #include <linux/ip.h>
 
-#include "basic/macro.h"
-#include "basic/util.h"
-#include "sd-netlink/sd-netlink.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/util.h"
+#include "systemd-staging/sd-netlink.h"
 
 static int load_module(const char *mod_name) {
         struct kmod_ctx *ctx;

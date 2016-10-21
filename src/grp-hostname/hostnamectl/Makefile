@@ -29,6 +29,7 @@ hostnamectl_SOURCES = \
 	src/hostname/hostnamectl.c
 
 hostnamectl_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la
 
 bin_PROGRAMS += \

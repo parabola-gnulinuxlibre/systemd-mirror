@@ -24,9 +24,9 @@
 #include <libkmod.h>
 #endif
 
-#include "basic/capability-util.h"
-#include "basic/macro.h"
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/capability-util.h"
+#include "systemd-basic/macro.h"
 
 #include "kmod-setup.h"
 

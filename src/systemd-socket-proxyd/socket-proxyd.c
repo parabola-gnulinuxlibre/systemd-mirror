@@ -31,15 +31,15 @@
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-event.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/log.h"
-#include "basic/path-util.h"
-#include "basic/set.h"
-#include "basic/socket-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
-#include "sd-resolve/sd-resolve.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/set.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-staging/sd-resolve.h"
 
 #define BUFFER_SIZE (256 * 1024)
 #define CONNECTIONS_MAX 256

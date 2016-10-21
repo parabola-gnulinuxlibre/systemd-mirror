@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "shared/conf-parser.h"
+#include "systemd-shared/conf-parser.h"
 
 #include "timesyncd-manager.h"
 

@@ -27,20 +27,19 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/alloc-util.h"
-#include "basic/bus-label.h"
-#include "basic/cgroup-util.h"
-#include "basic/def.h"
-#include "basic/fd-util.h"
-#include "basic/hexdecoct.h"
-#include "basic/hostname-util.h"
-#include "basic/macro.h"
-#include "basic/missing.h"
-#include "basic/parse-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/util.h"
-#include "shared/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/bus-label.h"
+#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
 
 #include "bus-container.h"
 #include "bus-control.h"
@@ -53,6 +52,7 @@
 #include "bus-socket.h"
 #include "bus-track.h"
 #include "bus-type.h"
+#include "bus-util.h"
 
 #define log_debug_bus_message(m)                                         \
         do {                                                             \

@@ -29,6 +29,7 @@ loginctl_SOURCES = \
 	src/login/sysfs-show.c
 
 loginctl_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la
 
 rootbin_PROGRAMS += \

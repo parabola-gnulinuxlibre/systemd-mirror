@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/log.h"
+#include "systemd-basic/log.h"
 
 #include "bus-introspect.h"
 

@@ -17,11 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/parse-util.h"
-#include "basic/string-table.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/conf-parser.h"
 
 #include "networkd-util.h"
 

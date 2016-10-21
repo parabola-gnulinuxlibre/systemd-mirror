@@ -19,15 +19,15 @@
 
 #include <net/if.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/missing.h"
-#include "basic/mkdir.h"
-#include "basic/parse-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "sd-network/sd-network.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/missing.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-staging/sd-network.h"
 
 #include "resolved-link.h"
 

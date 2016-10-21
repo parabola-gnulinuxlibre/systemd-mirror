@@ -23,9 +23,9 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/in-addr-util.h"
-#include "basic/list.h"
-#include "sd-netlink/sd-netlink.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/list.h"
+#include "systemd-staging/sd-netlink.h"
 
 typedef struct ExposePort {
         int protocol;

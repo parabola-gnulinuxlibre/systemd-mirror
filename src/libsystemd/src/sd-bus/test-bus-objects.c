@@ -22,16 +22,16 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/alloc-util.h"
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/strv.h"
-#include "basic/util.h"
-#include "shared/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
 
 #include "bus-dump.h"
 #include "bus-internal.h"
 #include "bus-message.h"
+#include "bus-util.h"
 
 struct context {
         int fds[2];

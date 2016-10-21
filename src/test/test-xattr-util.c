@@ -23,12 +23,12 @@
 #include <sys/xattr.h>
 #include <unistd.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fs-util.h"
-#include "basic/macro.h"
-#include "basic/string-util.h"
-#include "basic/xattr-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/xattr-util.h"
 
 static void test_fgetxattrat_fake(void) {
         char t[] = "/var/tmp/xattrtestXXXXXX";

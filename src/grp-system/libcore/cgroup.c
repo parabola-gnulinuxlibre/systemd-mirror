@@ -20,18 +20,18 @@
 #include <fcntl.h>
 #include <fnmatch.h>
 
-#include "basic/alloc-util.h"
-#include "basic/cgroup-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/fs-util.h"
-#include "basic/parse-util.h"
-#include "basic/path-util.h"
-#include "basic/process-util.h"
-#include "basic/special.h"
-#include "basic/stdio-util.h"
-#include "basic/string-table.h"
-#include "basic/string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/process-util.h"
+#include "systemd-basic/special.h"
+#include "systemd-basic/stdio-util.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/string-util.h"
 
 #include "cgroup.h"
 

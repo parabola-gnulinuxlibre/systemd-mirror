@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/macro.h"
-#include "basic/strv.h"
-#include "basic/verbs.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/verbs.h"
 
 static int noop_dispatcher(int argc, char *argv[], void *userdata) {
         return 0;

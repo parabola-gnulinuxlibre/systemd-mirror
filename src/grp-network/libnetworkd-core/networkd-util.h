@@ -19,7 +19,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/macro.h"
+#include "systemd-basic/macro.h"
 
 typedef enum AddressFamilyBoolean {
         /* This is a bitmask, though it usually doesn't feel that way! */

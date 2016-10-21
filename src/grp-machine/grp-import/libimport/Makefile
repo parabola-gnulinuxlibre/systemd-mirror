@@ -30,7 +30,7 @@ libimport_la_SOURCES = \
         import-common.c \
 	import-compress.c
 
-libimport_la_LIBADD += libbasic.la
+libimport_la_LIBADD += libsystemd-basic.la
 
 manual_tests += \
 	test-qcow2

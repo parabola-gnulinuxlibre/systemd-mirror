@@ -27,10 +27,10 @@
 
 #include <systemd/sd-messages.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 #include "logind-button.h"
 

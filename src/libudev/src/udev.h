@@ -24,11 +24,11 @@
 
 #include <libudev.h>
 
-#include "basic/label.h"
-#include "basic/macro.h"
-#include "basic/strv.h"
-#include "basic/util.h"
-#include "sd-netlink/sd-netlink.h"
+#include "systemd-basic/label.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
+#include "systemd-staging/sd-netlink.h"
 
 #include "libudev-private.h"
 

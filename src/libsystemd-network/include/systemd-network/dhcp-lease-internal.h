@@ -24,8 +24,8 @@
 
 #include <linux/if_packet.h>
 
-#include "basic/list.h"
-#include "basic/util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/util.h"
 
 #include "dhcp-protocol.h"
 #include "sd-dhcp-client.h"

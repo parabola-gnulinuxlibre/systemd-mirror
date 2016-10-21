@@ -21,9 +21,9 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-#include "basic/alloc-util.h"
-#include "basic/hexdecoct.h"
-#include "basic/string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/string-util.h"
 
 #include "resolved-dns-dnssec.h"
 #include "resolved-dns-rr.h"

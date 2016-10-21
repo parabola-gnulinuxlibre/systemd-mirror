@@ -19,15 +19,15 @@
 
 #include <stdlib.h>
 
-#include "basic/alloc-util.h"
-#include "basic/log.h"
-#include "basic/path-util.h"
-#include "basic/strv.h"
-#include "basic/unit-name.h"
 #include "manager.h"
 #include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "shared/pager.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/unit-name.h"
+#include "systemd-shared/pager.h"
 
 #include "analyze-verify.h"
 

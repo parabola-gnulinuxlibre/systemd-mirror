@@ -60,6 +60,7 @@ nodist_catalog_DATA = \
 
 EXTRA_DIST += \
 	$(nodist_catalog_DATA:.catalog=.catalog.in)
+EXTRA_DIST := $(EXTRA_DIST)
 
 # Note that we don't use @@ for replacement markers here, but %%. This is
 # because the catalog uses @@ already for its runtime replacement handling and

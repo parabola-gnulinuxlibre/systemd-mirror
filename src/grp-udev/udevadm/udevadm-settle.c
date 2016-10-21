@@ -26,8 +26,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "basic/parse-util.h"
-#include "basic/util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/util.h"
 #include "udev.h"
 
 static void help(void) {

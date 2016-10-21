@@ -17,14 +17,14 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/in-addr-util.h"
-#include "basic/parse-util.h"
-#include "basic/set.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
 #include "sd-netlink/netlink-util.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/set.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/conf-parser.h"
 
 #include "networkd-route.h"
 #include "networkd.h"

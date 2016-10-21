@@ -21,8 +21,8 @@
 
 #include <netinet/if_ether.h>
 
-#include "basic/socket-util.h"
-#include "basic/sparse-endian.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/sparse-endian.h"
 
 int arp_network_bind_raw_socket(int index, be32_t address, const struct ether_addr *eth_mac);
 

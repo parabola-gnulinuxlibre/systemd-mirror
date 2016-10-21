@@ -19,14 +19,14 @@
 
 #include <resolv.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio-label.h"
-#include "basic/fileio.h"
-#include "basic/ordered-set.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "shared/dns-domain.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio-label.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/ordered-set.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-shared/dns-domain.h"
 
 #include "resolved-conf.h"
 #include "resolved-resolv-conf.h"

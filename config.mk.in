@@ -102,40 +102,47 @@ rootlibexecdir=$(rootprefix)/lib/systemd
 rootlibdir=@rootlibdir@
 
 # Libraries we provide
-libbasic.CPPFLAGS                    = -I$(topsrcdir)/src/libbasic/include -I$(topoutdir)/src/libbasic/include
-libbasic.DEPENDS                     =   $(topoutdir)/src/libbasic/src/libbasic.la
-libfirewall.CPPFLAGS                 = -I$(topsrcdir)/src/libfirewall
-libfirewall.DEPENDS                  =   $(topoutdir)/src/libfirewall/libfirewall.la
-libshared.CPPFLAGS                   = -I$(topsrcdir)/src/libshared/include $(libsystemd-internal.CPPFLAGS) -I$(topsrcdir)/src/libudev/src
-libshared.DEPENDS                    =   $(topoutdir)/src/libshared/src/libshared.la
-libsystemd-shared.CPPFLAGS =
-libsystemd-shared.DEPENDS =
-
-libsystemd-internal.CPPFLAGS         = -I$(topsrcdir)/src/libsystemd/src -I$(topoutdir)/src/libsystemd/src $(libsystemd.CPPFLAGS) $(libbasic.CPPFLAGS)
-libsystemd-internal.DEPENDS          =   $(topoutdir)/src/libsystemd/src/libsystemd-internal.la
-libsystemd-network.CPPFLAGS          = -I$(topsrcdir)/src/libsystemd-network/include
-libsystemd-network.DEPENDS           =   $(topoutdir)/src/libsystemd-network/src/libsystemd-network.la
 libsystemd.CPPFLAGS                  = -I$(topsrcdir)/src/libsystemd/include
 libsystemd.DEPENDS                   =   $(topoutdir)/src/libsystemd/libsystemd.la
+libsystemd-internal.CPPFLAGS         = -I$(topsrcdir)/src/libsystemd/src -I$(topoutdir)/src/libsystemd/src $(libsystemd.CPPFLAGS) $(libsystemd-basic.CPPFLAGS)
+libsystemd-internal.DEPENDS          =   $(topoutdir)/src/libsystemd/src/libsystemd-internal.la
+libsystemd-staging.CPPFLAGS          = -I$(topsrcdir)/src/libsystemd/include-staging $(libsystemd.CPPFLAGS)
+libsystemd-staging.DEPENDS           = $(libsystemd-internal.DEPENDS)
+
+libsystemd-basic.CPPFLAGS            = -I$(topsrcdir)/src/libsystemd-basic/include
+libsystemd-basic.DEPENDS             =   $(topoutdir)/src/libsystemd-basic/src/libsystemd-basic.la
+libsystemd-blkid.CPPFLAGS            = -I$(topsrcdir)/src/libsystemd-blkid/include $(libsystemd-basic.CPPFLAGS) $(BLKID_CFLAGS)
+libsystemd-blkid.DEPENDS             = $(BLKID_LIBS)
+libsystemd-firewall.CPPFLAGS         = -I$(topsrcdir)/src/libsystemd-firewall/include $(libsystemd-basic.CPPFLAGS)
+libsystemd-firewall.DEPENDS          =   $(topoutdir)/src/libsystemd-firewall/src/libsystemd-firewall.la
+libsystemd-microhttpd.CPPFLAGS       = -I$(topsrcdir)/src/libsystemd-microhttpd/include $(libsystemd-basic.CPPFLAGS)
+libsystemd-microhttpd.DEPENDS        =   $(topoutdir)/src/libsystemd-microhttpd/src/libsystemd-microhttpd.la
+libsystemd-gcrypt.CPPFLAGS           = -I$(topsrcdir)/src/libsystemd-gcrypt/include
+libsystemd-gcrypt.DEPENDS            =   $(topoutdir)/src/libsystemd-gcrypt/src/libsystemd-gcrypt.la
+libsystemd-network.CPPFLAGS          = -I$(topsrcdir)/src/libsystemd-network/include $(libsystemd-basic.CPPFLAGS) $(libsystemd-shared.CPPFLAGS)
+libsystemd-network.DEPENDS           =   $(topoutdir)/src/libsystemd-network/src/libsystemd-network.la
+libsystemd-shared.CPPFLAGS           = -I$(topsrcdir)/src/libsystemd-shared/include $(libsystemd-basic.CPPFLAGS) $(libudev-internal.CPPFLAGS)
+libsystemd-shared.DEPENDS            =   $(topoutdir)/src/libsystemd-shared/src/libsystemd-shared.la
 
 libudev.CPPFLAGS                     = -I$(topsrcdir)/src/libudev/include
-libudev.DEPENDS                      =   $(topoutdir)/src/libudev/src/libudev.la
-libudev-internal.CPPFLAGS            = -I$(topsrcdir)/src/libudev/src $(libudev.CPPFLAGS) $(libbasic.CPPFLAGS)
+libudev.DEPENDS                      =   $(topoutdir)/src/libudev/libudev.la
+libudev-internal.CPPFLAGS            = -I$(topsrcdir)/src/libudev/src $(libudev.CPPFLAGS) $(libsystemd-basic.CPPFLAGS) $(libsystemd-staging.CPPFLAGS)
 libudev-internal.DEPENDS             =   $(topoutdir)/src/libudev/src/libudev-internal.la
+
 # -core libs
-libcore.CPPFLAGS                     = -I$(topsrcdir)/src/grp-system/libcore $(libshared.CPPFLAGS)
+libcore.CPPFLAGS                     = -I$(topsrcdir)/src/grp-system/libcore $(libsystemd-shared.CPPFLAGS)
 libcore.DEPENDS                      =   $(topoutdir)/src/grp-system/libcore/libcore.la
 #libbus-proxy-core.CPPFLAGS =
 #libbus-proxy-core.DEPENDS  =
-libjournal-core.CPPFLAGS   = -I$(topsrcdir)/src/grp-journal/libjournal-core $(libsystemd-internal.CPPFLAGS) $(libbasic.CPPFLAGS)
-libjournal-core.DEPENDS    =   $(topoutdir)/src/grp-journal/libjournal-core/libjournal-core.la
+libjournal-core.CPPFLAGS   = -I$(topsrcdir)/src/grp-journal/libjournal-core/include $(libsystemd-internal.CPPFLAGS) $(libsystemd-basic.CPPFLAGS) $(libsystemd-shared.CPPFLAGS)
+libjournal-core.DEPENDS    =   $(topoutdir)/src/grp-journal/libjournal-core/src/libjournal-core.la
 #liblogind-core.CPPFLAGS    =
 #liblogind-core.DEPENDS     =
 libmachine-core.CPPFLAGS   = -I$(topsrcdir)/src/grp-machine/libmachine-core/include
 libmachine-core.DEPENDS    =   $(topoutdir)/src/grp-machine/libmachine-core/src/libmachine-core.la
-libnetworkd-core.CPPFLAGS  = -I$(topsrcdir)/src/grp-network/libnetworkd-core $(libsystemd-internal.CPPFLAGS) $(libsystemd-network.CPPFLAGS) $(libshared.CPPFLAGS) $(libudev-internal.CPPFLAGS)
+libnetworkd-core.CPPFLAGS  = -I$(topsrcdir)/src/grp-network/libnetworkd-core $(libsystemd-internal.CPPFLAGS) $(libsystemd-network.CPPFLAGS) $(libsystemd-shared.CPPFLAGS) $(libudev-internal.CPPFLAGS)
 libnetworkd-core.DEPENDS   =   $(topoutdir)/src/grp-network/libnetworkd-core/libnetworkd-core.la
-libudev-core.CPPFLAGS      = -I$(topoutdir)/src/grp-udev/libudev-core $(libsystemd-network.CPPFLAGS) $(libshared.CPPFLAGS)
+libudev-core.CPPFLAGS      = -I$(topoutdir)/src/grp-udev/libudev-core $(libsystemd-network.CPPFLAGS) $(libsystemd-shared.CPPFLAGS)
 libudev-core.DEPENDS       =   $(topoutdir)/src/grp-udev/libudev-core/libudev-core.la
 libbasic-dns.CPPFLAGS      = -I$(topoutdir)/src/grp-resolve/libbasic-dns -I$(topsrcdir)/src/grp-resolve/libbasic-dns
 libbasic-dns.DEPENDS       =   $(topoutdir)/src/grp-resolve/libbasic-dns/libbasic-dns.la

@@ -20,15 +20,15 @@
 #include <string.h>
 #include <sys/socket.h>
 
-#include "basic/macro.h"
-#include "basic/string-util.h"
-#include "basic/util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 static const struct af_name* lookup_af(register const char *str, register unsigned int len);
 
-#include "basic/af-from-name.h"
-#include "basic/af-list.h"
-#include "basic/af-to-name.h"
+#include "af-from-name.h"
+#include "af-to-name.h"
+#include "systemd-basic/af-list.h"
 
 int main(int argc, const char *argv[]) {
 

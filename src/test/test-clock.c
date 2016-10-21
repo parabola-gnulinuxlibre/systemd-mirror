@@ -20,11 +20,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "basic/clock-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/log.h"
-#include "basic/macro.h"
+#include "systemd-basic/clock-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
 
 static void test_clock_is_localtime(void) {
         char adjtime[] = "/tmp/test-adjtime.XXXXXX";

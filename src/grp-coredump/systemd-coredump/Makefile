@@ -33,6 +33,8 @@ systemd_coredump_CFLAGS = \
 	$(ACL_CFLAGS)
 
 systemd_coredump_LDADD = \
+	libsystemd-internal.la \
+	libjournal-core.la \
 	libsystemd-shared.la \
 	$(ACL_LIBS)
 
@@ -82,7 +84,6 @@ EXTRA_DIST += \
 	sysctl.d/50-coredump.sysctl.in \
 	units/systemd-coredump@.service.in
 
-sd.CPPFLAGS += -I$(topsrcdir)/src/grp-journal/libjournal-core
 sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

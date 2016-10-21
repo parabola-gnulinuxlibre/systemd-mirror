@@ -3,9 +3,9 @@
 #include "networkd-netdev-macvlan.h"
 #include "networkd.h"
 #include "sd-netlink/netlink-internal.h"
-#include "shared/test-tables.h"
 #include "systemd-network/dhcp6-internal.h"
 #include "systemd-network/dhcp6-protocol.h"
+#include "systemd-shared/test-tables.h"
 
 int main(int argc, char **argv) {
         test_table(bond_mode, NETDEV_BOND_MODE);

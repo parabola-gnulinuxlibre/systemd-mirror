@@ -23,14 +23,14 @@
 #include <sys/prctl.h>
 #include <sys/types.h>
 
-#include "basic/fileio.h"
-#include "basic/fs-util.h"
-#include "basic/macro.h"
-#include "basic/mkdir.h"
-#include "basic/path-util.h"
-#include "basic/rm-rf.h"
-#include "basic/util.h"
 #include "manager.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-basic/util.h"
 #include "unit.h"
 
 #include "test-helper.h"

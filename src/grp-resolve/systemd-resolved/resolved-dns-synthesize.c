@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/hostname-util.h"
 #include "sd-netlink/local-addresses.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/hostname-util.h"
 
 #include "resolved-dns-synthesize.h"
 

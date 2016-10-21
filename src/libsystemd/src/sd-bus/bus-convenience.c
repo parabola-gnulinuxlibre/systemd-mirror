@@ -17,13 +17,13 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/string-util.h"
-#include "shared/bus-util.h"
+#include "systemd-basic/string-util.h"
 
 #include "bus-internal.h"
 #include "bus-message.h"
 #include "bus-signature.h"
 #include "bus-type.h"
+#include "bus-util.h"
 
 _public_ int sd_bus_emit_signal(
                 sd_bus *bus,

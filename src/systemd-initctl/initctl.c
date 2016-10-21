@@ -26,17 +26,17 @@
 #include <systemd/sd-bus.h>
 #include <systemd/sd-daemon.h>
 
-#include "basic/alloc-util.h"
-#include "basic/def.h"
-#include "basic/fd-util.h"
-#include "basic/formats-util.h"
-#include "basic/list.h"
-#include "basic/log.h"
-#include "basic/special.h"
-#include "basic/util.h"
 #include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "shared/initreq.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/special.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/initreq.h"
 
 #define SERVER_FD_MAX 16
 #define TIMEOUT_MSEC ((int) (DEFAULT_EXIT_USEC/USEC_PER_MSEC))

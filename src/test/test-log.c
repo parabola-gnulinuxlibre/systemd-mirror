@@ -20,9 +20,9 @@
 #include <stddef.h>
 #include <unistd.h>
 
-#include "basic/formats-util.h"
-#include "basic/log.h"
-#include "basic/util.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/util.h"
 
 int main(int argc, char* argv[]) {
 

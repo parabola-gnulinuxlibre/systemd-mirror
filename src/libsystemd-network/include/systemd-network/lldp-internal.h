@@ -22,9 +22,9 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/hashmap.h"
-#include "basic/log.h"
-#include "basic/prioq.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/prioq.h"
 
 #include "sd-lldp.h"
 

@@ -27,16 +27,16 @@
 
 #include <systemd/sd-bus.h>
 
-#include "basic/alloc-util.h"
-#include "basic/formats-util.h"
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/special.h"
-#include "basic/unit-name.h"
-#include "basic/util.h"
 #include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "shared/utmp-wtmp.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/special.h"
+#include "systemd-basic/unit-name.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/utmp-wtmp.h"
 
 typedef struct Context {
         sd_bus *bus;

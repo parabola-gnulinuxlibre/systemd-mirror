@@ -19,10 +19,10 @@
 
 #include <stddef.h>
 
-#include "basic/alloc-util.h"
-#include "basic/user-util.h"
-#include "basic/util.h"
-#include "shared/uid-range.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/uid-range.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_free_ UidRange *p = NULL;

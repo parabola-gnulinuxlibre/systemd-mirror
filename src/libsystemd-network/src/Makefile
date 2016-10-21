@@ -23,7 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-noinst_LTLIBRARIES += \
+rootlibexec_LTLIBRARIES += \
 	libsystemd-network.la
 
 libsystemd_network_la_CFLAGS = \
@@ -78,10 +78,9 @@ libsystemd_network_la_SOURCES = \
 	src/libsystemd-network/sd-lldp.c
 
 libsystemd_network_la_LIBADD = \
+	libsystemd-basic.la \
+	libsystemd.la \
+	libsystemd-shared.la \
 	$(KMOD_LIBS)
-
-sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
-sd.CPPFLAGS += $(libshared.CPPFLAGS)
-sd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

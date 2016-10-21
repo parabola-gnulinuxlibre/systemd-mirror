@@ -19,18 +19,18 @@
 
 #include <systemd/sd-messages.h>
 
-#include "basic/alloc-util.h"
-#include "basic/conf-files.h"
-#include "basic/def.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/hexdecoct.h"
-#include "basic/parse-util.h"
-#include "basic/set.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
 #include "resolved-dns-dnssec.h"
-#include "shared/dns-domain.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/conf-files.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/set.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-shared/dns-domain.h"
 
 #include "resolved-dns-trust-anchor.h"
 

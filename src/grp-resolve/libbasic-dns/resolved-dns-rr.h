@@ -21,11 +21,11 @@
 
 #include <netinet/in.h>
 
-#include "basic/bitmap.h"
-#include "basic/hashmap.h"
-#include "basic/in-addr-util.h"
-#include "basic/list.h"
-#include "basic/string-util.h"
+#include "systemd-basic/bitmap.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/string-util.h"
 
 #include "dns-type.h"
 

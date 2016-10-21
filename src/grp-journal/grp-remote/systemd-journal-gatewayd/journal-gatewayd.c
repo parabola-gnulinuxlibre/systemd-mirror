@@ -31,17 +31,17 @@
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-journal.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/hostname-util.h"
-#include "basic/log.h"
-#include "basic/parse-util.h"
-#include "basic/sigbus.h"
-#include "basic/util.h"
-#include "microhttpd-util.h"
-#include "shared/bus-util.h"
-#include "shared/logs-show.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/sigbus.h"
+#include "systemd-basic/util.h"
+#include "systemd-microhttpd/microhttpd-util.h"
+#include "systemd-shared/logs-show.h"
 
 #define JOURNAL_WAIT_TIMEOUT (10*USEC_PER_SEC)
 

@@ -21,7 +21,7 @@
 
 #include <systemd/sd-bus.h>
 
-#include "shared/bus-util.h"
+#include "sd-bus/bus-util.h"
 
 #include "manager.h"
 

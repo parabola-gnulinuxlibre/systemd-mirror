@@ -35,6 +35,7 @@ systemd_update_utmp_CFLAGS = \
 	$(AUDIT_CFLAGS)
 
 systemd_update_utmp_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la \
 	$(AUDIT_LIBS)
 

@@ -21,10 +21,10 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/list.h"
-#include "basic/ratelimit.h"
-#include "sd-network/sd-network.h"
-#include "sd-resolve/sd-resolve.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/ratelimit.h"
+#include "systemd-staging/sd-network.h"
+#include "systemd-staging/sd-resolve.h"
 
 typedef struct Manager Manager;
 

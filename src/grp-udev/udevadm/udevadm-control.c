@@ -20,7 +20,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "shared/udev-util.h"
+#include "systemd-shared/udev-util.h"
 #include "udev.h"
 
 static void print_help(void) {

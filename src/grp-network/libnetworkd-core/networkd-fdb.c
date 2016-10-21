@@ -20,11 +20,11 @@
 #include <net/ethernet.h>
 #include <net/if.h>
 
-#include "basic/alloc-util.h"
-#include "basic/util.h"
 #include "sd-netlink/netlink-util.h"
-#include "shared/conf-parser.h"
-#include "shared/vlan-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/conf-parser.h"
+#include "systemd-shared/vlan-util.h"
 
 #include "networkd-fdb.h"
 #include "networkd.h"

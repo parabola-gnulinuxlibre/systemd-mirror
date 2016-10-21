@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
 #include "sd-hwdb/hwdb-util.h"
-#include "sd-hwdb/sd-hwdb.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-staging/sd-hwdb.h"
 
 #include "libudev-private.h"
 

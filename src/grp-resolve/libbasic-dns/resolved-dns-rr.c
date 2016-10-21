@@ -19,14 +19,14 @@
 
 #include <math.h>
 
-#include "basic/alloc-util.h"
-#include "basic/escape.h"
-#include "basic/hexdecoct.h"
-#include "basic/string-table.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/terminal-util.h"
-#include "shared/dns-domain.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/escape.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/string-table.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-shared/dns-domain.h"
 
 #include "dns-type.h"
 #include "resolved-dns-dnssec.h"

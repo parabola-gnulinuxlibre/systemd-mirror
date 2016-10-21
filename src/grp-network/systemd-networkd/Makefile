@@ -30,12 +30,12 @@ systemd_networkd_SOURCES = \
 	src/network/networkd.c
 
 systemd_networkd_LDADD = \
-	libbasic.la \
+	libsystemd-basic.la \
 	libnetworkd-core.la
 
 ifneq ($(HAVE_LIBIPTC),)
 systemd_networkd_LDADD += \
-	libfirewall.la
+	libsystemd-firewall.la
 endif # HAVE_LIBIPTC
 
 dist_systemunit_DATA += \

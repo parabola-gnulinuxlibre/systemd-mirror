@@ -22,10 +22,10 @@
 #include <netinet/ip.h>
 #include <netinet/udp.h>
 
-#include "basic/hashmap.h"
-#include "basic/in-addr-util.h"
-#include "basic/macro.h"
-#include "basic/sparse-endian.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/sparse-endian.h"
 
 typedef struct DnsPacket DnsPacket;
 typedef struct DnsPacketHeader DnsPacketHeader;

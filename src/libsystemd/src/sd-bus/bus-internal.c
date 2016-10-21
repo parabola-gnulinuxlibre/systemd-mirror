@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/hexdecoct.h"
-#include "basic/string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/string-util.h"
 
 #include "bus-internal.h"
 #include "bus-message.h"

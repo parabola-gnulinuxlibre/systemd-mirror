@@ -22,10 +22,10 @@
 
 #include <linux/if.h>
 
-#include "basic/alloc-util.h"
-#include "basic/time-util.h"
-#include "basic/util.h"
 #include "sd-netlink/netlink-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/time-util.h"
+#include "systemd-basic/util.h"
 #include "systemd-network/network-internal.h"
 
 #include "networkd-wait-online-link.h"

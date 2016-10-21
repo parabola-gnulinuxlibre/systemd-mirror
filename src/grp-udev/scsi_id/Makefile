@@ -30,7 +30,7 @@ scsi_id_SOURCES =\
 	src/udev/scsi_id/scsi_id.h
 
 scsi_id_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 udevlibexec_PROGRAMS += \
 	scsi_id

@@ -26,13 +26,13 @@
 #include <systemd/sd-bus.h>
 #include <systemd/sd-id128.h>
 
-#include "basic/alloc-util.h"
-#include "basic/architecture.h"
-#include "basic/hostname-util.h"
-#include "basic/util.h"
 #include "sd-bus/bus-error.h"
-#include "shared/bus-util.h"
-#include "shared/spawn-polkit-agent.h"
+#include "sd-bus/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/architecture.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/spawn-polkit-agent.h"
 
 static bool arg_ask_password = true;
 static BusTransport arg_transport = BUS_TRANSPORT_LOCAL;

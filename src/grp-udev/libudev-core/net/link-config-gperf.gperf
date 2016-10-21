@@ -1,8 +1,8 @@
 %{
 #include <stddef.h>
 
-#include "shared/conf-parser.h"
 #include "systemd-network/network-internal.h"
+#include "systemd-shared/conf-parser.h"
 
 #include "ethtool-util.h"
 #include "link-config.h"

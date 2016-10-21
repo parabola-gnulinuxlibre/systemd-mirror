@@ -17,12 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/log.h"
-#include "basic/macro.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/util.h"
-#include "shared/conf-parser.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/conf-parser.h"
 
 static void test_config_parse_path_one(const char *rvalue, const char *expected) {
         char *path = NULL;

@@ -20,13 +20,13 @@
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-event.h>
 
-#include "basic/capability-util.h"
-#include "basic/clock-util.h"
-#include "basic/fd-util.h"
-#include "basic/fs-util.h"
-#include "basic/signal-util.h"
-#include "basic/user-util.h"
 #include "sd-network/network-util.h"
+#include "systemd-basic/capability-util.h"
+#include "systemd-basic/clock-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/user-util.h"
 
 #include "timesyncd-conf.h"
 #include "timesyncd-manager.h"

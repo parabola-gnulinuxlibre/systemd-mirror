@@ -22,12 +22,12 @@
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-messages.h>
 
-#include "basic/formats-util.h"
-#include "basic/sigbus.h"
-#include "journald-kmsg.h"
-#include "journald-server.h"
-#include "journald-syslog.h"
+#include "journal-core/journald-kmsg.h"
+#include "journal-core/journald-server.h"
+#include "journal-core/journald-syslog.h"
 #include "sd-journal/journal-authenticate.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/sigbus.h"
 
 int main(int argc, char *argv[]) {
         Server server;

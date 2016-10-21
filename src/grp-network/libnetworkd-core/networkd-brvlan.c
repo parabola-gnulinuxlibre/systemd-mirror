@@ -22,11 +22,11 @@
 
 #include <linux/if_bridge.h>
 
-#include "basic/alloc-util.h"
-#include "basic/parse-util.h"
 #include "sd-netlink/netlink-util.h"
-#include "shared/conf-parser.h"
-#include "shared/vlan-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-shared/conf-parser.h"
+#include "systemd-shared/vlan-util.h"
 
 #include "networkd-brvlan.h"
 #include "networkd.h"

@@ -22,10 +22,10 @@
 
 #include <systemd/sd-daemon.h>
 
-#include "basic/alloc-util.h"
-#include "basic/log.h"
-#include "basic/utf8.h"
-#include "basic/util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/utf8.h"
+#include "systemd-basic/util.h"
 
 #include "journal-upload.h"
 

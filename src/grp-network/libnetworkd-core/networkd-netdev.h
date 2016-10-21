@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/list.h"
-#include "basic/time-util.h"
-#include "sd-netlink/sd-netlink.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/time-util.h"
+#include "systemd-staging/sd-netlink.h"
 
 typedef struct netdev_join_callback netdev_join_callback;
 typedef struct Link Link;

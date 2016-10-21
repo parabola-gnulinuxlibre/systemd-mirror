@@ -26,10 +26,10 @@
 
 #include <systemd/sd-event.h>
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/macro.h"
-#include "basic/string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
 #include "systemd-network/lldp-network.h"
 #include "systemd-network/sd-lldp.h"
 

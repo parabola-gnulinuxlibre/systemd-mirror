@@ -17,17 +17,17 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "basic/alloc-util.h"
-#include "basic/fd-util.h"
-#include "basic/fileio.h"
-#include "basic/hexdecoct.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "shared/bus-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
 
 #include "bus-internal.h"
 #include "bus-match.h"
 #include "bus-message.h"
+#include "bus-util.h"
 
 /* Example:
  *

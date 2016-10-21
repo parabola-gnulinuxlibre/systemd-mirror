@@ -20,13 +20,13 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include "basic/env-util.h"
-#include "basic/fileio.h"
-#include "basic/locale-util.h"
-#include "basic/string-util.h"
-#include "basic/strv.h"
-#include "basic/util.h"
-#include "basic/virt.h"
+#include "systemd-basic/env-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/locale-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
+#include "systemd-basic/virt.h"
 
 #include "locale-setup.h"
 
