@@ -19,6 +19,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <sys/types.h>
+#include <stdint.h>
 
 int setup_seccomp(uint64_t cap_list_retain);

@@ -21,6 +21,7 @@
 
 typedef struct Mount Mount;
 
+#include "cgroup.h"
 #include "execute.h"
 #include "kill.h"
 

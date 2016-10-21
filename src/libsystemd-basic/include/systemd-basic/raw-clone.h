@@ -21,6 +21,7 @@
 
 #include <sched.h>
 #include <sys/syscall.h>
+#include <unistd.h>
 
 #include "log.h"
 #include "macro.h"

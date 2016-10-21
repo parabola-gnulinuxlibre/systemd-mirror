@@ -21,16 +21,16 @@
 
 #include <stdbool.h>
 
-#include "systemd-basic/cgroup-util.h"
-#include "systemd-basic/list.h"
-#include "systemd-basic/time-util.h"
-
 typedef struct CGroupContext CGroupContext;
 typedef struct CGroupDeviceAllow CGroupDeviceAllow;
 typedef struct CGroupIODeviceWeight CGroupIODeviceWeight;
 typedef struct CGroupIODeviceLimit CGroupIODeviceLimit;
 typedef struct CGroupBlockIODeviceWeight CGroupBlockIODeviceWeight;
 typedef struct CGroupBlockIODeviceBandwidth CGroupBlockIODeviceBandwidth;
+
+#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/time-util.h"
 
 typedef enum CGroupDevicePolicy {
 
