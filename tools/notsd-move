@@ -10,23 +10,30 @@ in_array() (
 	return 1 # Not Found
 )
 
-split_lib() {
+split_lib() (
+	shopt -s nullglob
 	local d=$1
+	local t
 
-	local t=("$d"/test-*)
-	if [[ -f ${t[0]} ]]; then
+	if t=("$d"/test-*) && [[ ${#t[@]} -gt 0 ]]; then
 		mkdir "$d/test"
-		mv "$d"/test-* -t "$d/test"
+		mv -t "$d/test" -- "${t[@]}"
 	fi
 
-	mkdir "$d/src"
-	mv "$d"/*.c -t "$d/src"
+	if t=("$d"/*.c) && [[ ${#t[@]} -gt 0 ]]; then
+		mkdir "$d/src"
+		mv -t "$d/src" -- "${t[@]}"
+	fi
 
-	local h=${d##*/lib}
-	mkdir "$d/include"
-	mkdir "$d/include/$h"
-	mv "$d"/*.h -t "$d/include/$h"
-}
+	if t=("$d"/*.h) && [[ ${#t[@]} -gt 0 ]]; then
+		local h=${d##*/lib}
+		mkdir "$d/include"
+		mkdir "$d/include/$h"
+		mv -t "$d/include/$h" -- "${t[@]}"
+	else
+		return 1
+	fi
+)
 
 grp() {
 	local grp=$1
@@ -124,14 +131,41 @@ move_files() (
 
 	mv -T src/lib{systemd-shared,core}/linux
 
-	mkdir src/libfirewall
-	mv -T src/lib{systemd-shared,firewall}/firewall-util.c
-	mv -T src/lib{systemd-shared,firewall}/firewall-util.h
+	mkdir src/libsystemd-firewall
+	mv -T src/libsystemd-{shared,firewall}/firewall-util.c
+	mv -T src/libsystemd-{shared,firewall}/firewall-util.h
+
+	mkdir src/libsystemd-gcrypt
+	mv -T src/libsystemd-{shared,gcrypt}/gcrypt-util.c
+	mv -T src/libsystemd-{shared,gcrypt}/gcrypt-util.h
+
+	mkdir src/libsystemd-blkid
+	mv -T src/libsystemd-{basic,blkid}/blkid-util.h
+
+	mkdir src/libsystemd-microhttpd
+	mv -t src/libsystemd-microhttpd \
+	   src/journal-remote/microhttpd*
 
 	split_lib src/libcore
 	split_lib src/libsystemd-basic
 	split_lib src/libsystemd-shared
 	split_lib src/libsystemd-network
+	split_lib src/libsystemd-firewall
+	split_lib src/libsystemd-gcrypt
+	split_lib src/libsystemd-blkid
+	split_lib src/libsystemd-microhttpd
+
+	mv -t src/libcore/src \
+	   src/libcore/linux \
+	   src/libcore/include/core/dbus*.h
+	mv -T src/libcore/{src,include/core}/dbus-manager.h
+	mv -T src/libcore/{include/core,src}/audit-fd.h
+	mv -T src/libcore/{include/core,src}/load-dropin.h
+	mv -T src/libcore/{include/core,src}/locale-setup.h
+	mv -T src/libcore/{include/core,src}/selinux-access.h
+	mv -T src/libcore/{include/core,src}/transaction.h
+	mv -T src/libcore/{include/core,src}/unit-printf.h
+	mv -T src/libcore/{,src}/load-fragment-gperf.gperf.m4
 
 	mv src/libsystemd-shared/{test,include/systemd-shared}/test-tables.h
 	rmdir src/libsystemd-shared/test
@@ -154,6 +188,7 @@ move_files() (
 	   src/resolve/.gitignore \
 	   src/resolve/*
 	rmdir src/resolve
+	split_lib src/libbasic-dns
 
 	# src/import => src/{libimport,systemd-{export,importd,import}}
 	mkdir src/libimport
@@ -179,7 +214,7 @@ move_files() (
 	   src/import/curl-util*
 	rmdir src/import
 
-	# src/journal => src/..
+	# src/journal => src/...
 	mkdir src/libjournal-core
 	mv -t src/libjournal-core \
 	   src/journal/.gitignore \
@@ -222,6 +257,8 @@ move_files() (
 	   src/journal/mmap-cache.h \
 	   src/journal/sd-journal.c
 	rmdir src/journal
+	split_lib src/libjournal-core
+	mv -T src/libjournal-core/{,src/}journald-gperf.gperf
 
 	# src/network => src/...
 	mkdir src/systemd-networkd-wait-online
@@ -243,15 +280,17 @@ move_files() (
 	   src/network/test-*
 	rmdir src/network
 
-	# src/machine => src/{machinectl,systemd-machined}
-	mkdir src/machinectl
-	mv -t src/machinectl \
-	   src/machine/machinectl*
-	mkdir src/systemd-machined
+	# src/machine => src/{machinectl,systemd-machined,libmachine-core}
+	mkdir src/machinectl src/systemd-machined src/libmachine-core
+	mv -T src/{machine,machinectl}/machinectl.c
+	mv -T src/{machine,systemd-machined}/machined.c
 	mv -t src/systemd-machined \
 	   src/machine/.gitignore \
+	   src/machine/org.*
+	mv -t src/libmachine-core \
 	   src/machine/*
 	rmdir src/machine
+	split_lib src/libmachine-core
 
 	# src/coredump => src/{coredumpctl,systemd-coredump}
 	mkdir src/coredumpctl
@@ -286,8 +325,7 @@ move_files() (
 	mv -t src/grp-remote.d \
 	   src/journal-remote/.gitignore \
 	   src/journal-remote/browse.html \
-	   src/journal-remote/log-generator.py \
-	   src/journal-remote/microhttpd*
+	   src/journal-remote/log-generator.py
 	rmdir src/journal-remote
 
 	# src/locale => src/...
@@ -442,7 +480,7 @@ move_files() (
 	   units/machine.slice*
 
 	# muck
-	mv -t src/libsystemd-basic/include/systemd-basic src/libsystemd-basic/.gitignore
+	mv -t src/libsystemd-basic/src src/libsystemd-basic/.gitignore
 	mv -T {test,src/systemd-boot}/test-efi-create-disk.sh
 	mv -t src/systemd-tmpfiles units/systemd-tmpfiles*
 	mv -t src/systemd-tmpfiles \
@@ -461,7 +499,7 @@ move_files() (
 	mkdir src/libudev/include
 	mv -T src/libudev/{src,include}/libudev.h
 	mv -T src/{systemd-networkd,libnetworkd-core}/networkd.h
-	mv -T src/{systemd-resolved,libbasic-dns}/resolved-def.h
+	mv -T src/{systemd-resolved,libbasic-dns/include/basic-dns}/resolved-def.h
 	mv -t src/cdrom_id  rules/*cdrom*
 	mv -t src/mtd_probe rules/*mtd*
 	mv -t src/v4l_id    rules/*v4l*
@@ -470,9 +508,10 @@ move_files() (
 	   src/libsystemd/include/systemd/sd-ipv4* \
 	   src/libsystemd/include/systemd/sd-lldp* \
 	   src/libsystemd/include/systemd/sd-ndisc*
-	for l in device hwdb netlink network resolve; do
-		mv -T src/libsystemd/include/systemd/sd-$l.h src/libsystemd/src/sd-$l/sd-$l.h
-	done
+	mkdir src/libsystemd/include-staging{,/systemd-staging}
+	mv -t src/libsystemd/include-staging/systemd-staging \
+	   src/libsystemd/include/systemd/sd-{device,hwdb,netlink,network,resolve}.h
+
 	mkdir src/grp-journal.d
 	mv -t src/grp-journal.d tmpfiles.d/journal-nocow.*
 	mv -t src/grp-remote.d tmpfiles.d/systemd-remote.*
@@ -579,6 +618,7 @@ move_files() (
 	    src/systemd-hibernate-resume-generator \
 	    src/systemd-sleep
 	grp src/grp-remote \
+	    src/libsystemd-microhttpd \
 	    src/systemd-journal-gatewayd \
 	    src/systemd-journal-remote \
 	    src/systemd-journal-upload
@@ -598,6 +638,7 @@ move_files() (
 	    src/systemd-inhibit \
 	    src/systemd-logind
 	grp src/grp-machine \
+	    src/libmachine-core \
 	    src/machinectl \
 	    src/nss-mymachines \
 	    src/systemd-machined
@@ -648,6 +689,17 @@ move_files() (
 	    src/systemd-notify \
 	    src/systemd-path \
 	    src/systemd-socket-activate
+
+	mv -t src/grp-udev \
+	   src/grp-udev/rules/*
+	cat src/grp-udev/rules/.gitignore >> src/grp-udev/.gitignore
+	rm src/grp-udev/rules/.gitignore
+	rmdir src/grp-udev/rules
+
+	mv -t src/grp-journal/systemd-journald \
+	   src/grp-journal/catalog/.gitignore \
+	   src/grp-journal/catalog/*
+	rmdir src/grp-journal/catalog
 
 	mv -t src/systemd-timesyncd system-preset/??-timesyncd.preset
 	for file in system-preset/??-*.preset; do
@@ -704,29 +756,11 @@ breakup_makefile() (
 	    src/libsystemd/src/sd-journal/Makefile \
 	    src/grp-udev/libudev-core/Makefile
 
-	ln -sT ../grp-system/libcore/mount-setup.h src/systemd-remount-fs/mount-setup.h
-	ln -sT ../grp-system/libcore/mount-setup.c src/systemd-remount-fs/mount-setup.c
-	ln -sT ../libcore/mount-setup.h src/grp-system/systemd-shutdown/mount-setup.h
-	ln -sT ../libcore/mount-setup.c src/grp-system/systemd-shutdown/mount-setup.c
-	ln -sT ../libcore/killall.h src/grp-system/systemd-shutdown/killall.h
-	ln -sT ../libcore/killall.c src/grp-system/systemd-shutdown/killall.c
-	ln -sT ../../libcore/mount-setup.h src/grp-system/grp-utils/systemd-fstab-generator/mount-setup.h
-	ln -sT ../../libcore/mount-setup.c src/grp-system/grp-utils/systemd-fstab-generator/mount-setup.c
-	ln -sT ../grp-system/libcore/mount-setup.h src/systemd-nspawn/mount-setup.h
-	ln -sT ../grp-system/libcore/loopback-setup.h src/systemd-nspawn/loopback-setup.h
-	ln -sT ../grp-system/libcore/loopback-setup.c src/systemd-nspawn/loopback-setup.c
-	ln -sT ../grp-system/libcore/machine-id-setup.h src/systemd-nspawn/machine-id-setup.h
-	ln -sT ../grp-system/libcore/machine-id-setup.c src/systemd-nspawn/machine-id-setup.c
-	ln -sT ../grp-system/libcore/mount-setup.c src/systemd-nspawn/mount-setup.c
-	ln -sT ../../../libsystemd/include/systemd/_sd-common.h src/libsystemd-network/include/systemd-network/_sd-common.h
-	ln -sT ../../libsystemd/include/systemd/_sd-common.h src/grp-utils/systemd-path/_sd-common.h
-	ln -sT ../../grp-login/systemd-logind/logind-acl.h src/grp-udev/libudev-core/logind-acl.h
-	ln -sT ../../libsystemd/src/sd-login/sd-login.c src/grp-udev/libudev-core/sd-login.c
-	ln -sT ../../grp-login/systemd-logind/logind-acl.c src/grp-udev/libudev-core/logind-acl.c
-	ln -sT ../../../libsystemd-shared/include/systemd-shared/gcrypt-util.h src/libsystemd/src/sd-journal/gcrypt-util.h
-	ln -sT ../../../libsystemd-shared/src/gcrypt-util.c src/libsystemd/src/sd-journal/gcrypt-util.c
-	ln -sT ../grp-system/libcore/machine-id-setup.h src/systemd-machine-id-setup/machine-id-setup.h
-	ln -sT ../grp-system/libcore/machine-id-setup.c src/systemd-machine-id-setup/machine-id-setup.c
+	ln -srT src/libsystemd/include/systemd/_sd-common.h src/libsystemd-network/include/systemd-network/_sd-common.h
+	ln -srT src/libsystemd/include/systemd/_sd-common.h src/grp-utils/systemd-path/_sd-common.h
+	ln -srT src/grp-login/systemd-logind/logind-acl.h   src/grp-udev/libudev-core/logind-acl.h
+	ln -srT src/grp-login/systemd-logind/logind-acl.c   src/grp-udev/libudev-core/logind-acl.c
+	ln -srT src/libsystemd/src/sd-login/sd-login.c      src/grp-udev/libudev-core/sd-login.c
 
 	ln -sT ../subdir.mk src/libsystemd/src/sd-network/Makefile
 	ln -sT ../subdir.mk src/libsystemd/src/sd-bus/Makefile
@@ -752,9 +786,11 @@ fixup_makefile() {
 	    -e 's|--version-script=.*/([^/]+)\.sym|--version-script=$(srcdir)/\1.sym|g' \
 	    -e '#### Rename helpers ################' \
 	    -e 's|libbasic_la|libsystemd_basic_la|g' \
-	    -e 's|libshared_la|libsystemd_shared_la|g' \
 	    -e 's|libbasic|libsystemd-basic|g' \
 	    -e 's|libshared|libsystemd-shared|g' \
+	    -e 's|libshared_la|libsystemd_shared_la|g' \
+	    -e 's|libfirewall|libsystemd-firewall|g' \
+	    -e 's|libfirewall_la|libsystemd_firewall_la|g' \
 	    -e 's|libsystemd-basic-dns|libbasic-dns|g'
 }
 
