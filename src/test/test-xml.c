@@ -19,10 +19,10 @@
 
 #include <stdarg.h>
 
-#include "alloc-util.h"
-#include "string-util.h"
-#include "util.h"
-#include "xml.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-basic/xml.h"
 
 static void test_one(const char *data, ...) {
         void *state = NULL;

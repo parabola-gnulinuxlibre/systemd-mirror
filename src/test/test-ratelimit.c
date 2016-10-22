@@ -19,9 +19,9 @@
 
 #include <unistd.h>
 
-#include "macro.h"
-#include "ratelimit.h"
-#include "time-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/ratelimit.h"
+#include "systemd-basic/time-util.h"
 
 static void test_ratelimit_test(void) {
         int i;
