@@ -28,8 +28,8 @@
 #include <libgen.h>
 #undef basename
 
-#include "machine-dbus.h"
-#include "machine.h"
+#include "machine-core/machine-dbus.h"
+#include "machine-core/machine.h"
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-internal.h"
 #include "sd-bus/bus-util.h"

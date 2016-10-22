@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "operation.h"
+#include "machine-core/operation.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/fd-util.h"
 #include "systemd-basic/process-util.h"

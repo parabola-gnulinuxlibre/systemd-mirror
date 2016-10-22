@@ -23,8 +23,8 @@
 
 #include <systemd/sd-messages.h>
 
-#include "machine-dbus.h"
-#include "machine.h"
+#include "machine-core/machine-dbus.h"
+#include "machine-core/machine.h"
 #include "sd-bus/bus-error.h"
 #include "sd-bus/bus-util.h"
 #include "systemd-basic/alloc-util.h"

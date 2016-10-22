@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "image-dbus.h"
+#include "machine-core/image-dbus.h"
 #include "sd-bus/bus-util.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/bus-label.h"

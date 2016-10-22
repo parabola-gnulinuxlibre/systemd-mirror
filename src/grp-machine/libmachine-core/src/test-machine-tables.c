@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "machine.h"
+#include "machine-core/machine.h"
 #include "systemd-shared/test-tables.h"
 
 int main(int argc, char **argv) {

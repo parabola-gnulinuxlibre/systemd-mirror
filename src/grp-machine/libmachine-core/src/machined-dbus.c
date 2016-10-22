@@ -23,9 +23,9 @@
 
 #include <systemd/sd-id128.h>
 
-#include "image-dbus.h"
-#include "machine-dbus.h"
-#include "machined.h"
+#include "machine-core/image-dbus.h"
+#include "machine-core/machine-dbus.h"
+#include "machine-core/machined.h"
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-util.h"
 #include "systemd-basic/alloc-util.h"

@@ -23,7 +23,7 @@
 
 #include <systemd/sd-daemon.h>
 
-#include "machined.h"
+#include "machine-core/machined.h"
 #include "sd-bus/bus-error.h"
 #include "sd-bus/bus-util.h"
 #include "systemd-basic/alloc-util.h"
