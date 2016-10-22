@@ -133,6 +133,10 @@ move_files() (
 	split_lib src/libsystemd-shared
 	split_lib src/libsystemd-network
 
+	mv -t src/libcore/src \
+	   src/libcore/linux \
+	   src/libcore/include/core/dbus*.h
+
 	mv src/libsystemd-shared/{test,include/systemd-shared}/test-tables.h
 	rmdir src/libsystemd-shared/test
 
@@ -154,6 +158,7 @@ move_files() (
 	   src/resolve/.gitignore \
 	   src/resolve/*
 	rmdir src/resolve
+	split_lib src/libbasic-dns
 
 	# src/import => src/{libimport,systemd-{export,importd,import}}
 	mkdir src/libimport
@@ -179,7 +184,7 @@ move_files() (
 	   src/import/curl-util*
 	rmdir src/import
 
-	# src/journal => src/..
+	# src/journal => src/...
 	mkdir src/libjournal-core
 	mv -t src/libjournal-core \
 	   src/journal/.gitignore \
@@ -222,6 +227,7 @@ move_files() (
 	   src/journal/mmap-cache.h \
 	   src/journal/sd-journal.c
 	rmdir src/journal
+	split_lib src/libjournal-core
 
 	# src/network => src/...
 	mkdir src/systemd-networkd-wait-online
@@ -648,6 +654,12 @@ move_files() (
 	    src/systemd-notify \
 	    src/systemd-path \
 	    src/systemd-socket-activate
+
+	mv -t src/grp-udev \
+	   src/grp-udev/rules/*
+	cat src/grp-udev/rules/.gitignore >> src/grp-udev/.gitignore
+	rm src/grp-udev/rules/.gitignore
+	rmdir src/grp-udev/rules
 
 	mv -t src/systemd-timesyncd system-preset/??-timesyncd.preset
 	for file in system-preset/??-*.preset; do
