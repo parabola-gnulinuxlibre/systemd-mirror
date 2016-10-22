@@ -14,7 +14,7 @@ split_lib() {
 	local d=$1
 
 	local t=("$d"/test-*)
-	if [[ -f ${t[0]} ]]; then
+	if [[ -e ${t[0]} ]]; then
 		mkdir "$d/test"
 		mv "$d"/test-* -t "$d/test"
 	fi
@@ -124,14 +124,15 @@ move_files() (
 
 	mv -T src/lib{systemd-shared,core}/linux
 
-	mkdir src/libfirewall
-	mv -T src/lib{systemd-shared,firewall}/firewall-util.c
-	mv -T src/lib{systemd-shared,firewall}/firewall-util.h
+	mkdir src/libsystemd-firewall
+	mv -T src/libsystemd-{shared,firewall}/firewall-util.c
+	mv -T src/libsystemd-{shared,firewall}/firewall-util.h
 
 	split_lib src/libcore
 	split_lib src/libsystemd-basic
 	split_lib src/libsystemd-shared
 	split_lib src/libsystemd-network
+	split_lib src/libsystemd-firewall
 
 	mv -t src/libcore/src \
 	   src/libcore/linux \
@@ -228,6 +229,7 @@ move_files() (
 	   src/journal/sd-journal.c
 	rmdir src/journal
 	split_lib src/libjournal-core
+	mv -T src/libjournal-core/{,src/}journald-gperf.gperf
 
 	# src/network => src/...
 	mkdir src/systemd-networkd-wait-online
@@ -661,6 +663,11 @@ move_files() (
 	rm src/grp-udev/rules/.gitignore
 	rmdir src/grp-udev/rules
 
+	mv -t src/grp-journal/systemd-journald \
+	   src/grp-journal/catalog/.gitignore \
+	   src/grp-journal/catalog/*
+	rmdir src/grp-journal/catalog
+
 	mv -t src/systemd-timesyncd system-preset/??-timesyncd.preset
 	for file in system-preset/??-*.preset; do
 		base="${file##*/??-}"
@@ -764,9 +771,11 @@ fixup_makefile() {
 	    -e 's|--version-script=.*/([^/]+)\.sym|--version-script=$(srcdir)/\1.sym|g' \
 	    -e '#### Rename helpers ################' \
 	    -e 's|libbasic_la|libsystemd_basic_la|g' \
-	    -e 's|libshared_la|libsystemd_shared_la|g' \
 	    -e 's|libbasic|libsystemd-basic|g' \
 	    -e 's|libshared|libsystemd-shared|g' \
+	    -e 's|libshared_la|libsystemd_shared_la|g' \
+	    -e 's|libfirewall|libsystemd-firewall|g' \
+	    -e 's|libfirewall_la|libsystemd_firewall_la|g' \
 	    -e 's|libsystemd-basic-dns|libbasic-dns|g'
 }
 
