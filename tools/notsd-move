@@ -488,9 +488,10 @@ move_files() (
 	   src/libsystemd/include/systemd/sd-ipv4* \
 	   src/libsystemd/include/systemd/sd-lldp* \
 	   src/libsystemd/include/systemd/sd-ndisc*
-	for l in device hwdb netlink network resolve; do
-		mv -T src/libsystemd/include/systemd/sd-$l.h src/libsystemd/src/sd-$l/sd-$l.h
-	done
+	mkdir src/libsystemd/include-staging{,/systemd-staging}
+	mv -t src/libsystemd/include-staging/systemd-staging \
+	   src/libsystemd/include/systemd/sd-{device,hwdb,netlink,network,resolve}.h
+
 	mkdir src/grp-journal.d
 	mv -t src/grp-journal.d tmpfiles.d/journal-nocow.*
 	mv -t src/grp-remote.d tmpfiles.d/systemd-remote.*
@@ -616,6 +617,7 @@ move_files() (
 	    src/systemd-inhibit \
 	    src/systemd-logind
 	grp src/grp-machine \
+	    src/libmachine-core \
 	    src/machinectl \
 	    src/nss-mymachines \
 	    src/systemd-machined
