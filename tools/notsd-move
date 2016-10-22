@@ -137,6 +137,14 @@ move_files() (
 	mv -t src/libcore/src \
 	   src/libcore/linux \
 	   src/libcore/include/core/dbus*.h
+	mv -T src/libcore/{src,include/core}/dbus-manager.h
+	mv -T src/libcore/{include/core,src}/audit-fd.h
+	mv -T src/libcore/{include/core,src}/load-dropin.h
+	mv -T src/libcore/{include/core,src}/locale-setup.h
+	mv -T src/libcore/{include/core,src}/selinux-access.h
+	mv -T src/libcore/{include/core,src}/transaction.h
+	mv -T src/libcore/{include/core,src}/unit-printf.h
+	mv -T src/libcore/{,src}/load-fragment-gperf.gperf.m4
 
 	mv src/libsystemd-shared/{test,include/systemd-shared}/test-tables.h
 	rmdir src/libsystemd-shared/test
@@ -251,15 +259,17 @@ move_files() (
 	   src/network/test-*
 	rmdir src/network
 
-	# src/machine => src/{machinectl,systemd-machined}
-	mkdir src/machinectl
-	mv -t src/machinectl \
-	   src/machine/machinectl*
-	mkdir src/systemd-machined
+	# src/machine => src/{machinectl,systemd-machined,libmachine-core}
+	mkdir src/machinectl src/systemd-machined src/libmachine-core
+	mv -T src/{machine,machinectl}/machinectl.c
+	mv -T src/{machine,systemd-machined}/machined.c
 	mv -t src/systemd-machined \
 	   src/machine/.gitignore \
+	   src/machine/org.*
+	mv -t src/libmachine-core \
 	   src/machine/*
 	rmdir src/machine
+	split_lib src/libmachine-core
 
 	# src/coredump => src/{coredumpctl,systemd-coredump}
 	mkdir src/coredumpctl
@@ -469,7 +479,7 @@ move_files() (
 	mkdir src/libudev/include
 	mv -T src/libudev/{src,include}/libudev.h
 	mv -T src/{systemd-networkd,libnetworkd-core}/networkd.h
-	mv -T src/{systemd-resolved,libbasic-dns}/resolved-def.h
+	mv -T src/{systemd-resolved,libbasic-dns/include/basic-dns}/resolved-def.h
 	mv -t src/cdrom_id  rules/*cdrom*
 	mv -t src/mtd_probe rules/*mtd*
 	mv -t src/v4l_id    rules/*v4l*
