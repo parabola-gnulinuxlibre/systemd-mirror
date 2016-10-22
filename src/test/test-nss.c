@@ -18,22 +18,22 @@
 ***/
 
 #include <dlfcn.h>
-#include <stdlib.h>
 #include <net/if.h>
+#include <stdlib.h>
 
-#include "log.h"
-#include "nss-util.h"
-#include "path-util.h"
-#include "string-util.h"
-#include "alloc-util.h"
-#include "in-addr-util.h"
-#include "hexdecoct.h"
-#include "af-list.h"
-#include "stdio-util.h"
-#include "strv.h"
-#include "errno-list.h"
-#include "hostname-util.h"
-#include "local-addresses.h"
+#include "sd-netlink/local-addresses.h"
+#include "systemd-basic/af-list.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/errno-list.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/nss-util.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/stdio-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
 
 static const char* nss_status_to_string(enum nss_status status, char *buf, size_t buf_len) {
         switch (status) {
