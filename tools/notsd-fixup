@@ -25,18 +25,18 @@ fixup_includes() (
 	dirs=($(find "$@" -type d -name include))
 	if [[ ${#dirs[@]} -gt 0 ]]; then
 		find "${dirs[@]}" -type d | while read -r dir; do
-			printf '=> libdir %q\n' "$dir"
 			lib="${dir##*/}"
 			find "$dir" -type f | while read -r filename; do
-				printf ' => sed -ir %q %q\n' "s|$lib/||" "$filename"
+				>&2 printf ' => sed -r %q < %q\n' "s|$lib/||" "$filename"
 				sed -r "s|$lib/||" < "$filename" | build-aux/write-ifchanged "$filename"
 			done
 		done
 	fi
 
 	find "$@" \( -name '*.h' -o -name '*.c' -o -name '*.gperf' \) -type f | while read -r filename; do
-		"$0"--includes "$filename"
+		"$0"--includes "$filename" | build-aux/write-ifchanged "$filename"
 	done
+	rm -rf -- "$0"--includes.cache
 )
 
 main() {
