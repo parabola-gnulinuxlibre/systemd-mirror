@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "cpu-set-util.h"
-#include "macro.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/cpu-set-util.h"
+#include "systemd-basic/macro.h"
 
 static void test_parse_cpu_set(void) {
         cpu_set_t *c = NULL;
