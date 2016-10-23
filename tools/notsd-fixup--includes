@@ -1,28 +1,48 @@
 #!/usr/bin/env bash
 
-panic() {
-	>&2 echo panic
-	exit 2
-}
+# Requires Bash 4.2 or higher (for `test -v`).
+
+# If you are thinking "this file looks gross!", it is.  It
+# started out as a set of Bash one-liners.  Which got turned
+# into a script.  Which grew somewhat organically.  Not huge,
+# but given that it started as some one liners, that's not a
+# very pretty several hundred lines.  So yes, it is gross.
+# Rewrites welcome; just don't introduce any behavioral changes
+# (easy since `tools/notsd-move` runs it on the entire repo and
+# puts the results in git history).
+
+################################################################
+# Everything else in this program is just fluff and bookkeeping
+# around around calling classify().
 
 out() {
-	printf '%q ' "$@"
+	_ret_class=$1
+	_ret_path=$2
 }
 
-# system
-# linux
-# public
-# protected
-# private
+# Return a tuple of (class/group, path); which is a class that
+# the header path belongs to, and a normalized path for it.
+#
+# There are a fixed number of classes that it may put a header
+# in; in order of most-public to most-private:
+#
+#  system
+#  linux
+#  public
+#  protected
+#  private
+#
+# This uses the global variable `expensive`.
 classify() {
-	local path=$1
+	local current_file=$1
+	local path=$2
 	if [[ "$path" = linux/* ]]; then
 		out linux "$path"
-	elif [[ -f "${current_file%/*}/${path}" ]]; then
+	elif expensive.exists "${current_file%/*}/${path}"; then
 		out private "$path"
 	elif [[ "$path" != systemd/* ]] &&
 	     [[ "$path" != libudev.h ]] &&
-	     cpp -include "$path" <<<'' &>/dev/null; then
+	     expensive.cpp "$path"; then
 		out system "$path"
 	else
 		case "$path" in
@@ -38,7 +58,7 @@ classify() {
 					*)
 						>&2 printf 'Unknown gperf base: %q\n' "$base"
 						>&2 printf 'Cannot figure out: %q\n' "$path"
-						exit 2
+						return 2
 						;;
 				esac
 				file="$d/${path##*/}"
@@ -61,7 +81,7 @@ classify() {
 				fi
 				;;
 			*)
-				file=$(find src -type f -name "${path##*/}")
+				file=$(expensive.find "${path##*/}")
 				if [[ -f "$file" ]]; then
 					case "$file" in
 						*/src/*)
@@ -90,23 +110,174 @@ classify() {
 					esac
 				else
 					>&2 printf 'Cannot figure out: %q\n' "$path"
-					exit 2
+					return 2
 				fi
 				;;
 		esac
 	fi
 }
 
-phase=phase0
-hook=:
+################################################################
+# Cache expensive things
+
+cache.init_cpp() {
+	if ! [[ -v _cache_cpp[@] ]]; then
+		if [[ -f "$0.cache/cpp" ]]; then
+			. "$0.cache/cpp"
+		else
+			declare -gA _cache_cpp=()
+		fi
+	fi
+}
+
+cache.save_cpp() {
+	cache.init_cpp
+	mkdir -p "$0.cache"
+	declare -p _cache_cpp | sed 's/-/-g/' > "$0.cache/cpp"
+}
+
+
+cache.init_fs() {
+	if ! [[ -v _cache_fs ]]; then
+		if ! [[ -f "$0.cache/fs" ]]; then
+			>&2 echo expensive fs.find
+			mkdir -p "$0.cache"
+			find src -name '*.h' \( -type l -printf 'l %p\n' -o -type f -printf 'f %p\n' \) > "$0.cache/fs"
+		fi
+		declare -g _cache_fs=true
+	fi
+}
+
+expensive.cpp() {
+	local path=$1
+	cache.init_cpp
+	if [[ -z "${_cache_cpp[$path]}" ]]; then
+		>&2 echo expensive cpp "$path"
+		local r
+		r=0; cpp -include "$path" <<<'' &>/dev/null || r=$?
+		_cache_cpp[$path]=$r
+	fi
+	return ${_cache_cpp[$path]}
+}
+
+expensive.exists() {
+	local path=$1
+	cache.init_fs
+	grep -qFx \
+	     -e "l $path" \
+	     -e "f $path" \
+	     < "$0.cache/fs"
+}
+
+expensive.find() {
+	local name=$1
+	cache.init_fs
+	sed -n "/^f .*\/${name//./\\.}\$/s/^f //p" < "$0.cache/fs"
+}
+
+################################################################
+# Data structure for storing a chunk of `#include` lines.
+
+includes.init() {
+	_includes_trailing_nl=
+	_includes_system=()
+	_includes_linux=()
+	_includes_public=()
+	_includes_protected=()
+	_includes_typedef=()
+	_includes_typedef_last=true
+	_includes_private=()
+}
+includes.print() {
+	local b=:
+	if [[ ${#_includes_system[@]} -gt 0 ]]; then
+		printf '%s\n' "${_includes_system[@]}" | sort -u
+		b=echo
+	fi
+	if [[ ${#_includes_linux[@]} -gt 0 ]]; then
+		$b
+		printf '%s\n' "${_includes_linux[@]}"
+		b=echo
+	fi
+	if [[ ${#_includes_public[@]} -gt 0 ]]; then
+		$b
+		printf '%s\n' "${_includes_public[@]}" | sort -u
+		b=echo
+	fi
+	if [[ ${#_includes_protected[@]} -gt 0 ]]; then
+		$b
+		printf '%s\n' "${_includes_protected[@]}" | sort -u
+		b=echo
+	fi
+	if [[ ${#_includes_typedef[@]} -gt 0 ]] && ! $_includes_typedef_last; then
+		$b
+		printf '%s\n' "${typedef[@]}" | sort -u
+		b=echo
+	fi
+	if [[ ${#_includes_private[@]} -gt 0 ]]; then
+		$b
+		printf '%s\n' "${_includes_private[@]}" | sort -u
+		b=echo
+	fi
+	if [[ ${#_includes_typedef[@]} -gt 0 ]] && $_includes_typedef_last; then
+		$b
+		printf '%s\n' "${_includes_typedef[@]}"
+	fi
+	printf '%s' "$_includes_trailing_nl"
+}
+includes.add() {
+	local class=$1
+	local path=$2
+	local extra=$3
+	local line
+	case "$class" in
+		system)
+			printf -v line '#include <%s>%s' "$path" "$extra"
+			_includes_system+=("$line")
+			;;
+		linux)
+			printf -v line '#include <%s>%s' "$path" "$extra"
+			_includes_linux+=("$line")
+			;;
+		public)
+			printf -v line '#include <%s>%s' "$path" "$extra"
+			_includes_public+=("$line")
+			;;
+		protected)
+			printf -v line '#include "%s"%s' "$path" "$extra"
+			_includes_protected+=("$line")
+			;;
+		private)
+			if [[ ${#typedef[@]} -gt 0 ]]; then
+				_includes_typedef_last=false
+			fi
+			printf -v line '#include "%s"%s' "$path" "$extra"
+			_includes_private+=("$line")
+			;;
+		*)
+			>&2 printf 'Invalid include class: %q\n' "$class"
+			return 2
+			;;
+	esac
+}
+
+################################################################
+# The main program loop
+
+panic() {
+	>&2 echo panic
+	exit 2
+}
 
 phase0() {
 	phase=phase0
 	hook=:
-	local line="$1"
+	local filename="$1"
+	local line="$2"
 	case "$line" in
 		'#include'*|'typedef '*';')
-			phase1 "$line"
+			includes.init
+			phase1 "$filename" "$line"
 			;;
 		*)
 			printf '%s\n' "$line"
@@ -114,122 +285,54 @@ phase0() {
 	esac
 }
 
-phase1_init() {
-	phase1_tail=
-	system=()
-	linux=()
-	public=()
-	protected=()
-	typedef=(); typedef_last=true
-	private=()
-}
-phase1_init
-phase1_flush() {
-	local b=:
-	if [[ ${#system[@]} -gt 0 ]]; then
-		printf '%s\n' "${system[@]}" | sort -u
-		b=echo
-	fi
-	if [[ ${#linux[@]} -gt 0 ]]; then
-		$b
-		printf '%s\n' "${linux[@]}"
-		b=echo
-	fi
-	if [[ ${#public[@]} -gt 0 ]]; then
-		$b
-		printf '%s\n' "${public[@]}" | sort -u
-		b=echo
-	fi
-	if [[ ${#protected[@]} -gt 0 ]]; then
-		$b
-		printf '%s\n' "${protected[@]}" | sort -u
-		b=echo
-	fi
-	if [[ ${#typedef[@]} -gt 0 ]] && ! $typedef_last; then
-		$b
-		printf '%s\n' "${typedef[@]}" | sort -u
-		b=echo
-	fi
-	if [[ ${#private[@]} -gt 0 ]]; then
-		$b
-		printf '%s\n' "${private[@]}" | sort -u
-		b=echo
-	fi
-	if [[ ${#typedef[@]} -gt 0 ]] && $typedef_last; then
-		$b
-		printf '%s\n' "${typedef[@]}"
-	fi
-	printf '%s' "$phase1_tail"
-	phase1_init
-}
 phase1() {
 	phase=phase1
-	hook=phase1_flush
-	local line="$1"
+	hook=includes.print
+	local filename="$1"
+	local line="$2"
 	case "$line" in
 		'')
-			phase1_tail+=$'\n'
+			_includes_trailing_nl+=$'\n'
 			;;
 		'#include'*)
-			phase1_tail=''
+			_includes_trailing_nl=''
 			local re='^#include [<"]([^">]*)[">](.*)'
 			if [[ "$line" =~ $re ]]; then
-				IFS=' '
-				local buf
-				buf="$(classify "${BASH_REMATCH[1]}")" || panic
-				read -r class path <<<"$buf"
-				case "$class" in
-					system)
-						printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
-						system+=("$line")
-						;;
-					linux)
-						printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
-						linux+=("$line")
-						;;
-					public)
-						printf -v line '#include <%s>%s' "$path" "${BASH_REMATCH[2]}"
-						public+=("$line")
-						;;
-					protected)
-						printf -v line '#include "%s"%s' "$path" "${BASH_REMATCH[2]}"
-						protected+=("$line")
-						;;
-					private)
-						if [[ ${#typedef[@]} -gt 0 ]]; then
-							typedef_last=false
-						fi
-						printf -v line '#include "%s"%s' "$path" "${BASH_REMATCH[2]}"
-						private+=("$line")
-						;;
-				esac
+				# OK, this is gross, but we want to avoid creating a subshell
+				local _ret_class _ret_path
+				classify "$filename" "${BASH_REMATCH[1]}" || panic
+				includes.add "$_ret_class" "$_ret_path" "${BASH_REMATCH[2]}" || panic
 			else
 				panic
 			fi
 			;;
 		'typedef '*';')
-			phase1_tail=''
-			typedef+=("$line")
+			_includes_trailing_nl=''
+			_includes_typedef+=("$line")
 			;;
 		*)
-			phase1_flush
-			phase0 "$line"
+			includes.print
+			phase0 "$filename" "$line"
 			;;
 	esac
 }
 
+phase=phase0
+hook=:
+
 main() {
-	current_file="$1"
-	printf ' => %q %q\n' "$0" "$current_file"
+	local filename="$1"
+	>&2 printf ' => %q %q\n' "$0" "$filename"
 	set -o pipefail
 	{
 		IFS=''
 		while read -r line; do
-			"$phase" "$line"
+			"$phase" "$filename" "$line"
 			IFS=''
 		done
 		"$hook"
-	} < "$current_file" | build-aux/write-ifchanged "$current_file"
+	} < "$filename"
+	cache.save_cpp
 }
 
 main "$@"
