@@ -852,7 +852,7 @@ main() {
 	git commit -m './tools/notsd-move'
 	git merge -s ours notsystemd/postmove
 	git checkout notsystemd/postmove
-	git merge tmp/postmove
+	git merge --no-edit tmp/postmove
 	git branch -d tmp/postmove
 }
 
