@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright (C) 2015-2016  Luke Shumaker
 
 # The reason we do `find`/`while read`-loops instead of `find -exec` commands
 # is that we want errors from the inner loop to bubble up.
@@ -34,7 +35,25 @@ fixup_includes() (
 	fi
 
 	find "$@" \( -name '*.h' -o -name '*.c' -o -name '*.gperf' \) -type f | while read -r filename; do
-		"$0"--includes "$filename" | build-aux/write-ifchanged "$filename"
+		false
+		# We copy the write-ifchanged logic to here, because we have a
+		# higher-than usual chance of the main command failing.  In a
+		# Makefile we would handle this by setting .DELETE_ON_ERROR:,
+		# but we can't do that here, so we have to inter-mingle the
+		# logics.
+		local outfile="$filename"
+		tmpfile="$(dirname "$outfile")/.tmp.${outfile##*/}.tmp"
+		local r=0
+		"$0"--includes "$filename" > "$tmpfile" || r=$?
+		if [[ $r != 0 ]]; then
+			rm -f "$tmpfile" || :
+			(exit $r)
+		fi
+		if cmp -s "$tmpfile" "$outfile"; then
+			rm -f "$tmpfile" || :
+		else
+			mv -f "$tmpfile" "$outfile"
+		fi
 	done
 	rm -rf -- "$0"--includes.cache
 )
