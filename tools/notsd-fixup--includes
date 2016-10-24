@@ -1,24 +1,25 @@
-#!/usr/bin/env bash
-
-# Requires Bash 4.2 or higher (for `test -v`).
+#!/usr/bin/env python3
 
 # If you are thinking "this file looks gross!", it is.  It
 # started out as a set of Bash one-liners.  Which got turned
 # into a script.  Which grew somewhat organically.  Not huge,
 # but given that it started as some one liners, that's not a
-# very pretty several hundred lines.  So yes, it is gross.
+# very pretty several hunderd lines.  Then got fairly litterally
+# translated into this, for speed.  So yes, it is gross.
 # Rewrites welcome; just don't introduce any behavioral changes
 # (easy since `tools/notsd-move` runs it on the entire repo and
 # puts the results in git history).
 
+import json
+import os
+import re
+import shlex
+import subprocess
+import sys
+
 ################################################################
 # Everything else in this program is just fluff and bookkeeping
 # around around calling classify().
-
-out() {
-	_ret_class=$1
-	_ret_path=$2
-}
 
 # Return a tuple of (class/group, path); which is a class that
 # the header path belongs to, and a normalized path for it.
@@ -31,308 +32,248 @@ out() {
 #  public
 #  protected
 #  private
-#
-# This uses the global variable `expensive`.
-classify() {
-	local current_file=$1
-	local path=$2
-	if [[ "$path" = linux/* ]]; then
-		out linux "$path"
-	elif expensive.exists "${current_file%/*}/${path}"; then
-		out private "$path"
-	elif [[ "$path" != systemd/* ]] &&
-	     [[ "$path" != libudev.h ]] &&
-	     expensive.cpp "$path"; then
-		out system "$path"
-	else
-		case "$path" in
-			*-to-name.h|*-from-name.h)
-				base="${path##*/}"
-				base="${base%-to-name.h}"
-				base="${base%-from-name.h}"
-				case "$base" in
-					dns_type)	     d=src/grp-resolve/systemd-resolved;;
-					keyboard-keys)	     d=src/grp-udev/libudev-core;;
-					af|arphrd|cap|errno) d=src/libsystemd-basic/src;;
-					audit_type)	     d=src/libsystemd/src/sd-journal;;
-					*)
-						>&2 printf 'Unknown gperf base: %q\n' "$base"
-						>&2 printf 'Cannot figure out: %q\n' "$path"
-						return 2
-						;;
-				esac
-				file="$d/${path##*/}"
-				if [[ "$current_file" = "$d"/* ]]; then
-					out private "${file##*/}"
-				elif [[ "$file" = */include/* ]]; then
-					out protected "${file##*/include/}"
-				else
-					out protected "${file##*/}"
-				fi
-				;;
-			asm/sgidefs.h|dbus/dbus.h|efi.h|efilib.h|gio/gio.h|glib.h|libmount.h)
-				out system "$path"
-				;;
-			util.h|*/util.h)
-				if [[ "$current_file" = */systemd-boot/* ]]; then
-					out private util.h
-				else
-					out protected systemd-basic/util.h
-				fi
-				;;
-			*)
-				file=$(expensive.find "${path##*/}")
-				if [[ -f "$file" ]]; then
-					case "$file" in
-						*/src/*)
-							if [[ "${current_file%/*}" = "${file%/*}" ]]; then
-								out private "${file##*/}"
-							else
-								out protected "${file##*/src/}"
-							fi
-							;;
-						*/libsystemd/include/*|*/libudev/include/*)
-							out public "${file##*/include/}"
-							;;
-						*/include/*)
-							out protected "${file##*/include/}"
-							;;
-						*/include-staging/*)
-							out protected "${file##*/include-staging/}"
-							;;
-						*)
-							if [[ "${current_file%/*}" = "${file%/*}" ]]; then
-								out private "${file##*/}"
-							else
-								out protected "${file##*/}"
-							fi
-							;;
-					esac
-				else
-					>&2 printf 'Cannot figure out: %q\n' "$path"
-					return 2
-				fi
-				;;
-		esac
-	fi
-}
+def classify(expensive, current_file, path):
+    if path.startswith('linux/'):
+        return 'linux', path
+    elif expensive.exists(os.path.join(os.path.dirname(current_file), path)):
+        return 'private', path
+    elif not path.startswith('systemd/') and path != 'libudev.h' and expensive.cpp(path):
+        return 'system', path
+    else:
+        if path.endswith('-to-name.h') or path.endswith('-from-name.h'):
+            base = re.fullmatch('(.*)-(to|from)-name\.h', os.path.basename(path)).group(1)
+            d={
+                'dns_type'      : 'src/grp-resolve/systemd-resolved',
+                'keyboard-keys' : 'src/grp-udev/libudev-core',
+                'af'            : 'src/libsystemd-basic/src',
+                'arphrd'        : 'src/libsystemd-basic/src',
+                'cap'           : 'src/libsystemd-basic/src',
+                'errno'         : 'src/libsystemd-basic/src',
+                'audit_type'    : 'src/libsystemd/src/sd-journal',
+            }
+            file = os.path.join(d[base], os.path.basename(path))
+            if current_file.startswith(d[base]):
+                return 'private', os.path.basename(file)
+            elif '/include/' in file:
+                return 'protected', re.sub('.*/include/', '', file)
+            else:
+                return 'protected', os.path.basename(file)
+        elif path in [ 'asm/sgidefs.h', 'dbus/dbus.h', 'efi.h', 'efilib.h', 'gio/gio.h', 'glib.h', 'libmount.h' ]:
+            return 'system', path
+        elif os.path.basename(path) == 'util.h':
+            if '/systemd-boot/' in current_file:
+                return 'private', 'util.h'
+            else:
+                return 'protected', 'systemd-basic/util.h'
+        else:
+            find = expensive.find(os.path.basename(path))
+            if len(find) == 1:
+                file = find[0]
+                if '/src/' in file:
+                    if os.path.dirname(current_file) == os.path.dirname(file):
+                        return 'private', os.path.basename(file)
+                    else:
+                        return 'protected', re.sub('.*/src/', '', file)
+                elif ('/libsystemd/include/' in file) or ('/libudev/include/' in file):
+                    return 'public', re.sub('.*/include/', '', file)
+                elif '/include/' in file:
+                    return 'protected', re.sub('.*/include/', '', file)
+                elif '/include-staging/' in file:
+                    return 'protected', re.sub('.*/include-staging/', '', file)
+                else:
+                    if os.path.dirname(current_file) == os.path.dirname(file):
+                        return 'private', os.path.basename(file)
+                    else:
+                        return 'protected', os.path.basename(file)
+            else:
+                sys.exit('Cannot figure out: {0}'.format(path))
 
 ################################################################
 # Cache expensive things
 
-cache.init_cpp() {
-	if ! [[ -v _cache_cpp[@] ]]; then
-		if [[ -f "$0.cache/cpp" ]]; then
-			. "$0.cache/cpp"
-		else
-			declare -gA _cache_cpp=()
-		fi
-	fi
-}
+class Cache:
+    def __init__(self, filename):
+        self.cache = {
+            'find': None,
+            'cpp': {}
+        }
+        self.dirty = True
 
-cache.save_cpp() {
-	cache.init_cpp
-	mkdir -p "$0.cache"
-	declare -p _cache_cpp | sed 's/-/-g/' > "$0.cache/cpp"
-}
+        if os.path.isfile(filename):
+            with open(filename) as file:
+                self.cache = json.load(file)
+                self.dirty = False
 
+    def save(self, filename):
+        if self.dirty:
+            with open(filename, 'w') as file:
+                json.dump(self.cache, file)
 
-cache.init_fs() {
-	if ! [[ -v _cache_fs ]]; then
-		if ! [[ -f "$0.cache/fs" ]]; then
-			>&2 echo expensive fs.find
-			mkdir -p "$0.cache"
-			find src -name '*.h' \( -type l -printf 'l %p\n' -o -type f -printf 'f %p\n' \) > "$0.cache/fs"
-		fi
-		declare -g _cache_fs=true
-	fi
-}
+    def real_cpp(path):
+        # `cpp -include "$path" <<<'' &>/dev/null`
+        print('  -> cpp({0})'.format(path), file=sys.stderr)
+        with subprocess.Popen(['cpp', '-include', path],
+                                stdin=subprocess.PIPE,
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL) as proc:
+            proc.stdin.close()
+            return proc.wait() == 0
 
-expensive.cpp() {
-	local path=$1
-	cache.init_cpp
-	if [[ -z "${_cache_cpp[$path]}" ]]; then
-		>&2 echo expensive cpp "$path"
-		local r
-		r=0; cpp -include "$path" <<<'' &>/dev/null || r=$?
-		_cache_cpp[$path]=$r
-	fi
-	return ${_cache_cpp[$path]}
-}
+    def real_find():
+        # This can probably be done with os.walk or something,
+        # but since it is only called once, it isn't a good
+        # place to start optimizing.
+        #
+        # `find src -name '*.h' \( -type l -printf 'l %p\n' -o -type f -printf 'f %p\n' \)`
+        print('  -> find()', file=sys.stderr)
+        ret = {}
+        with subprocess.Popen(['find', 'src', '-name', '*.h', '(', '-type', 'l', '-printf', 'l %p\n', '-o', '-type', 'f', '-printf', 'f %p\n', ')'],
+                              stdin=subprocess.DEVNULL,
+                              stdout=subprocess.PIPE, universal_newlines=True,
+                              stderr=subprocess.DEVNULL) as proc:
+            for line in proc.stdout:
+                t, p = line.rstrip('\n').split(' ', 1)
+                ret[p]=t
+        return ret
 
-expensive.exists() {
-	local path=$1
-	cache.init_fs
-	grep -qFx \
-	     -e "l $path" \
-	     -e "f $path" \
-	     < "$0.cache/fs"
-}
+    def cpp(self, path):
+        # `cpp -include "$path" <<<'' &>/dev/null`
+        if path not in self.cache['cpp']:
+            self.cache['cpp'][path] = Cache.real_cpp(path)
+            self.dirty = True
+        return self.cache['cpp'][path]
 
-expensive.find() {
-	local name=$1
-	cache.init_fs
-	sed -n "/^f .*\/${name//./\\.}\$/s/^f //p" < "$0.cache/fs"
-}
+    def exists(self, path):
+        # `test -f "$path"`
+        if not self.cache['find']:
+            self.cache['find'] = Cache.real_find()
+            self.dirty = True
+        return path in self.cache['find']
+
+    def find(self, name):
+        # `find src -type f -name "$name"`
+        if not self.cache['find']:
+            self.cache['find'] = Cache.real_find()
+            self.dirty = True
+        return [p for p in self.cache['find'].keys() if self.cache['find'][p]=='f' and os.path.basename(p) == name]
 
 ################################################################
 # Data structure for storing a chunk of `#include` lines.
 
-includes.init() {
-	_includes_trailing_nl=
-	_includes_system=()
-	_includes_linux=()
-	_includes_public=()
-	_includes_protected=()
-	_includes_typedef=()
-	_includes_typedef_last=true
-	_includes_private=()
-}
-includes.print() {
-	local b=:
-	if [[ ${#_includes_system[@]} -gt 0 ]]; then
-		printf '%s\n' "${_includes_system[@]}" | sort -u
-		b=echo
-	fi
-	if [[ ${#_includes_linux[@]} -gt 0 ]]; then
-		$b
-		printf '%s\n' "${_includes_linux[@]}"
-		b=echo
-	fi
-	if [[ ${#_includes_public[@]} -gt 0 ]]; then
-		$b
-		printf '%s\n' "${_includes_public[@]}" | sort -u
-		b=echo
-	fi
-	if [[ ${#_includes_protected[@]} -gt 0 ]]; then
-		$b
-		printf '%s\n' "${_includes_protected[@]}" | sort -u
-		b=echo
-	fi
-	if [[ ${#_includes_typedef[@]} -gt 0 ]] && ! $_includes_typedef_last; then
-		$b
-		printf '%s\n' "${typedef[@]}" | sort -u
-		b=echo
-	fi
-	if [[ ${#_includes_private[@]} -gt 0 ]]; then
-		$b
-		printf '%s\n' "${_includes_private[@]}" | sort -u
-		b=echo
-	fi
-	if [[ ${#_includes_typedef[@]} -gt 0 ]] && $_includes_typedef_last; then
-		$b
-		printf '%s\n' "${_includes_typedef[@]}"
-	fi
-	printf '%s' "$_includes_trailing_nl"
-}
-includes.add() {
-	local class=$1
-	local path=$2
-	local extra=$3
-	local line
-	case "$class" in
-		system)
-			printf -v line '#include <%s>%s' "$path" "$extra"
-			_includes_system+=("$line")
-			;;
-		linux)
-			printf -v line '#include <%s>%s' "$path" "$extra"
-			_includes_linux+=("$line")
-			;;
-		public)
-			printf -v line '#include <%s>%s' "$path" "$extra"
-			_includes_public+=("$line")
-			;;
-		protected)
-			printf -v line '#include "%s"%s' "$path" "$extra"
-			_includes_protected+=("$line")
-			;;
-		private)
-			if [[ ${#typedef[@]} -gt 0 ]]; then
-				_includes_typedef_last=false
-			fi
-			printf -v line '#include "%s"%s' "$path" "$extra"
-			_includes_private+=("$line")
-			;;
-		*)
-			>&2 printf 'Invalid include class: %q\n' "$class"
-			return 2
-			;;
-	esac
-}
+class IncludeSection:
+    def __init__(self):
+        self.trailing_nl = ''
+        self.system = []
+        self.linux = []
+        self.public = []
+        self.protected = []
+        self.typedef = []
+        self.typedef_last = True
+        self.private = []
+    def print(self, file=sys.stdout):
+        b=''
+        if len(self.system) > 0:
+            for line in sorted(set(self.system)):
+                print(line, file=file)
+            b='\n'
+        if len(self.linux) > 0:
+            print(b, end='', file=file)
+            for line in self.linux:
+                print(line, file=file)
+            b='\n'
+        if len(self.public) > 0:
+            print(b, end='', file=file)
+            for line in sorted(set(self.public)):
+                print(line, file=file)
+            b='\n'
+        if len(self.protected) > 0:
+            print(b, end='', file=file)
+            for line in sorted(set(self.protected)):
+                print(line, file=file)
+            b='\n'
+        if len(self.typedef) > 0 and not self.typedef_last:
+            print(b, end='', file=file)
+            for line in sorted(set(self.typedef)):
+                print(line, file=file)
+            b='\n'
+        if len(self.private) > 0:
+            print(b, end='', file=file)
+            for line in sorted(set(self.private)):
+                print(line, file=file)
+            b='\n'
+        if len(self.typedef) > 0 and self.typedef_last:
+            print(b, end='', file=file)
+            for line in sorted(set(self.typedef)):
+                print(line, file=file)
+        print(self.trailing_nl, end='', file=file)
+    def add(self, group, path, extra):
+        if group == 'system':
+            self.system.append('#include <{0}>{1}'.format(path, extra))
+        elif group == 'linux':
+            self.linux.append('#include <{0}>{1}'.format(path, extra))
+        elif group == 'public':
+            self.public.append('#include <{0}>{1}'.format(path, extra))
+        elif group == 'protected':
+            self.protected.append('#include "{0}"{1}'.format(path, extra))
+        elif group == 'private':
+            if len(self.typedef) > 0:
+                self.typedef_last = False
+            self.private.append('#include "{0}"{1}'.format(path, extra))
+        else:
+            sys.exit('panic: unrecognized line class: {0}'.format(group))
 
 ################################################################
 # The main program loop
 
-panic() {
-	>&2 echo panic
-	exit 2
-}
+def phase0(cache, filename, line):
+    global phase
+    phase = phase0
 
-phase0() {
-	phase=phase0
-	hook=:
-	local filename="$1"
-	local line="$2"
-	case "$line" in
-		'#include'*|'typedef '*';')
-			includes.init
-			phase1 "$filename" "$line"
-			;;
-		*)
-			printf '%s\n' "$line"
-			;;
-	esac
-}
+    if re.fullmatch('#include.*|typedef .*;', line):
+        global includes
+        includes = IncludeSection()
+        phase1(cache, filename, line)
+    else:
+        print(line)
 
-phase1() {
-	phase=phase1
-	hook=includes.print
-	local filename="$1"
-	local line="$2"
-	case "$line" in
-		'')
-			_includes_trailing_nl+=$'\n'
-			;;
-		'#include'*)
-			_includes_trailing_nl=''
-			local re='^#include [<"]([^">]*)[">](.*)'
-			if [[ "$line" =~ $re ]]; then
-				# OK, this is gross, but we want to avoid creating a subshell
-				local _ret_class _ret_path
-				classify "$filename" "${BASH_REMATCH[1]}" || panic
-				includes.add "$_ret_class" "$_ret_path" "${BASH_REMATCH[2]}" || panic
-			else
-				panic
-			fi
-			;;
-		'typedef '*';')
-			_includes_trailing_nl=''
-			_includes_typedef+=("$line")
-			;;
-		*)
-			includes.print
-			phase0 "$filename" "$line"
-			;;
-	esac
-}
+def phase1(cache, filename, line):
+    global phase, includes
+    phase = phase1
 
-phase=phase0
-hook=:
+    if line == '':
+        includes.trailing_nl += '\n'
+    elif line.startswith('#include'):
+        includes.trailing_nl = ''
+        match = re.fullmatch('^#include [<"]([^">]*)[">](.*)', line)
+        if match:
+            group, path = classify(cache, filename, match.group(1))
+            includes.add(group, path, match.group(2))
+        else:
+            sys.exit('panic: malformed #include line')
+    elif re.fullmatch('typedef .*;', line):
+        includes.trailing_nl = ''
+        includes.typedef.append(line)
+    else:
+        includes.print()
+        includes = None
+        phase0(cache, filename, line)
 
-main() {
-	local filename="$1"
-	>&2 printf ' => %q %q\n' "$0" "$filename"
-	set -o pipefail
-	{
-		IFS=''
-		while read -r line; do
-			"$phase" "$filename" "$line"
-			IFS=''
-		done
-		"$hook"
-	} < "$filename"
-	cache.save_cpp
-}
+includes = None
+phase = phase0
 
-main "$@"
+def main(argv):
+    filename = argv[1]
+    print(' => {0} {1}'.format(
+        shlex.quote(__file__),
+        shlex.quote(filename),
+    ), file=sys.stderr)
+    cache = Cache(__file__+'.cache')
+    with open(filename) as f:
+        for line in f:
+            phase(cache, filename, line.rstrip('\n'))
+    if includes:
+        includes.print()
+    cache.save(__file__+'.cache')
+
+if __name__ == '__main__':
+    main(sys.argv)
