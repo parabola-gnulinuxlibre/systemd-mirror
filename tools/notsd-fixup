@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Copyright (C) 2015-2016  Luke Shumaker
 
+# We wrap the programs called by xargs with `sh` because xargs only exits early
+# if the status is 255, but we want to exit early for all non-zero statuses.
+# We use xargs instead of `find -exec` because `-exec` won't do much of
+# anything useful with the exit status.
+
 fixup_makefiles() (
 	find "$@" -type f -name Makefile | while read -r filename; do
 		>&2 printf ' => fixup %q\n' "$filename"
@@ -21,21 +26,6 @@ fixup_makefiles() (
 )
 
 fixup_includes() (
-	dirs=($(find "$@" -type d -name include))
-	if [[ ${#dirs[@]} -gt 0 ]]; then
-		find "${dirs[@]}" -type d | while read -r dir; do
-			lib="${dir##*/}"
-			find "$dir" -type f | while read -r filename; do
-				>&2 printf ' => sed -r %q < %q\n' "s|$lib/||" "$filename"
-				sed -r "s|$lib/||" < "$filename" | build-aux/write-ifchanged "$filename"
-			done
-		done
-	fi
-
-	# We wrap the $0--includes program with `sh` because xargs only exits
-	# early if the status is 255, but we want to exit early for all
-	# non-zero statuses.  We use xargs instead of -exec because -exec won't
-	# do much of anything useful with the exit status.
 	rm -rf -- "$0"--includes.cache
 	find "$@" \( -name '*.h' -o -name '*.c' -o -name '*.gperf' -o -name '*.gperf.m4' \) -type f -print0 |
 		xargs -r0 sh -c "$0--includes \"\$@\" || exit 255" --

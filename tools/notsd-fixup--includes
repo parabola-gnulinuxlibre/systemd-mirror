@@ -35,6 +35,10 @@ import sys
 #  protected
 #  private
 def classify(expensive, current_file, path):
+    if re.fullmatch('.*/include(-staging)?/.*/.*', current_file):
+        lib = os.path.basename(os.path.dirname(current_file))
+        if path.startswith(lib+'/'):
+            path = re.sub('^'+lib+'/', path)
     if path.startswith('linux/'):
         return 'linux', path
     elif expensive.exists(os.path.join(os.path.dirname(current_file), path)):
