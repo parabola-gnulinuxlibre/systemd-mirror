@@ -22,7 +22,7 @@ main() {
 	set -o pipefail
         local filename
         for filename in "$@"; do
-		>&2 printf ' => fixup %q\n' "$filename"
+		>&2 printf ' => %q %q\n' "$0" "$filename"
                 doit "$filename"
         done
 }

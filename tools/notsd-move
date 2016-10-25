@@ -709,6 +709,12 @@ move_files() (
 		mv -t src/grp-"$base" "$file"
 	done
 	rmdir system-preset
+
+	ln -srT src/libsystemd/include/systemd/_sd-common.h src/libsystemd-network/include/systemd-network/_sd-common.h
+	ln -srT src/libsystemd/include/systemd/_sd-common.h src/grp-utils/systemd-path/_sd-common.h
+	ln -srT src/grp-login/systemd-logind/logind-acl.h   src/grp-udev/libudev-core/logind-acl.h
+	ln -srT src/grp-login/systemd-logind/logind-acl.c   src/grp-udev/libudev-core/logind-acl.c
+	ln -srT src/libsystemd/src/sd-login/sd-login.c      src/grp-udev/libudev-core/sd-login.c
 )
 
 breakup_makefile() (
@@ -755,12 +761,6 @@ breakup_makefile() (
 	    src/libsystemd/src/Makefile \
 	    src/libsystemd/src/sd-journal/Makefile \
 	    src/grp-udev/libudev-core/Makefile
-
-	ln -srT src/libsystemd/include/systemd/_sd-common.h src/libsystemd-network/include/systemd-network/_sd-common.h
-	ln -srT src/libsystemd/include/systemd/_sd-common.h src/grp-utils/systemd-path/_sd-common.h
-	ln -srT src/grp-login/systemd-logind/logind-acl.h   src/grp-udev/libudev-core/logind-acl.h
-	ln -srT src/grp-login/systemd-logind/logind-acl.c   src/grp-udev/libudev-core/logind-acl.c
-	ln -srT src/libsystemd/src/sd-login/sd-login.c      src/grp-udev/libudev-core/sd-login.c
 
 	ln -sT ../subdir.mk src/libsystemd/src/sd-network/Makefile
 	ln -sT ../subdir.mk src/libsystemd/src/sd-bus/Makefile
