@@ -1,43 +1,25 @@
 #!/usr/bin/env bash
 # Copyright (C) 2015-2016  Luke Shumaker
 
-# We wrap the programs called by xargs with `sh` because xargs only exits early
-# if the status is 255, but we want to exit early for all non-zero statuses.
-# We use xargs instead of `find -exec` because `-exec` won't do much of
-# anything useful with the exit status.
-
-fixup_makefiles() (
-	find "$@" -type f -name Makefile | while read -r filename; do
-		>&2 printf ' => fixup %q\n' "$filename"
-		{
-			<"$filename" sed -r \
-			 -e "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="$(dirname -- "$filename")" config.mk)|" \
-			 -e '/^nested\.subdirs/d' \
-			 -e '/^include \$\(topsrcdir\)\/build-aux\/Makefile\.tail\.mk$/d'
-			echo
-			find "$(dirname "$filename")" -mindepth 2 -maxdepth 2 -name Makefile -print0 |
-			    xargs -r0 dirname -z -- |
-			    xargs -r0 basename -a -z |
-			    xargs -r0 printf 'nested.subdirs += %s\n' | sort
-			echo
-			echo 'include $(topsrcdir)/build-aux/Makefile.tail.mk'
-		} | cat -s | build-aux/write-ifchanged "$filename"
-	done
-)
-
-fixup_includes() (
-	rm -rf -- "$0"--includes.cache
-	find "$@" \( -name '*.h' -o -name '*.c' -o -name '*.gperf' -o -name '*.gperf.m4' \) -type f -print0 |
-		xargs -r0 sh -c "$0--includes \"\$@\" || exit 255" --
-	rm -rf -- "$0"--includes.cache
-)
-
 main() {
 	set -e
 	set -o pipefail
 	export LC_COLLATE=C
-	fixup_makefiles "$@"
-	fixup_includes "$@"
+
+	# We wrap the programs called by xargs with `sh` because xargs only exits early
+	# if the status is 255, but we want to exit early for all non-zero statuses.
+	# We use xargs instead of `find -exec` because `-exec` won't do much of
+	# anything useful with the exit status.
+
+	# Makefiles
+	find "$@" -type f -name Makefile -print0 |
+		xargs -r0 sh -c "$0--makefiles \"\$@\" || exit 255" --
+
+	# C includes
+	rm -rf -- "$0"--includes.cache
+	find "$@" \( -name '*.h' -o -name '*.c' -o -name '*.gperf' -o -name '*.gperf.m4' \) -type f -print0 |
+		xargs -r0 sh -c "$0--includes \"\$@\" || exit 255" --
+	rm -rf -- "$0"--includes.cache
 }
 
 main "$@"
