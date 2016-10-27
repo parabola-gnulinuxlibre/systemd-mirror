@@ -21,8 +21,8 @@
 #include <locale.h>
 #include <math.h>
 
-#include "log.h"
-#include "parse-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/parse-util.h"
 
 static void test_parse_boolean(void) {
         assert_se(parse_boolean("1") == 1);
