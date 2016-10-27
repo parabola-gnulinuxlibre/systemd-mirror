@@ -43,11 +43,6 @@ dist_udevrules_DATA += \
 	rules/78-sound-card.rules \
 	rules/80-net-setup-link.rules
 
-ifneq ($(HAVE_KMOD),)
-dist_udevrules_DATA += \
-	rules/80-drivers.rules
-endif # HAVE_KMOD
-
 nodist_udevrules_DATA += \
 	rules/99-systemd.rules
 
@@ -74,6 +69,11 @@ SOCKETS_TARGET_WANTS += \
 SYSINIT_TARGET_WANTS += \
 	systemd-udevd.service \
 	systemd-udev-trigger.service
+
+ifneq ($(HAVE_KMOD),)
+dist_udevrules_DATA += \
+	rules/80-drivers.rules
+endif # HAVE_KMOD
 
 nested.subdirs += ata_id
 nested.subdirs += cdrom_id

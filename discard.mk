@@ -519,58 +519,6 @@ EXTRA_DIST += \
 
 @INTLTOOL_POLICY_RULE@
 
-# ------------------------------------------------------------------------------
-
-include Makefile-man.am
-
-.PHONY: man update-man-list
-man: $(MANPAGES) $(MANPAGES_ALIAS) $(HTML_FILES) $(HTML_ALIAS)
-
-CLEANFILES += \
-	$(man_MANS) \
-	$(HTML_FILES) \
-	$(HTML_ALIAS) \
-	docs/html/man
-
-$(outdir)/man:
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
-	$(AM_V_LN)$(LN_S) -f ../../man $@
-
-$(outdir)/index.html: man/systemd.index.html
-	$(AM_V_LN)$(LN_S) -f systemd.index.html $@
-
-ifneq ($(HAVE_PYTHON),)
-noinst_DATA += \
-	man/index.html
-endif # HAVE_PYTHON
-
-CLEANFILES += \
-	man/index.html
-
-XML_GLOB = $(wildcard $(top_srcdir)/man/*.xml)
-NON_INDEX_XML_FILES = $(filter-out man/systemd.index.xml,$(XML_FILES))
-SOURCE_XML_FILES = ${patsubst %,$(top_srcdir)/%,$(filter-out man/systemd.directives.xml,$(NON_INDEX_XML_FILES))}
-
-$(outdir)/systemd.index.xml: $(top_srcdir)/tools/make-man-index.py $(NON_INDEX_XML_FILES)
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
-	$(AM_V_GEN)$(PYTHON) $< $@ $(filter-out $<,$^)
-
-$(outdir)/systemd.directives.xml: $(top_srcdir)/tools/make-directive-index.py man/custom-entities.ent $(SOURCE_XML_FILES)
-	$(AM_V_at)$(MKDIR_P) $(dir $@)
-	$(AM_V_GEN)$(PYTHON) $< $@ $(SOURCE_XML_FILES)
-
-CLEANFILES += \
-	man/systemd.index.xml \
-	man/systemd.directives.xml
-
-EXTRA_DIST += \
-	$(filter-out man/systemd.directives.xml man/systemd.index.xml,$(XML_FILES)) \
-	tools/make-man-index.py \
-	tools/make-man-rules.py \
-	tools/make-directive-index.py \
-	tools/xml_helper.py \
-	man/glib-event-glue.c
-
 ifneq ($(ENABLE_LDCONFIG),)
 dist_systemunit_DATA += \
 	units/ldconfig.service
@@ -645,6 +593,10 @@ lcov-run lcov-report:
 	echo "Need to reconfigure with --enable-coverage"
 endif # ENABLE_COVERAGE
 
+ifneq ($(HAVE_REMOTE),)
+nodist_sysusers_DATA += \
+	sysusers.d/systemd-remote.conf
+endif # HAVE_REMOTE
 dist_factory_etc_DATA = \
 	factory/etc/nsswitch.conf
 
@@ -743,6 +695,13 @@ test_nss_LDADD = \
 manual_tests += \
 	test-nss
 
+endif # HAVE_GCRYPT
+endif # HAVE_BZIP2
+endif # HAVE_ZLIB
+endif # HAVE_XZ
+endif # HAVE_LIBCURL
+
+endif # ENABLE_IMPORTD
 EXTRA_DIST += \
 	test/Makefile \
 	test/README.testsuite \
@@ -840,7 +799,6 @@ EXTRA_DIST += \
 	$(polkitpolicy_in_files) \
 	$(polkitpolicy_in_in_files)
 
-# ------------------------------------------------------------------------------
 CLEANFILES += \
 	man/custom-entities.ent
 
@@ -1050,5 +1008,6 @@ CLEANFILES += \
 tests += \
 	test-libsystemd-sym \
 	test-libudev-sym
+
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -79,6 +79,7 @@ systemd_resolved_CFLAGS = \
 	$(GCRYPT_CFLAGS)
 
 systemd_resolved_LDADD = \
+	libbasic-dns.la \
 	libsystemd-internal.la \
 	libsystemd-network.la \
 	libsystemd-shared.la \
@@ -112,9 +113,6 @@ GENERAL_ALIASES += \
 nodist_pkgsysconf_DATA += \
 	src/resolve/resolved.conf
 
-gperf_txt_sources += \
-	src/resolve/dns_type-list.txt
-
 gperf_gperf_sources += \
 	src/resolve/resolved-gperf.gperf
 
@@ -124,8 +122,6 @@ EXTRA_DIST += \
 
 dist_rootlibexec_DATA += \
 	src/resolve/resolv.conf
-
-systemd_resolved_LDADD += libbasic-dns.la
 
 sd.CPPFLAGS += -DPKGSYSCONFDIR=\"$(pkgsysconfdir)\"
 

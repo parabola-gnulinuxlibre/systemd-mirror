@@ -39,6 +39,7 @@ systemd_resolve_CFLAGS = \
 systemd_resolve_LDADD = \
 	libsystemd-internal.la \
 	libsystemd-gcrypt.la \
+	libbasic-dns.la \
 	libsystemd-shared.la \
 	$(GCRYPT_LIBS) \
 	-lm
@@ -51,7 +52,5 @@ dist_bashcompletion_data += \
 
 dist_zshcompletion_data += \
 	shell-completion/zsh/_systemd-resolve
-
-systemd_resolve_LDADD += libbasic-dns.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -238,19 +238,19 @@ libsystemd_basic_la_LIBADD = \
 	-lrt \
 	-lm
 
-$(outdir)/errno-list.txt: | $(outdir)/.deps
+$(outdir)/errno-list.txt: | $(outdir)/$(DEPDIR)
 	$(AM_V_GEN)$(CPP) $(sd.ALL_CPPFLAGS) -dM -include errno.h - </dev/null | $(AWK) '/^#define[ \t]+E[^ _]+[ \t]+/ { print $$2; }' >$@
 
 $(outdir)/errno-to-name.h: $(outdir)/errno-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "static const char* const errno_names[] = { "} !/EDEADLOCK/ && !/EWOULDBLOCK/ && !/ENOTSUP/ { printf "[%s] = \"%s\",\n", $$1, $$1 } END{print "};"}' <$< >$@
 
-$(outdir)/af-list.txt: | $(outdir)/.deps
+$(outdir)/af-list.txt: | $(outdir)/$(DEPDIR)
 	$(AM_V_GEN)$(CPP) $(sd.ALL_CPPFLAGS) -dM -include sys/socket.h - </dev/null | grep -v AF_UNSPEC | grep -v AF_MAX | $(AWK) '/^#define[ \t]+AF_[^ \t]+[ \t]+PF_[^ \t]/ { print $$2; }' >$@
 
 $(outdir)/af-to-name.h: $(outdir)/af-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "static const char* const af_names[] = { "} !/AF_FILE/ && !/AF_ROUTE/ && !/AF_LOCAL/ { printf "[%s] = \"%s\",\n", $$1, $$1 } END{print "};"}' <$< >$@
 
-$(outdir)/arphrd-list.txt: | $(outdir)/.deps
+$(outdir)/arphrd-list.txt: | $(outdir)/$(DEPDIR)
 	$(AM_V_GEN)$(CPP) $(sd.ALL_CPPFLAGS) -dM -include net/if_arp.h - </dev/null | $(AWK) '/^#define[ \t]+ARPHRD_[^ \t]+[ \t]+[^ \t]/ { print $$2; }' | sed -e 's/ARPHRD_//' >$@
 
 $(outdir)/arphrd-to-name.h: $(outdir)/arphrd-list.txt
@@ -259,7 +259,7 @@ $(outdir)/arphrd-to-name.h: $(outdir)/arphrd-list.txt
 $(outdir)/arphrd-from-name.gperf: $(outdir)/arphrd-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct arphrd_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { printf "%s, ARPHRD_%s\n", $$1, $$1 }' <$< >$@
 
-$(outdir)/cap-list.txt: | $(outdir)/.deps
+$(outdir)/cap-list.txt: | $(outdir)/$(DEPDIR)
 	$(AM_V_GEN)$(CPP) $(sd.ALL_CPPFLAGS) -dM -include linux/capability.h -include systemd-basic/missing.h - </dev/null | $(AWK) '/^#define[ \t]+CAP_[A-Z_]+[ \t]+/ { print $$2; }' | grep -v CAP_LAST_CAP >$@
 
 $(outdir)/cap-to-name.h: $(outdir)/cap-list.txt

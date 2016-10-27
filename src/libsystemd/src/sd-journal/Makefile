@@ -23,12 +23,12 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-audit_list_includes = -include linux/audit.h -include $(topsrcdir)/src/libsystemd-basic/include/systemd-basic/missing.h
+audit_list_includes = -include linux/audit.h -include systemd-basic/missing.h
 ifneq ($(HAVE_AUDIT),)
 audit_list_includes += -include libaudit.h
 endif # HAVE_AUDIT
 
-$(outdir)/audit_type-list.txt: $(call at.path,$(topsrcdir)/src/libsystemd-basic/include/systemd-basic/missing.h)
+$(outdir)/audit_type-list.txt: | $(outdir)/$(DEPDIR)
 	$(AM_V_GEN)$(CPP) $(sd.ALL_CPPFLAGS) -dM $(audit_list_includes) - </dev/null | grep -vE 'AUDIT_.*(FIRST|LAST)_' | $(SED) -r -n 's/^#define\s+AUDIT_(\w+)\s+([0-9]{4})\s*$$/\1\t\2/p' | sort -k2 >$@
 
 $(outdir)/audit_type-to-name.h: $(outdir)/audit_type-list.txt

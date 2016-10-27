@@ -26,7 +26,7 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 noinst_LTLIBRARIES += \
 	libudev-core.la
 
-$(outdir)/keyboard-keys-list.txt:
+$(outdir)/keyboard-keys-list.txt: | $(outdir)/$(DEPDIR)
 	$(AM_V_GEN)$(CPP) $(sd.ALL_CPPFLAGS) -dM -include linux/input.h - < /dev/null | $(AWK) '/^#define[ \t]+KEY_[^ ]+[ \t]+[0-9K]/ { if ($$2 != "KEY_MAX") { print $$2 } }' > $@
 
 $(outdir)/keyboard-keys-from-name.gperf: $(outdir)/keyboard-keys-list.txt
@@ -73,9 +73,9 @@ libudev_core_la_CFLAGS = \
 libudev_core_la_LIBADD = \
 	libsystemd-internal.la \
 	libsystemd-basic.la \
-	libsystemd-shared.la \
-	libsystemd-network.la \
 	libsystemd-staging.la \
+	libsystemd-network.la \
+	libsystemd-shared.la \
 	$(BLKID_LIBS) \
 	$(KMOD_LIBS)
 
