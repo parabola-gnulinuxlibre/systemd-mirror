@@ -1418,9 +1418,7 @@ CLEANFILES += \
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 
-#@src/libbasic/include/Makefile
-nested.subdirs += basic
-#@src/libbasic/include/systemd-basic/Makefile
+#@src/libbasic/src/Makefile
 src/basic/errno-list.txt:
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM -include errno.h - </dev/null | $(AWK) '/^#define[ \t]+E[^ _]+[ \t]+/ { print $$2; }' >$@
