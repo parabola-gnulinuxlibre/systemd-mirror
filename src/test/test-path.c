@@ -20,19 +20,20 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fs-util.h"
-#include "macro.h"
-#include "manager.h"
-#include "mkdir.h"
-#include "rm-rf.h"
-#include "string-util.h"
-#include "strv.h"
+#include "core/manager.h"
+#include "core/unit.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/tests.h"
+
 #include "test-helper.h"
-#include "tests.h"
-#include "unit.h"
-#include "util.h"
 
 typedef void (*test_function_t)(Manager *m);
 

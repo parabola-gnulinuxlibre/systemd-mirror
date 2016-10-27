@@ -19,16 +19,16 @@
 
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fileio.h"
-#include "fd-util.h"
-#include "fs-util.h"
-#include "macro.h"
-#include "mkdir.h"
-#include "rm-rf.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
 
 static void test_unlink_noerrno(void) {
         char name[] = "/tmp/test-close_nointr.XXXXXX";
