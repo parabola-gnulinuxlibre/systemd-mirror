@@ -766,14 +766,12 @@ breakup_makefile() (
 	    src/grp-udev/libudev-core/Makefile
 
 	ln -sT ../subdir.mk src/libsystemd/src/sd-network/Makefile
-	ln -sT ../subdir.mk src/libsystemd/src/sd-bus/Makefile
 	ln -sT ../subdir.mk src/libsystemd/src/sd-event/Makefile
 	ln -sT ../subdir.mk src/libsystemd/src/sd-login/Makefile
 	ln -sT ../subdir.mk src/libsystemd/src/sd-resolve/Makefile
 	ln -sT ../subdir.mk src/libsystemd/src/sd-daemon/Makefile
 	ln -sT ../subdir.mk src/libsystemd/src/sd-netlink/Makefile
 	ln -sT ../subdir.mk src/libsystemd/src/sd-id128/Makefile
-	ln -sT ../subdir.mk src/libsystemd/src/sd-hwdb/Makefile
 	ln -sT ../subdir.mk src/libsystemd/src/sd-device/Makefile
 )
 
