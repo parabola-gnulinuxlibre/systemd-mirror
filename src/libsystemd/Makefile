@@ -55,11 +55,6 @@ _pkginclude_HEADERS += \
 	src/systemd/sd-id128.h \
 	src/systemd/sd-daemon.h
 
-_pkginclude_HEADERS += \
-	src/systemd/sd-journal.h \
-	src/systemd/sd-messages.h \
-	src/systemd/_sd-common.h
-
 rootlib_LTLIBRARIES += \
 	libsystemd.la
 
@@ -85,6 +80,11 @@ tests += \
 	test-netlink \
 	test-local-addresses \
 	test-resolve
+
+_pkginclude_HEADERS += \
+	src/systemd/sd-journal.h \
+	src/systemd/sd-messages.h \
+	src/systemd/_sd-common.h
 
 $(outdir)/test-libsystemd-sym.c: \
 		$(srcdir)/include/systemd/sd-journal.h \

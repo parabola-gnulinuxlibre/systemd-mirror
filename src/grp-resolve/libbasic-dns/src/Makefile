@@ -32,9 +32,6 @@ $(outdir)/dns_type-to-name.h: $(outdir)/dns_type-list.txt
 $(outdir)/dns_type-from-name.gperf: $(outdir)/dns_type-list.txt
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "struct dns_type_name { const char* name; int id; };"; print "%null-strings"; print "%%";} { s=$$1; sub(/_/, "-", s); printf "%s, ", $$s; printf "DNS_TYPE_%s\n", $$1 }' <$< >$@
 
-gperf_txt_sources += \
-	src/resolve/dns_type-list.txt
-
 libbasic_dns_la_SOURCES = \
 	src/resolve/resolved-dns-dnssec.c \
 	src/resolve/resolved-dns-dnssec.h \
@@ -48,6 +45,9 @@ libbasic_dns_la_SOURCES = \
 	src/resolve/resolved-dns-question.h \
 	src/resolve/dns-type.c \
 	src/resolve/dns-type.h
+
+gperf_txt_sources += \
+	src/resolve/dns_type-list.txt
 
 noinst_LTLIBRARIES = libbasic-dns.la
 libbasic_dns_la_LIBADD += \
