@@ -19,11 +19,11 @@
 
 #include <stdlib.h>
 
-#include "alloc-util.h"
-#include "prioq.h"
-#include "set.h"
-#include "siphash24.h"
-#include "util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/prioq.h"
+#include "systemd-basic/set.h"
+#include "systemd-basic/siphash24.h"
+#include "systemd-basic/util.h"
 
 #define SET_SIZE 1024*4
 
