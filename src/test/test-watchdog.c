@@ -19,8 +19,8 @@
 
 #include <unistd.h>
 
-#include "log.h"
-#include "watchdog.h"
+#include "systemd-basic/log.h"
+#include "systemd-shared/watchdog.h"
 
 int main(int argc, char *argv[]) {
         usec_t t = 10 * USEC_PER_SEC;
