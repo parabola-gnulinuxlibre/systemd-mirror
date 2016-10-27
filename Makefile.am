@@ -6861,13 +6861,16 @@ sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
 #@src/grp-machine/Makefile
 #@src/grp-machine/grp-import/Makefile
 #@src/grp-machine/grp-import/libimport/Makefile
+#@src/grp-machine/libmachine-core/Makefile
 #@src/grp-resolve/Makefile
 #@src/grp-resolve/libbasic-dns/Makefile
 #@src/grp-resolve/libbasic-dns/test/Makefile
 #@src/grp-system/Makefile
 #@src/grp-system/grp-utils/Makefile
+#@src/grp-system/libcore/Makefile
 #@src/grp-timedate/Makefile
 #@src/grp-utils/Makefile
+#@src/libsystemd-firewall/Makefile
 #@src/libsystemd-gcrypt/Makefile
 #@src/libsystemd-gcrypt/src/Makefile
 #@src/libsystemd/src/sd-bus/Makefile
