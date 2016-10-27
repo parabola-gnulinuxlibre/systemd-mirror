@@ -780,19 +780,23 @@ fixup_makefile() {
 	    -e '#### Specific complete strings #####' \
 	    -e 's|\$\(CPP\) \$\(CFLAGS\) \$\(AM_CPPFLAGS\) \$\(CPPFLAGS\)|$(CPP) $(sd.ALL_CPPFLAGS)|g' \
 	    -e '/^	\$\(AM_V_at\)\$\(MKDIR_P\) \$\(dir \$@\)/d' \
+	    \
 	    -e '#### General cases #################' \
 	    -e '/^[^#	]*:/ { s|^(\s*)\S+/|\1$(outdir)/| }' \
 	    -e 's|^if (.*)|ifneq ($(\1),)|' \
 	    -e '/^\s*\$\(AM_(C|CPP|LD)FLAGS\b/d' \
 	    -e 's|--version-script=.*/([^/]+)\.sym|--version-script=$(srcdir)/\1.sym|g' \
+	    \
 	    -e '#### Rename helpers ################' \
 	    -e 's|libbasic_la|libsystemd_basic_la|g' \
 	    -e 's|libbasic|libsystemd-basic|g' \
-	    -e 's|libshared|libsystemd-shared|g' \
+	    -e 's|libsystemd-basic-dns|libbasic-dns|g' \
+	    \
 	    -e 's|libshared_la|libsystemd_shared_la|g' \
-	    -e 's|libfirewall|libsystemd-firewall|g' \
+	    -e 's|libshared|libsystemd-shared|g' \
+	    \
 	    -e 's|libfirewall_la|libsystemd_firewall_la|g' \
-	    -e 's|libsystemd-basic-dns|libbasic-dns|g'
+	    -e 's|libfirewall|libsystemd-firewall|g'
 }
 
 breakup_zshcompletion() (
