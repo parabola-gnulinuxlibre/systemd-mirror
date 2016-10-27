@@ -852,9 +852,9 @@ main() {
 
 	git add .
 	git commit -m './tools/notsd-move'
-	git merge -s ours notsystemd/postmove
+	git merge --no-edit -s ours notsystemd/postmove
 	git checkout notsystemd/postmove
-	git merge --no-edit tmp/postmove
+	git merge tmp/postmove
 	git branch -d tmp/postmove
 }
 
