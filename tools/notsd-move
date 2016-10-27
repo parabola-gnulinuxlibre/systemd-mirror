@@ -760,7 +760,7 @@ breakup_makefile() (
 
 	sed -ri \
 	    -e '/^[^#	]*:/ { s|\S+/|$(outdir)/|g }' \
-	    src/libsystemd-basic/include/systemd-basic/Makefile \
+	    src/libsystemd-basic/src/Makefile \
 	    src/libsystemd/src/Makefile \
 	    src/libsystemd/src/sd-journal/Makefile \
 	    src/grp-udev/libudev-core/Makefile
