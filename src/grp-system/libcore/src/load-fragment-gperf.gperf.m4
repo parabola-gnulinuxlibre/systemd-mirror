@@ -1,10 +1,9 @@
 %{
 #include <stddef.h>
 
+#include "core/load-fragment.h"
 #include "systemd-basic/missing.h"
 #include "systemd-shared/conf-parser.h"
-
-#include "core/load-fragment.h"
 %}
 struct ConfigPerfItem;
 %null_strings

@@ -42,7 +42,6 @@ nested.subdirs += libsystemd
 nested.subdirs += libsystemd-basic
 nested.subdirs += libsystemd-firewall
 nested.subdirs += libsystemd-gcrypt
-nested.subdirs += libsystemd-microhttpd
 nested.subdirs += libsystemd-network
 nested.subdirs += libsystemd-shared
 nested.subdirs += libudev

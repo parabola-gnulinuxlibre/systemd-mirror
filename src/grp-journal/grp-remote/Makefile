@@ -23,6 +23,7 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+nested.subdirs += libsystemd-microhttpd
 nested.subdirs += systemd-journal-gatewayd
 nested.subdirs += systemd-journal-remote
 nested.subdirs += systemd-journal-upload

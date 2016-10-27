@@ -29,7 +29,6 @@
 !/build-aux/Makefile*
 !/build-aux/write-atomic
 !/build-aux/write-ifchanged
-!/build-aux/no-builtin-variables.mk
 /busctl
 /cdrom_id
 /collect
