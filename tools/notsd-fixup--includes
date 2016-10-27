@@ -231,41 +231,56 @@ class IncludeSection:
 ################################################################
 # The main program loop
 
-def phase0(cache, filename, line, file=sys.stdout):
-    global phase
-    phase = phase0
+class Parser:
+    def __init__(self, cache, ifilename, ofilename):
+        self.cache = cache
+        self.ifilename = os.path.normpath(ifilename)
+        self.ofilename = ofilename
 
-    if re.fullmatch('#include.*|typedef .*;', line):
-        global includes
-        includes = IncludeSection()
-        phase1(cache, filename, line)
-    else:
-        print(line, file=file)
+        self.includes = None
+        self.phase = self.phase0
 
-def phase1(cache, filename, line, file=sys.stdout):
-    global phase, includes
-    phase = phase1
+    def phase0(self, line, ofile):
+        self.phase = self.phase0
 
-    if line == '':
-        includes.trailing_nl += '\n'
-    elif line.startswith('#include'):
-        includes.trailing_nl = ''
-        match = re.fullmatch('^#include [<"]([^">]*)[">](.*)', line)
-        if match:
-            group, path = classify(cache, filename, match.group(1))
-            includes.add(group, path, match.group(2))
+        if re.fullmatch('#include.*|typedef .*;', line):
+            self.includes = IncludeSection()
+            self.phase1(line, ofile)
         else:
-            sys.exit('panic: malformed #include line')
-    elif re.fullmatch('typedef .*;', line):
-        includes.trailing_nl = ''
-        includes.typedef.append(line)
-    else:
-        includes.print(file=file)
-        includes = None
-        phase0(cache, filename, line, file=file)
+            print(line, file=ofile)
 
-includes = None
-phase = phase0
+    def phase1(self, line, ofile):
+        self.phase = self.phase1
+
+        if line == '':
+            self.includes.trailing_nl += '\n'
+        elif line.startswith('#include'):
+            self.includes.trailing_nl = ''
+            match = re.fullmatch('^#include [<"]([^">]*)[">](.*)', line)
+            if match:
+                group, path = classify(self.cache, self.ifilename, match.group(1))
+                self.includes.add(group, path, match.group(2))
+            else:
+                sys.exit('panic: malformed #include line')
+        elif re.fullmatch('typedef .*;', line):
+            self.includes.trailing_nl = ''
+            self.includes.typedef.append(line)
+        else:
+            self.includes.print(file=ofile)
+            self.includes = None
+            self.phase0(line, ofile)
+
+    def run(self):
+        print(' => {0} {1}'.format(
+            shlex.quote(__file__),
+            shlex.quote(self.ifilename),
+        ), file=sys.stderr)
+        with open(self.ofilename, 'w') as ofile:
+            with open(self.ifilename) as ifile:
+                for line in ifile:
+                    self.phase(line.rstrip('\n'), ofile)
+            if self.includes:
+                self.includes.print(file=ofile)
 
 def main(argv):
     cache = Cache(__file__+'.cache')
@@ -279,16 +294,7 @@ def main(argv):
     atexit.register(cleanup)
     for filename in argv[1:]:
         tmpfilename = os.path.join(os.path.dirname(filename), '.tmp.'+os.path.basename(filename)+'.tmp')
-        print(' => {0} {1}'.format(
-            shlex.quote(__file__),
-            shlex.quote(filename),
-        ), file=sys.stderr)
-        with open(tmpfilename, 'w') as tmpfile:
-            with open(filename) as f:
-                for line in f:
-                    phase(cache, filename, line.rstrip('\n'), file=tmpfile)
-            if includes:
-                includes.print(file=tmpfile)
+        Parser(cache, filename, tmpfilename).run()
         if not filecmp.cmp(filename, tmpfilename):
             os.rename(tmpfilename, filename)
         cleanup()
