@@ -5650,7 +5650,7 @@ dist_bashcompletion_data += \
 dist_zshcompletion_data += \
 	shell-completion/zsh/_systemd-resolve
 
-#@src/grp-resolve/libbasic-dns/src/Makefile
+#@src/grp-resolve/libbasic-dns/test/Makefile
 tests += \
 	test-dns-packet \
 	test-resolve-tables \
@@ -5728,7 +5728,7 @@ test_dnssec_complex_LDADD = \
 
 #@auto/systemd-resolved/Makefile
 endif # ENABLE_RESOLVED
-#@auto/libbasic-dns/Makefile
+#@src/grp-resolve/libbasic-dns/src/Makefile
 
 gperf_txt_sources += \
 	src/resolve/dns_type-list.txt
@@ -6829,7 +6829,6 @@ sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
 #@src/grp-machine/libmachine-core/Makefile
 #@src/grp-resolve/Makefile
 #@src/grp-resolve/libbasic-dns/Makefile
-#@src/grp-resolve/libbasic-dns/test/Makefile
 #@src/grp-system/Makefile
 #@src/grp-system/grp-utils/Makefile
 #@src/grp-system/libcore/Makefile
