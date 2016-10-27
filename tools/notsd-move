@@ -48,7 +48,6 @@ grp() {
 
 move_files() (
 	# first focus on getting directories to the right names.
-	mv -T src/{,systemd-}dbus1-generator
 	mv -T src/{,systemd-}debug-generator
 	mv -T src/{,systemd-}fstab-generator
 	mv -T src/{,systemd-}getty-generator
@@ -831,6 +830,7 @@ run() (
 
 move() (
 	find . \( -name Makefile -o -name '*.mk' \) -delete
+	find src -type d -empty -exec rmdir -p --ignore-fail-on-non-empty -- {} +
 
 	>&2 echo ' => breakup_zshcompletion'
 	run breakup_zshcompletion
