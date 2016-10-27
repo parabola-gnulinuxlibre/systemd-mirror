@@ -4460,12 +4460,13 @@ tests += \
 	test-compress-benchmark
 endif # HAVE_COMPRESSION
 
-#@src/libsystemd/src/Makefile
+#@src/libsystemd/Makefile
 pkginclude_HEADERS += \
 	src/systemd/sd-journal.h \
 	src/systemd/sd-messages.h \
 	src/systemd/_sd-common.h
 
+#@src/libsystemd/src/Makefile
 libsystemd_journal_internal_la_SOURCES = \
 	src/journal/sd-journal.c \
 	src/systemd/sd-journal.h \
@@ -5496,6 +5497,7 @@ EXTRA_DIST += \
 #@auto/systemd-resolved/Makefile -----------------------------------------------
 if ENABLE_RESOLVED
 
+#@src/grp-resolve/libbasic-dns/src/Makefile
 basic_dns_sources = \
 	src/resolve/resolved-dns-dnssec.c \
 	src/resolve/resolved-dns-dnssec.h \
@@ -5510,6 +5512,7 @@ basic_dns_sources = \
 	src/resolve/dns-type.c \
 	src/resolve/dns-type.h
 
+#@auto/systemd-resolved/Makefile
 systemd_resolved_SOURCES = \
 	src/resolve/resolved.c \
 	src/resolve/resolved-manager.c \
