@@ -5213,6 +5213,7 @@ systemd_machined_LDADD = \
 rootlibexec_PROGRAMS += \
 	systemd-machined
 
+#@src/grp-machine/libmachine-core/src/Makefile
 libmachine_core_la_SOURCES = \
 	src/machine/machine.c \
 	src/machine/machine.h \
@@ -6825,7 +6826,6 @@ sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
 #@src/grp-machine/Makefile
 #@src/grp-machine/grp-import/Makefile
 #@src/grp-machine/grp-import/libimport/Makefile
-#@src/grp-machine/libmachine-core/src/Makefile
 #@src/grp-resolve/Makefile
 #@src/grp-resolve/libbasic-dns/Makefile
 #@src/grp-resolve/libbasic-dns/src/Makefile
