@@ -42,7 +42,7 @@ test_resolve_tables_CFLAGS = \
 	$(GCRYPT_CFLAGS)
 
 test_resolve_tables_LDADD = \
-        libbasic-dns.la \
+	libbasic-dns.la \
 	libsystemd-shared.la \
 	$(GCRYPT_LIBS) \
 	-lm
@@ -58,7 +58,8 @@ test_dns_packet_CFLAGS = \
 	$(GCRYPT_CFLAGS)
 
 test_dns_packet_LDADD = \
-        libbasic-dns.la \
+	libbasic-dns.la \
+	libsystemd-shared.la \
 	$(GCRYPT_LIBS) \
 	-lm
 
@@ -83,7 +84,7 @@ test_dnssec_CFLAGS = \
 	$(GCRYPT_CFLAGS)
 
 test_dnssec_LDADD = \
-        libbasic-dns.la \
+	libbasic-dns.la \
 	libsystemd-shared.la \
 	$(GCRYPT_LIBS) \
 	-lm

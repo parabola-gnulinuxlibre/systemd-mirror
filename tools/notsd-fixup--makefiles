@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+doit() {
+        local filename=$1
+	{
+		<"$filename" sed -r \
+		 -e "s|(/\.\.)*/config.mk|/$(realpath -ms --relative-to="$(dirname -- "$filename")" config.mk)|" \
+		 -e '/^nested\.subdirs/d' \
+		 -e '/^include \$\(topsrcdir\)\/build-aux\/Makefile\.tail\.mk$/d'
+		echo
+		find "$(dirname "$filename")" -mindepth 2 -maxdepth 2 -name Makefile -print0 |
+		    xargs -r0 dirname -z -- |
+		    xargs -r0 basename -a -z |
+		    xargs -r0 printf 'nested.subdirs += %s\n' | sort
+		echo
+		echo 'include $(topsrcdir)/build-aux/Makefile.tail.mk'
+	} | cat -s | build-aux/write-ifchanged "$filename"
+}
+
+main() {
+	set -e
+	set -o pipefail
+        local filename
+        for filename in "$@"; do
+		>&2 printf ' => %q %q\n' "$0" "$filename"
+                doit "$filename"
+        done
+}
+
+main "$@"

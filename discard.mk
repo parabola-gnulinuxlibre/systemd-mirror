@@ -737,7 +737,7 @@ test_nss_SOURCES = \
 
 test_nss_LDADD = \
 	libsystemd-internal.la \
-	libbasic.la \
+	libsystemd-basic.la \
 	-ldl
 
 manual_tests += \

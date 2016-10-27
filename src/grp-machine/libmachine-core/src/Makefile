@@ -41,13 +41,4 @@ libmachine_core_la_LIBADD = \
 noinst_LTLIBRARIES += \
 	libmachine-core.la
 
-test_machine_tables_SOURCES = \
-	src/machine/test-machine-tables.c
-
-test_machine_tables_LDADD = \
-	libmachine-core.la
-
-tests += \
-	test-machine-tables
-
 include $(topsrcdir)/build-aux/Makefile.tail.mk

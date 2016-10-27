@@ -192,7 +192,6 @@ dist_systempreset_DATA = \
 
 nested.subdirs += grp-remote
 nested.subdirs += journalctl
-nested.subdirs += libjournal-core
 nested.subdirs += systemd-cat
 nested.subdirs += systemd-journald
 

@@ -367,7 +367,7 @@ test_copy_SOURCES = \
 
 # Link statically to ensure file is large
 test_copy_LDADD = \
-	libshared.la
+	libsystemd-shared.la
 
 test_sigbus_SOURCES = \
 	src/test/test-sigbus.c
@@ -737,7 +737,7 @@ test_firewall_util_CFLAGS = \
 	$(LIBIPTC_CFLAGS)
 
 test_firewall_util_LDADD = \
-	libfirewall.la \
+	libsystemd-firewall.la \
 	libsystemd-shared.la \
 	$(LIBIPTC_LIBS)
 endif # HAVE_LIBIPTC

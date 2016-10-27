@@ -135,6 +135,8 @@ libsystemd_shared_la_CFLAGS = \
 
 libsystemd_shared_la_LIBADD = \
 	libsystemd-internal.la \
+	libsystemd-basic.la \
+	libsystemd-journal-internal.la \
 	libudev-internal.la \
 	$(ACL_LIBS) \
 	$(LIBIDN_LIBS) \
@@ -145,6 +147,15 @@ libsystemd_shared_la_CFLAGS = \
 	$(LIBIDN_CFLAGS) \
 	$(SECCOMP_CFLAGS) \
 	-fvisibility=default
+
+libsystemd_shared_la_LIBADD = \
+	$(libsystemd_basic_la_LIBADD) \
+	$(libsystemd_internal_la_LIBADD) \
+	$(libsystemd_journal_internal_la_LIBADD) \
+	$(libudev_internal_la_LIBADD) \
+	$(ACL_LIBS) \
+	$(LIBIDN_LIBS) \
+	$(SECCOMP_LIBS)
 
 libsystemd_shared_la_LDFLAGS = \
 	-release $(PACKAGE_VERSION)

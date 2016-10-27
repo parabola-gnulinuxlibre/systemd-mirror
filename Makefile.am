@@ -1209,7 +1209,7 @@ libsystemd_shared_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
 	-release $(PACKAGE_VERSION)
 
-#@auto/libfirewall/Makefile ----------------------------------------------------
+#@src/libsystemd-firewall/src/Makefile -----------------------------------------
 if HAVE_LIBIPTC
 noinst_LTLIBRARIES += \
 	libfirewall.la
@@ -1235,7 +1235,7 @@ SYSINIT_TARGET_WANTS += \
 	ldconfig.service
 endif # ENABLE_LDCONFIG
 
-#@auto/libcore/Makefile --------------------------------------------------------
+#@src/grp-system/libcore/src/Makefile ------------------------------------------
 noinst_LTLIBRARIES += \
 	libcore.la
 
@@ -1418,9 +1418,7 @@ CLEANFILES += \
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GPERF)$(GPERF) -L ANSI-C -t --ignore-case -N lookup_$(notdir $*) -H hash_$(notdir $*)_name -p -C <$< >$@
 
-#@src/libbasic/include/Makefile
-nested.subdirs += basic
-#@src/libbasic/include/systemd-basic/Makefile
+#@src/libbasic/src/Makefile
 src/basic/errno-list.txt:
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(CPP) $(CFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) -dM -include errno.h - </dev/null | $(AWK) '/^#define[ \t]+E[^ _]+[ \t]+/ { print $$2; }' >$@
@@ -1482,7 +1480,7 @@ src/journal/audit_type-to-name.h: src/journal/audit_type-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
 
-#@auto/libbasic-dns/Makefile
+#@src/grp-resolve/libbasic-dns/src/Makefile
 
 src/resolve/dns_type-list.txt: src/resolve/dns-type.h
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -4380,7 +4378,7 @@ test_audit_type_SOURCES = \
 test_audit_type_LDADD = \
 	libjournal-core.la
 
-#@auto/libjournal-core/Makefile
+#@src/grp-journal/libjournal-core/src/Makefile
 libjournal_core_la_SOURCES = \
 	src/journal/journald-kmsg.c \
 	src/journal/journald-kmsg.h \
@@ -5215,6 +5213,7 @@ systemd_machined_LDADD = \
 rootlibexec_PROGRAMS += \
 	systemd-machined
 
+#@src/grp-machine/libmachine-core/src/Makefile
 libmachine_core_la_SOURCES = \
 	src/machine/machine.c \
 	src/machine/machine.h \
@@ -5242,7 +5241,7 @@ machinectl_LDADD = \
 rootbin_PROGRAMS += \
 	machinectl
 
-#@auto/systemd-machined/Makefile
+#@src/grp-machine/libmachine-core/test/Makefile
 test_machine_tables_SOURCES = \
 	src/machine/test-machine-tables.c
 
@@ -5252,6 +5251,7 @@ test_machine_tables_LDADD = \
 tests += \
 	test-machine-tables
 
+#@auto/systemd-machined/Makefile
 nodist_systemunit_DATA += \
 	units/systemd-machined.service
 
@@ -5650,7 +5650,7 @@ dist_bashcompletion_data += \
 dist_zshcompletion_data += \
 	shell-completion/zsh/_systemd-resolve
 
-#@auto/libbasic-dns/Makefile
+#@src/grp-resolve/libbasic-dns/test/Makefile
 tests += \
 	test-dns-packet \
 	test-resolve-tables \
@@ -5728,7 +5728,7 @@ test_dnssec_complex_LDADD = \
 
 #@auto/systemd-resolved/Makefile
 endif # ENABLE_RESOLVED
-#@auto/libbasic-dns/Makefile
+#@src/grp-resolve/libbasic-dns/src/Makefile
 
 gperf_txt_sources += \
 	src/resolve/dns_type-list.txt
@@ -6820,17 +6820,25 @@ sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
 #@src/grp-initprogs/Makefile
 #@src/grp-initprogs/grp-sleep/Makefile
 #@src/grp-journal/grp-remote/Makefile
+#@src/grp-journal/grp-remote/libsystemd-microhttpd/Makefile
+#@src/grp-journal/grp-remote/libsystemd-microhttpd/src/Makefile
 #@src/grp-locale/Makefile
 #@src/grp-machine/Makefile
 #@src/grp-machine/grp-import/Makefile
 #@src/grp-machine/grp-import/libimport/Makefile
+#@src/grp-machine/libmachine-core/Makefile
 #@src/grp-resolve/Makefile
 #@src/grp-resolve/libbasic-dns/Makefile
 #@src/grp-system/Makefile
 #@src/grp-system/grp-utils/Makefile
+#@src/grp-system/libcore/Makefile
 #@src/grp-timedate/Makefile
 #@src/grp-utils/Makefile
-#@src/libudev/Makefile
+#@src/libsystemd-firewall/Makefile
+#@src/libsystemd-gcrypt/Makefile
+#@src/libsystemd-gcrypt/src/Makefile
+#@src/libsystemd/src/sd-bus/Makefile
+#@src/libsystemd/src/sd-hwdb/Makefile
 #@all
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
