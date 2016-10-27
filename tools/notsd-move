@@ -710,6 +710,10 @@ move_files() (
 	done
 	rmdir system-preset
 
+	mv -t src/libsystemd/src/sd-bus \
+	   src/libsystemd-shared/src/bus-util.c \
+	   src/libsystemd-shared/include/systemd-shared/bus-util.h
+
 	ln -srT src/libsystemd/include/systemd/_sd-common.h src/libsystemd-network/include/systemd-network/_sd-common.h
 	ln -srT src/libsystemd/include/systemd/_sd-common.h src/grp-utils/systemd-path/_sd-common.h
 	ln -srT src/grp-login/systemd-logind/logind-acl.h   src/grp-udev/libudev-core/logind-acl.h
