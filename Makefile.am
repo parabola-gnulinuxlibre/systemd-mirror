@@ -1209,7 +1209,7 @@ libsystemd_shared_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
 	-release $(PACKAGE_VERSION)
 
-#@auto/libfirewall/Makefile ----------------------------------------------------
+#@src/libsystemd-firewall/src/Makefile -----------------------------------------
 if HAVE_LIBIPTC
 noinst_LTLIBRARIES += \
 	libfirewall.la
@@ -1235,7 +1235,7 @@ SYSINIT_TARGET_WANTS += \
 	ldconfig.service
 endif # ENABLE_LDCONFIG
 
-#@auto/libcore/Makefile --------------------------------------------------------
+#@src/grp-system/libcore/src/Makefile ------------------------------------------
 noinst_LTLIBRARIES += \
 	libcore.la
 
@@ -1480,7 +1480,7 @@ src/journal/audit_type-to-name.h: src/journal/audit_type-list.txt
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN)$(AWK) 'BEGIN{ print "const char *audit_type_to_string(int type) {\n\tswitch(type) {" } {printf "        case AUDIT_%s: return \"%s\";\n", $$1, $$1 } END{ print "        default: return NULL;\n\t}\n}\n" }' <$< >$@
 
-#@auto/libbasic-dns/Makefile
+#@src/grp-resolve/libbasic-dns/src/Makefile
 
 src/resolve/dns_type-list.txt: src/resolve/dns-type.h
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -4378,7 +4378,7 @@ test_audit_type_SOURCES = \
 test_audit_type_LDADD = \
 	libjournal-core.la
 
-#@auto/libjournal-core/Makefile
+#@src/grp-journal/libjournal-core/src/Makefile
 libjournal_core_la_SOURCES = \
 	src/journal/journald-kmsg.c \
 	src/journal/journald-kmsg.h \
@@ -5241,7 +5241,7 @@ machinectl_LDADD = \
 rootbin_PROGRAMS += \
 	machinectl
 
-#@auto/systemd-machined/Makefile
+#@src/grp-machine/libmachine-core/test/Makefile
 test_machine_tables_SOURCES = \
 	src/machine/test-machine-tables.c
 
@@ -5251,6 +5251,7 @@ test_machine_tables_LDADD = \
 tests += \
 	test-machine-tables
 
+#@auto/systemd-machined/Makefile
 nodist_systemunit_DATA += \
 	units/systemd-machined.service
 
@@ -5649,7 +5650,7 @@ dist_bashcompletion_data += \
 dist_zshcompletion_data += \
 	shell-completion/zsh/_systemd-resolve
 
-#@auto/libbasic-dns/Makefile
+#@src/grp-resolve/libbasic-dns/src/Makefile
 tests += \
 	test-dns-packet \
 	test-resolve-tables \
@@ -6821,26 +6822,21 @@ sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
 #@src/grp-journal/grp-remote/Makefile
 #@src/grp-journal/grp-remote/libsystemd-microhttpd/Makefile
 #@src/grp-journal/grp-remote/libsystemd-microhttpd/src/Makefile
-#@src/grp-journal/libjournal-core/src/Makefile
 #@src/grp-locale/Makefile
 #@src/grp-machine/Makefile
 #@src/grp-machine/grp-import/Makefile
 #@src/grp-machine/grp-import/libimport/Makefile
 #@src/grp-resolve/Makefile
 #@src/grp-resolve/libbasic-dns/Makefile
-#@src/grp-resolve/libbasic-dns/src/Makefile
 #@src/grp-resolve/libbasic-dns/test/Makefile
 #@src/grp-system/Makefile
 #@src/grp-system/grp-utils/Makefile
-#@src/grp-system/libcore/src/Makefile
 #@src/grp-timedate/Makefile
 #@src/grp-utils/Makefile
-#@src/libsystemd-firewall/src/Makefile
 #@src/libsystemd-gcrypt/Makefile
 #@src/libsystemd-gcrypt/src/Makefile
 #@src/libsystemd/src/sd-bus/Makefile
 #@src/libsystemd/src/sd-hwdb/Makefile
-#@src/libudev/Makefile
 #@all
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
