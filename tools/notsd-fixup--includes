@@ -209,7 +209,7 @@ class IncludeSection:
             b='\n'
         if len(self.typedef) > 0 and self.typedef_last:
             print(b, end='', file=file)
-            for line in sorted(set(self.typedef)):
+            for line in self.typedef:
                 print(line, file=file)
         print(self.trailing_nl, end='', file=file)
     def add(self, group, path, extra):
