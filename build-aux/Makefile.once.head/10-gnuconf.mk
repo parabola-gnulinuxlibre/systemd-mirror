@@ -13,10 +13,21 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# This file is based on §7.2 "Makefile Conventions" of the release of
-# the GNU Coding Standards dated July 25, 2016.
-
 mod.gnuconf.description = GNU standard configuration variables
+define mod.gnuconf.doc
+# Inputs:
+#   - Global variable: `gnuconf.pkgname`
+#      (Default: `$(firstword $(PACKAGE_TARNAME) $(PACKAGE) $(PACKAGE_NAME))`)
+# Outputs:
+#   (see below)
+#
+# This module defines default values (using `?=`) a huge list of
+# variables specified in the GNU Coding Standards that installing-users
+# expect to be able to set.
+#
+# This is based on §7.2 "Makefile Conventions" of the July 25, 2016
+# release of the GNU Coding Standards.
+endef
 
 gnuconf.pkgname ?= $(firstword $(PACKAGE_TARNAME) $(PACKAGE) $(PACKAGE_NAME))
 ifeq ($(gnuconf.pkgname),)

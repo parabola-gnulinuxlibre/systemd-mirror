@@ -15,6 +15,45 @@
 
 mod.files.description = Keeping track of groups of files
 mod.files.depends += nested
+define mod.files.doc
+# User variables:
+#   - `DESTDIR ?=`
+#   - `RM      ?= rm -f`
+#   - `RMDIR_P ?= rmdir -p --ignore-fail-on-non-empty`
+#   - `TRUE    ?= true`
+# Inputs:
+#   - Global variable    : `files.groups   ?= all`
+#   - Global variable    : `files.default  ?= all`
+#   - Global variable    : `files.vcsclean ?= files.vcsclean`
+#   - Global variable    : `files.generate ?= files.generate`
+#   - Directory variable : `files.src.src`
+#   - Directory variable : `files.src.int`
+#   - Directory variable : `files.src.cfg`
+#   - Directory variable : `files.src.gen`
+#   - Directory variable : `files.out.slow`
+#   - Directory variable : `files.out.int`
+#   - Directory variable : `files.out.cfg`
+#   - Directory variable : `files.out.$(files.groups)` (well, $(addprefix...))
+#   - Directory variable : `files.sys.$(files.groups)` (well, $(addprefix...))
+# Outputs:
+#   - Global variable : `nested.targets`
+#   - Global variable : `at.targets`
+#   - Global variable : `.DEFAULT_GOAL = $(files.default)`
+#   - Creative .PHONY targets:
+#     - `$(outdir)/$(files.generate))`
+#     - `$(addprefix $(outdir)/,$(files.groups))`
+#     - `$(outdir)/installdirs`
+#     - `$(outdir)/install`
+#   - Destructive .PHONY targets:
+#     - `$(outdir)/uninstall`
+#     - `$(outdir)/mostlyclean`
+#     - `$(outdir)/clean`
+#     - `$(outdir)/distclean`
+#     - `$(outdir)/maintainer-clean`
+#     - `$(outdir)/$(files.vcsclean)`
+#
+# TODO: prose documentation
+endef
 
 files.groups ?= all
 files.default ?= all

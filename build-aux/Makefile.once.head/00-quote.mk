@@ -14,6 +14,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 mod.quote.description = Macros to quote tricky strings
+define mod.quote.doc
+# Inputs:
+#   (none)
+# Outputs:
+#   - Global variable: `quote.var`       : GNU Make variables
+#   - Global variable: `quote.pattern`   : GNU Make patterns
+#   - Global variable: `quote.ere`       : POSIX Extended Regular Expressions
+#   - Global variable: `quote.bre`       : POSIX Basic Regular Expressions
+#   - Global variable: `quote.shell`     : POSIX sh(1) strings
+#   - Global variable: `quote.shell-each`: POSIX sh(1) strings
+#
+# Escaping/quoting things is hard!  This module provides a number of
+# functions to escape/quote strings for various contexts.
+#
+# `quote.shell-each` quotes each list-item separately (munging
+# whitespace), while `quote.shell` keeps them as one string (preserving
+# whitespace).
+endef
 
 _quote.backslash = $(if $1,$(call _quote.backslash,$(wordlist 2,$(words $1),$1),$(subst $(firstword $1),\$(firstword $1),$2)),$2)
 
@@ -24,6 +42,7 @@ quote.bre     = $(call _quote.backslash, \ ^ . [ $$       *       ,$1)
 
 quote.shell-each = $(foreach _quote.tmp,$1,$(call quote.shell,$(_quote.tmp)))
 
-# I put this as the last line in the file because it confuses Emacs syntax
-# highlighting and makes the remainder of the file difficult to edit.
+# I put this as the last line in the file because it confuses Emacs
+# syntax highlighting and makes the remainder of the file difficult to
+# edit.
 quote.shell = $(subst $(at.nl),'$$'\n'','$(subst ','\'',$1)')

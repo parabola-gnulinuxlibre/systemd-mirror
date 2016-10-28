@@ -29,12 +29,15 @@ at.targets += $(addprefix $(outdir)/, at-variables-global at-variables-local at-
 
 $(outdir)/at-modules:
 	@printf 'Autothing modules used in this project:\n'
-	@printf ' - %s\n' $(foreach _mod.tmp,$(_mod.modules),$(call quote.shell,$(_mod.tmp)	$(mod.$(_mod.tmp).description)))|column -t -s $$'\t'
+	@printf ' - %s\n' $(foreach _mod.tmp,$(_mod.modules),$(call quote.shell,$(_mod.tmp)	$(mod.$(_mod.tmp).description)	$(if $(value mod.$(_mod.tmp).doc),(more))))|column -t -s $$'\t'
 $(addprefix $(outdir)/at-modules/,$(_mod.modules)): $(outdir)/at-modules/%:
-	@printf 'Name           : %s\n' $(call quote.shell,$*)
-	@printf 'Description    : %s\n' $(call quote.shell,$(mod.$*.description))
-	@echo   'Contains Files :' $(call quote.shell-each,$(call at.relto,$(topsrcdir),$(sort $(mod.$*.files) $(wildcard $(topsrcdir)/build-aux/Makefile.*/??-$*.mk))))
-	@echo   'Depends on     :' $(mod.$*.depends)
+	@printf 'Name          : %s\n' $(call quote.shell,$*)
+	@printf 'Description   : %s\n' $(call quote.shell,$(mod.$*.description))
+	@echo   'Depends on    :' $(sort $(mod.$*.depends))
+	@echo   'Files         :'
+	@printf '  %s\n' $(call quote.shell-each,$(call at.relto,$(topsrcdir),$(sort $(mod.$*.files) $(wildcard $(topsrcdir)/build-aux/Makefile.*/??-$*.mk))))
+	@echo   'Documentation :'
+	@printf '%s\n' $(call quote.shell,$(value mod.$*.doc)) | sed -e 's/^# /  /' -e 's/^#//'
 
 $(outdir)/at-noop:
 .PHONY:       $(outdir)/at-noop

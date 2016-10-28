@@ -15,6 +15,28 @@
 
 mod.mod.description = Display information about Autothing modules
 mod.mod.depends += quote
+define mod.mod.doc
+# Inputs:
+#   - Files           : `$(topsrcdir)/build-aux/Makefile.*/??-*.mk`
+#   - Global variable : `mod.*.name`
+#   - Global variable : `mod.*.description`
+#   - Global variable : `mod.*.depends`
+#   - Global variable : `mod.*.files`
+#   - Global variable : `mod.*.doc`
+# Outputs:
+#   - Directory variable : `at.targets`
+#   - .PHONY Target      : `$(outdir)/at-variables-local`
+#   - .PHONY Target      : `$(outdir)/at-variables-global`
+#   - .PHONY Target      : `$(outdir)/at-variables`
+#   - .PHONY Target      : `$(outdir)/at-variables/%`
+#   - .PHONY Target      : `$(outdir)/at-values`
+#   - .PHONY Target      : `$(outdir)/at-values/%`
+#   - .PHONY Target      : `$(outdir)/at-modules`
+#   - .PHONY Target      : `$(outdir)/at-modules/%`
+#   - .PHONY Target      : `$(outdir)/at-noop`
+#
+# TODO: prose documentation
+endef
 
 # The trickery that is _mod.empty/_mod.space is from §6.2 of the GNU Make
 # manual, "The Two Flavors of Variables".
