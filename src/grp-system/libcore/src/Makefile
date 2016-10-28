@@ -166,7 +166,6 @@ libcore_la_LIBADD = \
 $(outdir)/load-fragment-gperf-nulstr.c: $(outdir)/load-fragment-gperf.gperf
 	$(AM_V_GEN)$(AWK) 'BEGIN{ keywords=0 ; FS="," ; print "extern const char load_fragment_gperf_nulstr[];" ; print "const char load_fragment_gperf_nulstr[] ="} ; keyword==1 { print "\"" $$1 "\\0\"" } ; /%%/ { keyword=1} ; END { print ";" }' < $< > $@
 
-sd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
 sd.CPPFLAGS += -DMOUNT_PATH=\"$(MOUNT_PATH)\"
 sd.CPPFLAGS += -DUMOUNT_PATH=\"$(UMOUNT_PATH)\"
 sd.CPPFLAGS += -DSYSTEMD_CGROUP_AGENT_PATH=\"$(libexecdir)/systemd-cgroups-agent\"

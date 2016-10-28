@@ -92,6 +92,4 @@ manual_tests += \
 dist_tmpfiles_DATA = \
 	tmpfiles.d/systemd-nspawn.conf
 
-sd.CPPFLAGS += -I$(topsrcdir)/src/libudev/src
-
 include $(topsrcdir)/build-aux/Makefile.tail.mk
