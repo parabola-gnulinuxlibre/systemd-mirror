@@ -21,6 +21,7 @@ $(topoutdir)/$(dist.pkgname)-$(dist.version): $(_dist.files)
 	$(foreach f,$^,$(call _dist.addfile,$(topsrcdir),$(@D)/.tmp.$(@F),$f)$(at.nl))
 	$(MV) $(@D)/.tmp.$(@F) $@ || $(RM) -r $(@D)/.tmp.$(@F)
 
+# TODO: The tar rule isn't reproducible, it should be.
 $(topoutdir)/$(dist.pkgname)-$(dist.version).tar: %.tar: %
 	$(TAR) cf $@ -C $(<D) $(<F)
 $(topoutdir)/$(dist.pkgname)-$(dist.version).tar.gz: %.gz: %

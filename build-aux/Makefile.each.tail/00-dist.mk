@@ -1,1 +1,1 @@
-_dist.files := $(strip $(_dist.files) $(_files.src))
+_dist.files := $(strip $(_dist.files) $(call at.addprefix,$(srcdir),$(files.src)))

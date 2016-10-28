@@ -14,6 +14,40 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 mod.dist.description = `dist` target for distribution tarballs
+define mod.dist.doc
+# User variables:
+#   - `CP      ?= cp`
+#   - `GZIP    ?= gzip`
+#   - `MKDIR   ?= mkdir`
+#   - `MKDIR_P ?= mkdir -p`
+#   - `MV      ?= mv`
+#   - `RM      ?= rm -f`
+#   - `TAR     ?= tar`
+#   - `GZIPFLAGS ?= $(GZIP_ENV)`
+#   - `GZIP_ENV ?= --best` (only used via `GZIPFLAGS`, not directly)
+# Inputs:
+#   - Global variable    : `dist.exts`    (Default: `.tar.gz`)
+#   - Global variable    : `dist.pkgname` (Default: first of PACKAGE_TARNAME PACKAGE PACKAGE_NAME)
+#   - Global variable    : `dist.version` (Default: first of PACKAGE_VERSION VERSION)
+#   - Directory variable : `files.src`
+# Outputs:
+#   - Directory variable : `files.out.int` (only in top dir)
+#   - .PHONY Target      : `$(outdir)/dist`
+#   - Target             : `$(topoutdir)/$(dist.pkgname)-$(dist.version)`
+#   - Target             : `$(topoutdir)/$(dist.pkgname)-$(dist.version).tar`
+#   - Target             : `$(topoutdir)/$(dist.pkgname)-$(dist.version).tar.gz`
+#
+# Provide the standard `dist` .PHONY target, based on the `files` module
+# information.
+#
+# You may change the default compression target easily via the
+# `dist.exts` variable, but you must define the rule for it manually.
+#
+# Bugs:
+#
+#   The tarball isn't reproducible.  It uses file-system ordering of
+#   files, and includes timestamps.
+endef
 
 # Developer configuration
 
