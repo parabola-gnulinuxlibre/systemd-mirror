@@ -18,5 +18,6 @@ define mod.write-atomic.doc
 #
 # The are only different in that one is atomic, while the other is not.
 endef
+mod.write-atomic.doc := $(value mod.write-atomic.doc)
 
 WRITE_ATOMIC ?= $(topsrcdir)/build-aux/write-atomic

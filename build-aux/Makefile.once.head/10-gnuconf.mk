@@ -28,6 +28,7 @@ define mod.gnuconf.doc
 # This is based on §7.2 "Makefile Conventions" of the July 25, 2016
 # release of the GNU Coding Standards.
 endef
+mod.gnuconf.doc := $(value mod.gnuconf.doc)
 
 gnuconf.pkgname ?= $(firstword $(PACKAGE_TARNAME) $(PACKAGE) $(PACKAGE_NAME))
 ifeq ($(gnuconf.pkgname),)

@@ -40,5 +40,6 @@ define mod.nested.doc
 #      | at.subdirs     | DIST_SUBDIRS |
 #      | nested.subdirs | SUBDIRS      |
 endef
+mod.nested.doc := $(value mod.nested.doc)
 
 nested.targets ?=
