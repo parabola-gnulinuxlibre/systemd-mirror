@@ -36,14 +36,18 @@ define mod.files.doc
 #   - Directory variable : `files.out.$(files.groups)` (well, $(addprefix...))
 #   - Directory variable : `files.sys.$(files.groups)` (well, $(addprefix...))
 # Outputs:
-#   - Global variable : `nested.targets`
-#   - Global variable : `at.targets`
-#   - Global variable : `.DEFAULT_GOAL = $(files.default)`
+#   - Global variable    : `nested.targets`
+#   - Global variable    : `at.targets`
+#   - Global variable    : `.DEFAULT_GOAL = $(files.default)`
+#   - Directory variable : `files.src`
+#   - Directory variable : `files.out`
+#   - Directory variable : `files.sys`
 #   - Creative .PHONY targets:
 #     - `$(outdir)/$(files.generate))`
-#     - `$(addprefix $(outdir)/,$(files.groups))`
-#     - `$(outdir)/installdirs`
+#     - `$(outdir)/$(group)` for `group` in `$(files.groups)`
 #     - `$(outdir)/install`
+#     - `$(outdir)/install-$(group)` for `group` in `$(filter-out $(files.default),$(files.groups))`
+#     - `$(outdir)/installdirs`
 #   - Destructive .PHONY targets:
 #     - `$(outdir)/uninstall`
 #     - `$(outdir)/mostlyclean`
@@ -51,6 +55,9 @@ define mod.files.doc
 #     - `$(outdir)/distclean`
 #     - `$(outdir)/maintainer-clean`
 #     - `$(outdir)/$(files.vcsclean)`
+#
+# Basic `*` wildcards are supported.  Use `*`, not `%`; it will automatically
+# substitute `*`->`%` where appropriate.
 #
 # TODO: prose documentation
 endef
