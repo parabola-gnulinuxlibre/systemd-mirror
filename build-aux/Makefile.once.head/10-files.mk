@@ -54,6 +54,7 @@ define mod.files.doc
 #
 # TODO: prose documentation
 endef
+mod.files.doc := $(value mod.files.doc)
 
 files.groups ?= all
 files.default ?= all

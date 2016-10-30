@@ -56,6 +56,7 @@ define mod.gitfiles.doc
 # or may not be safe to use the value of `$(files.src.src)` in your
 # Makefile, depending on how you set `nested.subdirs`.
 endef
+mod.gitfiles.doc := $(value mod.gitfiles.doc)
 
 gitfiles.file ?= gitfiles.mk
 

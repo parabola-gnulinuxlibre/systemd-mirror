@@ -48,6 +48,7 @@ define mod.dist.doc
 #   The tarball isn't reproducible.  It uses file-system ordering of
 #   files, and includes timestamps.
 endef
+mod.dist.doc := $(value mod.dist.doc)
 
 # Developer configuration
 

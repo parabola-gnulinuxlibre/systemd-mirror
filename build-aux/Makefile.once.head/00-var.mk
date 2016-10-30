@@ -28,5 +28,6 @@ define mod.var.doc
 # With this module, to depend on the value of a variable, depend on
 # `$(outdir)/.var.VARNAME`.
 endef
+mod.var.doc := $(value mod.var.doc)
 
 .PHONY: _var.FORCE

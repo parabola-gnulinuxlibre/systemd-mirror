@@ -18,5 +18,6 @@ define mod.write-ifchanged.doc
 #     ... > $@
 #     ... | $(WRITE_ATOMIC) $@
 endef
+mod.write-ifchanged.doc := $(value mod.write-ifchanged.doc)
 
 WRITE_IFCHANGED ?= $(topsrcdir)/build-aux/write-ifchanged

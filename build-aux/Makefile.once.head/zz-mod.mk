@@ -18,7 +18,6 @@ mod.mod.depends += quote
 define mod.mod.doc
 # Inputs:
 #   - Files           : `$(topsrcdir)/build-aux/Makefile.*/??-*.mk`
-#   - Global variable : `mod.*.name`
 #   - Global variable : `mod.*.description`
 #   - Global variable : `mod.*.depends`
 #   - Global variable : `mod.*.files`
@@ -37,6 +36,7 @@ define mod.mod.doc
 #
 # TODO: prose documentation
 endef
+mod.mod.doc := $(value mod.mod.doc)
 
 # The trickery that is _mod.empty/_mod.space is from §6.2 of the GNU Make
 # manual, "The Two Flavors of Variables".
@@ -55,4 +55,5 @@ undefine _mod.file2mod
 $(eval $(foreach _mod.tmp,$(_mod.modules),\
   mod.$(_mod.tmp).description ?=$(at.nl)\
   mod.$(_mod.tmp).depends ?=$(at.nl)\
-  mod.$(_mod.tmp).files ?=$(at.nl)))
+  mod.$(_mod.tmp).files ?=$(at.nl)\
+  mod.$(_mod.tmp).doc ?=$(at.nl)))

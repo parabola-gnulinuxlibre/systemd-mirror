@@ -32,6 +32,7 @@ define mod.quote.doc
 # whitespace), while `quote.shell` keeps them as one string (preserving
 # whitespace).
 endef
+mod.quote.doc := $(value mod.quote.doc)
 
 _quote.backslash = $(if $1,$(call _quote.backslash,$(wordlist 2,$(words $1),$1),$(subst $(firstword $1),\$(firstword $1),$2)),$2)
 
