@@ -24,9 +24,9 @@ import os.path
 from xml_helper import *
 
 SECTION = '''\
-MANPAGES += \\
+sdman.MANPAGES += \\
 	{manpages}
-MANPAGES_ALIAS += \\
+sdman.MANPAGES_ALIAS += \\
 	{aliases}
 {rules}
 {htmlrules}
