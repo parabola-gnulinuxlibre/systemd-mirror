@@ -250,7 +250,7 @@ endef
 # Utility functions
 _am.sys2dirs = $(sort $(patsubst %/,%,$(dir $(foreach p,$(_am.primaries),$(am.sys_$p)))))
 
-_am.pass3 = $(eval $(foreach d,$(_am.sys2dirs)  ,$(call _am.per_directory,$d)$(at.nl)))
+_am.pass4 = $(eval $(foreach d,$(_am.sys2dirs)  ,$(call _am.per_directory,$d)$(at.nl)))
 define _am.per_directory
 $$(DESTDIR)$1/%: $$(outdir)/%
 	@$$(NORMAL_INSTALL)

@@ -43,7 +43,7 @@ _lt.dedup = $(if $1,$(if $(filter $(firstword $1),$(call _lt.rest,$1)),,$(firstw
 # Insert a .la library's dependency_libs after the library itself in the list.
 _lt.dependency_libs = $(foreach _lt.tmp,$1,$(_lt.tmp)$(if $(filter %.la,$(_lt.tmp)), $(shell . $(_lt.tmp); echo $$dependency_libs)))
 
- lt.lib.rpath     = $(dir $(filter %/$(@F),$(files.sys))
+ lt.lib.rpath     = $(dir $(filter %/$(@F),$(files.sys)))
  lt.lib.files.all = $(filter %.lo %.la -l%,$(call _lt.unLIBPATTERNS,$^))
  lt.lib.files.ld  = $(strip $(if $(lt.lib.rpath),\
                                  $(lt.lib.files.all),\

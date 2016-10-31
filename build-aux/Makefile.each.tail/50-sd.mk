@@ -42,10 +42,12 @@ $(outdir)/$(DEPDIR):
 
 $(outdir)/%.la:
 	@if test $(words $(lt.lib.files.all)) = 0; then echo 'Cannot link library with no dependencies: $@' >&2; exit 1; fi
+	@if test $(origin am.LDFLAGS) = undefined; then echo 'Cannot link library with undefined am.LDFLAGS: $@' >&2; exit 1; fi
 	$(AM_V_CCLD)$(sd.LINK) $(if $(lt.lib.rpath),-rpath $(lt.lib.rpath)) $(lt.lib.files.ld)
 	$(AM_V_at)$(lt.lib.post)
 $(addprefix $(outdir)/,$(am.out_PROGRAMS)): $(outdir)/%:
 	@if test $(words $(lt.exe.files.all)) = 0; then echo 'Cannot link executable with no dependencies: $@' >&2; exit 1; fi
+	@if test $(origin am.LDFLAGS) = undefined; then echo 'Cannot link executable with undefined am.LDFLAGS: $@' >&2; exit 1; fi
 	$(AM_V_CCLD)$(sd.LINK) $(lt.exe.files.ld)
 
 # Stupid test that everything purported to be exported really is
