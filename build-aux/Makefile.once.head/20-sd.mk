@@ -23,8 +23,81 @@
 
 mod.sd.description = (systemd) shared build rules
 mod.sd.depends += am
+define mod.sd.doc
+# User variables:
+#   (flags)
+#   - `CFLAGS`
+#   - `CPPFLAGS`
+#   - `LDFLAGS`
+#   - `LIBTOOLFLAGS`
+#   (programs)
+#   - `CC`
+#   - `CCLD`
+#   - `LIBTOOL`
+#   - `MKDIR_P`
+#   - `SED`
+#   (verbosity)
+#   - `V`
+#   - `AM_V_*`
+#   - `INTLTOOL_V_MERGE*`
+#   (substitutions)$(foreach v,$(sort $(sd.substitution_keys)),$(at.nl)#   - $v)
+# Inputs:
+#   - Global variable    : `DEPDIR`
+#   - Global variable    : `ENABLE_TESTS`
+#   - Global variable    : `ENABLE_UNSAFE_TESTS`
+#   - Global variable    : `OUR_CFLAGS`
+#   - Global variable    : `OUR_CPPFLAGS`
+#   - Global variable    : `OUR_LDFLAGS`
+#   - Global variable    : `OUR_LIBTOOLFLAGS`
+#   (Makefiles)
+#   - Directory variable : `sd.CFLAGS`
+#   - Directory variable : `sd.CPPFLAGS`
+#   - Directory variable : `sd.LDFLAGS`
+#   - Directory variable : `sd.LIBTOOLFLAGS`
+#   - Directory variable : `sd.sed_files` (default based on `EXTRA_DIST`)
+#   (am)
+#   - Directory variable : `EXTRA_DIST`
+#   - Directory variable : `am.out_PROGRAMS`
+#   - Directory variable : `am.CFLAGS`
+#   - Directory variable : `am.CPPFLAGS`
+#   - Target variable    : `am.LDFLAGS`
+# Outputs:
+#   - Global variable    : `SHELL`
+#   - Make setting       : `.DELETE_ON_ERROR`
+#   - Make setting       : `.SECONDARY`
+#   - Global variable    : `sd.substitutions`
+#   - Global variable    : `sd.substitution_keys`
+#   - Global variable    : `sd.sed_process`
+#   - Directory variable : `files.out.int`
+#   - Target variable    : `sd.ALL_CFLAGS`
+#   - Target variable    : `sd.ALL_CPPFLAGS`
+#   - Target variable    : `sd.ALL_LDFLAGS`
+#   - Target variable    : `sd.ALL_LIBTOLFLAGS`
+#   - Target variable    : `sd.COMPILE`
+#   - Target variable    : `sd.LTCOMPILE`
+#   - Target variable    : `sd.LINK`
+#   - Target             : `$$(outdir)/%.o`
+#   - Target             : `$$(outdir)/%.lo`
+#   - Target             : `$$(outdir)/$$(DEPDIR)`
+#   - Target             : `$$(outdir)/%.la`
+#   - Target             : `$$(addprefix $$(outdir)/,$$(am.out_PROGRAMS))`
+#   - Target             : `$$(outdir)/test-lib%-sym.c`
+#   - Target             : `$$(outdir)/%-from-name.gperf`
+#   - Target             : `$$(outdir)/%-from-name.h`
+#   - Target             : `$$(addprefix $$(outdir)/,$$(sd.sed_files))`
+#   - Target             : `$$(outdir)/%.c: $$(srcdir)/%.gperf`
+#   - Target             : `$$(outdir)/%: $$(srcdir)/%.m4`
+# ???:
+#   - tests
+#   - unsafe_tests
+#   - TESTS
 
-TESTS ?=
+endef
+
+tests ?=
+unsafe_tests ?=
+TESTS = $(if $(ENABLE_TESTS),$(tests) \
+        $(if $(ENABLE_UNSAFE_TESTS),$(unsafe_tests)))
 
 # Make behavior
 SHELL = bash -o pipefail
@@ -37,7 +110,6 @@ OUR_CPPFLAGS += -MT $@ -MD -MP -MF $(@D)/$(DEPDIR)/$(basename $(@F)).P$(patsubst
 OUR_CPPFLAGS += -include $(topoutdir)/config.h
 OUR_CPPFLAGS += $(sort -I$(@D) $(if $(<D),-I$(<D) -I$(call at.out2src,$(<D))))
 
-# 
 sd.ALL_CFLAGS       = $(strip $(OUR_CFLAGS)       $(am.CFLAGS)       $(sd.CFLAGS)       $(CFLAGS)       )
 sd.ALL_CPPFLAGS     = $(strip $(OUR_CPPFLAGS)     $(am.CPPFLAGS)     $(sd.CPPFLAGS)     $(CPPFLAGS)     )
 sd.ALL_LDFLAGS      = $(strip $(OUR_LDFLAGS)      $(am.LDFLAGS)      $(sd.LDFLAGS)      $(LDFLAGS)      )
@@ -63,20 +135,10 @@ AM_V_M4_ ?= $(AM_V_M4_$(AM_DEFAULT_VERBOSITY))
 AM_V_M4_0 ?= @echo "  M4      " $@;
 AM_V_M4_1 ?=
 
-AM_V_XSLT ?= $(AM_V_XSLT_$(V))
-AM_V_XSLT_ ?= $(AM_V_XSLT_$(AM_DEFAULT_VERBOSITY))
-AM_V_XSLT_0 ?= @echo "  XSLT    " $@;
-AM_V_XSLT_1 ?=
-
 AM_V_GPERF ?= $(AM_V_GPERF_$(V))
 AM_V_GPERF_ ?= $(AM_V_GPERF_$(AM_DEFAULT_VERBOSITY))
 AM_V_GPERF_0 ?= @echo "  GPERF   " $@;
 AM_V_GPERF_1 ?=
-
-AM_V_LN ?= $(AM_V_LN_$(V))
-AM_V_LN_ ?= $(AM_V_LN_$(AM_DEFAULT_VERBOSITY))
-AM_V_LN_0 ?= @echo "  LN      " $@;
-AM_V_LN_1 ?=
 
 AM_V_RM ?= $(AM_V_RM_$(V))
 AM_V_RM_ ?= $(AM_V_RM_$(AM_DEFAULT_VERBOSITY))
@@ -113,16 +175,16 @@ AM_V_GEN_ ?= $(AM_V_GEN_$(AM_DEFAULT_VERBOSITY))
 AM_V_GEN_0 ?= @echo "  GEN     " $@;
 AM_V_GEN_1 ?=
 
+AM_V_lt ?= $(AM_V_lt_$(V))
+AM_V_lt_ ?= $(AM_V_lt_$(AM_DEFAULT_VERBOSITY))
+AM_V_lt_0 ?= --silent
+AM_V_lt_1 ?=
+
 INTLTOOL_V_MERGE ?= $(INTLTOOL_V_MERGE_$(V))
 INTLTOOL_V_MERGE_OPTIONS ?= $(intltool_v_merge_options_$(V))
 INTLTOOL_V_MERGE_ ?= $(INTLTOOL_V_MERGE_$(AM_DEFAULT_VERBOSITY))
 INTLTOOL_V_MERGE_0 ?= @echo "  ITMRG " $@;
 INTLTOOL_V_MERGE_1 ?=
-
-AM_V_lt ?= $(AM_V_lt_$(V))
-AM_V_lt_ ?= $(AM_V_lt_$(AM_DEFAULT_VERBOSITY))
-AM_V_lt_0 ?= --silent
-AM_V_lt_1 ?=
 
 sd.substitutions = \
        '|rootlibexecdir=$(rootlibexecdir)|' \
@@ -192,23 +254,3 @@ sd.SED_PROCESS = \
 	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
 	$(SED) $(subst '|,-e 's|@,$(subst =,\@|,$(subst |',|g',$(sd.substitutions)))) \
 		< $< > $@
-
-sd.XSLTPROC_FLAGS = \
-	--nonet \
-	--xinclude \
-	--stringparam man.output.quietly 1 \
-	--stringparam funcsynopsis.style ansi \
-	--stringparam man.authors.section.enabled 0 \
-	--stringparam man.copyright.section.enabled 0 \
-	--stringparam systemd.version $(VERSION) \
-	--path '$(outdir):$(srcdir):$(topoutdir)/man:$(topsrcdir)/man'
-
-sd.XSLT = $(if $(XSLTPROC), $(XSLTPROC), xsltproc)
-sd.XSLTPROC_PROCESS_MAN = \
-	$(AM_V_XSLT)$(sd.XSLT) -o $@ $(sd.XSLTPROC_FLAGS) $(srcdir)/man/custom-man.xsl $<
-
-sd.XSLTPROC_PROCESS_HTML = \
-	$(AM_V_XSLT)$(sd.XSLT) -o $@ $(sd.XSLTPROC_FLAGS) $(srcdir)/man/custom-html.xsl $<
-
-sd.html-alias = \
-	$(AM_V_LN)$(LN_S) -f $(notdir $<) $@

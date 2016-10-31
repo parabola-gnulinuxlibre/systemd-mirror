@@ -21,27 +21,6 @@
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
-mod.sdman.description = (systemd) manpages
-mod.sdman.depends += am files write-atomic
-define mod.sdman.doc
-# Inputs:
-#   - Global variable    : `ENABLE_MANPAGES`
-#   - Directory variable : `files.src.src`
-# Inputs (from `$(srcdir)/Makefile-man.mk`):
-#   - Directory variable : `sdman.MANPAGES`
-#   - Directory variable : `sdman.MANPAGES_ALIAS`
-# Outputs:
-#   - File               : `$(srcdir)/Makefile-man.mk`
-#   - Directory variable : `at.subdirs`
-#   - Directory variable : `files.src.gen`
-#   - Directory variable : `man_MANS`
-#   - Directory variable : `noinst_DATA`
-#
-# The `sdman.*` variables are the interface by which Makefile-man.mk may
-# communicate up.  They should not be used outside of the `sdman` module.
-endef
-mod.sdman.doc := $(value mod.sdman.doc)
-
 _sdman.man_xml = $(foreach _sdman.tmp,$(filter %.xml,$(files.src.src)),$(if $(findstring /,$(_sdman.tmp)),,$(_sdman.tmp)))
 
 ifneq ($(_sdman.man_xml),)
@@ -72,5 +51,23 @@ noinst_DATA += \
 endif # ENABLE_MANPAGES
 
 at.subdirs += $(abspath $(topoutdir)/man)
+
+$(outdir)/%.1: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
+	$(_sdman.XSLTPROC_PROCESS_MAN)
+
+$(outdir)/%.3: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
+	$(_sdman.XSLTPROC_PROCESS_MAN)
+
+$(outdir)/%.5: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
+	$(_sdman.XSLTPROC_PROCESS_MAN)
+
+$(outdir)/%.7: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
+	$(_sdman.XSLTPROC_PROCESS_MAN)
+
+$(outdir)/%.8: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
+	$(_sdman.XSLTPROC_PROCESS_MAN)
+
+$(outdir)/%.html: $(srcdir)/%.xml $(topsrcdir)/man/custom-html.xsl $(topoutdir)/man/custom-entities.ent
+	$(_sdman.XSLTPROC_PROCESS_HTML)
 
 endif # _sdman.man_xml

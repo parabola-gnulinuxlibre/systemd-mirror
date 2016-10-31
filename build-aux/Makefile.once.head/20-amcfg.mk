@@ -1,9 +1,24 @@
 mod.amcfg.description = (systemd) Automake-to-Autothing configuration
 mod.amcfg.depends += am
 define mod.amcfg.doc
-# User varaibles:
+# User variables:
 #   - `V`
 #   - `AM_V_*`
+#   - `pamconfdir`
+#   - `tmpfilesdir`
+#   - `sysusersdir`
+#   - `sysctldir`
+#   - `bashcompletiondir`
+#   - `zshcompletiondir`
+#   - `LIBTOOL`
+#   - `INSTALL_PROGRAM`
+#   - `INSTALL_SCRIPT`
+#   - `INSTALL_DATA`
+# Inputs:
+#   - Global variable: `sd.ALL_LIBTOOLFLAGS`
+# Outputs:
+#   - Global variable: `am.sys2out_*`
+#   - Global variable: `am.INSTALL_*`
 endef
 mod.amcfg.doc := $(value mod.amcfg.doc)
 

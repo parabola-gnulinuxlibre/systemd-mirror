@@ -54,7 +54,7 @@ HEADER = '''\
 
 HTML_ALIAS_RULE = '''\
 {}.html: {}.html
-	$(html-alias)
+	$(sdman.html-alias)
 '''
 
 FOOTER = '''\
