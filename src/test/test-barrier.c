@@ -31,8 +31,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "barrier.h"
-#include "util.h"
+#include "systemd-basic/barrier.h"
+#include "systemd-basic/util.h"
 
 /* 20ms to test deadlocks; All timings use multiples of this constant as
  * alarm/sleep timers. If this timeout is too small for slow machines to perform
