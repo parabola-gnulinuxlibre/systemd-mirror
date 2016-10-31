@@ -786,6 +786,7 @@ fixup_makefile() {
 	    -e 's|^if (.*)|ifneq ($(\1),)|' \
 	    -e '/^\s*\$\(AM_(C|CPP|LD)FLAGS\b/d' \
 	    -e 's|--version-script=.*/([^/]+)\.sym|--version-script=$(srcdir)/\1.sym|g' \
+	    -e 's|\$\((lib\S+)_la_LIBADD\)|\1.la|g' \
 	    \
 	    -e '#### Rename helpers ################' \
 	    -e 's|libbasic_la|libsystemd_basic_la|g' \

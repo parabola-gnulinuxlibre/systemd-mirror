@@ -363,21 +363,25 @@ AM_V_M4_ = $(AM_V_M4_$(AM_DEFAULT_VERBOSITY))
 AM_V_M4_0 = @echo "  M4      " $@;
 AM_V_M4_1 =
 
+#@build-aux/Makefile.once.head/20-sdman.mk
 AM_V_XSLT = $(AM_V_XSLT_$(V))
 AM_V_XSLT_ = $(AM_V_XSLT_$(AM_DEFAULT_VERBOSITY))
 AM_V_XSLT_0 = @echo "  XSLT    " $@;
 AM_V_XSLT_1 =
 
+#@build-aux/Makefile.once.head/20-sd.mk
 AM_V_GPERF = $(AM_V_GPERF_$(V))
 AM_V_GPERF_ = $(AM_V_GPERF_$(AM_DEFAULT_VERBOSITY))
 AM_V_GPERF_0 = @echo "  GPERF   " $@;
 AM_V_GPERF_1 =
 
+#@build-aux/Makefile.once.head/20-sdman.mk
 AM_V_LN = $(AM_V_LN_$(V))
 AM_V_LN_ = $(AM_V_LN_$(AM_DEFAULT_VERBOSITY))
 AM_V_LN_0 = @echo "  LN      " $@;
 AM_V_LN_1 =
 
+#@build-aux/Makefile.once.head/20-sd.mk
 AM_V_RM = $(AM_V_RM_$(V))
 AM_V_RM_ = $(AM_V_RM_$(AM_DEFAULT_VERBOSITY))
 AM_V_RM_0 = @echo "  RM      " $@;
@@ -747,7 +751,7 @@ EXTRA_DIST += \
 
 @INTLTOOL_POLICY_RULE@
 
-#@build-aux/Makefile.each.tail/70-man.mk ---------------------------------------
+#@build-aux/Makefile.each.tail/70-sdman.mk -------------------------------------
 
 MANPAGES =
 MANPAGES_ALIAS =
@@ -6373,7 +6377,7 @@ man/custom-entities.ent: configure.ac
 CLEANFILES += \
 	man/custom-entities.ent
 
-#@build-aux/Makefile.once.head/20-sd.mk
+#@build-aux/Makefile.once.head/20-sdman.mk
 XSLTPROC_FLAGS = \
 	--nonet \
 	--xinclude \
@@ -6391,7 +6395,7 @@ XSLTPROC_PROCESS_MAN = \
 XSLTPROC_PROCESS_HTML = \
 	$(AM_V_XSLT)$(XSLT) -o $@ $(XSLTPROC_FLAGS) $(srcdir)/man/custom-html.xsl $<
 
-#@build-aux/Makefile.each.tail/50-sd.mk
+#@build-aux/Makefile.each.tail/70-sdman.mk
 man/%.1: man/%.xml man/custom-man.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_MAN)
 
@@ -6410,7 +6414,7 @@ man/%.8: man/%.xml man/custom-man.xsl man/custom-entities.ent
 man/%.html: man/%.xml man/custom-html.xsl man/custom-entities.ent
 	$(XSLTPROC_PROCESS_HTML)
 
-#@build-aux/Makefile.once.head/20-sd.mk
+#@build-aux/Makefile.once.head/20-sdman.mk
 define html-alias
 	$(AM_V_LN)$(LN_S) -f $(notdir $<) $@
 endef
