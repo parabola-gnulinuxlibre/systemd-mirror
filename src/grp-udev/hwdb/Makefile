@@ -50,8 +50,6 @@ INSTALL_DATA_HOOKS += \
 
 hwdb-remove-hook:
 	-test -n "$(DESTDIR)" || rm -f /etc/udev/hwdb.bin
-endif # ENABLE_HWDB
-
 EXTRA_DIST += \
 	hwdb/ids-update.pl \
 	hwdb/sdio.ids

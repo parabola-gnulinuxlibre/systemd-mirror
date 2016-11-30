@@ -41,6 +41,8 @@ rootbin_PROGRAMS += \
 SYSINIT_TARGET_WANTS += \
 	systemd-hwdb-update.service
 
+endif # ENABLE_HWDB
+
 EXTRA_DIST += \
 	units/systemd-hwdb-update.service.in
 
