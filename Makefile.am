@@ -3990,9 +3990,9 @@ INSTALL_DATA_HOOKS += \
 
 hwdb-remove-hook:
 	-test -n "$(DESTDIR)" || rm -f /etc/udev/hwdb.bin
+#@auto/systemd-hwdb/Makefile
 endif # ENABLE_HWDB
 
-#@auto/systemd-hwdb/Makefile
 EXTRA_DIST += \
 	units/systemd-hwdb-update.service.in
 #@auto/hwdb/Makefile
