@@ -46,10 +46,6 @@ dist_udevrules_DATA += \
 nodist_udevrules_DATA += \
 	rules/99-systemd.rules
 
-udevconfdir = $(sysconfdir)/udev
-dist_udevconf_DATA = \
-	src/udev/udev.conf
-
 pkgconfigdata_DATA += \
 	src/udev/udev.pc
 

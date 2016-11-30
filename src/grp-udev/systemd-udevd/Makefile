@@ -23,6 +23,10 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+udevconfdir = $(sysconfdir)/udev
+dist_udevconf_DATA = \
+	src/udev/udev.conf
+
 rootlibexec_PROGRAMS += \
 	systemd-udevd
 

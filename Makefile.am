@@ -3804,10 +3804,12 @@ dist_udevrules_DATA += \
 nodist_udevrules_DATA += \
 	rules/99-systemd.rules
 
+#@auto/systemd-udevd/Makefile
 udevconfdir = $(sysconfdir)/udev
 dist_udevconf_DATA = \
 	src/udev/udev.conf
 
+#@src/grp-udev/Makefile
 pkgconfigdata_DATA += \
 	src/udev/udev.pc
 
