@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "firewall-util.h"
-#include "log.h"
+#include "systemd-basic/log.h"
+#include "systemd-firewall/firewall-util.h"
 
 #define MAKE_IN_ADDR_UNION(a,b,c,d) (union in_addr_union) { .in.s_addr = htobe32((uint32_t) (a) << 24 | (uint32_t) (b) << 16 | (uint32_t) (c) << 8 | (uint32_t) (d))}
 
