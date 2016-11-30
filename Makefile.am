@@ -3957,6 +3957,7 @@ systemd_hwdb_LDADD = \
 rootbin_PROGRAMS += \
 	systemd-hwdb
 
+#@auto/hwdb/Makefile
 dist_udevhwdb_DATA = \
 	hwdb/20-pci-vendor-model.hwdb \
 	hwdb/20-pci-classes.hwdb \
@@ -3974,12 +3975,14 @@ dist_udevhwdb_DATA = \
 	hwdb/70-pointingstick.hwdb \
 	hwdb/70-touchpad.hwdb
 
+#@auto/systemd-hwdb/Makefile
 SYSINIT_TARGET_WANTS += \
 	systemd-hwdb-update.service
 
+#@auto/hwdb/Makefile
 # Update hwdb on installation. Do not bother if installing
 # in DESTDIR, since this is likely for packaging purposes.
-hwdb-update-hook:
+hwdb-update-hook: $(DESTDIR)$(rootbindir)/systemd-hwdb
 	-test -n "$(DESTDIR)" || $(rootbindir)/systemd-hwdb update
 
 INSTALL_DATA_HOOKS += \
@@ -3989,8 +3992,11 @@ hwdb-remove-hook:
 	-test -n "$(DESTDIR)" || rm -f /etc/udev/hwdb.bin
 endif # ENABLE_HWDB
 
+#@auto/systemd-hwdb/Makefile
 EXTRA_DIST += \
-	units/systemd-hwdb-update.service.in \
+	units/systemd-hwdb-update.service.in
+#@auto/hwdb/Makefile
+EXTRA_DIST += \
 	hwdb/ids-update.pl \
 	hwdb/sdio.ids
 

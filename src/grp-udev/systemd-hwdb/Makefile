@@ -38,42 +38,11 @@ systemd_hwdb_LDADD = \
 rootbin_PROGRAMS += \
 	systemd-hwdb
 
-dist_udevhwdb_DATA = \
-	hwdb/20-pci-vendor-model.hwdb \
-	hwdb/20-pci-classes.hwdb \
-	hwdb/20-usb-vendor-model.hwdb \
-	hwdb/20-usb-classes.hwdb \
-	hwdb/20-sdio-vendor-model.hwdb \
-	hwdb/20-sdio-classes.hwdb \
-	hwdb/20-bluetooth-vendor-product.hwdb \
-	hwdb/20-acpi-vendor.hwdb \
-	hwdb/20-OUI.hwdb \
-	hwdb/20-net-ifname.hwdb \
-	hwdb/60-evdev.hwdb \
-	hwdb/60-keyboard.hwdb \
-	hwdb/70-mouse.hwdb \
-	hwdb/70-pointingstick.hwdb \
-	hwdb/70-touchpad.hwdb
-
 SYSINIT_TARGET_WANTS += \
 	systemd-hwdb-update.service
 
-# Update hwdb on installation. Do not bother if installing
-# in DESTDIR, since this is likely for packaging purposes.
-hwdb-update-hook:
-	-test -n "$(DESTDIR)" || $(rootbindir)/systemd-hwdb update
-
-INSTALL_DATA_HOOKS += \
-	hwdb-update-hook
-
-hwdb-remove-hook:
-	-test -n "$(DESTDIR)" || rm -f /etc/udev/hwdb.bin
-endif # ENABLE_HWDB
-
 EXTRA_DIST += \
-	units/systemd-hwdb-update.service.in \
-	hwdb/ids-update.pl \
-	hwdb/sdio.ids
+	units/systemd-hwdb-update.service.in
 
 sd.CPPFLAGS += -DUDEVLIBEXECDIR=\"$(udevlibexecdir)\"
 
