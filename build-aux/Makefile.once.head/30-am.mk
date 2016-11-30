@@ -177,6 +177,7 @@ define _am.pass2.doc
 #   - Directory variable : `am.subdirs`
 #
 # TODO: I'm not in love with how it figures out `am.subdirs`.
+# TODO: I'm not in love with how it does the `install` dependencies.
 endef
 _am.pass2 = $(eval $(foreach f,$(am.out_PROGRAMS)   ,$(call _am.per_PROGRAM,$f,$(call _am.file2var,$f))$(at.nl)))
 _am.var_PROGRAMS    = $1_SOURCES nodist_$1_SOURCES $1_CFLAGS $1_CPPFLAGS $1_LDFLAGS $1_LDADD
@@ -189,6 +190,7 @@ am.CPPFLAGS +=                 $$($2_CPPFLAGS)          $$(call _am.file2cpp,$1,
 am.CFLAGS   +=                 $$($2_CFLAGS)
 $$(outdir)/$1: private am.LDFLAGS := $$($2_LDFLAGS)
 $$(outdir)/$1: $$(_am.depends)
+$$(outdir)/install: $$(addsuffix install,$$(dir $$(filter %.la,$$(_am.depends))))
 am.subdirs := $$(sort $$(am.subdirs)\
                       $$(filter-out $$(abspath $$(srcdir)),\
                                     $$(abspath $$(dir $$(filter-out -l% /%,$$(_am.depends))))))
@@ -216,6 +218,7 @@ define _am.pass3.doc
 #   - Directory variable : `am.subdirs`
 #
 # TODO: I'm not in love with how it figures out `am.subdirs`.
+# TODO: I'm not in love with how it does the `install` dependencies.
 endef
 _am.pass3 = $(eval $(foreach f,$(am.out_LTLIBRARIES),$(call _am.per_LTLIBRARY,$f,$(call _am.file2var,$f))$(at.nl)))
 _am.var_LTLIBRARIES = $1_SOURCES nodist_$1_SOURCES $1_CFLAGS $1_CPPFLAGS $1_LDFLAGS $1_LIBADD
@@ -228,6 +231,7 @@ am.CPPFLAGS +=                 $$($2_CPPFLAGS)          $$(call _am.file2cpp,$1,
 am.CFLAGS   +=                 $$($2_CFLAGS)
 $$(outdir)/$1: private am.LDFLAGS := $$($2_LDFLAGS)
 $$(outdir)/$1: $$(_am.depends)
+$$(outdir)/install: $$(addsuffix install,$$(dir $$(filter %.la,$$(_am.depends))))
 am.subdirs := $$(sort $$(am.subdirs)\
                       $$(filter-out $$(abspath $$(srcdir)),\
                                     $$(abspath $$(dir $$(filter-out -l% /%,$$(_am.depends))))))

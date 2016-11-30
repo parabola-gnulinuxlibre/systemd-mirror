@@ -43,3 +43,10 @@ $(DESTDIR)$(zshcompletiondir)/_%: $(srcdir)/%.completion.zsh
 $(DESTDIR)$(zshcompletiondir)/_%: $(outdir)/%.completion.zsh
 	@$(NORMAL_INSTALL)
 	$(am.INSTALL)
+
+$(DESTDIR)$(xinitrcdir)/%.sh: $(srcdir)/%.xinitrc
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL)
+$(DESTDIR)$(xinitrcdir)/%.sh: $(outdir)/%.xinitrc
+	@$(NORMAL_INSTALL)
+	$(am.INSTALL)

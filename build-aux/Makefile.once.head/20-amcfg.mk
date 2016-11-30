@@ -31,6 +31,10 @@ am.sys2out_DATA = \
         $(patsubst $(bashcompletiondir)/%,%.completion.bash,\
         $(patsubst $(zshcompletiondir)/_%,%.completion.zsh,\
         $1)))))))
+am.sys2out_SCRIPTS = \
+        $(notdir \
+        $(patsubst $(xinitrcdir)/%.sh,%.xinitrc,\
+        $1))
 am.sys2out_HEADERS = $(abspath $(addprefix $(srcdir)/include/,$(notdir $1)))
 
 V ?=
