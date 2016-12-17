@@ -63,7 +63,7 @@
 	merge = refs/heads/notsystemd/postmove
 [branch "notsystemd/master"]
 	remote = origin
-	merge = refs/heads/notsystemd/postmove
+	merge = refs/heads/notsystemd/master
 
 [remote "r-autothing"]
 	url = git://lukeshu.com/autothing
