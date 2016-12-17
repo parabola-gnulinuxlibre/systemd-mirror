@@ -19,11 +19,12 @@
 
 #include <sched.h>
 
-#include "macro.h"
-#include "manager.h"
-#include "rm-rf.h"
+#include "core/manager.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-shared/tests.h"
+
 #include "test-helper.h"
-#include "tests.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_(rm_rf_physical_and_freep) char *runtime_dir = NULL;
