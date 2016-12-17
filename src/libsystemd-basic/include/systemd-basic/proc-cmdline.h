@@ -19,6 +19,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <stdbool.h>
+
 int proc_cmdline(char **ret);
 int parse_proc_cmdline(int (*parse_item)(const char *key, const char *value, void *data),
                        void *data,

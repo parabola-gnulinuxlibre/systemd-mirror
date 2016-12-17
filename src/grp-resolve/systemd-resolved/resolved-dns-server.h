@@ -39,15 +39,15 @@ typedef enum DnsServerFeatureLevel {
 const char* dns_server_feature_level_to_string(int i) _const_;
 int dns_server_feature_level_from_string(const char *s) _pure_;
 
-#include "resolved-link.h"
-#include "resolved-manager.h"
-
 typedef enum DnsServerType {
         DNS_SERVER_SYSTEM,
         DNS_SERVER_FALLBACK,
         DNS_SERVER_LINK,
 } DnsServerType;
 #define _DNS_SERVER_TYPE_MAX (DNS_SERVER_LINK + 1)
+
+#include "resolved-link.h"
+#include "resolved-manager.h"
 
 const char* dns_server_type_to_string(DnsServerType i) _const_;
 DnsServerType dns_server_type_from_string(const char *s) _pure_;

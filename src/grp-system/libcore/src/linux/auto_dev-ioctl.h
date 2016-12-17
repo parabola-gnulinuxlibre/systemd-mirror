@@ -10,6 +10,7 @@
 #ifndef _LINUX_AUTO_DEV_IOCTL_H
 #define _LINUX_AUTO_DEV_IOCTL_H
 
+#include <linux/limits.h>
 #include <linux/auto_fs.h>
 
 #ifdef __KERNEL__
