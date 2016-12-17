@@ -150,9 +150,11 @@ struct Service {
 
         /* Runtime data of the execution context */
         ExecRuntime *exec_runtime;
+        DynamicCreds dynamic_creds;
 
         pid_t main_pid, control_pid;
         int socket_fd;
+        SocketPeer *peer;
         bool socket_fd_selinux_context_net;
 
         bool permissions_start_only;
@@ -178,7 +180,7 @@ struct Service {
         char *status_text;
         int status_errno;
 
-        FailureAction failure_action;
+        EmergencyAction emergency_action;
 
         UnitRef accept_socket;
 

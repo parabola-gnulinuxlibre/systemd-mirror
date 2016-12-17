@@ -84,6 +84,7 @@ struct Swap {
         CGroupContext cgroup_context;
 
         ExecRuntime *exec_runtime;
+        DynamicCreds dynamic_creds;
 
         SwapState state, deserialized_state;
 

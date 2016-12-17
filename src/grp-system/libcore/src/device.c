@@ -332,11 +332,7 @@ static int device_setup_unit(Manager *m, struct udev_device *dev, const char *pa
         if (!u) {
                 delete = true;
 
-                u = unit_new(m, sizeof(Device));
-                if (!u)
-                        return log_oom();
-
-                r = unit_add_name(u, e);
+                r = unit_new_for_name(m, sizeof(Device), e, &u);
                 if (r < 0)
                         goto fail;
 
@@ -370,7 +366,7 @@ static int device_setup_unit(Manager *m, struct udev_device *dev, const char *pa
 fail:
         log_unit_warning_errno(u, r, "Failed to set up device unit: %m");
 
-        if (delete)
+        if (delete && u)
                 unit_free(u);
 
         return r;
@@ -464,6 +460,10 @@ static void device_update_found_one(Device *d, bool add, DeviceFound found, bool
 
         if (!now)
                 return;
+
+        /* Didn't exist before, but does now? if so, generate a new invocation ID for it */
+        if (previous == DEVICE_NOT_FOUND && d->found != DEVICE_NOT_FOUND)
+                (void) unit_acquire_invocation_id(UNIT(d));
 
         if (d->found & DEVICE_FOUND_UDEV)
                 /* When the device is known to udev we consider it

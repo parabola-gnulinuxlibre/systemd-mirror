@@ -40,7 +40,7 @@ libnss_resolve_la_LIBADD = \
 	libsystemd-basic.la \
         -ldl
 
-lib_LTLIBRARIES += \
+rootlib_LTLIBRARIES += \
 	libnss_resolve.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

@@ -39,6 +39,7 @@
 #include "systemd-basic/exit-status.h"
 #include "systemd-basic/fd-util.h"
 #include "systemd-basic/formats-util.h"
+#include "systemd-basic/in-addr-util.h"
 #include "systemd-basic/io-util.h"
 #include "systemd-basic/label.h"
 #include "systemd-basic/log.h"
@@ -59,6 +60,13 @@
 
 #include "dbus-socket.h"
 #include "unit-printf.h"
+
+struct SocketPeer {
+        unsigned n_ref;
+
+        Socket *socket;
+        union sockaddr_union peer;
+};
 
 static const UnitActiveState state_translation_table[_SOCKET_STATE_MAX] = {
         [SOCKET_DEAD] = UNIT_INACTIVE,
@@ -143,14 +151,22 @@ void socket_free_ports(Socket *s) {
 
 static void socket_done(Unit *u) {
         Socket *s = SOCKET(u);
+        SocketPeer *p;
 
         assert(s);
 
         socket_free_ports(s);
 
+        while ((p = set_steal_first(s->peers_by_address)))
+                p->socket = NULL;
+
+        s->peers_by_address = set_free(s->peers_by_address);
+
         s->exec_runtime = exec_runtime_unref(s->exec_runtime);
         exec_command_free_array(s->exec_command, _SOCKET_EXEC_COMMAND_MAX);
         s->control_command = NULL;
+
+        dynamic_creds_unref(&s->dynamic_creds);
 
         socket_unwatch_control_pid(s);
 
@@ -468,12 +484,50 @@ static int socket_verify(Socket *s) {
         return 0;
 }
 
+static void peer_address_hash_func(const void *p, struct siphash *state) {
+        const SocketPeer *s = p;
+
+        assert(s);
+        assert(IN_SET(s->peer.sa.sa_family, AF_INET, AF_INET6));
+
+        if (s->peer.sa.sa_family == AF_INET)
+                siphash24_compress(&s->peer.in.sin_addr, sizeof(s->peer.in.sin_addr), state);
+        else
+                siphash24_compress(&s->peer.in6.sin6_addr, sizeof(s->peer.in6.sin6_addr), state);
+}
+
+static int peer_address_compare_func(const void *a, const void *b) {
+        const SocketPeer *x = a, *y = b;
+
+        if (x->peer.sa.sa_family < y->peer.sa.sa_family)
+                return -1;
+        if (x->peer.sa.sa_family > y->peer.sa.sa_family)
+                return 1;
+
+        switch(x->peer.sa.sa_family) {
+        case AF_INET:
+                return memcmp(&x->peer.in.sin_addr, &y->peer.in.sin_addr, sizeof(x->peer.in.sin_addr));
+        case AF_INET6:
+                return memcmp(&x->peer.in6.sin6_addr, &y->peer.in6.sin6_addr, sizeof(x->peer.in6.sin6_addr));
+        }
+        assert_not_reached("Black sheep in the family!");
+}
+
+const struct hash_ops peer_address_hash_ops = {
+        .hash = peer_address_hash_func,
+        .compare = peer_address_compare_func
+};
+
 static int socket_load(Unit *u) {
         Socket *s = SOCKET(u);
         int r;
 
         assert(u);
         assert(u->load_state == UNIT_STUB);
+
+        r = set_ensure_allocated(&s->peers_by_address, &peer_address_hash_ops);
+        if (r < 0)
+                return r;
 
         r = unit_load_fragment_and_dropin(u);
         if (r < 0)
@@ -487,6 +541,87 @@ static int socket_load(Unit *u) {
         }
 
         return socket_verify(s);
+}
+
+static SocketPeer *socket_peer_new(void) {
+        SocketPeer *p;
+
+        p = new0(SocketPeer, 1);
+        if (!p)
+                return NULL;
+
+        p->n_ref = 1;
+
+        return p;
+}
+
+SocketPeer *socket_peer_ref(SocketPeer *p) {
+        if (!p)
+                return NULL;
+
+        assert(p->n_ref > 0);
+        p->n_ref++;
+
+        return p;
+}
+
+SocketPeer *socket_peer_unref(SocketPeer *p) {
+        if (!p)
+                return NULL;
+
+        assert(p->n_ref > 0);
+
+        p->n_ref--;
+
+        if (p->n_ref > 0)
+                return NULL;
+
+        if (p->socket)
+                set_remove(p->socket->peers_by_address, p);
+
+        return mfree(p);
+}
+
+int socket_acquire_peer(Socket *s, int fd, SocketPeer **p) {
+        _cleanup_(socket_peer_unrefp) SocketPeer *remote = NULL;
+        SocketPeer sa = {}, *i;
+        socklen_t salen = sizeof(sa.peer);
+        int r;
+
+        assert(fd >= 0);
+        assert(s);
+
+        r = getpeername(fd, &sa.peer.sa, &salen);
+        if (r < 0)
+                return log_error_errno(errno, "getpeername failed: %m");
+
+        if (!IN_SET(sa.peer.sa.sa_family, AF_INET, AF_INET6)) {
+                *p = NULL;
+                return 0;
+        }
+
+        i = set_get(s->peers_by_address, &sa);
+        if (i) {
+                *p = socket_peer_ref(i);
+                return 1;
+        }
+
+        remote = socket_peer_new();
+        if (!remote)
+                return log_oom();
+
+        remote->peer = sa.peer;
+
+        r = set_put(s->peers_by_address, remote);
+        if (r < 0)
+                return r;
+
+        remote->socket = s;
+
+        *p = remote;
+        remote = NULL;
+
+        return 1;
 }
 
 _const_ static const char* listen_lookup(int family, int type) {
@@ -1201,14 +1336,9 @@ static int usbffs_select_ep(const struct dirent *d) {
 
 static int usbffs_dispatch_eps(SocketPort *p) {
         _cleanup_free_ struct dirent **ent = NULL;
-        _cleanup_free_ char *path = NULL;
         int r, i, n, k;
 
-        path = dirname_malloc(p->path);
-        if (!path)
-                return -ENOMEM;
-
-        r = scandir(path, &ent, usbffs_select_ep, alphasort);
+        r = scandir(p->path, &ent, usbffs_select_ep, alphasort);
         if (r < 0)
                 return -errno;
 
@@ -1223,7 +1353,7 @@ static int usbffs_dispatch_eps(SocketPort *p) {
         for (i = 0; i < n; ++i) {
                 _cleanup_free_ char *ep = NULL;
 
-                ep = path_make_absolute(ent[i]->d_name, path);
+                ep = path_make_absolute(ent[i]->d_name, p->path);
                 if (!ep)
                         return -ENOMEM;
 
@@ -1604,6 +1734,9 @@ static int socket_coldplug(Unit *u) {
                         return r;
         }
 
+        if (!IN_SET(s->deserialized_state, SOCKET_DEAD, SOCKET_FAILED))
+                (void) unit_setup_dynamic_creds(u);
+
         socket_set_state(s, s->deserialized_state);
         return 0;
 }
@@ -1613,12 +1746,10 @@ static int socket_spawn(Socket *s, ExecCommand *c, pid_t *_pid) {
         pid_t pid;
         int r;
         ExecParameters exec_params = {
-                .apply_permissions = true,
-                .apply_chroot      = true,
-                .apply_tty_stdin   = true,
-                .stdin_fd          = -1,
-                .stdout_fd         = -1,
-                .stderr_fd         = -1,
+                .flags      = EXEC_APPLY_PERMISSIONS|EXEC_APPLY_CHROOT|EXEC_APPLY_TTY_STDIN,
+                .stdin_fd   = -1,
+                .stdout_fd  = -1,
+                .stderr_fd  = -1,
         };
 
         assert(s);
@@ -1635,6 +1766,10 @@ static int socket_spawn(Socket *s, ExecCommand *c, pid_t *_pid) {
         if (r < 0)
                 return r;
 
+        r = unit_setup_dynamic_creds(UNIT(s));
+        if (r < 0)
+                return r;
+
         r = socket_arm_timer(s, usec_add(now(CLOCK_MONOTONIC), s->timeout_usec));
         if (r < 0)
                 return r;
@@ -1645,7 +1780,7 @@ static int socket_spawn(Socket *s, ExecCommand *c, pid_t *_pid) {
 
         exec_params.argv = argv;
         exec_params.environment = UNIT(s)->manager->environment;
-        exec_params.confirm_spawn = UNIT(s)->manager->confirm_spawn;
+        exec_params.flags |= UNIT(s)->manager->confirm_spawn ? EXEC_CONFIRM_SPAWN : 0;
         exec_params.cgroup_supported = UNIT(s)->manager->cgroup_supported;
         exec_params.cgroup_path = UNIT(s)->cgroup_path;
         exec_params.cgroup_delegate = s->cgroup_context.delegate;
@@ -1656,6 +1791,7 @@ static int socket_spawn(Socket *s, ExecCommand *c, pid_t *_pid) {
                        &s->exec_context,
                        &exec_params,
                        s->exec_runtime,
+                       &s->dynamic_creds,
                        &pid);
         if (r < 0)
                 return r;
@@ -1756,15 +1892,19 @@ fail:
 static void socket_enter_dead(Socket *s, SocketResult f) {
         assert(s);
 
-        if (f != SOCKET_SUCCESS)
+        if (s->result == SOCKET_SUCCESS)
                 s->result = f;
+
+        socket_set_state(s, s->result != SOCKET_SUCCESS ? SOCKET_FAILED : SOCKET_DEAD);
 
         exec_runtime_destroy(s->exec_runtime);
         s->exec_runtime = exec_runtime_unref(s->exec_runtime);
 
         exec_context_destroy_runtime_directory(&s->exec_context, manager_get_runtime_prefix(UNIT(s)->manager));
 
-        socket_set_state(s, s->result != SOCKET_SUCCESS ? SOCKET_FAILED : SOCKET_DEAD);
+        unit_unref_uid_gid(UNIT(s), true);
+
+        dynamic_creds_destroy(&s->dynamic_creds);
 }
 
 static void socket_enter_signal(Socket *s, SocketState state, SocketResult f);
@@ -1773,7 +1913,7 @@ static void socket_enter_stop_post(Socket *s, SocketResult f) {
         int r;
         assert(s);
 
-        if (f != SOCKET_SUCCESS)
+        if (s->result == SOCKET_SUCCESS)
                 s->result = f;
 
         socket_unwatch_control_pid(s);
@@ -1801,7 +1941,7 @@ static void socket_enter_signal(Socket *s, SocketState state, SocketResult f) {
 
         assert(s);
 
-        if (f != SOCKET_SUCCESS)
+        if (s->result == SOCKET_SUCCESS)
                 s->result = f;
 
         r = unit_kill_context(
@@ -1845,7 +1985,7 @@ static void socket_enter_stop_pre(Socket *s, SocketResult f) {
         int r;
         assert(s);
 
-        if (f != SOCKET_SUCCESS)
+        if (s->result == SOCKET_SUCCESS)
                 s->result = f;
 
         socket_unwatch_control_pid(s);
@@ -2040,12 +2180,32 @@ static void socket_enter_running(Socket *s, int cfd) {
                 socket_set_state(s, SOCKET_RUNNING);
         } else {
                 _cleanup_free_ char *prefix = NULL, *instance = NULL, *name = NULL;
+                _cleanup_(socket_peer_unrefp) SocketPeer *p = NULL;
                 Service *service;
 
                 if (s->n_connections >= s->max_connections) {
-                        log_unit_warning(UNIT(s), "Too many incoming connections (%u), refusing connection attempt.", s->n_connections);
+                        log_unit_warning(UNIT(s), "Too many incoming connections (%u), dropping connection.",
+                                         s->n_connections);
                         safe_close(cfd);
                         return;
+                }
+
+                if (s->max_connections_per_source > 0) {
+                        r = socket_acquire_peer(s, cfd, &p);
+                        if (r < 0) {
+                                safe_close(cfd);
+                                return;
+                        } else if (r > 0 && p->n_ref > s->max_connections_per_source) {
+                                _cleanup_free_ char *t = NULL;
+
+                                sockaddr_pretty(&p->peer.sa, FAMILY_ADDRESS_SIZE(p->peer.sa.sa_family), true, false, &t);
+
+                                log_unit_warning(UNIT(s),
+                                                 "Too many incoming connections (%u) from source %s, dropping connection.",
+                                                 p->n_ref, strnull(t));
+                                safe_close(cfd);
+                                return;
+                        }
                 }
 
                 r = socket_instantiate_service(s);
@@ -2088,6 +2248,9 @@ static void socket_enter_running(Socket *s, int cfd) {
 
                 cfd = -1; /* We passed ownership of the fd to the service now. Forget it here. */
                 s->n_connections++;
+
+                service->peer = p; /* Pass ownership of the peer reference */
+                p = NULL;
 
                 r = manager_add_job(UNIT(s)->manager, JOB_START, UNIT(service), JOB_REPLACE, &error, NULL);
                 if (r < 0) {
@@ -2193,11 +2356,14 @@ static int socket_start(Unit *u) {
                 return r;
         }
 
+        r = unit_acquire_invocation_id(u);
+        if (r < 0)
+                return r;
+
         s->result = SOCKET_SUCCESS;
         s->reset_cpu_usage = true;
 
         socket_enter_start_pre(s);
-
         return 1;
 }
 
@@ -2288,6 +2454,11 @@ static int socket_serialize(Unit *u, FILE *f, FDSet *fds) {
         return 0;
 }
 
+static void socket_port_take_fd(SocketPort *p, FDSet *fds, int fd) {
+        safe_close(p->fd);
+        p->fd = fdset_remove(fds, fd);
+}
+
 static int socket_deserialize_item(Unit *u, const char *key, const char *value, FDSet *fds) {
         Socket *s = SOCKET(u);
 
@@ -2342,18 +2513,13 @@ static int socket_deserialize_item(Unit *u, const char *key, const char *value, 
 
                 if (sscanf(value, "%i %n", &fd, &skip) < 1 || fd < 0 || !fdset_contains(fds, fd))
                         log_unit_debug(u, "Failed to parse fifo value: %s", value);
-                else {
-
+                else
                         LIST_FOREACH(port, p, s->ports)
                                 if (p->type == SOCKET_FIFO &&
-                                    path_equal_or_files_same(p->path, value+skip))
+                                    path_equal_or_files_same(p->path, value+skip)) {
+                                        socket_port_take_fd(p, fds, fd);
                                         break;
-
-                        if (p) {
-                                safe_close(p->fd);
-                                p->fd = fdset_remove(fds, fd);
-                        }
-                }
+                                }
 
         } else if (streq(key, "special")) {
                 int fd, skip = 0;
@@ -2361,18 +2527,13 @@ static int socket_deserialize_item(Unit *u, const char *key, const char *value, 
 
                 if (sscanf(value, "%i %n", &fd, &skip) < 1 || fd < 0 || !fdset_contains(fds, fd))
                         log_unit_debug(u, "Failed to parse special value: %s", value);
-                else {
-
+                else
                         LIST_FOREACH(port, p, s->ports)
                                 if (p->type == SOCKET_SPECIAL &&
-                                    path_equal_or_files_same(p->path, value+skip))
+                                    path_equal_or_files_same(p->path, value+skip)) {
+                                        socket_port_take_fd(p, fds, fd);
                                         break;
-
-                        if (p) {
-                                safe_close(p->fd);
-                                p->fd = fdset_remove(fds, fd);
-                        }
-                }
+                                }
 
         } else if (streq(key, "mqueue")) {
                 int fd, skip = 0;
@@ -2380,18 +2541,13 @@ static int socket_deserialize_item(Unit *u, const char *key, const char *value, 
 
                 if (sscanf(value, "%i %n", &fd, &skip) < 1 || fd < 0 || !fdset_contains(fds, fd))
                         log_unit_debug(u, "Failed to parse mqueue value: %s", value);
-                else {
-
+                else
                         LIST_FOREACH(port, p, s->ports)
                                 if (p->type == SOCKET_MQUEUE &&
-                                    streq(p->path, value+skip))
+                                    streq(p->path, value+skip)) {
+                                        socket_port_take_fd(p, fds, fd);
                                         break;
-
-                        if (p) {
-                                safe_close(p->fd);
-                                p->fd = fdset_remove(fds, fd);
-                        }
-                }
+                                }
 
         } else if (streq(key, "socket")) {
                 int fd, type, skip = 0;
@@ -2399,17 +2555,12 @@ static int socket_deserialize_item(Unit *u, const char *key, const char *value, 
 
                 if (sscanf(value, "%i %i %n", &fd, &type, &skip) < 2 || fd < 0 || type < 0 || !fdset_contains(fds, fd))
                         log_unit_debug(u, "Failed to parse socket value: %s", value);
-                else {
-
+                else
                         LIST_FOREACH(port, p, s->ports)
-                                if (socket_address_is(&p->address, value+skip, type))
+                                if (socket_address_is(&p->address, value+skip, type)) {
+                                        socket_port_take_fd(p, fds, fd);
                                         break;
-
-                        if (p) {
-                                safe_close(p->fd);
-                                p->fd = fdset_remove(fds, fd);
-                        }
-                }
+                                }
 
         } else if (streq(key, "netlink")) {
                 int fd, skip = 0;
@@ -2417,17 +2568,12 @@ static int socket_deserialize_item(Unit *u, const char *key, const char *value, 
 
                 if (sscanf(value, "%i %n", &fd, &skip) < 1 || fd < 0 || !fdset_contains(fds, fd))
                         log_unit_debug(u, "Failed to parse socket value: %s", value);
-                else {
-
+                else
                         LIST_FOREACH(port, p, s->ports)
-                                if (socket_address_is_netlink(&p->address, value+skip))
+                                if (socket_address_is_netlink(&p->address, value+skip)) {
+                                        socket_port_take_fd(p, fds, fd);
                                         break;
-
-                        if (p) {
-                                safe_close(p->fd);
-                                p->fd = fdset_remove(fds, fd);
-                        }
-                }
+                                }
 
         } else if (streq(key, "ffs")) {
                 int fd, skip = 0;
@@ -2435,18 +2581,13 @@ static int socket_deserialize_item(Unit *u, const char *key, const char *value, 
 
                 if (sscanf(value, "%i %n", &fd, &skip) < 1 || fd < 0 || !fdset_contains(fds, fd))
                         log_unit_debug(u, "Failed to parse ffs value: %s", value);
-                else {
-
+                else
                         LIST_FOREACH(port, p, s->ports)
                                 if (p->type == SOCKET_USB_FUNCTION &&
-                                    path_equal_or_files_same(p->path, value+skip))
+                                    path_equal_or_files_same(p->path, value+skip)) {
+                                        socket_port_take_fd(p, fds, fd);
                                         break;
-
-                        if (p) {
-                                safe_close(p->fd);
-                                p->fd = fdset_remove(fds, fd);
-                        }
-                }
+                                }
 
         } else
                 log_unit_debug(UNIT(s), "Unknown serialization key: %s", key);
@@ -2607,7 +2748,7 @@ static void socket_sigchld_event(Unit *u, pid_t pid, int code, int status) {
 
         s->control_pid = 0;
 
-        if (is_clean_exit(code, status, NULL))
+        if (is_clean_exit(code, status, EXIT_CLEAN_COMMAND, NULL))
                 f = SOCKET_SUCCESS;
         else if (code == CLD_EXITED)
                 f = SOCKET_FAILURE_EXIT_CODE;
@@ -2629,7 +2770,7 @@ static void socket_sigchld_event(Unit *u, pid_t pid, int code, int status) {
                       "Control process exited, code=%s status=%i",
                       sigchld_code_to_string(code), status);
 
-        if (f != SOCKET_SUCCESS)
+        if (s->result == SOCKET_SUCCESS)
                 s->result = f;
 
         if (s->control_command &&
@@ -2932,6 +3073,7 @@ const UnitVTable socket_vtable = {
         .cgroup_context_offset = offsetof(Socket, cgroup_context),
         .kill_context_offset = offsetof(Socket, kill_context),
         .exec_runtime_offset = offsetof(Socket, exec_runtime),
+        .dynamic_creds_offset = offsetof(Socket, dynamic_creds),
 
         .sections =
                 "Unit\0"

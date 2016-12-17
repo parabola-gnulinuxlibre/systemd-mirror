@@ -43,6 +43,8 @@
 #include "systemd-basic/util.h"
 #include "systemd-basic/virt.h"
 
+#include "test-helper.h"
+
 static void test_get_process_comm(pid_t pid) {
         struct stat st;
         _cleanup_free_ char *a = NULL, *c = NULL, *d = NULL, *f = NULL, *i = NULL;
@@ -357,7 +359,7 @@ int main(int argc, char *argv[]) {
                 (void) parse_pid(argv[1], &pid);
                 test_get_process_comm(pid);
         } else {
-                test_get_process_comm(1);
+                TEST_REQ_RUNNING_SYSTEMD(test_get_process_comm(1));
                 test_get_process_comm(getpid());
         }
 

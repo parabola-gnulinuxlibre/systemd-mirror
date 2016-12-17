@@ -35,6 +35,7 @@
 #include "systemd-basic/process-util.h"
 #include "systemd-basic/signal-util.h"
 #include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
 #include "systemd-basic/terminal-util.h"
 #include "systemd-shared/pager.h"
 
@@ -71,7 +72,7 @@ int pager_open(bool no_pager, bool jump_to_end) {
                 pager = getenv("PAGER");
 
         /* If the pager is explicitly turned off, honour it */
-        if (pager && (pager[0] == 0 || streq(pager, "cat")))
+        if (pager && STR_IN_SET(pager, "", "cat"))
                 return 0;
 
         /* Determine and cache number of columns before we spawn the

@@ -23,9 +23,9 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-LIBSYSTEMD_CURRENT=16
+LIBSYSTEMD_CURRENT=17
 LIBSYSTEMD_REVISION=0
-LIBSYSTEMD_AGE=16
+LIBSYSTEMD_AGE=17
 
 EXTRA_DIST += \
 	src/libsystemd/libsystemd.pc.in \
@@ -76,6 +76,7 @@ tests += \
 	test-bus-error \
 	test-bus-creds \
 	test-bus-gvariant \
+	test-bus-track \
 	test-event \
 	test-netlink \
 	test-local-addresses \

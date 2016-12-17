@@ -40,7 +40,7 @@ libnss_myhostname_la_LIBADD = \
 	libsystemd-internal.la \
 	libsystemd-basic.la
 
-lib_LTLIBRARIES += \
+rootlib_LTLIBRARIES += \
 	libnss_myhostname.la
 endif # HAVE_MYHOSTNAME
 

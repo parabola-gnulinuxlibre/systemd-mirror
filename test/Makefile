@@ -139,6 +139,11 @@ tests += \
 	test-acl-util
 endif # HAVE_ACL
 
+ifneq ($(HAVE_SECCOMP),)
+tests += \
+	test-seccomp
+endif
+
 EXTRA_DIST += \
 	test/a.service \
 	test/basic.target \
@@ -196,15 +201,36 @@ EXTRA_DIST += \
 	test/test-execute/exec-passenvironment.service \
 	test/test-execute/exec-group.service \
 	test/test-execute/exec-group-nfsnobody.service \
+	test/test-execute/exec-supplementarygroups.service \
+	test/test-execute/exec-supplementarygroups-single-group.service \
+	test/test-execute/exec-supplementarygroups-single-group-user.service \
+	test/test-execute/exec-supplementarygroups-multiple-groups-default-group-user.service \
+	test/test-execute/exec-supplementarygroups-multiple-groups-withgid.service \
+	test/test-execute/exec-supplementarygroups-multiple-groups-withuid.service \
+	test/test-execute/exec-dynamicuser-fixeduser.service \
+	test/test-execute/exec-dynamicuser-fixeduser-one-supplementarygroup.service \
+	test/test-execute/exec-dynamicuser-supplementarygroups.service \
 	test/test-execute/exec-ignoresigpipe-no.service \
 	test/test-execute/exec-ignoresigpipe-yes.service \
 	test/test-execute/exec-personality-x86-64.service \
 	test/test-execute/exec-personality-x86.service \
 	test/test-execute/exec-personality-s390.service \
+	test/test-execute/exec-personality-ppc64.service \
+	test/test-execute/exec-personality-ppc64le.service \
+	test/test-execute/exec-personality-aarch64.service \
 	test/test-execute/exec-privatedevices-no.service \
 	test/test-execute/exec-privatedevices-yes.service \
+	test/test-execute/exec-privatedevices-no-capability-mknod.service \
+	test/test-execute/exec-privatedevices-yes-capability-mknod.service \
+	test/test-execute/exec-protectkernelmodules-no-capabilities.service \
+	test/test-execute/exec-protectkernelmodules-yes-capabilities.service \
+	test/test-execute/exec-protectkernelmodules-yes-mount-propagation.service \
 	test/test-execute/exec-privatetmp-no.service \
 	test/test-execute/exec-privatetmp-yes.service \
+	test/test-execute/exec-readonlypaths.service \
+	test/test-execute/exec-readonlypaths-mount-propagation.service \
+	test/test-execute/exec-readwritepaths-mount-propagation.service \
+	test/test-execute/exec-inaccessiblepaths-mount-propagation.service \
 	test/test-execute/exec-spec-interpolation.service \
 	test/test-execute/exec-systemcallerrornumber.service \
 	test/test-execute/exec-systemcallfilter-failing2.service \
@@ -578,6 +604,12 @@ test_acl_util_SOURCES = \
 	src/test/test-acl-util.c
 
 test_acl_util_LDADD = \
+	libsystemd-shared.la
+
+test_seccomp_SOURCES = \
+	src/test/test-seccomp.c
+
+test_seccomp_LDADD = \
 	libsystemd-shared.la
 
 test_namespace_LDADD = \

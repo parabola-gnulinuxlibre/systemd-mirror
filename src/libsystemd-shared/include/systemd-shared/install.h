@@ -27,6 +27,7 @@
 #include "systemd-basic/unit-name.h"
 
 typedef enum UnitFileChangeType UnitFileChangeType;
+typedef enum UnitFileFlags UnitFileFlags;
 typedef enum UnitFilePresetMode UnitFilePresetMode;
 typedef enum UnitFileScope UnitFileScope;
 typedef enum UnitFileState UnitFileState;
@@ -79,6 +80,12 @@ enum UnitFileChangeType {
         _UNIT_FILE_CHANGE_INVALID = INT_MIN
 };
 
+enum UnitFileFlags {
+        UNIT_FILE_RUNTIME = 1,
+        UNIT_FILE_FORCE = 1 << 1,
+        UNIT_FILE_DRY_RUN = 1 << 2,
+};
+
 /* type can either one of the UnitFileChangeTypes listed above, or a negative error.
  * If source is specified, it should be the contents of the path symlink.
  * In case of an error, source should be the existing symlink contents or NULL
@@ -120,10 +127,10 @@ struct UnitFileInstallInfo {
         char **also;
 
         char *default_instance;
+        char *symlink_target;
 
         UnitFileType type;
-
-        char *symlink_target;
+        bool auxiliary;
 };
 
 static inline bool UNIT_FILE_INSTALL_INFO_HAS_RULES(UnitFileInstallInfo *i) {
@@ -145,65 +152,59 @@ bool unit_type_may_template(UnitType type) _const_;
 
 int unit_file_enable(
                 UnitFileScope scope,
-                bool runtime,
+                UnitFileFlags flags,
                 const char *root_dir,
                 char **files,
-                bool force,
                 UnitFileChange **changes,
                 unsigned *n_changes);
 int unit_file_disable(
                 UnitFileScope scope,
-                bool runtime,
+                UnitFileFlags flags,
                 const char *root_dir,
                 char **files,
                 UnitFileChange **changes,
                 unsigned *n_changes);
 int unit_file_reenable(
                 UnitFileScope scope,
-                bool runtime,
+                UnitFileFlags flags,
                 const char *root_dir,
                 char **files,
-                bool force,
                 UnitFileChange **changes,
                 unsigned *n_changes);
 int unit_file_preset(
                 UnitFileScope scope,
-                bool runtime,
+                UnitFileFlags flags,
                 const char *root_dir,
                 char **files,
                 UnitFilePresetMode mode,
-                bool force,
                 UnitFileChange **changes,
                 unsigned *n_changes);
 int unit_file_preset_all(
                 UnitFileScope scope,
-                bool runtime,
+                UnitFileFlags flags,
                 const char *root_dir,
                 UnitFilePresetMode mode,
-                bool force,
                 UnitFileChange **changes,
                 unsigned *n_changes);
 int unit_file_mask(
                 UnitFileScope scope,
-                bool runtime,
+                UnitFileFlags flags,
                 const char *root_dir,
                 char **files,
-                bool force,
                 UnitFileChange **changes,
                 unsigned *n_changes);
 int unit_file_unmask(
                 UnitFileScope scope,
-                bool runtime,
+                UnitFileFlags flags,
                 const char *root_dir,
                 char **files,
                 UnitFileChange **changes,
                 unsigned *n_changes);
 int unit_file_link(
                 UnitFileScope scope,
-                bool runtime,
+                UnitFileFlags flags,
                 const char *root_dir,
                 char **files,
-                bool force,
                 UnitFileChange **changes,
                 unsigned *n_changes);
 int unit_file_revert(
@@ -214,9 +215,9 @@ int unit_file_revert(
                 unsigned *n_changes);
 int unit_file_set_default(
                 UnitFileScope scope,
+                UnitFileFlags flags,
                 const char *root_dir,
                 const char *file,
-                bool force,
                 UnitFileChange **changes,
                 unsigned *n_changes);
 int unit_file_get_default(
@@ -225,12 +226,11 @@ int unit_file_get_default(
                 char **name);
 int unit_file_add_dependency(
                 UnitFileScope scope,
-                bool runtime,
+                UnitFileFlags flags,
                 const char *root_dir,
                 char **files,
                 const char *target,
                 UnitDependency dep,
-                bool force,
                 UnitFileChange **changes,
                 unsigned *n_changes);
 

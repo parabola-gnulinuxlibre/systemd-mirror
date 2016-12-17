@@ -39,7 +39,7 @@ libnss_mymachines_la_LIBADD = \
 	libsystemd-internal.la \
 	libsystemd-basic.la
 
-lib_LTLIBRARIES += \
+rootlib_LTLIBRARIES += \
 	libnss_mymachines.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

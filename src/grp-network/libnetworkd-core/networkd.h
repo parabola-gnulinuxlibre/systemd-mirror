@@ -39,6 +39,7 @@
 #include "networkd-netdev-macvlan.h"
 #include "networkd-netdev-tunnel.h"
 #include "networkd-netdev-tuntap.h"
+#include "networkd-netdev-vcan.h"
 #include "networkd-netdev-veth.h"
 #include "networkd-netdev-vlan.h"
 #include "networkd-netdev-vrf.h"

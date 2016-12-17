@@ -26,6 +26,8 @@
 typedef struct DnsScope DnsScope;
 
 #include "resolved-dns-cache.h"
+#include "resolved-dns-query.h"
+#include "resolved-dns-search-domain.h"
 #include "resolved-dns-server.h"
 #include "resolved-dns-stream.h"
 #include "resolved-dns-zone.h"

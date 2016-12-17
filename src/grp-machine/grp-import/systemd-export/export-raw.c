@@ -33,6 +33,7 @@
 #include "systemd-basic/copy.h"
 #include "systemd-basic/fd-util.h"
 #include "systemd-basic/fileio.h"
+#include "systemd-basic/missing.h"
 #include "systemd-basic/ratelimit.h"
 #include "systemd-basic/string-util.h"
 #include "systemd-basic/util.h"
@@ -87,9 +88,7 @@ RawExport *raw_export_unref(RawExport *e) {
 
         free(e->buffer);
         free(e->path);
-        free(e);
-
-        return NULL;
+        return mfree(e);
 }
 
 int raw_export_new(

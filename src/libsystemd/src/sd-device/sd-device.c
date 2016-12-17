@@ -31,6 +31,7 @@
 #include "systemd-basic/parse-util.h"
 #include "systemd-basic/path-util.h"
 #include "systemd-basic/set.h"
+#include "systemd-basic/socket-util.h"
 #include "systemd-basic/stat-util.h"
 #include "systemd-basic/string-util.h"
 #include "systemd-basic/strv.h"
@@ -629,9 +630,9 @@ _public_ int sd_device_new_from_device_id(sd_device **ret, const char *id) {
                 if (r < 0)
                         return r;
 
-                sk = socket(PF_INET, SOCK_DGRAM, 0);
+                sk = socket_ioctl_fd();
                 if (sk < 0)
-                        return -errno;
+                        return sk;
 
                 r = ioctl(sk, SIOCGIFNAME, &ifr);
                 if (r < 0)

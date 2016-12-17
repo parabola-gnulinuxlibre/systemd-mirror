@@ -1,5 +1,6 @@
 *.a
 *.cache
+*.gch
 *.la
 *.lo
 *.log
@@ -38,6 +39,7 @@
 /exported
 /exported-*
 /hostnamectl
+/image.raw
 /install-tree
 /journalctl
 /libtool
@@ -91,6 +93,7 @@
 /systemd-machine-id-setup
 /systemd-machined
 /systemd-modules-load
+/systemd-mount
 /systemd-networkd
 /systemd-networkd-wait-online
 /systemd-notify
@@ -153,6 +156,7 @@
 /test-bus-policy
 /test-bus-server
 /test-bus-signature
+/test-bus-track
 /test-bus-zero-copy
 /test-calendarspec
 /test-cap-list
@@ -260,6 +264,7 @@
 /test-ring
 /test-rlimit-util
 /test-sched-prio
+/test-seccomp
 /test-selinux
 /test-set
 /test-sizeof

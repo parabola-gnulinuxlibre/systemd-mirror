@@ -76,10 +76,8 @@ Writer* writer_new(RemoteServer *server) {
         memset(&w->metrics, 0xFF, sizeof(w->metrics));
 
         w->mmap = mmap_cache_new();
-        if (!w->mmap) {
-                free(w);
-                return NULL;
-        }
+        if (!w->mmap)
+                return mfree(w);
 
         w->n_ref = 1;
         w->server = server;
@@ -104,9 +102,7 @@ Writer* writer_free(Writer *w) {
         if (w->mmap)
                 mmap_cache_unref(w->mmap);
 
-        free(w);
-
-        return NULL;
+        return mfree(w);
 }
 
 Writer* writer_unref(Writer *w) {

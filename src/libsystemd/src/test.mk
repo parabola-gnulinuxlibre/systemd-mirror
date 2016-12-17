@@ -54,6 +54,15 @@ test_bus_cleanup_CFLAGS = \
 test_bus_cleanup_LDADD = \
 	libsystemd-shared.la
 
+test_bus_track_SOURCES = \
+	src/libsystemd/sd-bus/test-bus-track.c
+
+test_bus_track_CFLAGS = \
+	$(SECCOMP_CFLAGS)
+
+test_bus_track_LDADD = \
+	libsystemd-shared.la
+
 test_bus_server_SOURCES = \
 	src/libsystemd/sd-bus/test-bus-server.c
 

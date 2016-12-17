@@ -64,8 +64,7 @@ Image *image_unref(Image *i) {
 
         free(i->name);
         free(i->path);
-        free(i);
-        return NULL;
+        return mfree(i);
 }
 
 static char **image_settings_path(Image *image) {

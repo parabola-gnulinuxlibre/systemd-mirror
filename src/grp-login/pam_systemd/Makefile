@@ -46,8 +46,10 @@ pam_systemd_la_LIBADD = \
 pamlib_LTLIBRARIES = \
 	pam_systemd.la
 
+ifneq ($(ENABLE_PAM_CONFIG),)
 dist_pamconf_DATA = \
 	src/login/systemd-user
+endif
 
 EXTRA_DIST += \
 	src/login/systemd-user.m4

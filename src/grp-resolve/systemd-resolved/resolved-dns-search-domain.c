@@ -105,9 +105,7 @@ DnsSearchDomain* dns_search_domain_unref(DnsSearchDomain *d) {
                 return NULL;
 
         free(d->name);
-        free(d);
-
-        return NULL;
+        return mfree(d);
 }
 
 void dns_search_domain_unlink(DnsSearchDomain *d) {

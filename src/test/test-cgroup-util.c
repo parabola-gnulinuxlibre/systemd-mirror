@@ -24,6 +24,7 @@
 #include "systemd-basic/formats-util.h"
 #include "systemd-basic/parse-util.h"
 #include "systemd-basic/process-util.h"
+#include "systemd-basic/stat-util.h"
 #include "systemd-basic/string-util.h"
 #include "systemd-basic/user-util.h"
 #include "systemd-basic/util.h"
@@ -310,6 +311,28 @@ static void test_mask_supported(void) {
                 printf("'%s' is supported: %s\n", cgroup_controller_to_string(c), yes_no(m & CGROUP_CONTROLLER_TO_MASK(c)));
 }
 
+static void test_is_cgroup_fs(void) {
+        struct statfs sfs;
+        assert_se(statfs("/sys/fs/cgroup", &sfs) == 0);
+        if (is_temporary_fs(&sfs))
+                assert_se(statfs("/sys/fs/cgroup/systemd", &sfs) == 0);
+        assert_se(is_cgroup_fs(&sfs));
+}
+
+static void test_fd_is_cgroup_fs(void) {
+        int fd;
+
+        fd = open("/sys/fs/cgroup", O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW);
+        assert_se(fd >= 0);
+        if (fd_is_temporary_fs(fd)) {
+                fd = safe_close(fd);
+                fd = open("/sys/fs/cgroup/systemd", O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW);
+                assert_se(fd >= 0);
+        }
+        assert_se(fd_is_cgroup_fs(fd));
+        fd = safe_close(fd);
+}
+
 int main(void) {
         test_path_decode_unit();
         test_path_get_unit();
@@ -325,6 +348,8 @@ int main(void) {
         test_slice_to_path();
         test_shift_path();
         TEST_REQ_RUNNING_SYSTEMD(test_mask_supported());
+        TEST_REQ_RUNNING_SYSTEMD(test_is_cgroup_fs());
+        TEST_REQ_RUNNING_SYSTEMD(test_fd_is_cgroup_fs());
 
         return 0;
 }

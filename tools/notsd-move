@@ -75,6 +75,7 @@ move_files() (
 	mv -T src/{,systemd-}initctl
 	mv -T src/{,systemd-}machine-id-setup
 	mv -T src/{,systemd-}modules-load
+	mv -T src/{,systemd-}mount
 	mv -T src/{,systemd-}notify
 	mv -T src/{,systemd-}nspawn
 	mv -T src/{,systemd-}path
@@ -701,6 +702,7 @@ move_files() (
 	rmdir src/grp-journal/catalog
 
 	mv -t src/systemd-timesyncd system-preset/??-timesyncd.preset
+	mv -t src/grp-journal/grp-remote system-preset/??-journal-remote.preset
 	for file in system-preset/??-*.preset; do
 		base="${file##*/??-}"
 		base="${base%.preset}"

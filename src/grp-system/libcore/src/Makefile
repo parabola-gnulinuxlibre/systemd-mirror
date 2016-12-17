@@ -69,6 +69,8 @@ libcore_la_SOURCES = \
 	src/core/load-dropin.h \
 	src/core/execute.c \
 	src/core/execute.h \
+	src/core/dynamic-user.c \
+	src/core/dynamic-user.h \
 	src/core/kill.c \
 	src/core/kill.h \
 	src/core/dbus.c \
@@ -139,8 +141,8 @@ libcore_la_SOURCES = \
 	src/core/audit-fd.h \
 	src/core/show-status.c \
 	src/core/show-status.h \
-	src/core/failure-action.c \
-	src/core/failure-action.h
+	src/core/emergency-action.c \
+	src/core/emergency-action.h
 
 nodist_libcore_la_SOURCES = \
 	src/core/load-fragment-gperf.c \

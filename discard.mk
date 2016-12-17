@@ -83,6 +83,7 @@ nodist_zshcompletion_DATA = $(nodist_zshcompletion_data)
 endif # ENABLE_ZSH_COMPLETION
 udevlibexec_PROGRAMS =
 gperf_gperf_sources =
+rootlib_LTLIBRARIES =
 
 in_files = $(filter %.in,$(EXTRA_DIST))
 in_in_files = $(filter %.in.in, $(in_files))
@@ -176,16 +177,6 @@ AM_CFLAGS = $(OUR_CFLAGS)
 AM_LDFLAGS = $(OUR_LDFLAGS)
 
 # ------------------------------------------------------------------------------
-define move-to-rootlibdir
-	if test "$(libdir)" != "$(rootlibdir)"; then \
-		$(MKDIR_P) $(DESTDIR)$(rootlibdir) && \
-		so_img_name=$$(readlink $(DESTDIR)$(libdir)/$$libname) && \
-		rm -f $(DESTDIR)$(libdir)/$$libname && \
-		$(LN_S) --relative -f $(DESTDIR)$(rootlibdir)/$$so_img_name $(DESTDIR)$(libdir)/$$libname && \
-		mv $(DESTDIR)$(libdir)/$$libname.* $(DESTDIR)$(rootlibdir); \
-	fi
-endef
-
 INSTALL_DIRS =
 
 SHUTDOWN_TARGET_WANTS =
@@ -354,7 +345,6 @@ dist_systemunit_DATA = \
 	units/swap.target \
 	units/slices.target \
 	units/system.slice \
-	units/x-.slice \
 	units/systemd-initctl.socket \
 	units/syslog.socket \
 	units/dev-hugepages.mount \
@@ -385,7 +375,6 @@ dist_systemunit_DATA_busnames += \
 nodist_systemunit_DATA = \
 	units/getty@.service \
 	units/serial-getty@.service \
-	units/console-shell.service \
 	units/console-getty.service \
 	units/container-getty@.service \
 	units/systemd-initctl.service \
@@ -426,7 +415,18 @@ endif # HAVE_UTMP
 dist_userunit_DATA = \
 	units/user/basic.target \
 	units/user/default.target \
-	units/user/exit.target
+	units/user/exit.target \
+	units/user/graphical-session.target \
+	units/user/graphical-session-pre.target \
+	units/user/bluetooth.target \
+	units/user/busnames.target \
+	units/user/paths.target \
+	units/user/printer.target \
+	units/user/shutdown.target \
+	units/user/smartcard.target \
+	units/user/sockets.target \
+	units/user/sound.target \
+	units/user/timers.target
 
 nodist_userunit_DATA = \
 	units/user/systemd-exit.service
@@ -437,7 +437,6 @@ dist_systempreset_DATA = \
 EXTRA_DIST += \
 	units/getty@.service.m4 \
 	units/serial-getty@.service.m4 \
-	units/console-shell.service.m4.in \
 	units/console-getty.service.m4.in \
 	units/container-getty@.service.m4.in \
 	units/rescue.service.in \
@@ -485,16 +484,8 @@ EXTRA_DIST += \
 	units/rc-local.service.in \
 	units/halt-local.service.in
 
-# automake is broken and can't handle files with a dash in front
-# http://debbugs.gnu.org/cgi/bugreport.cgi?bug=14728#8
-units-install-hook:
-	mv $(DESTDIR)$(systemunitdir)/x-.slice $(DESTDIR)/$(systemunitdir)/-.slice
-
-units-uninstall-hook:
-	rm -f $(DESTDIR)/$(systemunitdir)/-.slice
-
-INSTALL_DATA_HOOKS += units-install-hook
-UNINSTALL_DATA_HOOKS += units-uninstall-hook
+GENERAL_ALIASES += \
+	$(systemunitdir)/machines.target $(pkgsysconfdir)/system/multi-user.target.wants/machines.target
 
 dist_doc_DATA = \
 	README \
@@ -606,32 +597,14 @@ dist_factory_pam_DATA = \
 	factory/etc/pam.d/other
 endif # HAVE_PAM
 
-libsystemd-install-hook:
-	libname=libsystemd.so && $(move-to-rootlibdir)
-
-libsystemd-uninstall-hook:
-	rm -f $(DESTDIR)$(rootlibdir)/libsystemd.so*
-
-INSTALL_EXEC_HOOKS += libsystemd-install-hook
-UNINSTALL_EXEC_HOOKS += libsystemd-uninstall-hook
-
-# move lib from $(libdir) to $(rootlibdir) and update devel link, if needed
-libudev-install-hook:
-	libname=libudev.so && $(move-to-rootlibdir)
-
-libudev-uninstall-hook:
-	rm -f $(DESTDIR)$(rootlibdir)/libudev.so*
-
-INSTALL_EXEC_HOOKS += libudev-install-hook
-UNINSTALL_EXEC_HOOKS += libudev-uninstall-hook
-
 ifneq ($(ENABLE_TESTS),)
 TESTS += \
 	test/udev-test.pl
 
 ifneq ($(HAVE_PYTHON),)
 TESTS += \
-	test/rule-syntax-check.py
+	test/rule-syntax-check.py \
+	hwdb/parse_hwdb.py
 
 ifneq ($(HAVE_SYSV_COMPAT),)
 TESTS += \
@@ -682,7 +655,8 @@ EXTRA_DIST += \
 	test/udev-test.pl \
 	test/rule-syntax-check.py \
 	test/sysv-generator-test.py \
-	test/mocks/fsck
+	test/mocks/fsck \
+	hwdb/parse_hwdb.py
 
 test_nss_SOURCES = \
 	src/test/test-nss.c
@@ -739,6 +713,9 @@ EXTRA_DIST += \
 	test/TEST-11-ISSUE-3166/test.sh \
 	test/TEST-12-ISSUE-3171/Makefile \
 	test/TEST-12-ISSUE-3171/test.sh \
+	test/TEST-13-NSPAWN-SMOKE/Makefile \
+	test/TEST-13-NSPAWN-SMOKE/create-busybox-container \
+	test/TEST-13-NSPAWN-SMOKE/test.sh \
 	test/test-functions
 
 EXTRA_DIST += \
@@ -860,19 +837,6 @@ SYSTEM_UNIT_ALIASES += \
 	graphical.target default.target \
 	reboot.target ctrl-alt-del.target \
 	getty@.service autovt@.service
-
-USER_UNIT_ALIASES += \
-	$(systemunitdir)/shutdown.target shutdown.target \
-	$(systemunitdir)/sockets.target sockets.target \
-	$(systemunitdir)/timers.target timers.target \
-	$(systemunitdir)/paths.target paths.target \
-	$(systemunitdir)/bluetooth.target bluetooth.target \
-	$(systemunitdir)/printer.target printer.target \
-	$(systemunitdir)/sound.target sound.target \
-	$(systemunitdir)/smartcard.target smartcard.target
-
-USER_UNIT_ALIASES += \
-	$(systemunitdir)/busnames.target busnames.target
 
 GENERAL_ALIASES += \
 	$(systemunitdir)/remote-fs.target $(pkgsysconfdir)/system/multi-user.target.wants/remote-fs.target \
