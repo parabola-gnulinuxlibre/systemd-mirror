@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sd-netlink/local-addresses.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/hostname-util.h"
 #include "systemd-basic/macro.h"
@@ -32,6 +31,7 @@
 #include "systemd-basic/signal-util.h"
 #include "systemd-basic/string-util.h"
 #include "systemd-basic/util.h"
+#include "systemd-shared/local-addresses.h"
 
 /* We use 127.0.0.2 as IPv4 address. This has the advantage over
  * 127.0.0.1 that it can be translated back to the local hostname. For

@@ -20,28 +20,15 @@
 #
 #  You should have received a copy of the GNU Lesser General Public License
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
-ifneq ($(HAVE_MYHOSTNAME),)
-libnss_myhostname_la_SOURCES = \
-	src/nss-myhostname/nss-myhostname.sym \
-	src/nss-myhostname/nss-myhostname.c
+tests += test-local-addreses
 
-libnss_myhostname_la_LDFLAGS = \
-	-module \
-	-export-dynamic \
-	-avoid-version \
-	-shared \
-	-shrext .so.2 \
-	-Wl,--version-script=$(srcdir)/nss-myhostname.sym
+test_local_addresses_SOURCES = \
+	src/libsystemd/sd-netlink/test-local-addresses.c
 
-libnss_myhostname_la_LIBADD = \
-	libsystemd-shared.la \
-	libsystemd-basic.la
-
-rootlib_LTLIBRARIES += \
-	libnss_myhostname.la
-endif # HAVE_MYHOSTNAME
+test_local_addresses_LDADD = \
+	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

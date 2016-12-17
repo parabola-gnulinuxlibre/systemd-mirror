@@ -17,7 +17,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-netlink/local-addresses.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/fd-util.h"
 #include "systemd-basic/in-addr-util.h"
@@ -26,6 +25,7 @@
 #include "systemd-basic/string-util.h"
 #include "systemd-basic/util.h"
 #include "systemd-firewall/firewall-util.h"
+#include "systemd-shared/local-addresses.h"
 #include "systemd-staging/sd-netlink.h"
 
 #include "nspawn-expose-ports.h"

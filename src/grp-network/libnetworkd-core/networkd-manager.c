@@ -25,7 +25,6 @@
 
 #include "libudev-private.h"
 #include "sd-bus/bus-util.h"
-#include "sd-netlink/local-addresses.h"
 #include "sd-netlink/netlink-util.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/def.h"
@@ -37,6 +36,7 @@
 #include "systemd-basic/virt.h"
 #include "systemd-shared/conf-parser.h"
 #include "systemd-shared/dns-domain.h"
+#include "systemd-shared/local-addresses.h"
 #include "systemd-shared/udev-util.h"
 #include "systemd-staging/sd-netlink.h"
 

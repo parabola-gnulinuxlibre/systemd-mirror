@@ -23,7 +23,6 @@
 
 #include "sd-device/device-util.h"
 #include "sd-hwdb/hwdb-util.h"
-#include "sd-netlink/local-addresses.h"
 #include "sd-netlink/netlink-util.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/arphrd-list.h"
@@ -42,6 +41,7 @@
 #include "systemd-basic/util.h"
 #include "systemd-basic/verbs.h"
 #include "systemd-network/sd-lldp.h"
+#include "systemd-shared/local-addresses.h"
 #include "systemd-shared/pager.h"
 #include "systemd-staging/sd-device.h"
 #include "systemd-staging/sd-hwdb.h"

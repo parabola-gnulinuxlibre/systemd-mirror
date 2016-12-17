@@ -20,8 +20,7 @@
 #include "systemd-basic/af-list.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/in-addr-util.h"
-
-#include "local-addresses.h"
+#include "systemd-shared/local-addresses.h"
 
 static void print_local_addresses(struct local_address *a, unsigned n) {
         unsigned i;

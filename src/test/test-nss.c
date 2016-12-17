@@ -21,7 +21,6 @@
 #include <net/if.h>
 #include <stdlib.h>
 
-#include "sd-netlink/local-addresses.h"
 #include "systemd-basic/af-list.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/errno-list.h"
@@ -34,6 +33,7 @@
 #include "systemd-basic/stdio-util.h"
 #include "systemd-basic/string-util.h"
 #include "systemd-basic/strv.h"
+#include "systemd-shared/local-addresses.h"
 
 static const char* nss_status_to_string(enum nss_status status, char *buf, size_t buf_len) {
         switch (status) {

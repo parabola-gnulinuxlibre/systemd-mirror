@@ -79,7 +79,6 @@ tests += \
 	test-bus-track \
 	test-event \
 	test-netlink \
-	test-local-addresses \
 	test-resolve
 
 _pkginclude_HEADERS += \

@@ -33,7 +33,6 @@
 #include "sd-bus/bus-common-errors.h"
 #include "sd-bus/bus-internal.h"
 #include "sd-bus/bus-util.h"
-#include "sd-netlink/local-addresses.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/bus-label.h"
 #include "systemd-basic/copy.h"
@@ -50,6 +49,7 @@
 #include "systemd-basic/strv.h"
 #include "systemd-basic/terminal-util.h"
 #include "systemd-basic/user-util.h"
+#include "systemd-shared/local-addresses.h"
 
 static int property_get_state(
                 sd_bus *bus,

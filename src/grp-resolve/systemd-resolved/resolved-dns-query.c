@@ -18,11 +18,11 @@
 ***/
 
 #include "basic-dns/dns-type.h"
-#include "sd-netlink/local-addresses.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/hostname-util.h"
 #include "systemd-basic/string-util.h"
 #include "systemd-shared/dns-domain.h"
+#include "systemd-shared/local-addresses.h"
 
 #include "resolved-dns-query.h"
 #include "resolved-dns-synthesize.h"

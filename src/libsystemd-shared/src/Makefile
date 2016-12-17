@@ -27,6 +27,8 @@ rootlibexec_LTLIBRARIES += \
 	libsystemd-shared.la
 
 libsystemd_shared_la_SOURCES = \
+	src/libsystemd/sd-netlink/local-addresses.h \
+	src/libsystemd/sd-netlink/local-addresses.c \
 	src/shared/output-mode.h \
 	src/shared/output-mode.c \
 	src/shared/gpt.h \
