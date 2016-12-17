@@ -28,6 +28,7 @@ systemd_mount_SOURCES = \
 	src/mount/mount-tool.c
 
 systemd_mount_LDADD = \
+	libsystemd-internal.la \
 	libsystemd-shared.la
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
