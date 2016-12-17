@@ -1334,14 +1334,9 @@ static int usbffs_select_ep(const struct dirent *d) {
 
 static int usbffs_dispatch_eps(SocketPort *p) {
         _cleanup_free_ struct dirent **ent = NULL;
-        _cleanup_free_ char *path = NULL;
         int r, i, n, k;
 
-        path = dirname_malloc(p->path);
-        if (!path)
-                return -ENOMEM;
-
-        r = scandir(path, &ent, usbffs_select_ep, alphasort);
+        r = scandir(p->path, &ent, usbffs_select_ep, alphasort);
         if (r < 0)
                 return -errno;
 
@@ -1356,7 +1351,7 @@ static int usbffs_dispatch_eps(SocketPort *p) {
         for (i = 0; i < n; ++i) {
                 _cleanup_free_ char *ep = NULL;
 
-                ep = path_make_absolute(ent[i]->d_name, path);
+                ep = path_make_absolute(ent[i]->d_name, p->path);
                 if (!ep)
                         return -ENOMEM;
 
@@ -1905,6 +1900,8 @@ static void socket_enter_dead(Socket *s, SocketResult f) {
 
         exec_context_destroy_runtime_directory(&s->exec_context, manager_get_runtime_prefix(UNIT(s)->manager));
 
+        unit_unref_uid_gid(UNIT(s), true);
+
         dynamic_creds_destroy(&s->dynamic_creds);
 }
 
@@ -2357,11 +2354,14 @@ static int socket_start(Unit *u) {
                 return r;
         }
 
+        r = unit_acquire_invocation_id(u);
+        if (r < 0)
+                return r;
+
         s->result = SOCKET_SUCCESS;
         s->reset_cpu_usage = true;
 
         socket_enter_start_pre(s);
-
         return 1;
 }
 
@@ -2746,7 +2746,7 @@ static void socket_sigchld_event(Unit *u, pid_t pid, int code, int status) {
 
         s->control_pid = 0;
 
-        if (is_clean_exit(code, status, NULL))
+        if (is_clean_exit(code, status, EXIT_CLEAN_COMMAND, NULL))
                 f = SOCKET_SUCCESS;
         else if (code == CLD_EXITED)
                 f = SOCKET_FAILURE_EXIT_CODE;

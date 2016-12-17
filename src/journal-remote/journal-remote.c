@@ -127,6 +127,10 @@ static int spawn_child(const char* child, char** argv) {
         if (r < 0)
                 log_warning_errno(errno, "Failed to close write end of pipe: %m");
 
+        r = fd_nonblock(fd[0], true);
+        if (r < 0)
+                log_warning_errno(errno, "Failed to set child pipe to non-blocking: %m");
+
         return fd[0];
 }
 
@@ -524,13 +528,12 @@ static int process_http_upload(
                         log_warning("Failed to process data for connection %p", connection);
                         if (r == -E2BIG)
                                 return mhd_respondf(connection,
-                                                    MHD_HTTP_REQUEST_ENTITY_TOO_LARGE,
-                                                    "Entry is too large, maximum is %u bytes.\n",
-                                                    DATA_SIZE_MAX);
+                                                    r, MHD_HTTP_REQUEST_ENTITY_TOO_LARGE,
+                                                    "Entry is too large, maximum is " STRINGIFY(DATA_SIZE_MAX) " bytes.");
                         else
                                 return mhd_respondf(connection,
-                                                    MHD_HTTP_UNPROCESSABLE_ENTITY,
-                                                    "Processing failed: %s.", strerror(-r));
+                                                    r, MHD_HTTP_UNPROCESSABLE_ENTITY,
+                                                    "Processing failed: %m.");
                 }
         }
 
@@ -541,13 +544,14 @@ static int process_http_upload(
 
         remaining = source_non_empty(source);
         if (remaining > 0) {
-                log_warning("Premature EOFbyte. %zu bytes lost.", remaining);
-                return mhd_respondf(connection, MHD_HTTP_EXPECTATION_FAILED,
+                log_warning("Premature EOF byte. %zu bytes lost.", remaining);
+                return mhd_respondf(connection,
+                                    0, MHD_HTTP_EXPECTATION_FAILED,
                                     "Premature EOF. %zu bytes of trailing data not processed.",
                                     remaining);
         }
 
-        return mhd_respond(connection, MHD_HTTP_ACCEPTED, "OK.\n");
+        return mhd_respond(connection, MHD_HTTP_ACCEPTED, "OK.");
 };
 
 static int request_handler(
@@ -577,19 +581,16 @@ static int request_handler(
                                            *connection_cls);
 
         if (!streq(method, "POST"))
-                return mhd_respond(connection, MHD_HTTP_NOT_ACCEPTABLE,
-                                   "Unsupported method.\n");
+                return mhd_respond(connection, MHD_HTTP_NOT_ACCEPTABLE, "Unsupported method.");
 
         if (!streq(url, "/upload"))
-                return mhd_respond(connection, MHD_HTTP_NOT_FOUND,
-                                   "Not found.\n");
+                return mhd_respond(connection, MHD_HTTP_NOT_FOUND, "Not found.");
 
         header = MHD_lookup_connection_value(connection,
                                              MHD_HEADER_KIND, "Content-Type");
         if (!header || !streq(header, "application/vnd.fdo.journal"))
                 return mhd_respond(connection, MHD_HTTP_UNSUPPORTED_MEDIA_TYPE,
-                                   "Content-Type: application/vnd.fdo.journal"
-                                   " is required.\n");
+                                   "Content-Type: application/vnd.fdo.journal is required.");
 
         {
                 const union MHD_ConnectionInfo *ci;
@@ -599,7 +600,7 @@ static int request_handler(
                 if (!ci) {
                         log_error("MHD_get_connection_info failed: cannot get remote fd");
                         return mhd_respond(connection, MHD_HTTP_INTERNAL_SERVER_ERROR,
-                                           "Cannot check remote address");
+                                           "Cannot check remote address.");
                 }
 
                 fd = ci->connect_fd;
@@ -614,7 +615,7 @@ static int request_handler(
                 r = getpeername_pretty(fd, false, &hostname);
                 if (r < 0)
                         return mhd_respond(connection, MHD_HTTP_INTERNAL_SERVER_ERROR,
-                                           "Cannot check remote hostname");
+                                           "Cannot check remote hostname.");
         }
 
         assert(hostname);
@@ -623,8 +624,7 @@ static int request_handler(
         if (r == -ENOMEM)
                 return respond_oom(connection);
         else if (r < 0)
-                return mhd_respond(connection, MHD_HTTP_INTERNAL_SERVER_ERROR,
-                                   strerror(-r));
+                return mhd_respondf(connection, r, MHD_HTTP_INTERNAL_SERVER_ERROR, "%m");
 
         hostname = NULL;
         return MHD_YES;
@@ -1198,7 +1198,7 @@ static int parse_config(void) {
                 { "Remote",  "TrustedCertificateFile", config_parse_path,             0, &arg_trust      },
                 {}};
 
-        return config_parse_many(PKGSYSCONFDIR "/journal-remote.conf",
+        return config_parse_many_nulstr(PKGSYSCONFDIR "/journal-remote.conf",
                                  CONF_PATHS_NULSTR("systemd/journal-remote.conf.d"),
                                  "Remote\0", config_item_table_lookup, items,
                                  false, NULL);

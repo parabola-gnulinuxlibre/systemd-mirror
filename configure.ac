@@ -20,7 +20,7 @@
 AC_PREREQ([2.64])
 
 AC_INIT([systemd],
-        [231],
+        [232],
         [http://github.com/systemd/systemd/issues],
         [systemd],
         [http://www.freedesktop.org/wiki/Software/systemd])
@@ -459,7 +459,7 @@ AM_CONDITIONAL(HAVE_LIBMOUNT, [test "$have_libmount" = "yes"])
 have_seccomp=no
 AC_ARG_ENABLE(seccomp, AS_HELP_STRING([--disable-seccomp], [Disable optional SECCOMP support]))
 if test "x$enable_seccomp" != "xno"; then
-        PKG_CHECK_MODULES(SECCOMP, [libseccomp >= 1.0.0],
+        PKG_CHECK_MODULES(SECCOMP, [libseccomp >= 2.3.1],
                [AC_DEFINE(HAVE_SECCOMP, 1, [Define if seccomp is available])
                 have_seccomp=yes
                 M4_DEFINES="$M4_DEFINES -DHAVE_SECCOMP"],
@@ -623,10 +623,13 @@ AM_CONDITIONAL(HAVE_BZIP2, [test "$have_bzip2" = "yes"])
 have_lz4=no
 AC_ARG_ENABLE(lz4, AS_HELP_STRING([--disable-lz4], [Disable optional LZ4 support]))
 AS_IF([test "x$enable_lz4" != "xno"], [
-        PKG_CHECK_MODULES(LZ4, [ liblz4 >= 125 ],
-               [AC_DEFINE(HAVE_LZ4, 1, [Define in LZ4 is available])
+        PKG_CHECK_MODULES(LZ4, [ liblz4 < 10 ],
+               [AC_DEFINE(HAVE_LZ4, 1, [Define if LZ4 is available])
                 have_lz4=yes],
-                have_lz4=no)
+                [PKG_CHECK_MODULES(LZ4, [ liblz4 >= 125 ],
+                      [AC_DEFINE(HAVE_LZ4, 1, [Define if LZ4 is available])
+                      have_lz4=yes],
+                      have_lz4=no)])
         AS_IF([test "x$have_lz4" = xno -a "x$enable_lz4" = xyes],
               [AC_MSG_ERROR([*** LZ4 support requested but libraries not found])])
 ])
@@ -1220,9 +1223,9 @@ AM_CONDITIONAL(ENABLE_NETWORKD, [test "x$have_networkd" = "xyes"])
 
 # ------------------------------------------------------------------------------
 have_efi=no
-AC_ARG_ENABLE(efi, AS_HELP_STRING([--disable-efi], [disable EFI support]))
+AC_ARG_ENABLE(efi, AS_HELP_STRING([--disable-efi], [disable systemd-boot and bootctl (EFI support)]))
 if test "x$enable_efi" != "xno"; then
-        AC_DEFINE(ENABLE_EFI, 1, [Define if EFI support is to be enabled])
+        AC_DEFINE(ENABLE_EFI, 1, [Define if systemd-boot and bootctl are to be enabled])
         have_efi=yes
 fi
 AM_CONDITIONAL(ENABLE_EFI, [test "x$have_efi" = "xyes"])
@@ -1507,9 +1510,10 @@ AC_ARG_WITH([pamlibdir],
 AX_NORMALIZE_PATH([with_pamlibdir])
 
 AC_ARG_WITH([pamconfdir],
-        AS_HELP_STRING([--with-pamconfdir=DIR], [Directory for PAM configuration]),
+        AS_HELP_STRING([--with-pamconfdir=DIR], [Directory for PAM configuration (pass no to disable installing)]),
         [],
         [with_pamconfdir=${sysconfdir}/pam.d])
+AM_CONDITIONAL(ENABLE_PAM_CONFIG, [test "$with_pamconfdir" != "no"])
 AX_NORMALIZE_PATH([with_pamconfdir])
 
 AC_ARG_ENABLE([split-usr],
@@ -1656,7 +1660,6 @@ AC_MSG_RESULT([
         nss-myhostname:                    ${have_myhostname}
         hwdb:                              ${enable_hwdb}
         tpm:                               ${have_tpm}
-        kdbus:                             ${have_kdbus}
         Python:                            ${have_python}
         man pages:                         ${have_manpages}
         test coverage:                     ${have_coverage}

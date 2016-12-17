@@ -87,6 +87,10 @@ evdev:name:*DualPoint Stick:dmi:bvn*:bvr*:bd*:svnDellInc.:pnLatitudeE6320*:pvr*
 evdev:name:*DualPoint Stick:dmi:bvn*:bvr*:bd*:svnDellInc.:pnLatitudeE6400*:pvr*
  POINTINGSTICK_CONST_ACCEL=1.5
 
+# Latitude E7470
+evdev:name:*DualPoint Stick:dmi:bvn*:bvr*:bd*:svnDellInc.:pnLatitudeE7470*:pvr*
+ POINTINGSTICK_CONST_ACCEL=0.6
+
 #########################################
 # Lenovo
 #########################################
@@ -108,6 +112,8 @@ evdev:name:TPPS/2 IBM TrackPoint:dmi:bvn*:bvr*:bd*:svnLENOVO:pn*:pvrThinkPad??60
 evdev:name:TPPS/2 IBM TrackPoint:dmi:bvn*:bvr*:bd*:svnLENOVO:pn*:pvrThinkPadX1Carbon3rd:*
 # Lenovo Thinkpad X1 Carbon 4th gen
 evdev:name:TPPS/2 IBM TrackPoint:dmi:bvn*:bvr*:bd*:svnLENOVO:pn*:pvrThinkPadX1Carbon4th:*
+# Lenovo Thinkpad X1 Tablet
+evdev:name:TPPS/2 IBM TrackPoint:dmi:bvn*:bvr*:bd*:svnLENOVO:pn*:pvrThinkPadX1Tablet:*
  POINTINGSTICK_SENSITIVITY=200
  POINTINGSTICK_CONST_ACCEL=1.0
 

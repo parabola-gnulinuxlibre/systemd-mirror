@@ -31,14 +31,16 @@
 #include <unistd.h>
 #include <utmp.h>
 
-#include "missing.h"
 #include "alloc-util.h"
 #include "fd-util.h"
+#include "fileio.h"
 #include "formats-util.h"
 #include "macro.h"
+#include "missing.h"
 #include "parse-util.h"
 #include "path-util.h"
 #include "string-util.h"
+#include "strv.h"
 #include "user-util.h"
 #include "utf8.h"
 
@@ -171,6 +173,35 @@ int get_user_creds(
 
         if (shell)
                 *shell = p->pw_shell;
+
+        return 0;
+}
+
+int get_user_creds_clean(
+                const char **username,
+                uid_t *uid, gid_t *gid,
+                const char **home,
+                const char **shell) {
+
+        int r;
+
+        /* Like get_user_creds(), but resets home/shell to NULL if they don't contain anything relevant. */
+
+        r = get_user_creds(username, uid, gid, home, shell);
+        if (r < 0)
+                return r;
+
+        if (shell &&
+            (isempty(*shell) || PATH_IN_SET(*shell,
+                                            "/bin/nologin",
+                                            "/sbin/nologin",
+                                            "/usr/bin/nologin",
+                                            "/usr/sbin/nologin")))
+                *shell = NULL;
+
+        if (home &&
+            (isempty(*home) || path_equal(*home, "/")))
+                *home = NULL;
 
         return 0;
 }
@@ -429,9 +460,11 @@ int get_shell(char **_s) {
 }
 
 int reset_uid_gid(void) {
+        int r;
 
-        if (setgroups(0, NULL) < 0)
-                return -errno;
+        r = maybe_setgroups(0, NULL);
+        if (r < 0)
+                return r;
 
         if (setresgid(0, 0, 0) < 0)
                 return -errno;
@@ -571,4 +604,33 @@ bool valid_home(const char *p) {
                 return false;
 
         return true;
+}
+
+int maybe_setgroups(size_t size, const gid_t *list) {
+        int r;
+
+        /* Check if setgroups is allowed before we try to drop all the auxiliary groups */
+        if (size == 0) { /* Dropping all aux groups? */
+                _cleanup_free_ char *setgroups_content = NULL;
+                bool can_setgroups;
+
+                r = read_one_line_file("/proc/self/setgroups", &setgroups_content);
+                if (r == -ENOENT)
+                        /* Old kernels don't have /proc/self/setgroups, so assume we can use setgroups */
+                        can_setgroups = true;
+                else if (r < 0)
+                        return r;
+                else
+                        can_setgroups = streq(setgroups_content, "allow");
+
+                if (!can_setgroups) {
+                        log_debug("Skipping setgroups(), /proc/self/setgroups is set to 'deny'");
+                        return 0;
+                }
+        }
+
+        if (setgroups(size, list) < 0)
+                return -errno;
+
+        return 0;
 }

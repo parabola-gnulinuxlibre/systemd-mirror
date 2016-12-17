@@ -14,7 +14,6 @@ enable machines.target
 enable getty@.service
 
 disable console-getty.service
-disable console-shell.service
 disable debug-shell.service
 
 disable halt.target

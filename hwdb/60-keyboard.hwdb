@@ -238,8 +238,9 @@ evdev:atkbd:dmi:bvn*:bvr*:bd*:svnDell*:pnInspiron*1110:pvr*
 evdev:atkbd:dmi:bvn*:bvr*:bd*:svnDell*:pnInspiron*1210:pvr*
  KEYBOARD_KEY_84=wlan
 
-# Dell Inspiron 1520
+# Dell Inspiron 1520 and Latitude 2110
 evdev:atkbd:dmi:bvn*:bvr*:bd*:svnDell*:pnInspiron*1520:pvr*
+evdev:atkbd:dmi:bvn*:bvr*:bd*:svnDell*:pnLatitude*2110:pvr*
  KEYBOARD_KEY_85=unknown  # Brightness Down, also emitted by acpi-video, ignore
  KEYBOARD_KEY_86=unknown  # Brightness Up, also emitted by acpi-video, ignore
 
@@ -758,22 +759,22 @@ evdev:input:b0003v046DpC52D*
 
 # Internet Navigator
 evdev:input:b0003v046DpC309*
-  KEYBOARD_KEY_90001=chat         # Messenger/SMS
-  KEYBOARD_KEY_90002=camera       # webcam
-  KEYBOARD_KEY_90003=prog1        # iTouch
-  KEYBOARD_KEY_90004=shop         # Shopping
-  KEYBOARD_KEY_c0201=new          # New (F1)
-  KEYBOARD_KEY_c0289=reply        # Reply mail (F2)
-  KEYBOARD_KEY_c028b=forwardmail  # Forward mail (F3)
-  KEYBOARD_KEY_c028c=send         # Send (F4)
-  KEYBOARD_KEY_c021a=undo         # Undo (F5).
-  KEYBOARD_KEY_c0279=redo         # Redo (F6).
-  KEYBOARD_KEY_c0208=print        # Print (F7)
-  KEYBOARD_KEY_c0207=save         # Save (F8)
-  KEYBOARD_KEY_c0194=file         # My Computer (F9)
-  KEYBOARD_KEY_c01a7=documents    # My Documents (F10)
-  KEYBOARD_KEY_c01b6=images       # My Pictures (F11) ??
-  KEYBOARD_KEY_c01b7=sound        # My Music (F12) ??
+ KEYBOARD_KEY_90001=chat         # Messenger/SMS
+ KEYBOARD_KEY_90002=camera       # webcam
+ KEYBOARD_KEY_90003=prog1        # iTouch
+ KEYBOARD_KEY_90004=shop         # Shopping
+ KEYBOARD_KEY_c0201=new          # New (F1)
+ KEYBOARD_KEY_c0289=reply        # Reply mail (F2)
+ KEYBOARD_KEY_c028b=forwardmail  # Forward mail (F3)
+ KEYBOARD_KEY_c028c=send         # Send (F4)
+ KEYBOARD_KEY_c021a=undo         # Undo (F5)
+ KEYBOARD_KEY_c0279=redo         # Redo (F6)
+ KEYBOARD_KEY_c0208=print        # Print (F7)
+ KEYBOARD_KEY_c0207=save         # Save (F8)
+ KEYBOARD_KEY_c0194=file         # My Computer (F9)
+ KEYBOARD_KEY_c01a7=documents    # My Documents (F10)
+ KEYBOARD_KEY_c01b6=images       # My Pictures (F11) ??
+ KEYBOARD_KEY_c01b7=sound        # My Music (F12) ??
 
 
 ###########################################################
@@ -803,7 +804,7 @@ evdev:atkbd:dmi:bvn*:bvr*:svnMedion*:pnAkoya*:pvr*
  KEYBOARD_KEY_b0=!volumeup
  KEYBOARD_KEY_19=!p
  KEYBOARD_KEY_df=sleep
- 
+
 # FID2060
 evdev:atkbd:dmi:bvn*:bvr*:bd*:svnMEDION*:pn*FID2060*:pvr*
  KEYBOARD_KEY_6b=channeldown                            # Thottle Down
@@ -896,7 +897,6 @@ evdev:atkbd:dmi:bvn*:bvr*:bd*:svnOLPC:pnXO:*
  KEYBOARD_KEY_c2=f8
  KEYBOARD_KEY_c3=f9
  KEYBOARD_KEY_c4=f10
- # KEYBOARD_KEY_c7=f11 # FIXME!
  KEYBOARD_KEY_d8=f12
  KEYBOARD_KEY_f7=f13
  KEYBOARD_KEY_f6=f14

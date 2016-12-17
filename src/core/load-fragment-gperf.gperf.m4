@@ -35,9 +35,9 @@ $1.Environment,                  config_parse_environ,               0,         
 $1.EnvironmentFile,              config_parse_unit_env_file,         0,                             offsetof($1, exec_context.environment_files)
 $1.PassEnvironment,              config_parse_pass_environ,          0,                             offsetof($1, exec_context.pass_environment)
 $1.DynamicUser,                  config_parse_bool,                  0,                             offsetof($1, exec_context.dynamic_user)
-$1.StandardInput,                config_parse_input,                 0,                             offsetof($1, exec_context.std_input)
-$1.StandardOutput,               config_parse_output,                0,                             offsetof($1, exec_context.std_output)
-$1.StandardError,                config_parse_output,                0,                             offsetof($1, exec_context.std_error)
+$1.StandardInput,                config_parse_exec_input,            0,                             offsetof($1, exec_context)
+$1.StandardOutput,               config_parse_exec_output,           0,                             offsetof($1, exec_context)
+$1.StandardError,                config_parse_exec_output,           0,                             offsetof($1, exec_context)
 $1.TTYPath,                      config_parse_unit_path_printf,      0,                             offsetof($1, exec_context.tty_path)
 $1.TTYReset,                     config_parse_bool,                  0,                             offsetof($1, exec_context.tty_reset)
 $1.TTYVHangup,                   config_parse_bool,                  0,                             offsetof($1, exec_context.tty_vhangup)
@@ -89,6 +89,9 @@ $1.ReadOnlyPaths,                config_parse_namespace_path_strv,   0,         
 $1.InaccessiblePaths,            config_parse_namespace_path_strv,   0,                             offsetof($1, exec_context.inaccessible_paths)
 $1.PrivateTmp,                   config_parse_bool,                  0,                             offsetof($1, exec_context.private_tmp)
 $1.PrivateDevices,               config_parse_bool,                  0,                             offsetof($1, exec_context.private_devices)
+$1.ProtectKernelTunables,        config_parse_bool,                  0,                             offsetof($1, exec_context.protect_kernel_tunables)
+$1.ProtectKernelModules,         config_parse_bool,                  0,                             offsetof($1, exec_context.protect_kernel_modules)
+$1.ProtectControlGroups,         config_parse_bool,                  0,                             offsetof($1, exec_context.protect_control_groups)
 $1.PrivateNetwork,               config_parse_bool,                  0,                             offsetof($1, exec_context.private_network)
 $1.PrivateUsers,                 config_parse_bool,                  0,                             offsetof($1, exec_context.private_users)
 $1.ProtectSystem,                config_parse_protect_system,        0,                             offsetof($1, exec_context)
@@ -122,6 +125,8 @@ $1.KillSignal,                   config_parse_signal,                0,         
 m4_define(`CGROUP_CONTEXT_CONFIG_ITEMS',
 `$1.Slice,                       config_parse_unit_slice,            0,                             0
 $1.CPUAccounting,                config_parse_bool,                  0,                             offsetof($1, cgroup_context.cpu_accounting)
+$1.CPUWeight,                    config_parse_cpu_weight,            0,                             offsetof($1, cgroup_context.cpu_weight)
+$1.StartupCPUWeight,             config_parse_cpu_weight,            0,                             offsetof($1, cgroup_context.startup_cpu_weight)
 $1.CPUShares,                    config_parse_cpu_shares,            0,                             offsetof($1, cgroup_context.cpu_shares)
 $1.StartupCPUShares,             config_parse_cpu_shares,            0,                             offsetof($1, cgroup_context.startup_cpu_shares)
 $1.CPUQuota,                     config_parse_cpu_quota,             0,                             offsetof($1, cgroup_context)
@@ -129,6 +134,7 @@ $1.MemoryAccounting,             config_parse_bool,                  0,         
 $1.MemoryLow,                    config_parse_memory_limit,          0,                             offsetof($1, cgroup_context)
 $1.MemoryHigh,                   config_parse_memory_limit,          0,                             offsetof($1, cgroup_context)
 $1.MemoryMax,                    config_parse_memory_limit,          0,                             offsetof($1, cgroup_context)
+$1.MemorySwapMax,                config_parse_memory_limit,          0,                             offsetof($1, cgroup_context)
 $1.MemoryLimit,                  config_parse_memory_limit,          0,                             offsetof($1, cgroup_context)
 $1.DeviceAllow,                  config_parse_device_allow,          0,                             offsetof($1, cgroup_context)
 $1.DevicePolicy,                 config_parse_device_policy,         0,                             offsetof($1, cgroup_context.device_policy)
@@ -182,13 +188,13 @@ Unit.OnFailureIsolate,           config_parse_job_mode_isolate,      0,         
 Unit.IgnoreOnIsolate,            config_parse_bool,                  0,                             offsetof(Unit, ignore_on_isolate)
 Unit.IgnoreOnSnapshot,           config_parse_warn_compat,           DISABLED_LEGACY,               0
 Unit.JobTimeoutSec,              config_parse_sec_fix_0,             0,                             offsetof(Unit, job_timeout)
-Unit.JobTimeoutAction,           config_parse_failure_action,        0,                             offsetof(Unit, job_timeout_action)
+Unit.JobTimeoutAction,           config_parse_emergency_action,      0,                             offsetof(Unit, job_timeout_action)
 Unit.JobTimeoutRebootArgument,   config_parse_string,                0,                             offsetof(Unit, job_timeout_reboot_arg)
 Unit.StartLimitIntervalSec,      config_parse_sec,                   0,                             offsetof(Unit, start_limit.interval)
 m4_dnl The following is a legacy alias name for compatibility
 Unit.StartLimitInterval,         config_parse_sec,                   0,                             offsetof(Unit, start_limit.interval)
 Unit.StartLimitBurst,            config_parse_unsigned,              0,                             offsetof(Unit, start_limit.burst)
-Unit.StartLimitAction,           config_parse_failure_action,        0,                             offsetof(Unit, start_limit_action)
+Unit.StartLimitAction,           config_parse_emergency_action,      0,                             offsetof(Unit, start_limit_action)
 Unit.RebootArgument,             config_parse_string,                0,                             offsetof(Unit, reboot_arg)
 Unit.ConditionPathExists,        config_parse_unit_condition_path,   CONDITION_PATH_EXISTS,         offsetof(Unit, conditions)
 Unit.ConditionPathExistsGlob,    config_parse_unit_condition_path,   CONDITION_PATH_EXISTS_GLOB,    offsetof(Unit, conditions)
@@ -245,9 +251,9 @@ Service.WatchdogSec,             config_parse_sec,                   0,         
 m4_dnl The following three only exist for compatibility, they moved into Unit, see above
 Service.StartLimitInterval,      config_parse_sec,                   0,                             offsetof(Unit, start_limit.interval)
 Service.StartLimitBurst,         config_parse_unsigned,              0,                             offsetof(Unit, start_limit.burst)
-Service.StartLimitAction,        config_parse_failure_action,        0,                             offsetof(Unit, start_limit_action)
+Service.StartLimitAction,        config_parse_emergency_action,      0,                             offsetof(Unit, start_limit_action)
 Service.RebootArgument,          config_parse_string,                0,                             offsetof(Unit, reboot_arg)
-Service.FailureAction,           config_parse_failure_action,        0,                             offsetof(Service, failure_action)
+Service.FailureAction,           config_parse_emergency_action,      0,                             offsetof(Service, emergency_action)
 Service.Type,                    config_parse_service_type,          0,                             offsetof(Service, type)
 Service.Restart,                 config_parse_service_restart,       0,                             offsetof(Service, restart)
 Service.PermissionsStartOnly,    config_parse_bool,                  0,                             offsetof(Service, permissions_start_only)
@@ -353,6 +359,8 @@ Mount.Type,                      config_parse_string,                0,         
 Mount.TimeoutSec,                config_parse_sec,                   0,                             offsetof(Mount, timeout_usec)
 Mount.DirectoryMode,             config_parse_mode,                  0,                             offsetof(Mount, directory_mode)
 Mount.SloppyOptions,             config_parse_bool,                  0,                             offsetof(Mount, sloppy_options)
+Mount.LazyUnmount,               config_parse_bool,                  0,                             offsetof(Mount, lazy_unmount)
+Mount.ForceUnmount,              config_parse_bool,                  0,                             offsetof(Mount, force_unmount)
 EXEC_CONTEXT_CONFIG_ITEMS(Mount)m4_dnl
 CGROUP_CONTEXT_CONFIG_ITEMS(Mount)m4_dnl
 KILL_CONTEXT_CONFIG_ITEMS(Mount)m4_dnl

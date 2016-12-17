@@ -204,13 +204,25 @@ int bus_append_unit_property_assignment(sd_bus_message *m, const char *assignmen
                               "IgnoreSIGPIPE", "TTYVHangup", "TTYReset", "RemainAfterExit",
                               "PrivateTmp", "PrivateDevices", "PrivateNetwork", "PrivateUsers", "NoNewPrivileges",
                               "SyslogLevelPrefix", "Delegate", "RemainAfterElapse", "MemoryDenyWriteExecute",
-                              "RestrictRealtime", "DynamicUser")) {
+                              "RestrictRealtime", "DynamicUser", "RemoveIPC", "ProtectKernelTunables",
+                              "ProtectKernelModules", "ProtectControlGroups")) {
 
                 r = parse_boolean(eq);
                 if (r < 0)
                         return log_error_errno(r, "Failed to parse boolean assignment %s.", assignment);
 
                 r = sd_bus_message_append(m, "v", "b", r);
+
+        } else if (STR_IN_SET(field, "CPUWeight", "StartupCPUWeight")) {
+                uint64_t u;
+
+                r = cg_weight_parse(eq, &u);
+                if (r < 0) {
+                        log_error("Failed to parse %s value %s.", field, eq);
+                        return -EINVAL;
+                }
+
+                r = sd_bus_message_append(m, "v", "t", u);
 
         } else if (STR_IN_SET(field, "CPUShares", "StartupCPUShares")) {
                 uint64_t u;
@@ -292,7 +304,7 @@ int bus_append_unit_property_assignment(sd_bus_message *m, const char *assignmen
                                 rwm = "";
                         }
 
-                        if (!path_startswith(path, "/dev")) {
+                        if (!is_deviceallow_pattern(path)) {
                                 log_error("%s is not a device file in /dev.", path);
                                 return -EINVAL;
                         }
@@ -553,6 +565,21 @@ finish:
         r = sd_bus_message_close_container(m);
         if (r < 0)
                 return bus_log_create_error(r);
+
+        return 0;
+}
+
+int bus_append_unit_property_assignment_many(sd_bus_message *m, char **l) {
+        char **i;
+        int r;
+
+        assert(m);
+
+        STRV_FOREACH(i, l) {
+                r = bus_append_unit_property_assignment(m, *i);
+                if (r < 0)
+                        return r;
+        }
 
         return 0;
 }

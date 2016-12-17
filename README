@@ -79,6 +79,7 @@ REQUIREMENTS:
           CONFIG_TMPFS_XATTR
           CONFIG_{TMPFS,EXT4,XFS,BTRFS_FS,...}_POSIX_ACL
           CONFIG_SECCOMP
+          CONFIG_SECCOMP_FILTER (required for seccomp support)
           CONFIG_CHECKPOINT_RESTORE (for the kcmp() syscall)
 
         Required for CPUShares= in resource control unit settings
@@ -119,7 +120,7 @@ REQUIREMENTS:
         libcap
         libmount >= 2.27.1 (from util-linux)
                 (util-linux *must* be built with --enable-libmount-force-mountinfo)
-        libseccomp >= 1.0.0 (optional)
+        libseccomp >= 2.3.1 (optional)
         libblkid >= 2.24 (from util-linux) (optional)
         libkmod >= 15 (optional)
         PAM >= 1.1.2 (optional)
@@ -167,6 +168,13 @@ REQUIREMENTS:
         dynamically changing hostnames, the hostname stays resolvable
         under all circumstances. In fact, systemd-hostnamed will warn
         if nss-myhostname is not installed.
+
+        Additional packages are necessary to run some tests:
+        - busybox            (used by test/TEST-13-NSPAWN-SMOKE)
+        - nc                 (used by test/TEST-12-ISSUE-3171)
+        - python3-pyparsing
+        - python3-evdev      (used by hwdb parsing tests)
+        - strace             (used by test/test-functions)
 
 USERS AND GROUPS:
         Default udev rules use the following standard system group

@@ -71,6 +71,9 @@ struct Mount {
 
         bool sloppy_options;
 
+        bool lazy_unmount;
+        bool force_unmount;
+
         MountResult result;
         MountResult reload_result;
 

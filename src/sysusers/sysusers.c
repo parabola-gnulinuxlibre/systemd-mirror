@@ -190,7 +190,8 @@ static int load_group_database(void) {
 static int make_backup(const char *target, const char *x) {
         _cleanup_close_ int src = -1;
         _cleanup_fclose_ FILE *dst = NULL;
-        char *backup, *temp;
+        _cleanup_free_ char *temp = NULL;
+        char *backup;
         struct timespec ts[2];
         struct stat st;
         int r;
@@ -1189,6 +1190,7 @@ static void item_free(Item *i) {
         free(i->uid_path);
         free(i->gid_path);
         free(i->description);
+        free(i->home);
         free(i);
 }
 

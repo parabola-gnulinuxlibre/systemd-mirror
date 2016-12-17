@@ -289,7 +289,17 @@ static void service_fd_store_unlink(ServiceFDStore *fs) {
         free(fs);
 }
 
-static void service_release_resources(Unit *u) {
+static void service_release_fd_store(Service *s) {
+        assert(s);
+
+        log_unit_debug(UNIT(s), "Releasing all stored fds");
+        while (s->fd_store)
+                service_fd_store_unlink(s->fd_store);
+
+        assert(s->n_fd_store == 0);
+}
+
+static void service_release_resources(Unit *u, bool inactive) {
         Service *s = SERVICE(u);
 
         assert(s);
@@ -297,16 +307,14 @@ static void service_release_resources(Unit *u) {
         if (!s->fd_store && s->stdin_fd < 0 && s->stdout_fd < 0 && s->stderr_fd < 0)
                 return;
 
-        log_unit_debug(u, "Releasing all resources.");
+        log_unit_debug(u, "Releasing resources.");
 
         s->stdin_fd = safe_close(s->stdin_fd);
         s->stdout_fd = safe_close(s->stdout_fd);
         s->stderr_fd = safe_close(s->stderr_fd);
 
-        while (s->fd_store)
-                service_fd_store_unlink(s->fd_store);
-
-        assert(s->n_fd_store == 0);
+        if (inactive)
+                service_release_fd_store(s);
 }
 
 static void service_done(Unit *u) {
@@ -350,7 +358,7 @@ static void service_done(Unit *u) {
 
         s->timer_event_source = sd_event_source_unref(s->timer_event_source);
 
-        service_release_resources(u);
+        service_release_resources(u, true);
 }
 
 static int on_fd_store_io(sd_event_source *e, int fd, uint32_t revents, void *userdata) {
@@ -360,6 +368,10 @@ static int on_fd_store_io(sd_event_source *e, int fd, uint32_t revents, void *us
         assert(fs);
 
         /* If we get either EPOLLHUP or EPOLLERR, it's time to remove this entry from the fd store */
+        log_unit_debug(UNIT(fs->service),
+                       "Received %s on stored fd %d (%s), closing.",
+                       revents & EPOLLERR ? "EPOLLERR" : "EPOLLHUP",
+                       fs->fd, strna(fs->fdname));
         service_fd_store_unlink(fs);
         return 0;
 }
@@ -368,20 +380,23 @@ static int service_add_fd_store(Service *s, int fd, const char *name) {
         ServiceFDStore *fs;
         int r;
 
+        /* fd is always consumed if we return >= 0 */
+
         assert(s);
         assert(fd >= 0);
 
         if (s->n_fd_store >= s->n_fd_store_max)
-                return 0;
+                return -EXFULL; /* Our store is full.
+                                 * Use this errno rather than E[NM]FILE to distinguish from
+                                 * the case where systemd itself hits the file limit. */
 
         LIST_FOREACH(fd_store, fs, s->fd_store) {
                 r = same_fd(fs->fd, fd);
                 if (r < 0)
                         return r;
                 if (r > 0) {
-                        /* Already included */
                         safe_close(fd);
-                        return 1;
+                        return 0; /* fd already included */
                 }
         }
 
@@ -409,7 +424,7 @@ static int service_add_fd_store(Service *s, int fd, const char *name) {
         LIST_PREPEND(fd_store, s->fd_store, fs);
         s->n_fd_store++;
 
-        return 1;
+        return 1; /* fd newly stored */
 }
 
 static int service_add_fd_store_set(Service *s, FDSet *fds, const char *name) {
@@ -417,10 +432,7 @@ static int service_add_fd_store_set(Service *s, FDSet *fds, const char *name) {
 
         assert(s);
 
-        if (fdset_size(fds) <= 0)
-                return 0;
-
-        while (s->n_fd_store < s->n_fd_store_max) {
+        while (fdset_size(fds) > 0) {
                 _cleanup_close_ int fd = -1;
 
                 fd = fdset_steal_first(fds);
@@ -428,16 +440,16 @@ static int service_add_fd_store_set(Service *s, FDSet *fds, const char *name) {
                         break;
 
                 r = service_add_fd_store(s, fd, name);
+                if (r == -EXFULL)
+                        return log_unit_warning_errno(UNIT(s), r,
+                                                      "Cannot store more fds than FileDescriptorStoreMax=%u, closing remaining.",
+                                                      s->n_fd_store_max);
                 if (r < 0)
-                        return log_unit_error_errno(UNIT(s), r, "Couldn't add fd to fd store: %m");
-                if (r > 0) {
-                        log_unit_debug(UNIT(s), "Added fd to fd store.");
-                        fd = -1;
-                }
+                        return log_unit_error_errno(UNIT(s), r, "Failed to add fd to store: %m");
+                if (r > 0)
+                        log_unit_debug(UNIT(s), "Added fd %u (%s) to fd store.", fd, strna(name));
+                fd = -1;
         }
-
-        if (fdset_size(fds) > 0)
-                log_unit_warning(UNIT(s), "Tried to store more fds than FileDescriptorStoreMax=%u allows, closing remaining.", s->n_fd_store_max);
 
         return 0;
 }
@@ -1225,6 +1237,7 @@ static int service_spawn(
                         return r;
 
                 n_fds = r;
+                log_unit_debug(UNIT(s), "Passing %i fds to service", n_fds);
         }
 
         r = service_arm_timer(s, usec_add(now(CLOCK_MONOTONIC), timeout));
@@ -1256,10 +1269,16 @@ static int service_spawn(
                 socklen_t salen = sizeof(sa);
 
                 r = getpeername(s->socket_fd, &sa.sa, &salen);
-                if (r < 0)
-                        return -errno;
+                if (r < 0) {
+                        r = -errno;
 
-                if (IN_SET(sa.sa.sa_family, AF_INET, AF_INET6)) {
+                        /* ENOTCONN is legitimate if the endpoint disappeared on shutdown.
+                         * This connection is over, but the socket unit lives on. */
+                        if (r != -ENOTCONN || !IN_SET(s->control_command_id, SERVICE_EXEC_STOP, SERVICE_EXEC_STOP_POST))
+                                return r;
+                }
+
+                if (r == 0 && IN_SET(sa.sa.sa_family, AF_INET, AF_INET6)) {
                         _cleanup_free_ char *addr = NULL;
                         char *t;
                         int port;
@@ -1449,7 +1468,7 @@ static void service_enter_dead(Service *s, ServiceResult f, bool allow_restart) 
 
         if (s->result != SERVICE_SUCCESS) {
                 log_unit_warning(UNIT(s), "Failed with result '%s'.", service_result_to_string(s->result));
-                failure_action(UNIT(s)->manager, s->failure_action, UNIT(s)->reboot_arg);
+                emergency_action(UNIT(s)->manager, s->emergency_action, UNIT(s)->reboot_arg, "service failed");
         }
 
         if (allow_restart && service_shall_restart(s)) {
@@ -1470,6 +1489,9 @@ static void service_enter_dead(Service *s, ServiceResult f, bool allow_restart) 
 
         /* Also, remove the runtime directory */
         exec_context_destroy_runtime_directory(&s->exec_context, manager_get_runtime_prefix(UNIT(s)->manager));
+
+        /* Get rid of the IPC bits of the user */
+        unit_unref_uid_gid(UNIT(s), true);
 
         /* Release the user, and destroy it if we are the only remaining owner */
         dynamic_creds_destroy(&s->dynamic_creds);
@@ -1747,7 +1769,15 @@ static void service_enter_start(Service *s) {
         }
 
         if (!c) {
-                assert(s->type == SERVICE_ONESHOT);
+                if (s->type != SERVICE_ONESHOT) {
+                        /* There's no command line configured for the main command? Hmm, that is strange. This can only
+                         * happen if the configuration changes at runtime. In this case, let's enter a failure
+                         * state. */
+                        log_unit_error(UNIT(s), "There's no 'start' task anymore we could start: %m");
+                        r = -ENXIO;
+                        goto fail;
+                }
+
                 service_enter_start_post(s);
                 return;
         }
@@ -2023,6 +2053,10 @@ static int service_start(Unit *u) {
                 service_enter_dead(s, SERVICE_FAILURE_START_LIMIT_HIT, false);
                 return r;
         }
+
+        r = unit_acquire_invocation_id(u);
+        if (r < 0)
+                return r;
 
         s->result = SERVICE_SUCCESS;
         s->reload_result = SERVICE_SUCCESS;
@@ -2315,7 +2349,7 @@ static int service_deserialize_item(Unit *u, const char *key, const char *value,
                         r = service_add_fd_store(s, fd, t);
                         if (r < 0)
                                 log_unit_error_errno(u, r, "Failed to add fd to store: %m");
-                        else if (r > 0)
+                        else
                                 fdset_remove(fds, fd);
                 }
 
@@ -2591,8 +2625,7 @@ static void service_sigchld_event(Unit *u, pid_t pid, int code, int status) {
         assert(s);
         assert(pid >= 0);
 
-        if (UNIT(s)->fragment_path ? is_clean_exit(code, status, &s->success_status) :
-                                     is_clean_exit_lsb(code, status, &s->success_status))
+        if (is_clean_exit(code, status, s->type == SERVICE_ONESHOT ? EXIT_CLEAN_COMMAND : EXIT_CLEAN_DAEMON, &s->success_status))
                 f = SERVICE_SUCCESS;
         else if (code == CLD_EXITED)
                 f = SERVICE_FAILURE_EXIT_CODE;
@@ -2634,7 +2667,14 @@ static void service_sigchld_event(Unit *u, pid_t pid, int code, int status) {
                                 f = SERVICE_SUCCESS;
                 }
 
-                log_struct(f == SERVICE_SUCCESS ? LOG_DEBUG : LOG_NOTICE,
+                /* When this is a successful exit, let's log about the exit code on DEBUG level. If this is a failure
+                 * and the process exited on its own via exit(), then let's make this a NOTICE, under the assumption
+                 * that the service already logged the reason at a higher log level on its own. However, if the service
+                 * died due to a signal, then it most likely didn't say anything about any reason, hence let's raise
+                 * our log level to WARNING then. */
+
+                log_struct(f == SERVICE_SUCCESS ? LOG_DEBUG :
+                           (code == CLD_EXITED ? LOG_NOTICE : LOG_WARNING),
                            LOG_UNIT_ID(u),
                            LOG_UNIT_MESSAGE(u, "Main process exited, code=%s, status=%i/%s",
                                             sigchld_code_to_string(code), status,
@@ -2866,7 +2906,7 @@ static void service_sigchld_event(Unit *u, pid_t pid, int code, int status) {
 
         /* If the PID set is empty now, then let's finish this off
            (On unified we use proper notifications) */
-        if (cg_unified() <= 0 && set_isempty(u->pids))
+        if (cg_unified(SYSTEMD_CGROUP_CONTROLLER) <= 0 && set_isempty(u->pids))
                 service_notify_cgroup_empty_event(u);
 }
 
@@ -3076,9 +3116,7 @@ static void service_notify_message(Unit *u, pid_t pid, char **tags, FDSet *fds) 
 
                 if (!streq_ptr(s->status_text, t)) {
 
-                        free(s->status_text);
-                        s->status_text = t;
-                        t = NULL;
+                        free_and_replace(s->status_text, t);
 
                         notify_dbus = true;
                 }

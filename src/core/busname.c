@@ -639,6 +639,10 @@ static int busname_start(Unit *u) {
                 return r;
         }
 
+        r = unit_acquire_invocation_id(u);
+        if (r < 0)
+                return r;
+
         n->result = BUSNAME_SUCCESS;
         busname_enter_making(n);
 
@@ -868,7 +872,7 @@ static void busname_sigchld_event(Unit *u, pid_t pid, int code, int status) {
 
         n->control_pid = 0;
 
-        if (is_clean_exit(code, status, NULL))
+        if (is_clean_exit(code, status, EXIT_CLEAN_COMMAND, NULL))
                 f = BUSNAME_SUCCESS;
         else if (code == CLD_EXITED)
                 f = BUSNAME_FAILURE_EXIT_CODE;

@@ -1,22 +1,30 @@
 #!/usr/bin/python3
-#  -*- Mode: python; coding: utf-8; indent-tabs-mode: nil -*- */
+# -*- Mode: python; coding: utf-8; indent-tabs-mode: nil -*- */
 #
-#  This file is part of systemd.
+# This file is part of systemd. It is distrubuted under the MIT license, see
+# below.
 #
-#  Copyright 2016 Zbigniew Jędrzejewski-Szmek
+# Copyright 2016 Zbigniew Jędrzejewski-Szmek
 #
-#  systemd is free software; you can redistribute it and/or modify it
-#  under the terms of the GNU Lesser General Public License as published by
-#  the Free Software Foundation; either version 2.1 of the License, or
-#  (at your option) any later version.
+# The MIT License (MIT)
 #
-#  systemd is distributed in the hope that it will be useful, but
-#  WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-#  Lesser General Public License for more details.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-#  You should have received a copy of the GNU Lesser General Public License
-#  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 import functools
 import glob
@@ -41,6 +49,12 @@ except ImportError:
     ecodes = None
     print('WARNING: evdev is not available')
 
+try:
+    from functools import lru_cache
+except ImportError:
+    # don't do caching on old python
+    lru_cache = lambda: (lambda f: f)
+
 EOL = LineEnd().suppress()
 EMPTYLINE = LineStart() + LineEnd()
 COMMENTLINE = pythonStyleComment + EOL
@@ -54,7 +68,7 @@ TYPES = {'mouse':    ('usb', 'bluetooth', 'ps2', '*'),
          'keyboard': ('name', ),
          }
 
-@functools.lru_cache()
+@lru_cache()
 def hwdb_grammar():
     ParserElement.setDefaultWhitespaceChars('')
 
@@ -75,13 +89,16 @@ def hwdb_grammar():
 
     return grammar
 
-@functools.lru_cache()
+@lru_cache()
 def property_grammar():
     ParserElement.setDefaultWhitespaceChars(' ')
 
     setting = Optional('*')('DEFAULT') + INTEGER('DPI') + Suppress('@') + INTEGER('HZ')
     props = (('MOUSE_DPI', Group(OneOrMore(setting('SETTINGS*')))),
              ('MOUSE_WHEEL_CLICK_ANGLE', INTEGER),
+             ('MOUSE_WHEEL_CLICK_ANGLE_HORIZONTAL', INTEGER),
+             ('MOUSE_WHEEL_CLICK_COUNT', INTEGER),
+             ('MOUSE_WHEEL_CLICK_COUNT_HORIZONTAL', INTEGER),
              ('ID_INPUT_TRACKBALL', Literal('1')),
              ('POINTINGSTICK_SENSITIVITY', INTEGER),
              ('POINTINGSTICK_CONST_ACCEL', REAL),
