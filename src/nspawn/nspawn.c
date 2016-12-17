@@ -194,6 +194,7 @@ static int arg_settings_trusted = -1;
 static char **arg_parameters = NULL;
 static const char *arg_container_service_name = "systemd-nspawn";
 static bool arg_notify_ready = false;
+static bool arg_use_cgns = true;
 
 static void help(void) {
         printf("%s [OPTIONS...] [PATH] [ARGUMENTS...]\n\n"
@@ -215,10 +216,10 @@ static void help(void) {
                "     --uuid=UUID            Set a specific machine UUID for the container\n"
                "  -S --slice=SLICE          Place the container in the specified slice\n"
                "     --property=NAME=VALUE  Set scope unit property\n"
-               "  -U --private-users=pick   Run within user namespace, pick UID/GID range automatically\n"
+               "  -U --private-users=pick   Run within user namespace, autoselect UID/GID range\n"
                "     --private-users[=UIDBASE[:NUIDS]]\n"
-               "                            Run within user namespace, user configured UID/GID range\n"
-               "     --private-user-chown   Adjust OS tree file ownership for private UID/GID range\n"
+               "                            Similar, but with user configured UID/GID range\n"
+               "     --private-user-chown   Adjust OS tree ownership to private UID/GID range\n"
                "     --private-network      Disable network in container\n"
                "     --network-interface=INTERFACE\n"
                "                            Assign an existing network interface to the\n"
@@ -235,11 +236,10 @@ static void help(void) {
                "                            Add an additional virtual Ethernet link between\n"
                "                            host and container\n"
                "     --network-bridge=INTERFACE\n"
-               "                            Add a virtual Ethernet connection between host\n"
-               "                            and container and add it to an existing bridge on\n"
-               "                            the host\n"
-               "     --network-zone=NAME    Add a virtual Ethernet connection to the container,\n"
-               "                            and add it to an automatically managed bridge interface\n"
+               "                            Add a virtual Ethernet connection to the container\n"
+               "                            and attach it to an existing bridge on the host\n"
+               "     --network-zone=NAME    Similar, but attach the new interface to an\n"
+               "                            an automatically managed bridge interface\n"
                "  -p --port=[PROTOCOL:]HOSTPORT[:CONTAINERPORT]\n"
                "                            Expose a container IP port on the host\n"
                "  -Z --selinux-context=SECLABEL\n"
@@ -268,14 +268,12 @@ static void help(void) {
                "     --overlay-ro=PATH[:PATH...]:PATH\n"
                "                            Similar, but creates a read-only overlay mount\n"
                "  -E --setenv=NAME=VALUE    Pass an environment variable to PID 1\n"
-               "     --share-system         Share system namespaces with host\n"
                "     --register=BOOLEAN     Register container as machine\n"
                "     --keep-unit            Do not register a scope for the machine, reuse\n"
                "                            the service unit nspawn is running in\n"
                "     --volatile[=MODE]      Run the system in volatile mode\n"
                "     --settings=BOOLEAN     Load additional settings from .nspawn file\n"
-               "     --notify-ready=BOOLEAN Receive notifications from the container's init process,\n"
-               "                            accepted values: yes and no\n"
+               "     --notify-ready=BOOLEAN Receive notifications from the child init process\n"
                , program_invocation_short_name);
 }
 
@@ -404,7 +402,7 @@ static int parse_argv(int argc, char *argv[]) {
                 { "selinux-context",       required_argument, NULL, 'Z'                   },
                 { "selinux-apifs-context", required_argument, NULL, 'L'                   },
                 { "quiet",                 no_argument,       NULL, 'q'                   },
-                { "share-system",          no_argument,       NULL, ARG_SHARE_SYSTEM      },
+                { "share-system",          no_argument,       NULL, ARG_SHARE_SYSTEM      }, /* not documented */
                 { "register",              required_argument, NULL, ARG_REGISTER          },
                 { "keep-unit",             no_argument,       NULL, ARG_KEEP_UNIT         },
                 { "network-interface",     required_argument, NULL, ARG_NETWORK_INTERFACE },
@@ -813,6 +811,8 @@ static int parse_argv(int argc, char *argv[]) {
                         break;
 
                 case ARG_SHARE_SYSTEM:
+                        /* We don't officially support this anymore, except for compat reasons. People should use the
+                         * $SYSTEMD_NSPAWN_SHARE_SYSTEM environment variable instead. */
                         arg_share_system = true;
                         break;
 
@@ -1017,6 +1017,9 @@ static int parse_argv(int argc, char *argv[]) {
                         assert_not_reached("Unhandled option");
                 }
 
+        if (getenv_bool("SYSTEMD_NSPAWN_SHARE_SYSTEM") > 0)
+                arg_share_system = true;
+
         if (arg_share_system)
                 arg_register = false;
 
@@ -1024,7 +1027,7 @@ static int parse_argv(int argc, char *argv[]) {
                 arg_userns_chown = true;
 
         if (arg_start_mode != START_PID1 && arg_share_system) {
-                log_error("--boot and --share-system may not be combined.");
+                log_error("--boot and SYSTEMD_NSPAWN_SHARE_SYSTEM=1 may not be combined.");
                 return -EINVAL;
         }
 
@@ -1103,6 +1106,12 @@ static int parse_argv(int argc, char *argv[]) {
         e = getenv("SYSTEMD_NSPAWN_CONTAINER_SERVICE");
         if (e)
                 arg_container_service_name = e;
+
+        r = getenv_bool("SYSTEMD_NSPAWN_USE_CGNS");
+        if (r < 0)
+                arg_use_cgns = cg_ns_supported();
+        else
+                arg_use_cgns = r;
 
         return 1;
 }
@@ -1247,24 +1256,39 @@ static int setup_resolv_conf(const char *dest) {
         /* Fix resolv.conf, if possible */
         where = prefix_roota(dest, "/etc/resolv.conf");
 
+        if (access("/usr/lib/systemd/resolv.conf", F_OK) >= 0) {
+                /* resolved is enabled on the host. In this, case bind mount its static resolv.conf file into the
+                 * container, so that the container can use the host's resolver. Given that network namespacing is
+                 * disabled it's only natural of the container also uses the host's resolver. It also has the big
+                 * advantage that the container will be able to follow the host's DNS server configuration changes
+                 * transparently. */
+
+                if (mount("/usr/lib/systemd/resolv.conf", where, NULL, MS_BIND, NULL) < 0)
+                        log_warning_errno(errno, "Failed to mount /etc/resolv.conf in the container, ignoring: %m");
+                else {
+                        if (mount(NULL, where, NULL, MS_BIND|MS_REMOUNT|MS_RDONLY|MS_NOSUID|MS_NODEV, NULL) < 0)
+                                return log_error_errno(errno, "Failed to remount /etc/resolv.conf read-only: %m");
+
+                        return 0;
+                }
+        }
+
+        /* If that didn't work, let's copy the file */
         r = copy_file("/etc/resolv.conf", where, O_TRUNC|O_NOFOLLOW, 0644, 0);
         if (r < 0) {
-                /* If the file already exists as symlink, let's
-                 * suppress the warning, under the assumption that
-                 * resolved or something similar runs inside and the
-                 * symlink points there.
+                /* If the file already exists as symlink, let's suppress the warning, under the assumption that
+                 * resolved or something similar runs inside and the symlink points there.
                  *
-                 * If the disk image is read-only, there's also no
-                 * point in complaining.
+                 * If the disk image is read-only, there's also no point in complaining.
                  */
                 log_full_errno(IN_SET(r, -ELOOP, -EROFS) ? LOG_DEBUG : LOG_WARNING, r,
-                               "Failed to copy /etc/resolv.conf to %s: %m", where);
+                               "Failed to copy /etc/resolv.conf to %s, ignoring: %m", where);
                 return 0;
         }
 
         r = userns_lchown(where, 0, 0);
         if (r < 0)
-                log_warning_errno(r, "Failed to chown /etc/resolv.conf: %m");
+                log_warning_errno(r, "Failed to chown /etc/resolv.conf, ignoring: %m");
 
         return 0;
 }
@@ -1294,7 +1318,7 @@ static int setup_boot_id(const char *dest) {
         if (mount(from, to, NULL, MS_BIND, NULL) < 0)
                 r = log_error_errno(errno, "Failed to bind mount boot id: %m");
         else if (mount(NULL, to, NULL, MS_BIND|MS_REMOUNT|MS_RDONLY|MS_NOSUID|MS_NODEV, NULL) < 0)
-                log_warning_errno(errno, "Failed to make boot id read-only, ignoring: %m");
+                r = log_error_errno(errno, "Failed to make boot id read-only: %m");
 
         (void) unlink(from);
         return r;
@@ -1794,17 +1818,18 @@ static int dissect_image(
                 char **root_device, bool *root_device_rw,
                 char **home_device, bool *home_device_rw,
                 char **srv_device, bool *srv_device_rw,
+                char **esp_device,
                 bool *secondary) {
 
 #ifdef HAVE_BLKID
-        int home_nr = -1, srv_nr = -1;
+        int home_nr = -1, srv_nr = -1, esp_nr = -1;
 #ifdef GPT_ROOT_NATIVE
         int root_nr = -1;
 #endif
 #ifdef GPT_ROOT_SECONDARY
         int secondary_root_nr = -1;
 #endif
-        _cleanup_free_ char *home = NULL, *root = NULL, *secondary_root = NULL, *srv = NULL, *generic = NULL;
+        _cleanup_free_ char *home = NULL, *root = NULL, *secondary_root = NULL, *srv = NULL, *esp = NULL, *generic = NULL;
         _cleanup_udev_enumerate_unref_ struct udev_enumerate *e = NULL;
         _cleanup_udev_device_unref_ struct udev_device *d = NULL;
         _cleanup_blkid_free_probe_ blkid_probe b = NULL;
@@ -1822,6 +1847,7 @@ static int dissect_image(
         assert(root_device);
         assert(home_device);
         assert(srv_device);
+        assert(esp_device);
         assert(secondary);
         assert(arg_image);
 
@@ -2035,6 +2061,16 @@ static int dissect_image(
                                 r = free_and_strdup(&srv, node);
                                 if (r < 0)
                                         return log_oom();
+                        } else if (sd_id128_equal(type_id, GPT_ESP)) {
+
+                                if (esp && nr >= esp_nr)
+                                        continue;
+
+                                esp_nr = nr;
+
+                                r = free_and_strdup(&esp, node);
+                                if (r < 0)
+                                        return log_oom();
                         }
 #ifdef GPT_ROOT_NATIVE
                         else if (sd_id128_equal(type_id, GPT_ROOT_NATIVE)) {
@@ -2150,6 +2186,11 @@ static int dissect_image(
                 srv = NULL;
 
                 *srv_device_rw = srv_rw;
+        }
+
+        if (esp) {
+                *esp_device = esp;
+                esp = NULL;
         }
 
         return 0;
@@ -2284,7 +2325,8 @@ static int mount_devices(
                 const char *where,
                 const char *root_device, bool root_device_rw,
                 const char *home_device, bool home_device_rw,
-                const char *srv_device, bool srv_device_rw) {
+                const char *srv_device, bool srv_device_rw,
+                const char *esp_device) {
         int r;
 
         assert(where);
@@ -2305,6 +2347,27 @@ static int mount_devices(
                 r = mount_device(srv_device, arg_directory, "/srv", srv_device_rw);
                 if (r < 0)
                         return log_error_errno(r, "Failed to mount server data directory: %m");
+        }
+
+        if (esp_device) {
+                const char *mp, *x;
+
+                /* Mount the ESP to /efi if it exists and is empty. If it doesn't exist, use /boot instead. */
+
+                mp = "/efi";
+                x = strjoina(arg_directory, mp);
+                r = dir_is_empty(x);
+                if (r == -ENOENT) {
+                        mp = "/boot";
+                        x = strjoina(arg_directory, mp);
+                        r = dir_is_empty(x);
+                }
+
+                if (r > 0) {
+                        r = mount_device(esp_device, arg_directory, mp, true);
+                        if (r < 0)
+                                return log_error_errno(r, "Failed to  mount ESP: %m");
+                }
         }
 
         return 0;
@@ -2589,9 +2652,25 @@ static int inner_child(
                 return -ESRCH;
         }
 
-        r = mount_systemd_cgroup_writable("", arg_unified_cgroup_hierarchy);
-        if (r < 0)
-                return r;
+        if (arg_use_cgns && cg_ns_supported()) {
+                r = unshare(CLONE_NEWCGROUP);
+                if (r < 0)
+                        return log_error_errno(errno, "Failed to unshare cgroup namespace");
+                r = mount_cgroups(
+                                "",
+                                arg_unified_cgroup_hierarchy,
+                                arg_userns_mode != USER_NAMESPACE_NO,
+                                arg_uid_shift,
+                                arg_uid_range,
+                                arg_selinux_apifs_context,
+                                arg_use_cgns);
+                if (r < 0)
+                        return r;
+        } else {
+                r = mount_systemd_cgroup_writable("", arg_unified_cgroup_hierarchy);
+                if (r < 0)
+                        return r;
+        }
 
         r = reset_uid_gid();
         if (r < 0)
@@ -2780,6 +2859,7 @@ static int outer_child(
                 const char *root_device, bool root_device_rw,
                 const char *home_device, bool home_device_rw,
                 const char *srv_device, bool srv_device_rw,
+                const char *esp_device,
                 bool interactive,
                 bool secondary,
                 int pid_socket,
@@ -2841,7 +2921,8 @@ static int outer_child(
         r = mount_devices(directory,
                           root_device, root_device_rw,
                           home_device, home_device_rw,
-                          srv_device, srv_device_rw);
+                          srv_device, srv_device_rw,
+                          esp_device);
         if (r < 0)
                 return r;
 
@@ -2973,15 +3054,18 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = mount_cgroups(
-                        directory,
-                        arg_unified_cgroup_hierarchy,
-                        arg_userns_mode != USER_NAMESPACE_NO,
-                        arg_uid_shift,
-                        arg_uid_range,
-                        arg_selinux_apifs_context);
-        if (r < 0)
-                return r;
+        if (!arg_use_cgns || !cg_ns_supported()) {
+                r = mount_cgroups(
+                                directory,
+                                arg_unified_cgroup_hierarchy,
+                                arg_userns_mode != USER_NAMESPACE_NO,
+                                arg_uid_shift,
+                                arg_uid_range,
+                                arg_selinux_apifs_context,
+                                arg_use_cgns);
+                if (r < 0)
+                        return r;
+        }
 
         r = mount_move_root(directory);
         if (r < 0)
@@ -3444,7 +3528,7 @@ static int load_settings(void) {
 
 int main(int argc, char *argv[]) {
 
-        _cleanup_free_ char *device_path = NULL, *root_device = NULL, *home_device = NULL, *srv_device = NULL, *console = NULL;
+        _cleanup_free_ char *device_path = NULL, *root_device = NULL, *home_device = NULL, *srv_device = NULL, *esp_device = NULL, *console = NULL;
         bool root_device_rw = true, home_device_rw = true, srv_device_rw = true;
         _cleanup_close_ int master = -1, image_fd = -1;
         _cleanup_fdset_free_ FDSet *fds = NULL;
@@ -3626,6 +3710,7 @@ int main(int argc, char *argv[]) {
                                   &root_device, &root_device_rw,
                                   &home_device, &home_device_rw,
                                   &srv_device, &srv_device_rw,
+                                  &esp_device,
                                   &secondary);
                 if (r < 0)
                         goto finish;
@@ -3800,6 +3885,7 @@ int main(int argc, char *argv[]) {
                                         root_device, root_device_rw,
                                         home_device, home_device_rw,
                                         srv_device, srv_device_rw,
+                                        esp_device,
                                         interactive,
                                         secondary,
                                         pid_socket_pair[1],

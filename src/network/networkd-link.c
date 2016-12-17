@@ -256,12 +256,8 @@ static int link_enable_ipv6(Link *link) {
         r = write_string_file(p, one_zero(disabled), WRITE_STRING_FILE_VERIFY_ON_FAILURE);
         if (r < 0)
                 log_link_warning_errno(link, r, "Cannot %s IPv6 for interface %s: %m", disabled ? "disable" : "enable", link->ifname);
-        else {
-                if (disabled)
-                        log_link_info(link, "IPv6 disabled for interface: %m");
-                else
-                        log_link_info(link, "IPv6 enabled for interface: %m");
-        }
+        else
+                log_link_info(link, "IPv6 %sd for interface: %m", enable_disable(!disabled));
 
         return 0;
 }
@@ -1318,6 +1314,65 @@ int link_set_mtu(Link *link, uint32_t mtu) {
         return 0;
 }
 
+static int set_flags_handler(sd_netlink *rtnl, sd_netlink_message *m, void *userdata) {
+        _cleanup_link_unref_ Link *link = userdata;
+        int r;
+
+        assert(m);
+        assert(link);
+        assert(link->ifname);
+
+        if (IN_SET(link->state, LINK_STATE_FAILED, LINK_STATE_LINGER))
+                return 1;
+
+        r = sd_netlink_message_get_errno(m);
+        if (r < 0)
+                log_link_warning_errno(link, r, "Could not set link flags: %m");
+
+        return 1;
+}
+
+static int link_set_flags(Link *link) {
+        _cleanup_(sd_netlink_message_unrefp) sd_netlink_message *req = NULL;
+        unsigned ifi_change = 0;
+        unsigned ifi_flags = 0;
+        int r;
+
+        assert(link);
+        assert(link->manager);
+        assert(link->manager->rtnl);
+
+        if (link->flags & IFF_LOOPBACK)
+                return 0;
+
+        if (!link->network)
+                return 0;
+
+        if (link->network->arp < 0)
+                return 0;
+
+        r = sd_rtnl_message_new_link(link->manager->rtnl, &req, RTM_SETLINK, link->ifindex);
+        if (r < 0)
+                return log_link_error_errno(link, r, "Could not allocate RTM_SETLINK message: %m");
+
+        if (link->network->arp >= 0) {
+                ifi_change |= IFF_NOARP;
+                ifi_flags |= link->network->arp ? 0 : IFF_NOARP;
+        }
+
+        r = sd_rtnl_message_link_set_flags(req, ifi_flags, ifi_change);
+        if (r < 0)
+                return log_link_error_errno(link, r, "Could not set link flags: %m");
+
+        r = sd_netlink_call_async(link->manager->rtnl, req, set_flags_handler, link, 0, NULL);
+        if (r < 0)
+                return log_link_error_errno(link, r, "Could not send rtnetlink message: %m");
+
+        link_ref(link);
+
+        return 0;
+}
+
 static int link_set_bridge(Link *link) {
         _cleanup_(sd_netlink_message_unrefp) sd_netlink_message *req = NULL;
         int r;
@@ -2005,7 +2060,8 @@ static int link_joined(Link *link) {
                         log_link_error_errno(link, r, "Could not set bridge message: %m");
         }
 
-        if (link->network->bridge || streq_ptr("bridge", link->kind)) {
+        if (link->network->use_br_vlan &&
+            (link->network->bridge || streq_ptr("bridge", link->kind))) {
                 r = link_set_bridge_vlan(link);
                 if (r < 0)
                         log_link_error_errno(link, r, "Could not set bridge vlan: %m");
@@ -2318,6 +2374,35 @@ static int link_drop_foreign_config(Link *link) {
         return 0;
 }
 
+static int link_drop_config(Link *link) {
+        Address *address;
+        Route *route;
+        Iterator i;
+        int r;
+
+        SET_FOREACH(address, link->addresses, i) {
+                /* we consider IPv6LL addresses to be managed by the kernel */
+                if (address->family == AF_INET6 && in_addr_is_link_local(AF_INET6, &address->in_addr) == 1)
+                        continue;
+
+                r = address_remove(address, link, link_address_remove_handler);
+                if (r < 0)
+                        return r;
+        }
+
+        SET_FOREACH(route, link->routes, i) {
+                /* do not touch routes managed by the kernel */
+                if (route->protocol == RTPROT_KERNEL)
+                        continue;
+
+                r = route_remove(route, link, link_route_remove_handler);
+                if (r < 0)
+                        return r;
+        }
+
+        return 0;
+}
+
 static int link_update_lldp(Link *link) {
         int r;
 
@@ -2383,6 +2468,10 @@ static int link_configure(Link *link) {
                 return r;
 
         r = link_set_ipv6_hop_limit(link);
+        if (r < 0)
+                return r;
+
+        r = link_set_flags(link);
         if (r < 0)
                 return r;
 
@@ -2863,6 +2952,14 @@ static int link_carrier_lost(Link *link) {
                 link_enter_failed(link);
                 return r;
         }
+
+        r = link_drop_config(link);
+        if (r < 0)
+                return r;
+
+        r = link_drop_foreign_config(link);
+        if (r < 0)
+                return r;
 
         r = link_handle_bound_by_list(link);
         if (r < 0)

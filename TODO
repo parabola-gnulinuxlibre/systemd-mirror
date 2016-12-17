@@ -33,6 +33,19 @@ Janitorial Clean-ups:
 
 Features:
 
+* RemoveIPC= in unit files for removing POSIX/SysV IPC objects
+
+* Introduce ProtectSystem=strict for making the entire OS hierarchy read-only
+  except for a select few
+
+* nspawn: start UID allocation loop from hash of container name
+
+* nspawn: support that /proc, /sys/, /dev are pre-mounted
+
+* define gpt header bits to select volatility mode
+
+* nspawn: mount loopback filesystems with "discard"
+
 * ProtectKernelLogs= (drops CAP_SYSLOG, add seccomp for syslog() syscall, and DeviceAllow to /dev/kmsg) in service files
 
 * ProtectClock= (drops CAP_SYS_TIMES, adds seecomp filters for settimeofday, adjtimex), sets DeviceAllow o /dev/rtc
@@ -43,10 +56,9 @@ Features:
 
 * ProtectKeyRing= to take keyring calls away
 
-* PrivateUsers= which maps the all user ids except root and the one specified
-  in User= to nobody
+* ProtectControlGroups= which mounts all of /sys/fs/cgroup read-only
 
-* Add AllocateUser= for allowing dynamic user ids per-service
+* RemoveKeyRing= to remove all keyring entries of the specified user
 
 * Add DataDirectory=, CacheDirectory= and LogDirectory= to match
   RuntimeDirectory=, and create it as necessary when starting a service, owned by the right user.
@@ -60,14 +72,17 @@ Features:
 
 * RestrictNamespaces= or so in services (taking away the ability to create namespaces, with setns, unshare, clone)
 
-* nspawn: make /proc/sys/net writable?
-
 * make sure the ratelimit object can deal with USEC_INFINITY as way to turn off things
 
 * journalctl: make sure -f ends when the container indicated by -M terminates
 
 * expose the "privileged" flag of ExecCommand on the bus, and open it up to
   transient units
+
+* in nss-systemd, if we run inside of RootDirectory= with PrivateUsers= set,
+  find a way to map the User=/Group= of the service to the right name. This way
+  a user/group for a service only has to exist on the host for the right
+  mapping to work.
 
 * allow attaching additional journald log fields to cgroups
 

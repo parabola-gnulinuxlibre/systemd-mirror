@@ -134,6 +134,7 @@ static int network_load_one(Manager *manager, const char *filename) {
         network->ipv6_hop_limit = -1;
         network->duid.type = _DUID_TYPE_INVALID;
         network->proxy_arp = -1;
+        network->arp = -1;
         network->ipv6_accept_ra_use_dns = true;
 
         r = config_parse(NULL, filename, file,
@@ -394,10 +395,8 @@ int network_apply(Manager *manager, Network *network, Link *link) {
         if (!strv_isempty(network->dns) ||
             !strv_isempty(network->ntp) ||
             !strv_isempty(network->search_domains) ||
-            !strv_isempty(network->route_domains)) {
-                manager_dirty(manager);
+            !strv_isempty(network->route_domains))
                 link_dirty(link);
-        }
 
         return 0;
 }

@@ -4770,7 +4770,7 @@ static int show_one(
         else if (streq(verb, "status")) {
                 print_status_info(bus, &info, ellipsized);
 
-                if (info.active_state && STR_IN_SET(info.active_state, "inactive", "failed"))
+                if (info.active_state && !STR_IN_SET(info.active_state, "active", "reloading"))
                         r = EXIT_PROGRAM_NOT_RUNNING;
                 else
                         r = EXIT_PROGRAM_RUNNING_OR_SERVICE_OK;
@@ -5569,10 +5569,12 @@ static int enable_sysv_units(const char *verb, char **args) {
                 if (!found_sysv)
                         continue;
 
-                if (found_native)
-                        log_info("Synchronizing state of %s with SysV service script with %s.", name, argv[0]);
-                else
-                        log_info("%s is not a native service, redirecting to systemd-sysv-install.", name);
+                if (!arg_quiet) {
+                        if (found_native)
+                                log_info("Synchronizing state of %s with SysV service script with %s.", name, argv[0]);
+                        else
+                                log_info("%s is not a native service, redirecting to systemd-sysv-install.", name);
+                }
 
                 if (!isempty(arg_root))
                         argv[c++] = q = strappend("--root=", arg_root);
@@ -5673,6 +5675,29 @@ static int mangle_names(char **original_names, char ***mangled_names) {
         return 0;
 }
 
+static int normalize_names(char **names, bool warn_if_path) {
+        char **u;
+        bool was_path = false;
+
+        STRV_FOREACH(u, names) {
+                int r;
+
+                if (!is_path(*u))
+                        continue;
+
+                r = free_and_strdup(u, basename(*u));
+                if (r < 0)
+                        return log_error_errno(r, "Failed to normalize unit file path: %m");
+
+                was_path = true;
+        }
+
+        if (warn_if_path && was_path)
+                log_warning("Warning: Can't execute disable on the unit file path. Proceeding with the unit name.");
+
+        return 0;
+}
+
 static int unit_exists(const char *unit) {
         _cleanup_(sd_bus_message_unrefp) sd_bus_message *reply = NULL;
         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
@@ -5738,6 +5763,12 @@ static int enable_unit(int argc, char *argv[], void *userdata) {
                 if (arg_no_reload || install_client_side())
                         return 0;
                 return daemon_reload(argc, argv, userdata);
+        }
+
+        if (streq(verb, "disable")) {
+                r = normalize_names(names, true);
+                if (r < 0)
+                        return r;
         }
 
         if (install_client_side()) {
@@ -6563,9 +6594,9 @@ static void systemctl_help(void) {
                "     --preset-mode=   Apply only enable, only disable, or all presets\n"
                "     --root=PATH      Enable unit files in the specified root directory\n"
                "  -n --lines=INTEGER  Number of journal entries to show\n"
-               "  -o --output=STRING  Change journal output mode (short, short-iso,\n"
-               "                              short-precise, short-monotonic, verbose,\n"
-               "                              export, json, json-pretty, json-sse, cat)\n"
+               "  -o --output=STRING  Change journal output mode (short, short-precise,\n"
+               "                             short-iso, short-full, short-monotonic, short-unix,\n"
+               "                             verbose, export, json, json-pretty, json-sse, cat)\n"
                "     --firmware-setup Tell the firmware to show the setup menu on next boot\n"
                "     --plain          Print unit dependencies as a list instead of a tree\n\n"
                "Unit Commands:\n"

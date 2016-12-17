@@ -92,8 +92,7 @@ static enum {
         ACTION_HELP,
         ACTION_VERSION,
         ACTION_TEST,
-        ACTION_DUMP_CONFIGURATION_ITEMS,
-        ACTION_DONE
+        ACTION_DUMP_CONFIGURATION_ITEMS
 } arg_action = ACTION_RUN;
 static char *arg_default_unit = NULL;
 static bool arg_system = false;
@@ -1319,7 +1318,7 @@ static int fixup_environment(void) {
                 return r;
 
         if (r == 0) {
-                term = strdup(default_term_for_tty("/dev/console") + 5);
+                term = strdup(default_term_for_tty("/dev/console"));
                 if (!term)
                         return -ENOMEM;
         }
@@ -1415,11 +1414,11 @@ int main(int argc, char *argv[]) {
                         if (mac_selinux_setup(&loaded_policy) < 0) {
                                 error_message = "Failed to load SELinux policy";
                                 goto finish;
-                        } else if (ima_setup() < 0) {
-                                error_message = "Failed to load IMA policy";
-                                goto finish;
                         } else if (mac_smack_setup(&loaded_policy) < 0) {
                                 error_message = "Failed to load SMACK policy";
+                                goto finish;
+                        } else if (ima_setup() < 0) {
+                                error_message = "Failed to load IMA policy";
                                 goto finish;
                         }
                         dual_timestamp_get(&security_finish_timestamp);
@@ -1615,10 +1614,8 @@ int main(int argc, char *argv[]) {
                 retval = version();
                 goto finish;
         } else if (arg_action == ACTION_DUMP_CONFIGURATION_ITEMS) {
+                pager_open(arg_no_pager, false);
                 unit_dump_config_items(stdout);
-                retval = EXIT_SUCCESS;
-                goto finish;
-        } else if (arg_action == ACTION_DONE) {
                 retval = EXIT_SUCCESS;
                 goto finish;
         }

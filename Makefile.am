@@ -658,7 +658,9 @@ endif # HAVE_UTMP
 dist_userunit_DATA = \
 	units/user/basic.target \
 	units/user/default.target \
-	units/user/exit.target
+	units/user/exit.target \
+	units/user/graphical-session.target \
+	units/user/graphical-session-pre.target
 
 nodist_userunit_DATA = \
 	units/user/systemd-exit.service
@@ -1286,6 +1288,8 @@ libcore_la_SOURCES = \
 	src/core/load-dropin.h \
 	src/core/execute.c \
 	src/core/execute.h \
+	src/core/dynamic-user.c \
+	src/core/dynamic-user.h \
 	src/core/kill.c \
 	src/core/kill.h \
 	src/core/dbus.c \
@@ -1717,6 +1721,9 @@ EXTRA_DIST += \
 	test/test-execute/exec-personality-x86-64.service \
 	test/test-execute/exec-personality-x86.service \
 	test/test-execute/exec-personality-s390.service \
+	test/test-execute/exec-personality-ppc64.service \
+	test/test-execute/exec-personality-ppc64le.service \
+	test/test-execute/exec-personality-aarch64.service \
 	test/test-execute/exec-privatedevices-no.service \
 	test/test-execute/exec-privatedevices-yes.service \
 	test/test-execute/exec-privatetmp-no.service \
@@ -4009,7 +4016,8 @@ TESTS += \
 
 if HAVE_PYTHON
 TESTS += \
-	test/rule-syntax-check.py
+	test/rule-syntax-check.py \
+	hwdb/parse_hwdb.py
 
 if HAVE_SYSV_COMPAT
 TESTS += \
@@ -4061,7 +4069,8 @@ EXTRA_DIST += \
 	test/udev-test.pl \
 	test/rule-syntax-check.py \
 	test/sysv-generator-test.py \
-	test/mocks/fsck
+	test/mocks/fsck \
+	hwdb/parse_hwdb.py
 
 #@auto/ata_id/Makefile ---------------------------------------------------------
 ata_id_SOURCES = \
@@ -4807,9 +4816,6 @@ nodist_udevrules_DATA += \
 
 nodist_systemunit_DATA += \
 	units/systemd-vconsole-setup.service
-
-SYSINIT_TARGET_WANTS += \
-	systemd-vconsole-setup.service
 endif # ENABLE_VCONSOLE
 
 EXTRA_DIST += \
@@ -5191,6 +5197,27 @@ test_nss_LDADD = \
 
 manual_tests += \
 	test-nss
+
+#@auto/nss-systemd/Makefile ----------------------------------------------------
+libnss_systemd_la_SOURCES = \
+	src/nss-systemd/nss-systemd.sym \
+	src/nss-systemd/nss-systemd.c
+
+libnss_systemd_la_LDFLAGS = \
+	$(AM_LDFLAGS) \
+	-module \
+	-export-dynamic \
+	-avoid-version \
+	-shared \
+	-shrext .so.2 \
+	-Wl,--version-script=$(top_srcdir)/src/nss-systemd/nss-systemd.sym
+
+libnss_systemd_la_LIBADD = \
+	libsystemd-internal.la \
+	libbasic.la
+
+lib_LTLIBRARIES += \
+	libnss_systemd.la
 
 #@auto/nss-myhostname/Makefile -------------------------------------------------
 if HAVE_MYHOSTNAME

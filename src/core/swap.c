@@ -153,6 +153,8 @@ static void swap_done(Unit *u) {
         exec_command_done_array(s->exec_command, _SWAP_EXEC_COMMAND_MAX);
         s->control_command = NULL;
 
+        dynamic_creds_unref(&s->dynamic_creds);
+
         swap_unwatch_control_pid(s);
 
         s->timer_event_source = sd_event_source_unref(s->timer_event_source);
@@ -553,6 +555,9 @@ static int swap_coldplug(Unit *u) {
                         return r;
         }
 
+        if (!IN_SET(new_state, SWAP_DEAD, SWAP_FAILED))
+                (void) unit_setup_dynamic_creds(u);
+
         swap_set_state(s, new_state);
         return 0;
 }
@@ -606,12 +611,10 @@ static int swap_spawn(Swap *s, ExecCommand *c, pid_t *_pid) {
         pid_t pid;
         int r;
         ExecParameters exec_params = {
-                .apply_permissions = true,
-                .apply_chroot      = true,
-                .apply_tty_stdin   = true,
-                .stdin_fd          = -1,
-                .stdout_fd         = -1,
-                .stderr_fd         = -1,
+                .flags     = EXEC_APPLY_PERMISSIONS|EXEC_APPLY_CHROOT|EXEC_APPLY_TTY_STDIN,
+                .stdin_fd  = -1,
+                .stdout_fd = -1,
+                .stderr_fd = -1,
         };
 
         assert(s);
@@ -628,12 +631,16 @@ static int swap_spawn(Swap *s, ExecCommand *c, pid_t *_pid) {
         if (r < 0)
                 goto fail;
 
+        r = unit_setup_dynamic_creds(UNIT(s));
+        if (r < 0)
+                return r;
+
         r = swap_arm_timer(s, usec_add(now(CLOCK_MONOTONIC), s->timeout_usec));
         if (r < 0)
                 goto fail;
 
         exec_params.environment = UNIT(s)->manager->environment;
-        exec_params.confirm_spawn = UNIT(s)->manager->confirm_spawn;
+        exec_params.flags |= UNIT(s)->manager->confirm_spawn ? EXEC_CONFIRM_SPAWN : 0;
         exec_params.cgroup_supported = UNIT(s)->manager->cgroup_supported;
         exec_params.cgroup_path = UNIT(s)->cgroup_path;
         exec_params.cgroup_delegate = s->cgroup_context.delegate;
@@ -644,6 +651,7 @@ static int swap_spawn(Swap *s, ExecCommand *c, pid_t *_pid) {
                        &s->exec_context,
                        &exec_params,
                        s->exec_runtime,
+                       &s->dynamic_creds,
                        &pid);
         if (r < 0)
                 goto fail;
@@ -665,21 +673,23 @@ fail:
 static void swap_enter_dead(Swap *s, SwapResult f) {
         assert(s);
 
-        if (f != SWAP_SUCCESS)
+        if (s->result == SWAP_SUCCESS)
                 s->result = f;
+
+        swap_set_state(s, s->result != SWAP_SUCCESS ? SWAP_FAILED : SWAP_DEAD);
 
         exec_runtime_destroy(s->exec_runtime);
         s->exec_runtime = exec_runtime_unref(s->exec_runtime);
 
         exec_context_destroy_runtime_directory(&s->exec_context, manager_get_runtime_prefix(UNIT(s)->manager));
 
-        swap_set_state(s, s->result != SWAP_SUCCESS ? SWAP_FAILED : SWAP_DEAD);
+        dynamic_creds_destroy(&s->dynamic_creds);
 }
 
 static void swap_enter_active(Swap *s, SwapResult f) {
         assert(s);
 
-        if (f != SWAP_SUCCESS)
+        if (s->result == SWAP_SUCCESS)
                 s->result = f;
 
         swap_set_state(s, SWAP_ACTIVE);
@@ -690,7 +700,7 @@ static void swap_enter_signal(Swap *s, SwapState state, SwapResult f) {
 
         assert(s);
 
-        if (f != SWAP_SUCCESS)
+        if (s->result == SWAP_SUCCESS)
                 s->result = f;
 
         r = unit_kill_context(
@@ -987,7 +997,7 @@ static void swap_sigchld_event(Unit *u, pid_t pid, int code, int status) {
         else
                 assert_not_reached("Unknown code");
 
-        if (f != SWAP_SUCCESS)
+        if (s->result == SWAP_SUCCESS)
                 s->result = f;
 
         if (s->control_command) {
@@ -1466,6 +1476,7 @@ const UnitVTable swap_vtable = {
         .cgroup_context_offset = offsetof(Swap, cgroup_context),
         .kill_context_offset = offsetof(Swap, kill_context),
         .exec_runtime_offset = offsetof(Swap, exec_runtime),
+        .dynamic_creds_offset = offsetof(Swap, dynamic_creds),
 
         .sections =
                 "Unit\0"

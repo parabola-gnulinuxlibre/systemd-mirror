@@ -27,10 +27,6 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#ifdef HAVE_GNUTLS
-#include <gnutls/gnutls.h>
-#endif
-
 #include "sd-daemon.h"
 
 #include "alloc-util.h"
@@ -1564,7 +1560,7 @@ int main(int argc, char **argv) {
         if (r < 0)
                 log_error_errno(r, "Failed to enable watchdog: %m");
         else
-                log_debug("Watchdog is %s.", r > 0 ? "enabled" : "disabled");
+                log_debug("Watchdog is %sd.", enable_disable(r > 0));
 
         log_debug("%s running as pid "PID_FMT,
                   program_invocation_short_name, getpid());

@@ -5,6 +5,7 @@
 #  the Free Software Foundation; either version 2.1 of the License, or
 #  (at your option) any later version.
 
-disable syslog.socket
+# These ones should be enabled by default, even if distributions
+# generally follow a default-off policy.
 
-disable systemd-journal-gatewayd.*
+disable syslog.socket

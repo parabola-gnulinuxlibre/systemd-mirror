@@ -64,6 +64,7 @@
 #include "unit-name.h"
 #include "unit-printf.h"
 #include "unit.h"
+#include "user-util.h"
 #include "utf8.h"
 #include "web-util.h"
 
@@ -490,16 +491,17 @@ int config_parse_socket_bind(const char *unit,
         return 0;
 }
 
-int config_parse_exec_nice(const char *unit,
-                           const char *filename,
-                           unsigned line,
-                           const char *section,
-                           unsigned section_line,
-                           const char *lvalue,
-                           int ltype,
-                           const char *rvalue,
-                           void *data,
-                           void *userdata) {
+int config_parse_exec_nice(
+                const char *unit,
+                const char *filename,
+                unsigned line,
+                const char *section,
+                unsigned section_line,
+                const char *lvalue,
+                int ltype,
+                const char *rvalue,
+                void *data,
+                void *userdata) {
 
         ExecContext *c = data;
         int priority, r;
@@ -509,14 +511,13 @@ int config_parse_exec_nice(const char *unit,
         assert(rvalue);
         assert(data);
 
-        r = safe_atoi(rvalue, &priority);
+        r = parse_nice(rvalue, &priority);
         if (r < 0) {
-                log_syntax(unit, LOG_ERR, filename, line, r, "Failed to parse nice priority, ignoring: %s", rvalue);
-                return 0;
-        }
+                if (r == -ERANGE)
+                        log_syntax(unit, LOG_ERR, filename, line, r, "Nice priority out of range, ignoring: %s", rvalue);
+                else
+                        log_syntax(unit, LOG_ERR, filename, line, r, "Failed to parse nice priority, ignoring: %s", rvalue);
 
-        if (priority < PRIO_MIN || priority >= PRIO_MAX) {
-                log_syntax(unit, LOG_ERR, filename, line, 0, "Nice priority out of range, ignoring: %s", rvalue);
                 return 0;
         }
 
@@ -1763,6 +1764,123 @@ int config_parse_sec_fix_0(
         return 0;
 }
 
+int config_parse_user_group(
+                const char *unit,
+                const char *filename,
+                unsigned line,
+                const char *section,
+                unsigned section_line,
+                const char *lvalue,
+                int ltype,
+                const char *rvalue,
+                void *data,
+                void *userdata) {
+
+        char **user = data, *n;
+        Unit *u = userdata;
+        int r;
+
+        assert(filename);
+        assert(lvalue);
+        assert(rvalue);
+        assert(u);
+
+        if (isempty(rvalue))
+                n = NULL;
+        else {
+                _cleanup_free_ char *k = NULL;
+
+                r = unit_full_printf(u, rvalue, &k);
+                if (r < 0) {
+                        log_syntax(unit, LOG_ERR, filename, line, r, "Failed to resolve unit specifiers in %s, ignoring: %m", rvalue);
+                        return 0;
+                }
+
+                if (!valid_user_group_name_or_id(k)) {
+                        log_syntax(unit, LOG_ERR, filename, line, 0, "Invalid user/group name or numeric ID, ignoring: %s", k);
+                        return 0;
+                }
+
+                n = k;
+                k = NULL;
+        }
+
+        free(*user);
+        *user = n;
+
+        return 0;
+}
+
+int config_parse_user_group_strv(
+                const char *unit,
+                const char *filename,
+                unsigned line,
+                const char *section,
+                unsigned section_line,
+                const char *lvalue,
+                int ltype,
+                const char *rvalue,
+                void *data,
+                void *userdata) {
+
+        char ***users = data;
+        Unit *u = userdata;
+        const char *p;
+        int r;
+
+        assert(filename);
+        assert(lvalue);
+        assert(rvalue);
+        assert(u);
+
+        if (isempty(rvalue)) {
+                char **empty;
+
+                empty = new0(char*, 1);
+                if (!empty)
+                        return log_oom();
+
+                strv_free(*users);
+                *users = empty;
+
+                return 0;
+        }
+
+        p = rvalue;
+        for (;;) {
+                _cleanup_free_ char *word = NULL, *k = NULL;
+
+                r = extract_first_word(&p, &word, WHITESPACE, 0);
+                if (r == 0)
+                        break;
+                if (r == -ENOMEM)
+                        return log_oom();
+                if (r < 0) {
+                        log_syntax(unit, LOG_ERR, filename, line, r, "Invalid syntax, ignoring: %s", rvalue);
+                        break;
+                }
+
+                r = unit_full_printf(u, word, &k);
+                if (r < 0) {
+                        log_syntax(unit, LOG_ERR, filename, line, r, "Failed to resolve unit specifiers in %s, ignoring: %m", word);
+                        continue;
+                }
+
+                if (!valid_user_group_name_or_id(k)) {
+                        log_syntax(unit, LOG_ERR, filename, line, 0, "Invalid user/group name or numeric ID, ignoring: %s", k);
+                        continue;
+                }
+
+                r = strv_push(users, k);
+                if (r < 0)
+                        return log_oom();
+
+                k = NULL;
+        }
+
+        return 0;
+}
+
 int config_parse_busname_service(
                 const char *unit,
                 const char *filename,
@@ -2785,7 +2903,7 @@ int config_parse_cpu_quota(
                 return 0;
         }
 
-        r = parse_percent(rvalue);
+        r = parse_percent_unbounded(rvalue);
         if (r <= 0) {
                 log_syntax(unit, LOG_ERR, filename, line, r, "CPU quota '%s' invalid. Ignoring.", rvalue);
                 return 0;

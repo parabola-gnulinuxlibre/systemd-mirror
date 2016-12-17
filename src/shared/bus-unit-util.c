@@ -84,7 +84,7 @@ int bus_append_unit_property_assignment(sd_bus_message *m, const char *assignmen
                 if (isempty(eq))
                         r = sd_bus_message_append(m, "sv", "CPUQuotaPerSecUSec", "t", USEC_INFINITY);
                 else {
-                        r = parse_percent(eq);
+                        r = parse_percent_unbounded(eq);
                         if (r <= 0) {
                                 log_error_errno(r, "CPU quota '%s' invalid.", eq);
                                 return -EINVAL;
@@ -199,11 +199,12 @@ int bus_append_unit_property_assignment(sd_bus_message *m, const char *assignmen
                 r = sd_bus_message_append(m, "sv", sn, "t", l.rlim_cur);
 
         } else if (STR_IN_SET(field,
-                       "CPUAccounting", "MemoryAccounting", "IOAccounting", "BlockIOAccounting", "TasksAccounting",
-                       "SendSIGHUP", "SendSIGKILL", "WakeSystem", "DefaultDependencies",
-                       "IgnoreSIGPIPE", "TTYVHangup", "TTYReset", "RemainAfterExit",
-                       "PrivateTmp", "PrivateDevices", "PrivateNetwork", "NoNewPrivileges",
-                       "SyslogLevelPrefix", "Delegate", "RemainAfterElapse", "MemoryDenyWriteExecute")) {
+                              "CPUAccounting", "MemoryAccounting", "IOAccounting", "BlockIOAccounting", "TasksAccounting",
+                              "SendSIGHUP", "SendSIGKILL", "WakeSystem", "DefaultDependencies",
+                              "IgnoreSIGPIPE", "TTYVHangup", "TTYReset", "RemainAfterExit",
+                              "PrivateTmp", "PrivateDevices", "PrivateNetwork", "PrivateUsers", "NoNewPrivileges",
+                              "SyslogLevelPrefix", "Delegate", "RemainAfterElapse", "MemoryDenyWriteExecute",
+                              "RestrictRealtime", "DynamicUser")) {
 
                 r = parse_boolean(eq);
                 if (r < 0)
@@ -365,15 +366,13 @@ int bus_append_unit_property_assignment(sd_bus_message *m, const char *assignmen
                 }
 
         } else if (streq(field, "Nice")) {
-                int32_t i;
+                int n;
 
-                r = safe_atoi32(eq, &i);
-                if (r < 0) {
-                        log_error("Failed to parse %s value %s.", field, eq);
-                        return -EINVAL;
-                }
+                r = parse_nice(eq, &n);
+                if (r < 0)
+                        return log_error_errno(r, "Failed to parse nice value: %s", eq);
 
-                r = sd_bus_message_append(m, "v", "i", i);
+                r = sd_bus_message_append(m, "v", "i", (int32_t) n);
 
         } else if (STR_IN_SET(field, "Environment", "PassEnvironment")) {
                 const char *p;
