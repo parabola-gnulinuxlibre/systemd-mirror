@@ -307,8 +307,8 @@
     code. If <varname>$NOTIFY_SOCKET</varname> was not set and hence
     no status data could be sent, 0 is returned. If the status was
     sent, these functions return with a positive return value. In
-    order to support both, init systems that implement this scheme and
-    those which do not, it is generally recommended to ignore the
+    order to support both init systems that implement this scheme and
+    those that do not, it is generally recommended to ignore the
     return value of this call.</para>
   </refsect1>
 
