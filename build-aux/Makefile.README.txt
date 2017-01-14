@@ -1,0 +1,164 @@
+Luke's AutoMake
+===============
+
+Yo, this document is incomplete.  It describes the magical
+automake.{head,tail}.mk Makefiles and how to use them, kinda.
+
+I wrote a "clone" of automake.  I say clone, because it works
+differently.  Yeah, I need a new name for it.
+
+High-level overview
+-------------------
+
+Now, what this does for you is:
+
+It makes it _easy_ to write non-recursive Makefiles--and ones that are
+similar to plain recursive Makefiles, at that! (search for the paper
+"Recursive Make Considered Harmful")  As harmful as recursive make is,
+it's historically been difficult to to write non-recursive Makefiles.
+This makes it easy.
+
+It also makes it easy to follow the GNU standards for your makefiles:
+it takes care of this entire table of .PHONY targets for you:
+
+| this | and this         | are aliases for this                                   |
+|------+------------------+--------------------------------------------------------|
+| all  | build            | $(outdir)/build                                        |
+|      | install          | $(outdir)/install                                      |
+|      | uninstall        | $(outdir)/uninstall                                    |
+|      | mostlyclean      | $(outdir)/mostlyclean                                  |
+|      | clean            | $(outdir)/clean                                        |
+|      | distclean        | $(outdir)/distclean                                    |
+|      | maintainer-clean | $(outdir)/maintainer-clean                             |
+|      | check            | $(outdir)/check (not implemented for you)              |
+|      | dist             | $(topoutdir)/$(PACKAGE)-$(VERSION).tar.gz (not .PHONY) |
+
+(You are still responsible for implementing the `$(outdir)/check`
+target in each of your Makefiles.)
+
+What you have to do is:
+
+In each source directory, you write a `Makefile`, very similarly to if
+you were writing for plain GNU Make, with
+
+    topoutdir ?= ...
+    topsrcdir ?= ...
+    include $(topsrcdir)/build-aux/Makefile.head.mk
+
+    # your makefile
+    
+    include $(topsrcdir)/build-aux/Makefile.tail.mk
+
+And in the top-level source directory, Write your own helper makefiles
+that get included:
+ - `common.once.head.mk`: before parsing any of your Makefiles
+ - `common.each.head.mk`: before parsing each of your Makefiles
+ - `common.each.tail.mk`: after parsing each of your Makefiles
+ - `common.each.tail.mk`: after parsing all of your Makefiles
+
+The `common.*.mk` makefiles are nice for including generic pattern
+rules and variables that aren't specific to a directory.
+
+You're probably thinking that this sounds too good to be true!
+Unfortunately, there are two major deviations from writing a plain
+recursive Makefile:
+
+ 1. all targets and prerequisites (including .PHONY targets!) need to
+    be prefixed with
+    `$(srcdir)`/`$(outdir)`/`$(topsrcdir)`/`$(topoutdir)`.
+      * sub-gotcha: this means that if a pattern rule has a
+        prerequisite that may be in srcdir or outdir, then it must be
+        specified twice, once for each case.
+ 2. if a prerequisite is in a directory "owned" by another Makefile,
+    you must filter the pathname through `am_path`:
+    `$(call am_path,YOUR_PATH)`.  Further, that path must NOT contain
+    a `..` segment; if you need to refer to a sibling directory, do it
+    relative to `$(topoutdir)` or `$(topsrcdir)`.
+
+Telling automake about your program
+-----------------------------------
+
+You tell automake what to do for you by setting some variables.  They
+are all prefixed with `am_`; this prefix may be changed by editing the
+`_am` variable at the top of `automake.head.mk`.
+
+The exception to this is the `am_path` variable, which is a macro that
+is used to make a list of filenames relative to the appropriate
+directory, because unlike normal GNU (Auto)Make, `$(outdir)` isn't
+nescessarily equal to `.`.  See above.
+
+There are several commands that generate files; simply record the list
+of files that each command generates as the following variable
+variables:
+
+| Variable     | Create Command | Delete Command              | Description                       | Relative to |
+|--------------+----------------+-----------------------------+-----------------------------------+-------------|
+| am_src_files | emacs          | rm -rf .                    | Files that the developer writes   | srcdir      |
+| am_gen_files | ???            | make maintainer-clean       | Files the developer compiles      | srcdir      |
+| am_cfg_files | ./configure    | make distclean              | Users' compile-time configuration | outdir      |
+| am_out_files | make all       | make mostlyclean/make clean | Files the user compiles           | outdir      |
+| am_sys_files | make install   | make uninstall              | Files the user installs           | DESTDIR     |
+
+In addition, there are two more variables that control not how files
+are created, but how they are deleted:
+
+| Variable       | Affected command | Description                                    | Relative to |
+|----------------+------------------+------------------------------------------------+-------------|
+| am_clean_files | make clean       | A list of things to `rm` in addition to the    | outdir      |
+|                |                  | files in `$(am_out_files)`.  (Example: `*.o`)  |             |
+|----------------+------------------+------------------------------------------------+-------------|
+| am_slow_files  | make mostlyclean | A list of things that (as an exception) should | outdir      |
+|                |                  | _not_ be deleted.  (otherwise, `mostlyclean`   |             |
+|                |                  | is the same as `clean`)                        |             |
+
+Finally, there are two variables that express the relationships
+between directories:
+
+| Variable   | Description                                             |
+|------------+---------------------------------------------------------|
+| am_subdirs | A list of other directories (containing Makefiles) that |
+|            | may be considered "children" of this                    |
+|            | directory/Makefile; building a phony target in this     |
+|            | directory should also build it in the subdirectory.     |
+|            | They are not necesarily actually subdirectories of this |
+|            | directory in the filesystem.                            |
+|------------+---------------------------------------------------------|
+| am_depdirs | A list of other directories (containing Makefiles) that |
+|            | contain or generate files that are dependencies of      |
+|            | targets in this directory.  They are not necesarily     |
+|            | actually subdirectories of this directory in the        |
+|            | filesystem.  Except for files that are dependencies of  |
+|            | files in this directory, things in the dependency       |
+|            | directory will not be built.                            |
+
+Tips, notes
+-----------
+
+I like to have the first (non-comment) line in a Makefile be:
+
+    include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+
+(adjusting the number of `../` sequences as nescessary).  Then, my
+(user-editable) `config.mk` is of the form:
+
+    ifeq ($(topsrcdir),)
+    topoutdir := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+    topsrcdir := $(topoutdir)
+
+    # your configuration
+
+    endif
+
+If the package has a `./configure` script, then I have it modifiy
+topsrcdir as necessary, as well as modifying whatever other parts of
+the configuration.  All of the configuration lives in `config.mk`;
+`./configure` doesn't modify any `Makefile`s, it just generates
+`config.mk`, and copies (or (sym?)link?) every `$(srcdir)/Makefile` to
+`$(outdir)/Makefile`.
+
+----
+Copyright (C) 2016  Luke Shumaker
+
+This documentation file is placed into the public domain.  If that is
+not possible in your legal system, I grant you permission to use it in
+absolutely every way that I can legally grant to you.
