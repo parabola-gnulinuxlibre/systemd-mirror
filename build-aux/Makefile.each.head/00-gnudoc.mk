@@ -12,12 +12,5 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$(foreach d,$(gnustuff.program_dirs),$(eval $(call _gnustuff.install_program,$d)))
-$(foreach d,$(gnustuff.data_dirs)   ,$(eval $(call _gnustuff.install_data,$d)))
 
-$(outdir)/install-strip: install
-	$(STRIP) $(filter $(addsuffix /%,$(gnustuff.program_dirs)),$(std.sys_files/$(@D)))
-
-#TAGS: TODO
-#check: TODO
-#installcheck: TODO
+gnudoc.docs ?=
