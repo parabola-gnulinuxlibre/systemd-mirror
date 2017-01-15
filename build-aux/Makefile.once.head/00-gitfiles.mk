@@ -51,10 +51,10 @@ define mod.gitfiles.doc
 # subdirectory.  To do this, it uses an expression involving
 # `$(nested.subdirs)`.
 #
-# While gitfiles sets `files.src.src` very early
-# in `each.head`, because `nested.subdirs` might not be set yet, it may
-# or may not be safe to use the value of `$(files.src.src)` in your
-# Makefile, depending on how you set `nested.subdirs`.
+# While gitfiles sets `files.src.src` very early in `each.head`, because
+# `nested.subdirs` might not be set yet, it may or may not be safe to
+# use the value of `$(files.src.src)` in your Makefile, depending on how
+# you set `nested.subdirs`.
 endef
 mod.gitfiles.doc := $(value mod.gitfiles.doc)
 
