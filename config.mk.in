@@ -1,15 +1,38 @@
-# This file is based on §7.2 "Makefile Conventions" of the release of
-# the GNU Coding Standards dated April 13, 2016.
+# Copyright (C) 2016-2017  Luke Shumaker
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# This is based on §7.2 "Makefile Conventions" of the July 25, 2016
+# release of the GNU Coding Standards.
+#
+# Grep for '^##' in this file to see which Autoconf macros it depends
+# on.
 
 dist.pkgname = @PACKAGE_TARNAME@
-gnu.pkgname = @PACKAGE_NAME@
+gnuconf.pkgname = @PACKAGE_NAME@
 
-# AC_PROG_{AWK,GREP,EGREP,FGREP,INSTALL,MKDIR_P,SED}
 # 7.2.2: Utilities in Makefiles
 # ----------------------------- 
 
 # It's ok to hard-code these commands in rules, but who wants to
 # memorize the list of what's ok?
+
+## AC_PROG_AWK
+## AC_PROG_GREP
+## AC_PROG_EGREP
+## AC_PROG_SED
+
 AWK = @AWK@
 CAT = cat
 CMP = cmp
@@ -38,33 +61,83 @@ TOUCH = touch
 TR = tr
 TRUE = true
 
-AR = @AR@
-BISON = bison
-CC = @CC@
-FLEX = flex
-INSTALL = @INSTALL@
-LD = ld
-LDCONFIG = ldconfig
-LEX = @LEX@
-MAKEINFO = makeinfo
-RANLIB = @RANLIB@
-TEXI2DVI = texi2dvi
-YACC = @YACC@
+# 7.2.2: Utilities in Makefiles/7.2.3: Variables for Specifying Commands
+# ----------------------------------------------------------------------
 
-# 7.2.3 Variables for Specifying Commands
-# ---------------------------------------
+# Standard user-configurable programs.
+#
+# The list of programs here is specified in §7.2.2, but the associated FLAGS
+# variables are specified in §7.2.3.  I found it cleaner to list them together.
+
+## AC_PROG_INSTALL # @INSTALL@ @INSTALL_PROGRAM@ @INSTALL_SCRIPT@ @INSTALL_DATA@
+## AC_PROG_LEX # @LEX@ @LEXLIB@
+## AC_PROG_RANLIB
+## AC_PROG_YACC
+## AC_PROG_CC
+#
+# TODO: What causes Autoconf to define @AR@?
+
+AR = @AR@
+ARFLAGS =
+BISON = bison
+BISONFLAGS =
+CC = @CC@
+CFLAGS = @CFLAGS@ # CFLAGS instead of CCFLAGS
+FLEX = flex
+FLEXFLAGS =
+INSTALL = @INSTALL@
+# There is no INSTALLFLAGS[0]
+LD = ld
+LDFLAGS = @LDFLAGS@
+LDCONFIG = ldconfig # TODO[1]
+LDCONFIGFLAGS =
+LEX = @LEX@
+LFLAGS = #LFLAGS instead of LEXFLAGS
+#MAKE
+MAKEINFO = makeinfo
+MAKEINFOFLAGS =
+RANLIB = @RANLIB@
+RANLIBFLAGS =
+TEXI2DVI = texi2dvi
+TEXI2DVIFLAGS =
+YACC = @YACC@
+YFLAGS = # YFLAGS instead of YACCFLAGS
+
+CPPFLAGS = @CPPFLAGS@
+
+LN_S = @LN_S@
+
+CHGRP = chgrp
+CHGRPFLAGS =
+CHMOD = chmod
+CHMODFLAGS =
+CHOWN = chown
+CHOWNFLAGS =
+MKNOD = mknod
+MKNODFLAGS =
+
+# [0]: There is no INSTALLFLAGS because it would be inconsistent with how the
+#      standards otherwise recommend using $(INSTALL); with INSTALL_PROGRAM and
+#      INSTALL_DATA; which are specified in a way precluding the use of
+#      INSTALLFLAGS.  To have the variable, but to ignore it in the common case
+#      would be confusing.
+#
+# [1]: The RANLIB and LDCONFIG variables need some extra smarts; §7.2.2 says:
+#
+#       > When you use ranlib or ldconfig, you should make sure nothing bad
+#       > happens if the system does not have the program in question. Arrange
+#       > to ignore an error from that command, and print a message before the
+#       > command to tell the user that failure of this command does not mean a
+#       > problem. (The Autoconf ‘AC_PROG_RANLIB’ macro can help with this.)
+
+# 7.2.3: Variables for Specifying Commands
+# ----------------------------------------
 
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 
-STRIP = strip
-TEXI2HTML = $(MAKEINFO) --html
-TEXI2PDF = $(TEXI2DVI) --pdf
-TEXI2PS = $(TEXI2DVI) --ps
-MKDIR_P = @MKDIR_P@
-
-# 7.2.5 Variables for Installation Directories
-# --------------------------------------------
+# 7.2.5: Variables for Installation Directories
+# ---------------------------------------------
 
 # Root for the installation
 prefix = @prefix@
@@ -112,3 +185,14 @@ man5ext = .5
 man6ext = .6
 man7ext = .7
 man8ext = .8
+
+# 7.2.7: Install Command Categories
+# ---------------------------------
+
+PRE_INSTALL =
+POST_INSTALL =
+NORMAL_INSTALL =
+
+PRE_UNINSTALL =
+POST_UNINSTALL =
+NORMAL_UNINSTALL =
