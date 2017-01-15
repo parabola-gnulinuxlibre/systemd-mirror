@@ -34,7 +34,7 @@ $(eval \
   $(foreach _files.g,$(files.groups),\
     $$(outdir)/$(_files.g): $$(_files.out.$(_files.g))$(at.nl))\
   $(foreach _files.g,$(filter-out $(files.default),$(files.groups)),\
-    $$(outdir)/install-$(_files.g): $$(_files.sys.$(_files.g)))$(at.nl))
+    $$(outdir)/install-$(_files.g): $$(_files.sys.$(_files.g))$(at.nl)))
 
 # Destructive targets
 _files.uninstall   = $(_files.sys)
