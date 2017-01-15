@@ -1,283 +1,114 @@
-Autothing
-=========
+Autothing 3: The smart way to write GNU Makefiles
+=================================================
 
-Autothing is a set of Makefile fragments that you can `include` in
-your GNU Makefiles to provide two core things:
+Autothing is a thing that does things automatically.
 
- 1. Make it _easy_ to write non-recursive Makefiles. (search for the
-    paper "Recursive Make Considered Harmful")
- 2. Provide boilerplate for standard features people expect to be
-    implemented in Makefiles.
+Ok, more helpfully: Autothing is a pair of .mk Makefile fragments that
+you can `include` from your Makefiles to make them easier to write;
+specifically, it makes it _easy_ to write non-recursive Makefiles--and
+ones that are similar to plain recursive Makefiles, at that!
 
-Between these two, it should largely obviate GNU Automake in your
-projects.
+Sample
+------
 
-The recommended including Autothing into your project is to add the
-autothing repository as a `git` remote, and merge the `core` branch,
-and whichever `mod-*` module branches you want into your project's
-branch.
+Write your makefiles of the form:
 
-| module name | dependencies | description                                                                                      |
-|-------------+--------------+--------------------------------------------------------------------------------------------------|
-| at          |              | The core of Autothing                                                                            |
-|-------------+--------------+--------------------------------------------------------------------------------------------------|
-| std         | at           | Provide .PHONY targets: all/build/install/uninstall/mostlyclean/clean/distclean/maintainer-clean |
-| dist        | std          | Provide .PHONY target: dist                                                                      |
-| gnuconf     | dist         | Provide default values for user-variables from the GNU Coding Standards' Makefile Conventions    |
-| gnustuff    | gnuconf      | Provide remaining stuff from the GNU Coding Standards' Makefile Conventions                      |
+	topsrcdir ?= ...
+	topoutdir ?= ...
+	at.Makefile ?= Makefile # Optional
+	include $(topsrcdir)/build-aux/Makefile.head.mk
 
-Core (psuedo-module: at)
-------------------------
+	$(outdir)/%.o: $(srcdir)/%.c:
+		$(CC) -c -o $@ $<
 
-As harmful as recursive make is, it's historically been difficult to
-to write non-recursive Makefiles.  The goal of the core of Autothing
-is to make it easy.
+	$(outdir)/hello: $(outdir)/hello.o
 
-In each source directory, you write a `Makefile`, very similarly to if
-you were writing for plain GNU Make, with the form:
+	at.subdirs = ...
+	at.targets = ...
 
-    topoutdir ?= ...
-    topsrcdir ?= ...
-    include $(topsrcdir)/build-aux/Makefile.head.mk
+	include $(topsrcdir)/build-aux/Makefile.tail.mk
 
-    # your makefile
+This is similar to, but not quite, the comfortable way that you probably
+already write your Makefiles.
 
-    include $(topsrcdir)/build-aux/Makefile.tail.mk
+What's where?
+-------------
 
-| at.path | Use $(call at.path,FILENAME1 FILENAME2...) sanitize filenames that are not in the current Makefile's directory or its children |
-| at.nl   | A newline, for convenience, since it is difficult to type a newline in GNU Make expressions                                    |
+There are three things that Autothing provides:
 
-| at.dirlocal | Which variables to apply the namespacing mechanism to                                      |
-| at.phony    | Which targets to mark as .PHONY, and have automatic recursive dependencies                 |
-| at.subdirs  | Which directories to consider as children of this one                                      |
-| at.depdirs  | Which directories are't subdirs, but may contain dependencies of targets in this directory |
+ 1. Variable namespacing
+ 2. Tools for dealing with paths
+ 3. A module (plugin) system.
 
-outdir
-srcdir
+This repository contains both Autothing itself, and several modules.
 
-Module: std
------------
+Autothing itself is described in `build-aux/Makefile.README.txt`.
+That file is the core documentation.
 
-| Variable      | Create Command | Delete Command              | Description                       | Relative to |
-|---------------+----------------+-----------------------------+-----------------------------------+-------------|
-| std.src_files | emacs          | rm -rf .                    | Files that the developer writes   | srcdir      |
-| std.gen_files | ???            | make maintainer-clean       | Files the developer compiles      | srcdir      |
-| std.cfg_files | ./configure    | make distclean              | Users' compile-time configuration | outdir      |
-| std.out_files | make all       | make mostlyclean/make clean | Files the user compiles           | outdir      |
-| std.sys_files | make install   | make uninstall              | Files the user installs           | DESTDIR     |
+There is a "mod" module that adds self-documenting capabilities to the
+module system; adding Make targets that print documentation about the
+modules used in a project.  For convenience, in the top level of this
+repository, there is a Makefile allowing you to use these targets to
+get documentation on the modules in this repository.
 
-In addition, there are two more variables that control not how files
-are created, but how they are deleted:
+Running `make at-modules` will produce a list of modules, and short
+descriptions of them:
 
-| Variable        | Affected command | Description                                    | Relative to |
-|-----------------+------------------+------------------------------------------------+-------------|
-| std.clean_files | make clean       | A list of things to `rm` in addition to the    | outdir      |
-|                 |                  | files in `$(std.out_files)`.  (Example: `*.o`) |             |
-|-----------------+------------------+------------------------------------------------+-------------|
-| std.slow_files  | make mostlyclean | A list of things that (as an exception) should | outdir      |
-|                 |                  | _not_ be deleted.  (otherwise, `mostlyclean`   |             |
-|                 |                  | is the same as `clean`)                        |             |
+	$ make at-modules
+	Autothing modules used in this project:
+	 - dist             `dist` target for distribution tarballs        (more)
+	 - files            Keeping track of groups of files               (more)
+	 - gitfiles         Automatically populate files.src.src from git  (more)
+	 - gnuconf          GNU standard configuration variables           (more)
+	 - mod              Display information about Autothing modules    (more)
+	 - nested           Easy nested .PHONY targets                     (more)
+	 - quote            Macros to quote tricky strings                 (more)
+	 - texinfo          The GNU documentation system                   (more)
+	 - var              Depend on the values of variables              (more)
+	 - write-atomic     `write-atomic` auxiliary build script          (more)
+	 - write-ifchanged  `write-ifchanged` auxiliary build script       (more)
 
-| Variable | Default  | Description |
-|----------+----------+-------------|
-| DESTDIR  |          |             |
-|----------+----------+-------------|
-| RM       | rm -f    |             |
-| RMDIR_P  | rmdir -p |             |
-| TRUE     | true     |             |
+The "(more)" at the end of a line indicates that there is further
+documentation for that module, which can be produced by running the
+command `make at-modules/MODULE_NAME`.
 
-Module: dist
-------------
+Further development
+-------------------
 
-The `dist` module produces distribution tarballs
+The raison d'être of GNU Automake is that targeting multiple
+implementations of Make is hard; the different dialects have diverged
+significantly.
 
-| Variable     | Default    | Description |
-|--------------+------------+-------------|
-| dist.exts    | .tar.gz    |             |
-| dist.pkgname | $(PACKAGE) |             |
-| dist.version | $(VERSION) |             |
+But GNU's requirement of supporting multiple implementations of Make
+is relaxing.  With GNU Emacs 25, it GNU Make is explicitly required.
+We can finally rise up from our Automake shackles!
 
-| Variable  | Default     | Description                                        |
-|-----------+-------------+----------------------------------------------------|
-| CP        | cp          |                                                    |
-| GZIP      | gzip        |                                                    |
-| MKDIR     | mkdir       |                                                    |
-| MKDIR_P   | mkdir -p    |                                                    |
-| MV        | mv          |                                                    |
-| RM        | rm -f       |                                                    |
-| TAR       | tar         |                                                    |
-|-----------+-------------+----------------------------------------------------|
-| GZIPFLAGS | $(GZIP_ENV) |                                                    |
-| GZIP_ENV  | --best      | Because of GNU Automake, users expect this to work |
+... But we soon discover that the GNU Coding Standards require many
+things of our Makefiles, which Automake took care of for us.
 
-Module: gnuconf
----------------
+So, several of the modules in this repository combine to attempt to
+provide the things that the GNU Coding Standards require.  Between
+`gnuconf`, `dist`, `files`, and `texinfo`; the GNU Coding Standards
+for Makefiles are nearly entirely satisfied.  However, there are a few
+targets that are required, but aren't implemented by a module (yet!):
 
-The `gnuconf` module provides default values for user-facing toggles
-required by the GNU Coding Standards.
+ - `install-strip`
+ - `TAGS`
+ - `check`
+ - `installcheck` (optional, but recommended)
 
-There is only one developer configuration option:
+Further, none of the standard modules actually provide rules for
+installing files; they merely define the standard install targets with
+dependencies on the files they need to install.  This is because
+actual rules for installing them can be project-specific, but also
+depend on classes of files that none of the modules are aware of;
+binary executables might need a strip flag passed to INSTALL, but we
+need to avoid that flag for scripts; some parts might need libtool
+install commands, others not.
 
-| Variable        | Default    | Description                                   |
-|-----------------+------------+-----------------------------------------------|
-| gnuconf.pkgname | $(PACKAGE) | The package name to use in the default docdir |
+----
+Copyright (C) 2016-2017  Luke Shumaker
 
-There is an extensive list of user configuration options:
-
-| Variable        | Default                               | Description                               |
-|-----------------+---------------------------------------+-------------------------------------------|
-| AWK             | awk                                   |                                           |
-| CAT             | cat                                   |                                           |
-| CMP             | cmp                                   |                                           |
-| CP              | cp                                    |                                           |
-| DIFF            | diff                                  |                                           |
-| ECHO            | echo                                  |                                           |
-| EGREP           | egrep                                 |                                           |
-| EXPR            | expr                                  |                                           |
-| FALSE           | false                                 |                                           |
-| GREP            | grep                                  |                                           |
-| INSTALL_INFO    | install-info                          |                                           |
-| LN              | ln                                    |                                           |
-| LS              | ls                                    |                                           |
-| MKDIR           | mkdir                                 |                                           |
-| MV              | mv                                    |                                           |
-| PRINTF          | printf                                |                                           |
-| PWD             | pwd                                   |                                           |
-| RM              | rm                                    |                                           |
-| RMDIR           | rmdir                                 |                                           |
-| SED             | sed                                   |                                           |
-| SLEEP           | sleep                                 |                                           |
-| SORT            | sort                                  |                                           |
-| TAR             | tar                                   |                                           |
-| TEST            | test                                  |                                           |
-| TOUCH           | touch                                 |                                           |
-| TR              | tr                                    |                                           |
-| TRUE            | true                                  |                                           |
-|-----------------+---------------------------------------+-------------------------------------------|
-| AR              | ar                                    |                                           |
-| ARFLAGS         |                                       |                                           |
-| BISON           | bison                                 |                                           |
-| BISONFLAGS      |                                       |                                           |
-| CC              | cc                                    |                                           |
-| CCFLAGS         | $(CFLAGS)                             |                                           |
-| FLEX            | flex                                  |                                           |
-| FLEXFLAGS       |                                       |                                           |
-| INSTALL         | install                               |                                           |
-| INSTALLFLAGS    |                                       |                                           |
-| LD              | ld                                    |                                           |
-| LDFLAGS         |                                       |                                           |
-| LDCONFIG        | ldconfig                              | TODO: detect absence, fall back to `true` |
-| LDCONFIGFLAGS   |                                       |                                           |
-| LEX             | lex                                   |                                           |
-| LEXFLAGS        | $(LFLAGS)                             |                                           |
-| MAKEINFO        | makeinfo                              |                                           |
-| MAKEINFOFLAGS   |                                       |                                           |
-| RANLIB          | ranlib                                | TODO: detect absence, fall back to `true` |
-| RANLIBFLAGS     |                                       |                                           |
-| TEXI2DVI        | texi2dvi                              |                                           |
-| TEXI2DVIFLAGS   |                                       |                                           |
-| YACC            | yacc                                  |                                           |
-| YACCFLAGS       | $(YFLAGS)                             |                                           |
-|-----------------+---------------------------------------+-------------------------------------------|
-| CFLAGS          |                                       |                                           |
-| LFLAGS          |                                       |                                           |
-| YFLAGS          |                                       |                                           |
-|-----------------+---------------------------------------+-------------------------------------------|
-| LN_S            | ln -s                                 | TODO: detect when to fall back to `cp`    |
-|-----------------+---------------------------------------+-------------------------------------------|
-| CHGRP           | chgrp                                 |                                           |
-| CHMOD           | chmod                                 |                                           |
-| CHOWN           | chown                                 |                                           |
-| MKNOD           | mknod                                 |                                           |
-|-----------------+---------------------------------------+-------------------------------------------|
-| INSTALL_PROGRAM | $(INSTALL)                            |                                           |
-| INSTALL_DATA    | ${INSTALL} -m 644                     |                                           |
-|-----------------+---------------------------------------+-------------------------------------------|
-| prefix          | /usr/local                            |                                           |
-| exec_prefix     | $(prefix)                             |                                           |
-|-----------------+---------------------------------------+-------------------------------------------|
-| bindir          | $(exec_prefix)/bin                    |                                           |
-| sbindir         | $(exec_prefix)/sbin                   |                                           |
-| libexecdir      | $(exec_prefix)/libexec                |                                           |
-|-----------------+---------------------------------------+-------------------------------------------|
-| datadir         | $(datarootdir)                        |                                           |
-| sysconfdir      | $(prefix)/etc                         |                                           |
-| sharedstatedir  | $(prefix)/com                         |                                           |
-| localstatedir   | $(prefix)/var                         |                                           |
-| runstatedir     | $(localstatedir)/run                  |                                           |
-|-----------------+---------------------------------------+-------------------------------------------|
-| includedir      | $(prefix)/include                     |                                           |
-| oldincludedir   | /usr/include                          |                                           |
-| docdir          | $(datarootdir)/doc/$(gnuconf.pkgname) |                                           |
-| infodir         | $(datarootdir)/info                   |                                           |
-| htmldir         | $(docdir)                             |                                           |
-| dvidir          | $(docdir)                             |                                           |
-| pdfdir          | $(docdir)                             |                                           |
-| psdir           | $(docdir)                             |                                           |
-| libdir          | $(exec_prefix)/lib                    |                                           |
-| lispdir         | $(datarootdir)/emacs/site-lisp        |                                           |
-| localedir       | $(datarootdir)/locale                 |                                           |
-|-----------------+---------------------------------------+-------------------------------------------|
-| mandir          | $(datarootdir)/man                    |                                           |
-| man1dir         | $(mandir)/man1                        |                                           |
-| man2dir         | $(mandir)/man2                        |                                           |
-| man3dir         | $(mandir)/man3                        |                                           |
-| man4dir         | $(mandir)/man4                        |                                           |
-| man5dir         | $(mandir)/man5                        |                                           |
-| man6dir         | $(mandir)/man6                        |                                           |
-| man7dir         | $(mandir)/man7                        |                                           |
-| man8dir         | $(mandir)/man8                        |                                           |
-|-----------------+---------------------------------------+-------------------------------------------|
-| manext          | .1                                    |                                           |
-| man1ext         | .1                                    |                                           |
-| man2ext         | .2                                    |                                           |
-| man3ext         | .3                                    |                                           |
-| man4ext         | .4                                    |                                           |
-| man5ext         | .5                                    |                                           |
-| man6ext         | .6                                    |                                           |
-| man7ext         | .7                                    |                                           |
-| man8ext         | .8                                    |                                           |
-
-Module: gnustuff
-----------------
-
-This is a poorly-thought-out module implementing remaining things from
-the GNU Coding Standards.
-
-This is poorly thought out and poorly tested because it's basically
-the part of the GNU Coding Standards that I don't use.
-
-Developer configuration options:
-
-| Variable              | Default                                                                                 | Description                                                                         |
-|-----------------------+-----------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------|
-| gnustuff.info_docs    |                                                                                         | The list of texinfo documents in the current directory, without the `.texi` suffix. |
-| gnustuff.program_dirs | $(bindir) $(sbindir) $(libexecdir)                                                      | Directories to use $(INSTALL_PROGRAM) for inserting files into.                     |
-| gnustuff.data_dirs    | <every variable from gnuconf ending in `dir` that isn't bindir, sbindir, or libexecdir> | Directories to use $(INSTALL_DATA) for inserting files into.                        |
-| gnustuff.dirs         | $(gnustuff.program_dirs) $(gnustuff.data_dirs)                                          | Directories to create                                                               |
-
-User configuration options:
-
-| Variable  | Default         | Description |
-|-----------+-----------------+-------------|
-| STRIP     | strip           |             |
-| TEXI2HTML | makeinfo --html |             |
-| TEXI2PDF  | texi2pdf        |             |
-| TEXI2PS   | texi2dvi --ps   |             |
-| MKDIR_P   | mkdir -p        |             |
-
-It provides several `.phony` targets:
- - install-{html,dvi,pdf,ps}
- - install-strip
- - {info,html,dvi,pdf,ps}
- - TAGS
- - check
- - installcheck
-
-It also augments the `std` `install` rule to run $(INSTALL_INFO) as
-necessary.
-
-And several real rules:
- - How to install files into any of the $(gnustuff.program_dirs) or
-   $(gnustuff.data_dirs).
- - How to generate info, dvi, html, pdf, and ps files from texi files.
+This documentation file is placed into the public domain.  If that is
+not possible in your legal system, I grant you permission to use it in
+absolutely every way that I can legally grant to you.

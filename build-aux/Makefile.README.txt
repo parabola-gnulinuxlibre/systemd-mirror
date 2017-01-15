@@ -21,9 +21,9 @@ Write your makefiles of the form:
 	include $(topsrcdir)/build-aux/Makefile.head.mk
 
 	$(outdir)/%.o: $(srcdir)/%.c:
-                $(CC) -c -o $@ $<
+		$(CC) -c -o $@ $<
 
-        $(outdir)/hello: $(outdir)/hello.o
+	$(outdir)/hello: $(outdir)/hello.o
 
 	at.subdirs = ...
 	at.targets = ...
@@ -56,8 +56,8 @@ you want to be included in every Makefile, and this gives some structure to
 that.
 
 Requirements:
-  - A version of GNU Make that supports `undefine`. (TODO: check which version
-    of GNU Make introduced this feature)
+  - A version of GNU Make that supports `undefine` (ie, version 3.82
+    and above).
 
 Inputs:
   - In each `Makefile`:
@@ -105,7 +105,7 @@ while also making your Makefiles better.
     <http://aegis.sourceforge.net/auug97.pdf>
 
 ----
-Copyright (C) 2016  Luke Shumaker
+Copyright (C) 2016-2017  Luke Shumaker
 
 This documentation file is placed into the public domain.  If that is
 not possible in your legal system, I grant you permission to use it in
