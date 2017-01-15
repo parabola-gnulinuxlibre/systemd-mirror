@@ -13,22 +13,22 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-$(outdir)/info :  $(addsuffix .info,$(gnudoc.docs))
-files.src.gen  += $(addsuffix .info,$(gnudoc.docs))
-files.out.dvi  += $(addsuffix .dvi ,$(gnudoc.docs))
-files.out.html += $(addsuffix .html,$(gnudoc.docs))
-files.out.pdf  += $(addsuffix .pdf ,$(gnudoc.docs))
-files.out.ps   += $(addsuffix .ps  ,$(gnudoc.docs))
+$(outdir)/info :  $(addsuffix .info,$(texinfo.docs))
+files.src.gen  += $(addsuffix .info,$(texinfo.docs))
+files.out.dvi  += $(addsuffix .dvi ,$(texinfo.docs))
+files.out.html += $(addsuffix .html,$(texinfo.docs))
+files.out.pdf  += $(addsuffix .pdf ,$(texinfo.docs))
+files.out.ps   += $(addsuffix .ps  ,$(texinfo.docs))
 
-files.sys.all  += $(foreach f,$(gnudoc.docs), $(infodir)/$f.info )
-files.sys.dvi  += $(foreach f,$(gnudoc.docs), $(dvidir)/$f.dvi   )
-files.sys.html += $(foreach f,$(gnudoc.docs), $(htmldir)/$f.html )
-files.sys.pdf  += $(foreach f,$(gnudoc.docs), $(pdfdir)/$f.pdf   )
-files.sys.ps   += $(foreach f,$(gnudoc.docs), $(psdir)/$f.ps     )
+files.sys.all  += $(foreach f,$(texinfo.docs), $(infodir)/$f.info )
+files.sys.dvi  += $(foreach f,$(texinfo.docs), $(dvidir)/$f.dvi   )
+files.sys.html += $(foreach f,$(texinfo.docs), $(htmldir)/$f.html )
+files.sys.pdf  += $(foreach f,$(texinfo.docs), $(pdfdir)/$f.pdf   )
+files.sys.ps   += $(foreach f,$(texinfo.docs), $(psdir)/$f.ps     )
 
 $(outdir)/install:
 	$(POST_INSTALL)
-	$(foreach f,$(gnudoc.docs),$(INSTALL_INFO) $(DESTDIR)$(infodir)/$f.info $(DESTDIR)$(infodir)/dir$(at.nl))
+	$(foreach f,$(texinfo.docs),$(INSTALL_INFO) $(DESTDIR)$(infodir)/$f.info $(DESTDIR)$(infodir)/dir$(at.nl))
 
 $(outdir)/%.info: $(srcdir)/%.texi; $(MAKEINFO)  -o $(@D) $<
 $(outdir)/%.info: $(outdir)/%.texi; $(MAKEINFO)  -o $(@D) $<

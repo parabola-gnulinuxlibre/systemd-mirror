@@ -13,15 +13,15 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-mod.gnudoc.description = GNU Info page support
-mod.gnudoc.depends += files nested gnuconf
-define mod.gnudoc.doc
+mod.texinfo.description = The GNU documentation system
+mod.texinfo.depends += files nested gnuconf
+define mod.texinfo.doc
 # User variables (in addition to gnuconf):
 #   - `TEXI2HTML ?= makeinfo --html`
 #   - `TEXI2PDF  ?= texi2pdf`
 #   - `TEXI2PS   ?= texi2dvi --ps`
 # Inputs:
-#   - Directory variable : `gnudoc.docs ?=`
+#   - Directory variable : `texinfo.docs ?=`
 # Outputs:
 #   - Global variable    : `files.groups += html dvi pdf ps`
 #   - Global variable    : `nested.targets += info`
@@ -36,14 +36,12 @@ define mod.gnudoc.doc
 #   - target             : `$(outdir)/%.pdf`
 #   - Target             : `$(outdir)/%.ps`
 #
-# The The `gnudoc
-
 # The module counts on the `$(outdir)/install` target being defined by
 # `files`, but not having a rule that executes once the dependencies
 # have been taken care of; it adds a "post-install" rule to add the
 # info files to the index.
 endef
-mod.gnudoc.doc := $(value mod.gnudoc.doc)
+mod.texinfo.doc := $(value mod.texinfo.doc)
 
 TEXI2HTML ?= makeinfo --html
 TEXI2PDF  ?= texi2pdf
