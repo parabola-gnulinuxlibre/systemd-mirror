@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2016  Luke Shumaker
+# Copyright (C) 2015-2017  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -13,8 +13,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+at.Makefile ?= Makefile
 _at.MAKEFILE_LIST ?=
-_at.MAKEFILE_LIST := $(strip $(_at.MAKEFILE_LIST) $(abspath $(lastword $(filter-out %.mk,$(MAKEFILE_LIST)))))
+_at.MAKEFILE_LIST := $(strip $(_at.MAKEFILE_LIST) $(lastword $(filter %/$(at.Makefile),$(abspath $(MAKEFILE_LIST)))))
 
 # This bit only gets evaluated once, at the very beginning
 ifeq ($(origin _at.NO_ONCE),undefined)
@@ -85,9 +86,6 @@ define at.nl
 
 
 endef
-
-# External configuration ###############################################
-at.Makefile ?= Makefile
 
 # Include modules ######################################################
 include $(sort $(wildcard $(topsrcdir)/build-aux/Makefile.once.head/*.mk))

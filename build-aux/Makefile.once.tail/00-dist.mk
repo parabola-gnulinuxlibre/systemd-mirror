@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2016  Luke Shumaker
+# Copyright (C) 2015-2017  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -13,6 +13,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# NB: intentionally resolve symlinks (tack on the -P flag to `cp` to
+# not resolve them).  The GNU Coding Standards say to avoid symlinks
+# in tarballs.
 _dist.copyfile = $(MKDIR_P) $(dir $2) && $(CP) -T $1 $2
 _dist.addfile = $(call _dist.copyfile,$3,$2/$(call at.relto,$1,$3))
 $(topoutdir)/$(dist.pkgname)-$(dist.version): $(_dist.files)
