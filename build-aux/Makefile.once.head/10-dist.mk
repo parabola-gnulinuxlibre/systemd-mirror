@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-mod.dist.description = `dist` target for distribution tarballs
+mod.dist.description = `dist` target to create distribution tarballs
 define mod.dist.doc
 # User variables:
 #   - `CP      ?= cp`
