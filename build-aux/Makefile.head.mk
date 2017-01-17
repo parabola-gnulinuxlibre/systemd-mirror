@@ -24,9 +24,9 @@ ifeq ($(origin _at.NO_ONCE),undefined)
 # These 4 functions are all $(call _at.func,parent,child)
 _at.is_strict_subdir  = $(filter $(abspath $1)/%,$(abspath $2))
 _at.is_subdir         = $(filter $(abspath $1)/%,$(abspath $2)/.)
-_at.relbase = $(strip                                                 \
-  $(if $(call _at.is_subdir,$1,$2),                                   \
-       $(patsubst %/.,$(patsubst $(abspath $1)/%,%,$(abspath $2)/.)), \
+_at.relbase = $(strip                                                   \
+  $(if $(call _at.is_subdir,$1,$2),                                     \
+       $(patsubst %/.,%,$(patsubst $(abspath $1)/%,%,$(abspath $2)/.)), \
        $(abspath $2)))
 _at.relto = $(strip                                                     \
   $(if $(call _at.is_subdir,$1,$2),                                     \
