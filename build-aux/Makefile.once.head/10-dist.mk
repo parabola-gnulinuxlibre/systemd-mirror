@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2016  Luke Shumaker
+# Copyright (C) 2015-2017  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -49,6 +49,12 @@ define mod.dist.doc
 #   files, and includes timestamps.
 endef
 mod.dist.doc := $(value mod.dist.doc)
+
+PACKAGE_TARNAME ?=
+PACKAGE ?=
+PACKAGE_NAME ?=
+PACKAGE_VERSION ?=
+VERSION ?=
 
 # Developer configuration
 

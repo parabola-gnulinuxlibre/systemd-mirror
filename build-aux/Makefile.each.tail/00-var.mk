@@ -1,4 +1,4 @@
-# Copyright (C) 2016  Luke Shumaker
+# Copyright (C) 2016-2017  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-mod.var.depends += quote write-ifchanged
+mod.var.depends += files quote write-ifchanged
 
 $(outdir)/.var.%: _var.FORCE
 	@printf '%s' $(call quote.shell,$($*)) | sed 's/^/#/' | $(WRITE_IFCHANGED) $@
 -include $(wildcard $(outdir)/.var.*)
 
-at.targets += $(addprefix $(outdir)/,.var.%)
+files.out.int += .var.*

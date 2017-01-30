@@ -29,17 +29,13 @@ define mod.texinfo.doc
 #   - Directory variable : `files.out.{dvi,html,pdf,ps}`
 #   - Directory variable : `files.sys.{dvi,html,pdf,ps,all}`
 #   - .PHONY target      : `$(outdir)/info`
-#   - .PHONY target      : `$(outdir)/install` (see below)
 #   - Target             : `$(outdir)/%.info`
 #   - Target             : `$(outdir)/%.dvi`
 #   - target             : `$(outdir)/%.html`
 #   - target             : `$(outdir)/%.pdf`
 #   - Target             : `$(outdir)/%.ps`
 #
-# The module counts on the `$(outdir)/install` target being defined by
-# `files`, but not having a rule that executes once the dependencies
-# have been taken care of; it adds a "post-install" rule to add the
-# info files to the index.
+# TODO: prose documentation
 endef
 mod.texinfo.doc := $(value mod.texinfo.doc)
 

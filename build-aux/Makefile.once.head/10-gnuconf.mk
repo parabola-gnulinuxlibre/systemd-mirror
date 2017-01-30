@@ -30,6 +30,9 @@ define mod.gnuconf.doc
 endef
 mod.gnuconf.doc := $(value mod.gnuconf.doc)
 
+PACKAGE_TARNAME ?=
+PACKAGE ?=
+PACKAGE_NAME ?=
 gnuconf.pkgname ?= $(firstword $(PACKAGE_TARNAME) $(PACKAGE) $(PACKAGE_NAME))
 ifeq ($(gnuconf.pkgname),)
 $(error Autothing module: gnuconf: gnuconf.pkgname must be set)

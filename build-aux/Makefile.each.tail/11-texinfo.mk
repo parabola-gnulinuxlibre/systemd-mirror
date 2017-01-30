@@ -26,10 +26,6 @@ files.sys.html += $(foreach f,$(texinfo.docs), $(htmldir)/$f.html )
 files.sys.pdf  += $(foreach f,$(texinfo.docs), $(pdfdir)/$f.pdf   )
 files.sys.ps   += $(foreach f,$(texinfo.docs), $(psdir)/$f.ps     )
 
-$(outdir)/install:
-	$(POST_INSTALL)
-	$(foreach f,$(texinfo.docs),$(INSTALL_INFO) $(DESTDIR)$(infodir)/$f.info $(DESTDIR)$(infodir)/dir$(at.nl))
-
 $(outdir)/%.info: $(srcdir)/%.texi; $(MAKEINFO)  -o $(@D) $<
 $(outdir)/%.info: $(outdir)/%.texi; $(MAKEINFO)  -o $(@D) $<
 $(outdir)/%.dvi : $(srcdir)/%.texi; $(TEXI2DVI)  -o $(@D) $<

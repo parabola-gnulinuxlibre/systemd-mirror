@@ -1,4 +1,4 @@
-# Copyright (C) 2016  Luke Shumaker
+# Copyright (C) 2016-2017  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -18,3 +18,4 @@ $(eval $(foreach _tmp.nested,$(nested.targets),\
 .PHONY: $(addprefix $(outdir)/,$(nested.targets))
 
 at.subdirs += $(nested.subdirs)
+at.targets += $(addprefix $(outdir)/,$(nested.targets))
