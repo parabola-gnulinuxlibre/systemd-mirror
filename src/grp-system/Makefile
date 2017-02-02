@@ -1,3 +1,4 @@
+
 #  -*- Mode: makefile; indent-tabs-mode: t -*-
 #
 #  This file is part of systemd.
@@ -30,6 +31,7 @@ nested.subdirs += grp-utils
 nested.subdirs += libcore
 nested.subdirs += systemctl
 nested.subdirs += systemd
+nested.subdirs += systemd-cgroups-agent
 nested.subdirs += systemd-shutdown
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk

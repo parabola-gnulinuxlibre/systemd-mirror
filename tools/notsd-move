@@ -663,6 +663,7 @@ move_files() (
 	    src/libcore \
 	    src/systemctl \
 	    src/systemd \
+	    src/systemd-cgroups-agent \
 	    src/systemd-shutdown
 	grp src/grp-system/grp-utils \
 	    src/systemd-analyze \

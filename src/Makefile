@@ -49,7 +49,6 @@ nested.subdirs += nss-myhostname
 nested.subdirs += nss-systemd
 nested.subdirs += systemd-ask-password
 nested.subdirs += systemd-cgls
-nested.subdirs += systemd-cgroups-agent
 nested.subdirs += systemd-cgtop
 nested.subdirs += systemd-cryptsetup
 nested.subdirs += systemd-debug-generator
