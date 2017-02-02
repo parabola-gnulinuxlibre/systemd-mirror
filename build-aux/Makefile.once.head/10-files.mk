@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2016  Luke Shumaker
+# Copyright (C) 2015-2017  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -26,15 +26,15 @@ define mod.files.doc
 #   - Global variable    : `files.default  ?= all`
 #   - Global variable    : `files.vcsclean ?= files.vcsclean`
 #   - Global variable    : `files.generate ?= files.generate`
-#   - Directory variable : `files.src.src`
-#   - Directory variable : `files.src.int`
-#   - Directory variable : `files.src.cfg`
-#   - Directory variable : `files.src.gen`
-#   - Directory variable : `files.out.slow`
-#   - Directory variable : `files.out.int`
-#   - Directory variable : `files.out.cfg`
-#   - Directory variable : `files.out.$(files.groups)` (well, $(addprefix...))
-#   - Directory variable : `files.sys.$(files.groups)` (well, $(addprefix...))
+#   - Directory variable : `files.src.src`  # Sources
+#   - Directory variable : `files.src.int`  # Intermediates; deletable
+#   - Directory variable : `files.src.cfg`  # Outputs needed to run ./configure
+#   - Directory variable : `files.src.gen`  # Other outputs
+#   - Directory variable : `files.out.slow` # Things to exclude from `make mostlyclean`
+#   - Directory variable : `files.out.int`  # Intermediates
+#   - Directory variable : `files.out.cfg`  # Outputs created by ./configure
+#   - Directory variable : `files.out.$(group)` for `group` in `$(files.groups)`
+#   - Directory variable : `files.sys.$(group)` for `group` in `$(files.groups)`
 # Outputs:
 #   - Global variable    : `nested.targets`
 #   - Global variable    : `at.targets`
@@ -43,7 +43,7 @@ define mod.files.doc
 #   - Directory variable : `files.out`
 #   - Directory variable : `files.sys`
 #   - Creative .PHONY targets:
-#     - `$(outdir)/$(files.generate))`
+#     - `$(outdir)/$(files.generate)`
 #     - `$(outdir)/$(group)` for `group` in `$(files.groups)`
 #     - `$(outdir)/install`
 #     - `$(outdir)/install-$(group)` for `group` in `$(filter-out $(files.default),$(files.groups))`
@@ -58,6 +58,10 @@ define mod.files.doc
 #
 # Basic `*` wildcards are supported.  Use `*`, not `%`; it will automatically
 # substitute `*`->`%` where appropriate.
+#
+# Each of the destructive targets depends on `$(target)-hook`, which
+# is defined to be a "double-colon rule" allowing you to add your own
+# code.
 #
 # TODO: prose documentation
 endef
@@ -76,7 +80,7 @@ nested.targets += install installdirs
 nested.targets += $(foreach g,$(files.groups),$g)
 nested.targets += $(foreach g,$(filter-out $(files.default),$(files.groups)),install-$g install-$gdirs)
 # Standard destructive PHONY targets
-nested.targets += uninstall mostlyclean clean distclean maintainer-clean
+nested.targets += uninstall mostlyclean clean distclean maintainer-clean $(files.vcsclean)
 
 # User configuration
 
@@ -85,3 +89,12 @@ DESTDIR ?=
 RM      ?= rm -f
 RMDIR_P ?= rmdir -p --ignore-fail-on-non-empty
 TRUE    ?= true
+
+# Utility functions
+
+_files.XARGS = $(if $(strip $2),$1 $(strip $2))
+
+_files.maintainer-clean-warning:
+	@echo 'This command is intended for maintainers to use; it'
+	@echo 'deletes files that may need special tools to rebuild.'
+.PHONY: _files.maintainer-clean-warning

@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2016  Luke Shumaker
+# Copyright (C) 2015-2017  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-mod.dist.description = `dist` target for distribution tarballs
+mod.dist.description = `dist` target to create distribution tarballs
 define mod.dist.doc
 # User variables:
 #   - `CP      ?= cp`
@@ -49,6 +49,12 @@ define mod.dist.doc
 #   files, and includes timestamps.
 endef
 mod.dist.doc := $(value mod.dist.doc)
+
+PACKAGE_TARNAME ?=
+PACKAGE ?=
+PACKAGE_NAME ?=
+PACKAGE_VERSION ?=
+VERSION ?=
 
 # Developer configuration
 

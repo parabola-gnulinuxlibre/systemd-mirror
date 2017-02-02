@@ -5,36 +5,110 @@ Autothing 3: The smart way to write GNU Makefiles
 
 Autothing is a thing that does things automatically.
 
-Ok, more helpfully: Autothing is a pair of .mk Makefile fragments that
-you can `include` from your Makefiles to make them easier to write;
-specifically, it makes it _easy_ to write non-recursive Makefiles--and
-ones that are similar to plain recursive Makefiles, at that!
+Ok, more helpfully: Autothing is a pair of .mk Makefile fragments
+(`Makefile.head.mk` and `Makefile.tail.mk`) that you can `include`
+from your Makefiles to make them easier to write; specifically, it
+makes it _easy_ to write non-recursive Makefiles--and ones that are
+similar to plain recursive Makefiles, at that!
 
-Synopsis
---------
+To many people, talking about GNU Make directly is a non-starter
+because it means giving up the many other features that things like
+GNU Automake provide.  Other projects like GNU Automake were created
+to plaster over differences between make(1) implementations; however,
+this isn't all that Automake provides, it also makes it easy to do
+complex things that users want, or the GNU Coding Standards require.
+That's silly; the implementation of these features should be
+orthogonal to plastering over the differences between Make
+implementations.  So, in addition to the Automake core, Automake is
+distributed with several "modules" that implement similar feature sets
+to what Automake provides.
 
-Write your makefiles of the form:
+Autothing does depend on GNU Make; other make(1) implementations will
+not work.  However, if you are open to adding GNU Make as a
+dependency, then Autothing should obviate the need for GNU Automake,
+while also making your Makefiles better.
 
+Non-recursive?
+--------------
+
+  (For those of you who aren't up on Makefile jargon)
+
+When you have a project that spans multiple directories, you'll
+probably want to split up the Makefile, having the appropriate parts
+in each sub-directory.  There are a number of strategies you can use
+to approach this.
+
+One of the more prevelant strategies (so much so that GNU make
+includes special support for it) is to write "recursive Makefiles";
+that is, have Make rules that include commands like
+
+	other-directory/libfoo.so:
+		$(MAKE) -C other-directory libfoo.so
+
+or
+
+	other-directory/libfoo.so
+		cd other-directory && $(MAKE) libfoo.so
+
+This approach is popular because it is both very easy to implement,
+and is supported by a wide variety of Make implementations.  But, it
+also introduces a wide variety of issues; so much so that a rather
+famous paper was written about it: "Recursive Make Considered Harmful"
+(Miller, 1997).
+
+For all of the arguments against it, and all of the alternative
+approaches, recusive Makefiles are hard to beat because they are just
+so easy to write, and the alternatives... aren't.  UNTIL NOW!
+
+Instead of having rules that spawn a separate Make process in another
+directory for targets in that directory, Autothing lets you provide a
+list of directories that include targets that targets in this
+directory might depend on, and Autothing will automagically include
+the Makefile in that other directory into *this* instance of the Make
+program.
+
+  Peter Miller (1997) "Recursive Make Considered Harmful"
+    <http://aegis.sourceforge.net/auug97.pdf>
+
+An example Makefile / Introduction
+----------------------------------
+
+Write your Makefiles of the form:
+
+	# Initialize basic information about how your project is structured.
 	topsrcdir ?= ...
 	topoutdir ?= ...
-	at.Makefile ?= Makefile # Optional
+
+	# Include the Autothing entry point
 	include $(topsrcdir)/build-aux/Makefile.head.mk
 
+	# Now write your Makefile very similarly to how you normally
+	# would.  Just make sure that outputs are relative to $(outdir)
+	# and inputs relative to $(srcdir).
 	$(outdir)/%.o: $(srcdir)/%.c:
-                $(CC) -c -o $@ $<
+		$(CC) -c -o $@ $<
+	$(outdir)/hello: $(outdir)/hello.o
 
-        $(outdir)/hello: $(outdir)/hello.o
-
+	# If any of the dependencies of files here are outputs of a
+	# Makefile in another directory, list those directories here.
 	at.subdirs = ...
-	at.targets = ...
 
+	# This part is kind of a pain: define a list of ouput targets that
+	# this Makefile produces.
+	at.targets = $(outdir)/%.o $(outdir)/hello
+
+	# Include the Autothing exit point
 	include $(topsrcdir)/build-aux/Makefile.tail.mk
 
 This is similar to, but not quite, the comfortable way that you probably
 already write your Makefiles.
 
-Details
--------
+It is recommended that Autothing lives inside of the "build-aux"
+directory in the top level of your project sources; "build-aux" is a
+standard directory for auxiliary build programs and tools.
+
+What does Autothing do for me?
+------------------------------
 
 There are two fundamental things that Autothing provides:
 
@@ -49,15 +123,178 @@ The second is important because GNU Make is too dumb to know that
 Then, there's something that maybe doesn't belong, but I didn't have the heart
 to cut it out:
 
- 3. A module (plugin) system.
+ 3. A module (plugin) system, which allows for modules to provide
+    additional feature sets.
 
 The module system is "important" because there are very often common bits that
 you want to be included in every Makefile, and this gives some structure to
 that.
 
-Requirements:
-  - A version of GNU Make that supports `undefine`. (TODO: check which version
-    of GNU Make introduced this feature)
+Let's step through each of those features.
+
+## Variable namespacing
+
+When you write a Makefile, you quite likely use (global) variables.
+When you have a project that uses multiple Makefiles, each Makefile
+might have the same variable names, but with different values
+(especially if converting from recursive Make).
+
+You could be very disciplined and carefully name your variables so
+that they don't conflict.  This is difficult and error prone normally,
+but becomes neigh-on-impossible if you are converting a large-ish
+project from recursive Make.
+
+So, Autothing provides a solution.  If you provide Autothing with a
+list of targets defined in your Makefile (via the `at.targets`
+variable), Autothing will make any variables you defined local to that
+Makefile; they will be present when making targets listed in
+`at.targets`, but will be hidden from other Makfiles that get
+included.
+
+Any variables defined before `Makefile.head.mk` is included are
+treated as truly global; all Makefiles included will have access to
+them.
+
+## Tools for dealing with paths
+
+As stated above, GNU Make is too dumb to realize that `foo/bar/../baz`
+== `foo/baz`; so one has to be reasonably careful about path
+normalization.  For dealing with path normalization problems that
+arise because of the way Autothing inclusions work, several global
+functions are provided for dealing with paths.
+
+`$(call at.is_subdir,a,b)` returns whether `b` is a sub-directory of
+`a` (including `a` as a sub-directory of itself).
+`at.is_strict_subdir` does the same, but does not treat `a` as a
+sub-directory of itself.  (These function names mimic the terms
+"subset" and "strict subset" in mathematics.)  These use an empty
+string for "false" and a non-empty string for "true".
+
+`$(call at.path,files...)` is a generic path-normalization routine.
+The outputs of the other `at.*` functions are already normalized, and
+do not need to be passed through this.  Files immediately inside of
+`$(srcdir)` or `$(outdir)` (without another directory name after the
+variable) are already normalized, and do not need to be passed through
+this function either.  However, it is always safe to pass a path
+through this function, so if in doubt, call `at.path`.
+
+`$(call at.relbase,dir,files...)` and its cousin `at.relto` take a
+directory and a list of files, and transform each of the filenames to
+be relative to the directory, if the file is inside of the directory.
+Where they differ is that if the file is not inside of the directory;
+`at.relbase` transforms it into an absolute path, while `at.relto`
+prepends as many `../` segments as necessary to make it relative to
+the directory.  (These function names mimic the `--relative-base` and
+`--relative-to` flags of the `realpath` utility that is part of GNU
+coreutils.)
+
+If `$(srcdir)` and `$(outdir)` are the same, then `$(call
+at.out2src,files...)` is a no-op, but otherwise it takes a (possibly
+relative) path in `$(outdir)`, and transforms it to the equivalent
+filename in `$(srcdir)`.
+
+`$(call at.addprefix,dir,files...)` takes a directory and a list of
+filenames, and looks at each filename; if it is an absolute path, it
+passes it through (well, "only" normalizes it); if the filename is a
+relative path, it is joined with the given base directory.
+
+## Modules to provide feature sets
+
+The module system serves two purposes
+
+ 1. Allow your developers to share logic between Makefiles in multiple
+    directories.
+ 2. Allow your developers to import "standard" modules implementing
+    common feature sets, so they don't have to.
+
+Distributed along with autothing are some "standard" modules that
+provide commonly desired functionality from Makefiles; tricky little
+things that your developers shouldn't have to implement themselves for
+every project; the things that GNU Automake would take care of if you
+used Automake (a piece of software that Autothing hopes to replace).
+
+The module system is conceptually quite simple: have 4 directories for
+`.mk` makefile snippets that get included at certain points:
+
+	Makefile.once.head/*.mk
+
+	  Makefile.each.head/*.mk
+	    a/Makefile
+	  Makefile.each.tail/*.mk
+
+	  Makefile.each.head/*.mk
+	    b/Makefile
+	  Makefile.each.tail/*.mk
+
+	  Makefile.each.head/*.mk
+	    c/Makefile
+	  Makefile.each.tail/*.mk
+
+	Makefile.once.tail/*.mk
+
+Deciding which of the 4 directories to put your snippets in... you'll
+figure it out pretty quickly once you start playing with it.
+
+Beyond these 4 directories, Autothing itself imposes no structure, but
+there are some conventions that are followed by the distributed along
+with Autothing, and I recommend that your developers follow.
+
+Each of the `.mk` files is name `NN-MODULE.mk` where NN is a number
+(to affect the order that the module files are evaluated in, in case
+of dependencies between them), and MODULE is the module name.  Each
+module has "public" variables prefixed with `MODULE.`, and "private"
+variables prefixed with `_MODULE.` (again, "MODULE" being the module
+name).  For example, the "groups" parameter of the "files" module is
+configured via the `files.groups` variable.  Within this convention,
+Autothing presents itself as a pseudo-module named "at"; that is,
+public Autothing variables are prefixed with `at.`.
+
+If you follow these conventions, then the "mod" module distributed
+along with Autothing can display information about the modules that a
+project uses, and documentation on each module.  Running the command
+`make at-modules` (implemented by the "mod" module) will produce a
+list of the modules present in a project, and short descriptions of
+them:
+
+	$ make at-modules
+	Autothing modules used in this project:
+	 - dist             `dist` target for distribution tarballs        (more)
+	 - files            Keeping track of groups of files               (more)
+	 - gitfiles         Automatically populate files.src.src from git  (more)
+	 - gnuconf          GNU standard configuration variables           (more)
+	 - mod              Display information about Autothing modules    (more)
+	 - nested           Easy nested .PHONY targets                     (more)
+	 - quote            Macros to quote tricky strings                 (more)
+	 - texinfo          The GNU documentation system                   (more)
+	 - var              Depend on the values of variables              (more)
+	 - write-atomic     `write-atomic` auxiliary build script          (more)
+	 - write-ifchanged  `write-ifchanged` auxiliary build script       (more)
+
+The "(more)" at the end of a line indicates that there is further
+documentation for that module, which can be produced by running the
+command `make at-modules/MODULE_NAME`.  See the output of `make
+at-modules/mod` for instructions on how to produce this further
+documentation for modules you develop.
+
+Besides the "mod" module, the set modules distributed along with
+Autothing primarily exists to provide the bits of (sometimes somewhat
+tricky) functionality required of Makefiles by the GNU Coding
+Standards.  Run the `at-modules` commands above for documentation on
+each of them.
+
+Formal interface
+----------------
+
+System requirements:
+  - A version of GNU Make that supports `undefine` (ie, version 3.82
+    and above).
+
+    If the user attempts to use your Autothing-using Makefile with an
+    older version of GNU Make, `Makefile.head.mk` will print an error
+    message and refuse to proceed:
+
+		$ make-3.81
+		build-aux/Makefile.head.mk:58: *** Autothing: We need a version of Make that supports 'undefine'.  Stop.
 
 Inputs:
   - In each `Makefile`:
@@ -71,6 +308,31 @@ Inputs:
   - Files:
       - `${topsrcdir}/build-aux/Makefile.{each,once}.{head,tail}/*.mk`
 
+  Unfortunately, a limitation of Autothing is that it does require a
+  designated "top" directory; it can't be used to have a sub-project
+  that can also be totally separate and built alone.  In your
+  Makefiles, before you include `Makefile.head.mk`, you must tell
+  Autothing what the top directory is by setting `topoutdir` and
+  `topsrcdir`.
+
+  If you wish for your per-directory Makefiles to have a name other
+  than `Makefile` (such as `GNUmakefile` or `makefile`, which GNU Make
+  also looks for by default; or another name for project-specific
+  reasons), Autothing supports this by setting the `at.Makefile`
+  variable.  Unfortunately, Autothing does not support having a list
+  of filenames to try; so one must be consistent about the filename
+  throughout the project.
+
+  In the body of each Makefile, you may set the `at.targets` variable
+  to list which targets should have access to the variables defined in
+  the body of that Makefile.
+
+  In the body of each Makefile, you may set the `at.subdirs` variable
+  to list of directories which have their own Makefile which produces
+  targets that targets in this directory depend on.  Directories
+  listed in `at.subdirs` may be relative or absolute; if relative,
+  they are interpreted as relative to `$(outdir)`.
+
 Outputs:
   - Global:
     - Variable (function): `$(call at.is_subdir,        parent, child)`
@@ -80,32 +342,105 @@ Outputs:
     - Variable (function): `$(call at.path, paths...)`
     - Variable (function): `$(call at.out2src, paths...)`
     - Variable (function): `$(call at.addprefix, prefix, paths...)`
+    - Variable           : `$(at.nl)` # a single newline
   - Per-directory:
     - Variable: `$(outdir)`
     - Variable: `$(srcdir)`
 
-TODO: actually explain things.
+  For dealing with path normalization problems that arise because of
+  the way Autothing inclusions work, several global functions are
+  provided for dealing with paths; see the above "Tools for dealing
+  with paths" section for documentation on each of these functions.
 
-Motivation/Exposition
----------------------
+  For convenience, it also provides `$(at.nl)` which is a single
+  newline, as newlines are very difficult to type in Make variable
+  values.
 
-This section needs rewritten.  Or really just written.
+Tips, notes
+-----------
 
-Other projects like GNU Automake were created to plaster over differences
-between make(1) implementations; however, this isn't all that Automake
-provides, it also makes it easy to do complex things that users want, or the
-GNU Coding Standards require.  That's silly.
+If you use Autoconf (or similar), I recommend having a file at
+`$(topsrcdir)/config.mk.in` of the form
 
-Autothing does depend on GNU Make; other make(1) implementations will
-not work.  However, if you are open to adding GNU Make as a
-dependency, then Autothing should obviate the need for GNU Automake,
-while also making your Makefiles better.
+	ifeq ($(origin topsrcdir),undefined)
+	topoutdir := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
+	topsrcdir := $(topoutdir)/@top_srcdir@
 
-  Peter Miller (1997) "Recursive Make Considered Harmful"
-    <http://aegis.sourceforge.net/auug97.pdf>
+	# Any other global variables you might want to set
+
+	endif
+
+Then have `./configure` generate `$(topoutdir)/config.mk` from it by
+placing `AC_CONFIG_FILES([config.mk])` in your `configure.ac`.  I
+recommend that you have `config.mk` be the _only_ Makefile edited by
+`./configure`; which will require manual support to have `./configure`
+link/copy the Makefiles unedited into `$(topoutdir)`; you can do this
+by placing something like this in your `configure.ac`:
+
+	AC_OUTPUT([], [], [
+	if test "$srcdir" != .; then
+	        find "$srcdir" -name Makefile -printf '%P\n' \
+	        | while read -r filename; do
+	                mkdir -p "\$(dirname "\$filename")"
+	                ln -srfT "$srcdir/\$filename" "\$filename"
+	        done
+	fi
+	])
+
+This will allow you to write your Makefiles in the form:
+
+	include $(dir $(lastword $(MAKEFILE_LIST)))/../../config.mk
+	include $(topsrcdir)/build-aux/Makefile.head.mk
+
+	# your Makefile here
+
+	include $(topsrcdir)/build-aux/Makefile.tail.mk
+
+Where you only need to adjust the number of `../` segments in the
+first line based on how deep that directory is.
+
+Further development
+-------------------
+
+Most of the modules distributed along with Autothing have the goal of
+combining to provide the things that the GNU Coding Standards require.
+Between `gnuconf`, `dist`, `files`, and `texinfo`; the GNU Coding
+Standards for Makefiles are nearly entirely satisfied.  However, there
+are a few targets that are required, but aren't implemented by a
+module (yet!):
+
+ - `install-strip`
+ - `TAGS`
+ - `check`
+ - `installcheck` (optional, but recommended)
+
+TODO
+----
+
+ - Write documentation on `srcdir`, `outdir`, and out-of-tree builds;
+   I don't think discussions involving the separate `srcdir` and
+   `outdir` make much sense without that context.
+
+Bugs/Limitations
+----------------
+
+ - This documentation file is almost three times as long as the code
+   that it documents.
+
+ - The "parse time" for projects with hundreds of sub-directories
+   (each having a Makefile) can be slow (ex: a project with 166
+   directories has a parse time of around 12 seconds on my box).  I
+   blame GNU Make's garbage collector; I don't think it was ever
+   designed to deal with as much "garbage" as Autothing's variable
+   namespacing throws at it.
+
+ - Requires a designated "top" directory; see discussion above.
+
+ - Does not support varying per-directory Makefile names; see
+   discussion above.
 
 ----
-Copyright (C) 2016  Luke Shumaker
+Copyright (C) 2016-2017  Luke Shumaker
 
 This documentation file is placed into the public domain.  If that is
 not possible in your legal system, I grant you permission to use it in

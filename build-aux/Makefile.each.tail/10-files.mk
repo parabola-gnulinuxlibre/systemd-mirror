@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2016  Luke Shumaker
+# Copyright (C) 2015-2017  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -34,24 +34,19 @@ $(eval \
   $(foreach _files.g,$(files.groups),\
     $$(outdir)/$(_files.g): $$(_files.out.$(_files.g))$(at.nl))\
   $(foreach _files.g,$(filter-out $(files.default),$(files.groups)),\
-    $$(outdir)/install-$(_files.g): $$(_files.sys.$(_files.g)))$(at.nl))
+    $$(outdir)/install-$(_files.g): $$(_files.sys.$(_files.g))$(at.nl)))
 
 # Destructive targets
 _files.uninstall   = $(_files.sys)
 _files.mostlyclean = $(filter-out $(_files.out.slow) $(_files.out.cfg),$(_files.out))
 _files.clean       = $(filter-out                    $(_files.out.cfg),$(_files.out))
 _files.distclean   =                                                   $(_files.out)
-$(addprefix $(outdir)/,uninstall mostlyclean clean distclean): %: %-hook
-	$(RM)    -- $(sort $(filter-out %/,$(_files.$(@F))))
-	$(RM) -r -- $(sort $(filter     %/,$(_files.$(@F))))
-	$(RMDIR_P) -- $(sort $(dir $(_files.$(@F))))
-_files.maintainer-clean   = $(filter-out $(_files.src.cfg) $(_files.src.src),$(_files.src))
-_files.$(files.vcsclean)  = $(filter-out                   $(_files.src.src),$(_files.src))
-$(addprefix $(outdir)/,maintainer-clean $(files.vcsclean)): $(outdir)/%: $(outdir)/distclean $(outdir)/%-hook
-	@echo 'This command is intended for maintainers to use; it'
-	@echo 'deletes files that may need special tools to rebuild.'
-	$(RM)    -- $(sort $(filter-out %/,$(_files.$(@F))))
-	$(RM) -r -- $(sort $(filter     %/,$(_files.$(@F))))
-	$(RMDIR_P) -- $(sort $(dir $(_files.$(@F))))
+_files.maintainer-clean  = $(_files.distclean) $(filter-out $(_files.src.cfg) $(_files.src.src),$(_files.src))
+_files.$(files.vcsclean) = $(_files.distclean) $(filter-out                   $(_files.src.src),$(_files.src))
+$(addprefix $(outdir)/,uninstall mostlyclean clean distclean maintainer-clean $(files.vcsclean)): %: %-hook
+	$(call _files.XARGS,$(RM)    --,                  $(sort $(wildcard $(filter-out %/,$(_files.$(@F))))) )
+	$(call _files.XARGS,$(RM) -r --,                  $(sort $(wildcard $(filter     %/,$(_files.$(@F))))) )
+	$(call _files.XARGS,$(RMDIR_P) --,$(filter-out ./,$(sort $(wildcard $(dir           $(_files.$(@F)))))))
+$(addprefix $(outdir)/,maintainer-clean $(files.vcsclean)): _files.maintainer-clean-warning
 $(foreach t,uninstall mostlyclean clean distclean maintainer-clean $(files.vcsclean), $(outdir)/$t-hook)::
 .PHONY: $(foreach t,uninstall mostlyclean clean distclean maintainer-clean $(files.vcsclean), $(outdir)/$t-hook)

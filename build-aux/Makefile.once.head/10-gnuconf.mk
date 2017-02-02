@@ -1,4 +1,4 @@
-# Copyright (C) 2016  Luke Shumaker
+# Copyright (C) 2016-2017  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -30,6 +30,9 @@ define mod.gnuconf.doc
 endef
 mod.gnuconf.doc := $(value mod.gnuconf.doc)
 
+PACKAGE_TARNAME ?=
+PACKAGE ?=
+PACKAGE_NAME ?=
 gnuconf.pkgname ?= $(firstword $(PACKAGE_TARNAME) $(PACKAGE) $(PACKAGE_NAME))
 ifeq ($(gnuconf.pkgname),)
 $(error Autothing module: gnuconf: gnuconf.pkgname must be set)
@@ -100,6 +103,8 @@ TEXI2DVI ?= texi2dvi
 TEXI2DVIFLAGS ?=
 YACC ?= yacc
 YFLAGS ?= # YFLAGS instead of YACCFLAGS
+
+CPPFLAGS ?=
 
 LN_S ?= ln -s # TODO[2]
 

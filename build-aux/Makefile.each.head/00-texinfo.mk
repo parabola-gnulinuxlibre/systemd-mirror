@@ -13,9 +13,4 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-$(eval $(foreach _tmp.nested,$(nested.targets),\
-  $$(outdir)/$(_tmp.nested): $$(addsuffix /$(_tmp.nested),$$(call at.addprefix,$$(outdir),$$(nested.subdirs)))$(at.nl)))
-.PHONY: $(addprefix $(outdir)/,$(nested.targets))
-
-at.subdirs += $(nested.subdirs)
-at.targets += $(addprefix $(outdir)/,$(nested.targets))
+texinfo.docs ?=

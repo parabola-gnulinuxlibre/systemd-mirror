@@ -1,4 +1,4 @@
-# Copyright (C) 2016  Luke Shumaker
+# Copyright (C) 2016-2017  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -21,6 +21,7 @@ define mod.nested.doc
 # Outputs:
 #   - .PHONY Targets     : `$(addprefix $(outdir)/,$(nested.targets))`
 #   - Variable           : `at.subdirs`
+#   - Variable           : `at.targets`
 #
 # The Autothing `at.subdirs` slates a subdirectory's Makefile for inclusion,
 # but doesn't help with recursive targets like `all`, `install`, or `clean`,

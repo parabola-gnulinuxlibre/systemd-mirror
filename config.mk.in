@@ -6,7 +6,7 @@
 #  Copyright 2010-2012 Kay Sievers
 #  Copyright 2013 Zbigniew Jędrzejewski-Szmek
 #  Copyright 2013 David Strauss
-#  Copyright 2016 Luke Shumaker
+#  Copyright 2016-2017 Luke Shumaker
 #
 #  systemd is free software; you can redistribute it and/or modify it
 #  under the terms of the GNU Lesser General Public License as published by
@@ -27,7 +27,6 @@ topsrcdir := $(topoutdir)/@top_srcdir@
 
 .LIBPATTERNS = lib%.so lib%.a
 
-include $(topoutdir)/gnustandards.mk
 include $(topoutdir)/autoconf.mk
 
 CCLD = $(CC)
@@ -375,5 +374,189 @@ build_alias = @build_alias@
 build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
+
+# This is based on §7.2 "Makefile Conventions" of the July 25, 2016
+# release of the GNU Coding Standards.
+#
+# Grep for '^##' in this file to see which Autoconf macros it depends
+# on.
+
+dist.pkgname = @PACKAGE_TARNAME@
+gnuconf.pkgname = @PACKAGE_NAME@
+
+# 7.2.2: Utilities in Makefiles
+# ----------------------------- 
+
+# It's ok to hard-code these commands in rules, but who wants to
+# memorize the list of what's ok?
+
+## AC_PROG_AWK
+## AC_PROG_GREP
+## AC_PROG_EGREP
+## AC_PROG_SED
+
+AWK = @AWK@
+CAT = cat
+CMP = cmp
+CP = cp
+DIFF = diff
+ECHO = echo
+EGREP = @EGREP@
+EXPR = expr
+FALSE = false
+GREP = @GREP@
+INSTALL_INFO = install-info
+LN = ln
+LS = ls
+MKDIR = mkdir
+MV = mv
+PRINTF = printf
+PWD = pwd
+RM = rm
+RMDIR = rmdir
+SED = @SED@
+SLEEP = sleep
+SORT = sort
+TAR = tar
+TEST = test
+TOUCH = touch
+TR = tr
+TRUE = true
+
+# 7.2.2: Utilities in Makefiles/7.2.3: Variables for Specifying Commands
+# ----------------------------------------------------------------------
+
+# Standard user-configurable programs.
+#
+# The list of programs here is specified in §7.2.2, but the associated FLAGS
+# variables are specified in §7.2.3.  I found it cleaner to list them together.
+
+## AC_PROG_INSTALL # @INSTALL@ @INSTALL_PROGRAM@ @INSTALL_SCRIPT@ @INSTALL_DATA@
+## AC_PROG_LEX # @LEX@ @LEXLIB@
+## AC_PROG_RANLIB
+## AC_PROG_YACC
+## AC_PROG_CC
+#
+# TODO: What causes Autoconf to define @AR@?
+
+AR = @AR@
+ARFLAGS =
+BISON = bison
+BISONFLAGS =
+CC = @CC@
+CFLAGS = @CFLAGS@ # CFLAGS instead of CCFLAGS
+FLEX = flex
+FLEXFLAGS =
+INSTALL = @INSTALL@
+# There is no INSTALLFLAGS[0]
+LD = ld
+LDFLAGS = @LDFLAGS@
+LDCONFIG = ldconfig # TODO[1]
+LDCONFIGFLAGS =
+LEX = @LEX@
+LFLAGS = #LFLAGS instead of LEXFLAGS
+#MAKE
+MAKEINFO = makeinfo
+MAKEINFOFLAGS =
+RANLIB = @RANLIB@
+RANLIBFLAGS =
+TEXI2DVI = texi2dvi
+TEXI2DVIFLAGS =
+YACC = @YACC@
+YFLAGS = # YFLAGS instead of YACCFLAGS
+
+CPPFLAGS = @CPPFLAGS@
+
+LN_S = @LN_S@
+
+CHGRP = chgrp
+CHGRPFLAGS =
+CHMOD = chmod
+CHMODFLAGS =
+CHOWN = chown
+CHOWNFLAGS =
+MKNOD = mknod
+MKNODFLAGS =
+
+# [0]: There is no INSTALLFLAGS because it would be inconsistent with how the
+#      standards otherwise recommend using $(INSTALL); with INSTALL_PROGRAM and
+#      INSTALL_DATA; which are specified in a way precluding the use of
+#      INSTALLFLAGS.  To have the variable, but to ignore it in the common case
+#      would be confusing.
+#
+# [1]: The RANLIB and LDCONFIG variables need some extra smarts; §7.2.2 says:
+#
+#       > When you use ranlib or ldconfig, you should make sure nothing bad
+#       > happens if the system does not have the program in question. Arrange
+#       > to ignore an error from that command, and print a message before the
+#       > command to tell the user that failure of this command does not mean a
+#       > problem. (The Autoconf ‘AC_PROG_RANLIB’ macro can help with this.)
+
+# 7.2.3: Variables for Specifying Commands
+# ----------------------------------------
+
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+# 7.2.5: Variables for Installation Directories
+# ---------------------------------------------
+
+# Root for the installation
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+# Executable programs
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+# Data files (Autoconf won't support runstatedir until version 2.70)
+datarootdir = @datarootdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+runstatedir = $(localstatedir)/run
+# Specific types of files
+includedir = @includedir@
+oldincludedir = @oldincludedir@
+docdir = @docdir@
+infodir = @infodir@
+htmldir = @htmldir@
+dvidir = @dvidir@
+pdfdir = @pdfdir@
+psdir = @psdir@
+libdir = @libdir@
+lispdir = $(datarootdir)/emacs/site-lisp
+localedir = @localedir@
+
+mandir = @mandir@
+man1dir = $(mandir)/man1
+man2dir = $(mandir)/man2
+man3dir = $(mandir)/man3
+man4dir = $(mandir)/man4
+man5dir = $(mandir)/man5
+man6dir = $(mandir)/man6
+man7dir = $(mandir)/man7
+man8dir = $(mandir)/man8
+
+manext = .1
+man1ext = .1
+man2ext = .2
+man3ext = .3
+man4ext = .4
+man5ext = .5
+man6ext = .6
+man7ext = .7
+man8ext = .8
+
+# 7.2.7: Install Command Categories
+# ---------------------------------
+
+PRE_INSTALL =
+POST_INSTALL =
+NORMAL_INSTALL =
+
+PRE_UNINSTALL =
+POST_UNINSTALL =
+NORMAL_UNINSTALL =
 
 endif

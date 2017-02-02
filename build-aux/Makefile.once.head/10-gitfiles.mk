@@ -1,4 +1,4 @@
-# Copyright (C) 2016  Luke Shumaker
+# Copyright (C) 2016-2017  Luke Shumaker
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -51,10 +51,10 @@ define mod.gitfiles.doc
 # subdirectory.  To do this, it uses an expression involving
 # `$(nested.subdirs)`.
 #
-# While gitfiles sets `files.src.src` very early
-# in `each.head`, because `nested.subdirs` might not be set yet, it may
-# or may not be safe to use the value of `$(files.src.src)` in your
-# Makefile, depending on how you set `nested.subdirs`.
+# While gitfiles sets `files.src.src` very early in `each.head`, because
+# `nested.subdirs` might not be set yet, it may or may not be safe to
+# use the value of `$(files.src.src)` in your Makefile, depending on how
+# you set `nested.subdirs`.
 endef
 mod.gitfiles.doc := $(value mod.gitfiles.doc)
 
@@ -65,10 +65,11 @@ _gitfiles.all =
 
 ifneq ($(wildcard $(topsrcdir)/.git),)
 $(topsrcdir)/$(gitfiles.file): _gitfiles.FORCE
-	@(cd $(@D) && git ls-files -z) | sed -z -e 's/\$$/\$$$$/g' -e 's/\n/$$(at.nl)/g' | xargs -r0 printf '_gitfiles.all+=%s\n' | $(WRITE_IFCHANGED) $@
+	@(cd $(@D) && git ls-files --recurse-submodules -z) | sed -z -e 's/\$$/\$$$$/g' -e 's/\n/$$(at.nl)/g' | xargs -r0 printf '_gitfiles.all+=%s\n' | $(WRITE_IFCHANGED) $@
 .PHONY: _gitfiles.FORCE
 endif
 
 _gitfiles.dir = $(call at.relto,$(topsrcdir),$(srcdir))
-_gitfiles.dir.all = $(patsubst $(_gitfiles.dir)/%,%,$(filter $(_gitfiles.dir)/%,$(_gitfiles.all)))
+_gitfiles.pat = $(patsubst ./%,%,$(_gitfiles.dir)/%)
+_gitfiles.dir.all = $(patsubst $(_gitfiles.pat),%,$(filter $(_gitfiles.pat),$(_gitfiles.all)))
 _gitfiles.dir.src = $(filter-out $(addsuffix /%,$(nested.subdirs)),$(_gitfiles.dir.all))
