@@ -1604,8 +1604,7 @@ AC_CONFIG_FILES([
 AC_OUTPUT([], [], [
 if test "$srcdir" != .; then
 	{
-		find "$srcdir" -name Makefile -printf '%P\n'
-		find "$srcdir" -name subdir.mk -printf '%P\n'
+		find "$srcdir" '(' -name GNUmakefile -o -name Makefile -o -name subdir.mk ')' -printf '%P\n'
 	} | while read -r filename; do
 		mkdir -p "\$(dirname "\$filename")"
 		ln -srfT "$srcdir/\$filename" "\$filename"
