@@ -1616,7 +1616,16 @@ AC_CONFIG_FILES([
         po/Makefile.in
 ])
 
-AC_OUTPUT
+AC_OUTPUT([], [], [
+if test "$srcdir" != .; then
+	{
+		find "$srcdir" '(' -name GNUmakefile -o -name Makefile -o -name subdir.mk ')' -printf '%P\n'
+	} | while read -r filename; do
+		mkdir -p "\$(dirname "\$filename")"
+		ln -srfT "$srcdir/\$filename" "\$filename"
+	done
+fi
+])
 AC_MSG_RESULT([
         $PACKAGE_NAME $VERSION
 
