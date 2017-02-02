@@ -1,0 +1,3 @@
+# This file doesn't actually get used, it just needs to exist to keep Automake
+# happy.  We don't use Autmake for any Makefile stuff, but we do use auxiliary
+# build scripts provided by Automake.

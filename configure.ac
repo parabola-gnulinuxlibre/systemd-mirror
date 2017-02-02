@@ -1596,8 +1596,6 @@ AC_SUBST([rootlibdir], [$with_rootlibdir])
 AC_CONFIG_FILES([
         config.mk
         automake.mk
-        autoconf.mk
-        gnustandards.mk
         po/Makefile.in
 ])
 

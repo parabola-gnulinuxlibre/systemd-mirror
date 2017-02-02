@@ -27,8 +27,6 @@ topsrcdir := $(topoutdir)/@top_srcdir@
 
 .LIBPATTERNS = lib%.so lib%.a
 
-include $(topoutdir)/autoconf.mk
-
 CCLD = $(CC)
 
 OUR_CPPFLAGS = @OUR_CPPFLAGS@
@@ -375,6 +373,41 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 
+top_builddir = $(topoutdir)
+top_srcdir = $(topsrcdir)
+
+PACKAGE = @PACKAGE@
+VERSION = @VERSION@
+PACKAGE_NAME = @PACKAGE_NAME@
+PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_VERSION = @PACKAGE_VERSION@
+PACKAGE_STRING = @PACKAGE_STRING@
+PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
+PACKAGE_URL = @PACKAGE_URL@
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOHEADER = @AUTOHEADER@
+AUTOMAKE = @AUTOMAKE@
+CPP = @CPP@
+ECHO_C = @ECHO_C@
+ECHO_N = @ECHO_N@
+ECHO_T = @ECHO_T@
+FGREP = @FGREP@# Requires AC_PROG_FGREP
+GPERF = @GPERF@
+LIBTOOL = @LIBTOOL@
+M4 = @M4@
+M4_DEFINES = @M4_DEFINES@
+MKDIR_P = @MKDIR_P@# Requires AC_PROG_MKDIR_P
+MSGFMT = @MSGFMT@
+MSGMERGE = @MSGMERGE@
+NM = @NM@
+OBJCOPY = @OBJCOPY@
+OBJDUMP = @OBJDUMP@
+STRINGS = @STRINGS@
+STRIP = @STRIP@
+XGETTEXT = @XGETTEXT@
+
 # This is based on §7.2 "Makefile Conventions" of the July 25, 2016
 # release of the GNU Coding Standards.
 #
@@ -496,6 +529,8 @@ MKNODFLAGS =
 # ----------------------------------------
 
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
+#INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_DATA = @INSTALL_DATA@
 
 # 7.2.5: Variables for Installation Directories
