@@ -92,7 +92,7 @@ TRUE    ?= true
 
 # Utility functions
 
-_files.XARGS = $(if $(strip $2),$1 $(strip $2))
+_files.XARGS = $(if $(strip $2),$(subst {},$(strip $2),$1))
 
 _files.maintainer-clean-warning:
 	@echo 'This command is intended for maintainers to use; it'

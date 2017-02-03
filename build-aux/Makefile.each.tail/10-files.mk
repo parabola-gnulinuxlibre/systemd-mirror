@@ -37,16 +37,21 @@ $(eval \
     $$(outdir)/install-$(_files.g): $$(_files.sys.$(_files.g))$(at.nl)))
 
 # Destructive targets
-_files.uninstall   = $(_files.sys)
-_files.mostlyclean = $(filter-out $(_files.out.slow) $(_files.out.cfg),$(_files.out))
-_files.clean       = $(filter-out                    $(_files.out.cfg),$(_files.out))
-_files.distclean   =                                                   $(_files.out)
-_files.maintainer-clean  = $(_files.distclean) $(filter-out $(_files.src.cfg) $(_files.src.src),$(_files.src))
-_files.$(files.vcsclean) = $(_files.distclean) $(filter-out                   $(_files.src.src),$(_files.src))
+#
+# We do our on $(srcdir) / $(outdir) prefixing here because
+# at.addprefix (while necessary for dependency lists) doesn't preserve
+# trailing slashes, which we care about here; while also not caring
+# about the path normalization that at.addprefix does.
+_files.uninstall   = $(addprefix $(DESTDIR),$(files.sys))
+_files.mostlyclean = $(addprefix $(srcdir)/,$(filter-out $(files.out.slow) $(files.out.cfg),$(files.out)))
+_files.clean       = $(addprefix $(srcdir)/,$(filter-out                   $(files.out.cfg),$(files.out)))
+_files.distclean   = $(addprefix $(srcdir)/,                                                $(files.out))
+_files.maintainer-clean  = $(files.distclean) $(addprefix $(srcdir)/,$(filter-out $(files.src.cfg) $(files.src.src),$(files.src)))
+_files.$(files.vcsclean) = $(files.distclean) $(addprefix $(srcdir)/,$(filter-out                  $(files.src.src),$(files.src)))
 $(addprefix $(outdir)/,uninstall mostlyclean clean distclean maintainer-clean $(files.vcsclean)): %: %-hook
-	$(call _files.XARGS,$(RM)    --,                  $(sort $(wildcard $(filter-out %/,$(_files.$(@F))))) )
-	$(call _files.XARGS,$(RM) -r --,                  $(sort $(wildcard $(filter     %/,$(_files.$(@F))))) )
-	$(call _files.XARGS,$(RMDIR_P) --,$(filter-out ./,$(sort $(wildcard $(dir           $(_files.$(@F)))))))
+	$(call _files.XARGS,$(RM)    -- {},                                      $(sort $(filter-out %/,$(_files.$(@F)))) )
+	$(call _files.XARGS,$(RM) -r -- {},                                      $(sort $(filter     %/,$(_files.$(@F)))) )
+	$(call _files.XARGS,$(RMDIR_P) -- {} 2>/dev/null || true,$(filter-out ./,$(sort $(dir           $(_files.$(@F))))))
 $(addprefix $(outdir)/,maintainer-clean $(files.vcsclean)): _files.maintainer-clean-warning
 $(foreach t,uninstall mostlyclean clean distclean maintainer-clean $(files.vcsclean), $(outdir)/$t-hook)::
 .PHONY: $(foreach t,uninstall mostlyclean clean distclean maintainer-clean $(files.vcsclean), $(outdir)/$t-hook)
