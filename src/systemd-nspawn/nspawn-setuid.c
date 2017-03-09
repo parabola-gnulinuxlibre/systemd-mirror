@@ -18,6 +18,8 @@
 ***/
 
 #include <grp.h>
+#include <pwd.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -88,7 +90,8 @@ static int spawn_getent(const char *database, const char *key, pid_t *rpid) {
 }
 
 int change_uid_gid(const char *user, char **_home) {
-        char line[LINE_MAX], *x, *u, *g, *h;
+        char line[LINE_MAX], *x;
+        struct passwd *pw;
         const char *word, *state;
         _cleanup_free_ uid_t *uids = NULL;
         _cleanup_free_ char *home = NULL;
@@ -124,8 +127,9 @@ int change_uid_gid(const char *user, char **_home) {
                 return log_oom();
         fd = -1;
 
-        if (!fgets(line, sizeof(line), f)) {
-                if (!ferror(f)) {
+        errno = 0;
+        if (!(pw = fgetpwent(f))) {
+                if (!errno) {
                         log_error("Failed to resolve user %s.", user);
                         return -ESRCH;
                 }
@@ -133,66 +137,11 @@ int change_uid_gid(const char *user, char **_home) {
                 return log_error_errno(errno, "Failed to read from getent: %m");
         }
 
-        truncate_nl(line);
-
         wait_for_terminate_and_warn("getent passwd", pid, true);
 
-        x = strchr(line, ':');
-        if (!x) {
-                log_error("/etc/passwd entry has invalid user field.");
-                return -EIO;
-        }
-
-        u = strchr(x+1, ':');
-        if (!u) {
-                log_error("/etc/passwd entry has invalid password field.");
-                return -EIO;
-        }
-
-        u++;
-        g = strchr(u, ':');
-        if (!g) {
-                log_error("/etc/passwd entry has invalid UID field.");
-                return -EIO;
-        }
-
-        *g = 0;
-        g++;
-        x = strchr(g, ':');
-        if (!x) {
-                log_error("/etc/passwd entry has invalid GID field.");
-                return -EIO;
-        }
-
-        *x = 0;
-        h = strchr(x+1, ':');
-        if (!h) {
-                log_error("/etc/passwd entry has invalid GECOS field.");
-                return -EIO;
-        }
-
-        h++;
-        x = strchr(h, ':');
-        if (!x) {
-                log_error("/etc/passwd entry has invalid home directory field.");
-                return -EIO;
-        }
-
-        *x = 0;
-
-        r = parse_uid(u, &uid);
-        if (r < 0) {
-                log_error("Failed to parse UID of user.");
-                return -EIO;
-        }
-
-        r = parse_gid(g, &gid);
-        if (r < 0) {
-                log_error("Failed to parse GID of user.");
-                return -EIO;
-        }
-
-        home = strdup(h);
+        uid = pw->pw_uid;
+        gid = pw->pw_gid;
+        home = strdup(pw->pw_dir);
         if (!home)
                 return log_oom();
 
