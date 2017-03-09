@@ -42,8 +42,8 @@ int stub_pid1(void) {
         pid_t pid;
         int r;
 
-        /* Implements a stub PID 1, that reaps all processes and processes a couple of standard signals. This is useful
-         * for allowing arbitrary processes run in a container, and still have all zombies reaped. */
+        /* Implements a stub PID 1, that reaps all processes and handles a couple of standard signals. This is useful
+         * for allowing arbitrary processes to run in a container, and still have all zombies reaped. */
 
         assert_se(sigfillset(&fullmask) >= 0);
         assert_se(sigprocmask(SIG_BLOCK, &fullmask, &oldmask) >= 0);
