@@ -19,19 +19,19 @@
 
 #include <nss.h>
 
-#include "sd-bus.h"
+#include <systemd/sd-bus.h>
 
-#include "alloc-util.h"
-#include "bus-common-errors.h"
-#include "env-util.h"
-#include "fs-util.h"
-#include "macro.h"
-#include "nss-util.h"
-#include "signal-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "user-util.h"
-#include "util.h"
+#include "sd-bus/bus-common-errors.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/env-util.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/nss-util.h"
+#include "systemd-basic/signal-util.h"
+#include "systemd-basic/stdio-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
 
 #ifndef NOBODY_USER_NAME
 #define NOBODY_USER_NAME "nobody"
