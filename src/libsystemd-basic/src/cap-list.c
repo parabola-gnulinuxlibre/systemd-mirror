@@ -26,7 +26,7 @@
 #include "systemd-basic/parse-util.h"
 #include "systemd-basic/util.h"
 
-static const struct capability_name* lookup_capability(register const char *str, register unsigned int len);
+static const struct capability_name* lookup_capability(register const char *str, register GPERF_LEN_TYPE len);
 
 #include "cap-from-name.h"
 #include "cap-to-name.h"

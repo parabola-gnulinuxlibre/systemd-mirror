@@ -24,7 +24,7 @@
 #include "systemd-basic/string-util.h"
 #include "systemd-basic/util.h"
 
-static const struct arphrd_name* lookup_arphrd(register const char *str, register unsigned int len);
+static const struct arphrd_name* lookup_arphrd(register const char *str, register GPERF_LEN_TYPE len);
 
 #include "arphrd-from-name.h"
 #include "arphrd-to-name.h"
