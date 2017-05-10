@@ -30,19 +30,20 @@
 #include <valgrind/valgrind.h>
 #endif
 
-#include "alloc-util.h"
-#include "architecture.h"
-#include "fd-util.h"
-#include "log.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "process-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "terminal-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/architecture.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/process-util.h"
+#include "systemd-basic/stdio-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-basic/virt.h"
+
 #include "test-helper.h"
-#include "util.h"
-#include "virt.h"
 
 static void test_get_process_comm(pid_t pid) {
         struct stat st;
