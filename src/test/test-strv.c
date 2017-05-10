@@ -20,11 +20,11 @@
 
 #include <string.h>
 
-#include "alloc-util.h"
-#include "specifier.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/specifier.h"
 
 static void test_specifier_printf(void) {
         static const Specifier table[] = {

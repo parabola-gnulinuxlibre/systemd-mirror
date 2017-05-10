@@ -20,10 +20,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "cgroup-util.h"
-#include "path-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 int main(int argc, char*argv[]) {
         char *path;
