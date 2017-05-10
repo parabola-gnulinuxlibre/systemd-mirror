@@ -5493,10 +5493,11 @@ systemd_export_LDADD = \
 	$(ZLIB_LIBS) \
 	$(BZIP2_LIBS)
 
-#@auto/systemd-importd/Makefile
+#@auto/systemd-pull/Makefile
 dist_rootlibexec_DATA += \
 	src/import/import-pubring.gpg
 
+#@auto/systemd-importd/Makefile
 nodist_systemunit_DATA += \
 	units/systemd-importd.service
 

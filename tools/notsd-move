@@ -205,13 +205,14 @@ move_files() (
 	   src/import/.gitignore \
 	   src/import/importd.c \
 	   src/import/org.*
+	mkdir src/systemd-pull
+	mv -t src/systemd-pull \
+	   src/import/import-pubring.gpg \
+	   src/import/pull* \
+	   src/import/curl-util*
 	mkdir src/systemd-import
 	mv -t src/systemd-import \
 	   src/import/import*
-	mkdir src/systemd-pull
-	mv -t src/systemd-pull \
-	   src/import/pull* \
-	   src/import/curl-util*
 	rmdir src/import
 
 	# src/journal => src/...
