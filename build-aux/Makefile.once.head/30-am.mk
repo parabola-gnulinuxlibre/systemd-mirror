@@ -118,15 +118,17 @@ define _am.pass1.doc
 endef
 
 # Utility (reused in pass 2)
-_am.primary2dirs = $(filter $(patsubst %dir,%,$(filter %dir,$(.VARIABLES))),\
-                            $(patsubst nodist_%,%,$(patsubst dist_%,%,$(patsubst %_$1,%,$(filter %_$1,$(.VARIABLES))))))
+_am.primary2dirs = $(sort $(filter $(patsubst %dir,%,$(filter %dir,$(.VARIABLES))),\
+                                   $(patsubst nodist_%,%,$(patsubst dist_%,%,$(patsubst %_$1,%,$(filter %_$1,$(.VARIABLES)))))))
 
 define _am.pass1
 # == Pass 1: initialize variables ==
 $(foreach _am.primary,$(_am.primaries),
   $(foreach _am.dirname,$(call _am.primary2dirs,$(_am.primary)),
     am.outpat_$(_am.dirname)_$(_am.primary) ?= %
-    am.syspat_$(_am.dirname)_$(_am.primary) ?= %))
+    am.syspat_$(_am.dirname)_$(_am.primary) ?= %
+  )
+)
 endef
 
 define _am.pass2.doc
@@ -206,17 +208,12 @@ $(foreach _am.primary,$(_am.primaries),
 	@$$(MKDIR_P) $$(@D)
 	$$(am.INSTALL_$(_am.primary))
 
-    am.out_$(_am.primary) := $$(patsubst $(am.syspat_$(_am.dirname)_$(_am.primary)),$(am.outpat_$(_am.dirname)_$(_am.primary)),$$(notdir $$(nodist_$(_am.dirname)_$(_am.primary)) ))
-    am.sys_$(_am.primary) := $$(addprefix $$($(_am.dirname)dir)/,$$(notdir                                                               $$(nodist_$(_am.dirname)_$(_am.primary)) $$(dist_$(_am.dirname)_$(_am.primary)) ))
+    am.out_$(_am.primary) := $$(am.out_$(_am.primary)) $$(patsubst $(am.syspat_$(_am.dirname)_$(_am.primary)),$(am.outpat_$(_am.dirname)_$(_am.primary)),$$(notdir $$(nodist_$(_am.dirname)_$(_am.primary)) ))
+    am.sys_$(_am.primary) := $$(am.sys_$(_am.primary)) $$(addprefix $$($(_am.dirname)dir)/,$$(notdir                                                               $$(nodist_$(_am.dirname)_$(_am.primary)) $$(dist_$(_am.dirname)_$(_am.primary)) ))
 
-    undefine $(_am.dirname)_$(_am.primary)
-    undefine dist_$(_am.dirname)_$(_am.primary)
-    undefine nodist_$(_am.dirname)_$(_am.primary)
     ## (end dirname)
   )
 
-  undefine noinst_$(_am.primary)
-  undefine check_$(_am.primary)
   ## (end primary)
 )
 endef
@@ -257,7 +254,8 @@ $(foreach _am.file,$(am.out_PROGRAMS),
   $(eval _am.var = $(call _am.file2var,$(_am.file)))
   ## PROGRAM: $(_am.file) ($(_am.var))
   $(foreach var,_am.depends $(_am.var_PROGRAMS),
-    $(var) ?=)
+    $(var) ?=
+  )
 
   _am.depends += $$(call at.path,$$(call _am.file2.o,$(_am.file))  $$(call _am.file2lib,$(_am.file),LDADD))
   am.CPPFLAGS +=                 $$($(_am.var)_CPPFLAGS)           $$(call _am.file2cpp,$(_am.file),LDADD)
@@ -272,8 +270,8 @@ $(foreach _am.file,$(am.out_PROGRAMS),
   am.CPPFLAGS := $$(am.CPPFLAGS)
   am.CFLAGS := $$(am.CFLAGS)
 
-  $(foreach var,_am.depends $(_am.var_PROGRAMS),
-    undefine $(var)))
+  undefine _am.depends
+)
 endef
 
 define _am.pass4.doc
@@ -312,7 +310,8 @@ $(foreach _am.file,$(am.out_LTLIBRARIES),
   $(eval _am.var = $(call _am.file2var,$(_am.file)))
   ## LTLIBRARY: $(_am.file) ($(_am.var))
   $(foreach var,_am.depends $(_am.var_LTLIBRARIES),
-    $(var) ?=)
+    $(var) ?=
+  )
 
   _am.depends += $$(call at.path,$$(call _am.file2.lo,$(_am.file)) $$(call _am.file2lib,$(_am.file),LIBADD))
   am.CPPFLAGS +=                 $$($(_am.var)_CPPFLAGS)           $$(call _am.file2cpp,$(_am.file),LIBADD)
@@ -326,8 +325,9 @@ $(foreach _am.file,$(am.out_LTLIBRARIES),
 
   am.CPPFLAGS := $$(am.CPPFLAGS)
   am.CFLAGS := $$(am.CFLAGS)
-  $(foreach var,_am.depends $(_am.var_LTLIBRARIES),
-    undefine $(var)))
+
+  undefine _am.depends
+)
 endef
 
 mod.am.depends += files
@@ -337,7 +337,7 @@ define _am.pass5.doc
 #   - Directory variable : `am.subdirs`
 #   - Directory variable : `am.sys_$(primary)`
 #   - Directory variable : `am.out_$(primary)`
-#   - Directory variable : `am.check_$(primary)`
+#   - Directory variable : `am.chk_$(primary)`
 # Outputs:
 #   - Directory variable : `at.subdirs`
 #   - Directory variable : `files.sys.all`

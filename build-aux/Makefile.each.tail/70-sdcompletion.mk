@@ -16,8 +16,11 @@ mod.sdcompletion.doc := $(value mod.sdcompletion.doc)
 rootbin_PROGRAMS ?=
 bin_PROGRAMS ?=
 dist_bin_SCRIPTS ?=
-bashcompletion_DATA ?=
-zshcompletion_DATA ?=
-# We use `dist_` to trick `am` into not putting it in `am.out_DATA`
-dist_bashcompletion_DATA := $(sort $(bashcompletion_DATA) $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS))
-dist_zshcompletion_DATA := $(sort $(zshcompletion_DATA) $(addprefix _,$(notdir $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS))))
+
+_bashcompletion_DATA := $(sort $(bashcompletion_DATA) $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS))
+dist_bashcompletion_DATA   += $(filter     $(files.src),$(_bashcompletion_DATA))
+nodist_bashcompletion_DATA += $(filter-out $(files.src),$(_bashcompletion_DATA))
+
+_zshcompletion_DATA := $(sort $(zshcompletion_DATA) $(addprefix _,$(notdir $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS))))
+dist_zshcompletion_DATA   += $(filter     $(files.src),$(_zshcompletion_DATA))
+nodist_zshcompletion_DATA += $(filter-out $(files.src),$(_zshcompletion_DATA))
