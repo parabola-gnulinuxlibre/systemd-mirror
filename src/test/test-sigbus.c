@@ -19,9 +19,9 @@
 
 #include <sys/mman.h>
 
-#include "fd-util.h"
-#include "sigbus.h"
-#include "util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/sigbus.h"
+#include "systemd-basic/util.h"
 
 int main(int argc, char *argv[]) {
         _cleanup_close_ int fd = -1;
