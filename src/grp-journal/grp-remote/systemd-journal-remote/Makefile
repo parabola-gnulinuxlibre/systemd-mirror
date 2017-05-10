@@ -39,11 +39,6 @@ systemd_journal_remote_LDADD = \
 	libsystemd-microhttpd.la \
 	libjournal-core.la
 
-ifneq ($(ENABLE_TMPFILES),)
-dist_tmpfiles_DATA += \
-	tmpfiles.d/systemd-remote.conf
-endif # ENABLE_TMPFILES
-
 # systemd-journal-remote make sense mostly with full crypto stack
 dist_systemunit_DATA += \
 	units/systemd-journal-remote.socket
