@@ -36,9 +36,6 @@ systemd_importd_LDADD = \
 	libsystemd-internal.la \
 	libsystemd-shared.la
 
-dist_rootlibexec_DATA += \
-	src/import/import-pubring.gpg
-
 nodist_systemunit_DATA += \
 	units/systemd-importd.service
 

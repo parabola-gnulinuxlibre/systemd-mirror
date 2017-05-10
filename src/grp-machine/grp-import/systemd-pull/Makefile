@@ -55,4 +55,7 @@ systemd_pull_LDADD = \
 	$(BZIP2_LIBS) \
 	$(GCRYPT_LIBS)
 
+dist_rootlibexec_DATA += \
+	src/import/import-pubring.gpg
+
 include $(topsrcdir)/build-aux/Makefile.tail.mk
