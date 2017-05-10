@@ -15,6 +15,12 @@ main() {
 	find "$@" -type f -name Makefile -print0 |
 		xargs -r0 sh -c "$0--makefiles \"\$@\" || exit 255" --
 
+	# GNUmakefiles
+	find "$@" -type l -name GNUmakefile -delete
+	# It's OK for the top-level one to fail
+	find "$@" -type f -name Makefile -printf '%h\0' |
+		xargs -r0 -I {} ln -s -r -t {} GNUmakefile
+
 	# C includes
 	rm -rf -- "$0"--includes.cache
 	find "$@" \( -name '*.h' -o -name '*.c' -o -name '*.gperf' -o -name '*.gperf.m4' \) -type f -print0 |
