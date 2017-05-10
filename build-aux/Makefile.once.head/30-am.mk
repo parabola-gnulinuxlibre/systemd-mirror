@@ -54,6 +54,13 @@ _am.primaries += HEADERS
 _am.primaries += MANS
 #_am.primaries += TEXINFOS
 
+am.distmode_PROGRAMS    = nodist
+am.distmode_LTLIBRARIES = nodist
+am.distmode_SCRIPTS     = dist
+am.distmode_DATA        = nodist
+am.distmode_HEADERS     = dist
+am.distmode_MANS        = nodist
+
 # Used by the PROGRAMS and LTLIBRARIES passes
 _am.file2var = $(subst -,_,$(subst .,_,$1))
 _am.file2sources  = $(addprefix $(srcdir)/,$(notdir $($(_am.file2var)_SOURCES)))
@@ -129,7 +136,8 @@ define _am.pass2.doc
 #   - Global variable    : `MKDIR_P`
 #   - Global variable    : `am.INSTALL_$(primary)`
 #   - Global variable    : `am.outpat_$(dirname)_$(primary)`
-#   - Global variable    : `am.syspat_$(dirname)_$(primary)
+#   - Global variable    : `am.syspat_$(dirname)_$(primary)`
+#   - Global variable    : `am.distmode_$(primary)`
 #   - Global variable    : `$(dirname)dir`
 # Erased inputs:
 #   - Directory variable : `noinst_$(primary)`
@@ -182,14 +190,24 @@ $(foreach _am.primary,$(_am.primaries),
     dist_$(_am.dirname)_$(_am.primary)      ?=
     nodist_$(_am.dirname)_$(_am.primary)    ?=
 
-    $$(addprefix $$(DESTDIR)$$($(_am.dirname)dir)/,$$(notdir $(foreach v,$(_am.var_sys),$$($v)) )): \
+    $(am.distmode_$(_am.primary))_$(_am.dirname)_$(_am.primary) += $$($(_am.dirname)_$(_am.primary))
+
+    # nodist
+    $$(addprefix $$(DESTDIR)$$($(_am.dirname)dir)/,$$(notdir $$(nodist_$(_am.dirname)_$(_am.primary)) )): \
     $$(DESTDIR)$$($(_am.dirname)dir)/$(am.syspat_$(_am.dirname)_$(_am.primary)): $(call at.addprefix,$(outdir),$(am.outpat_$(_am.dirname)_$(_am.primary)))
 	@$$(NORMAL_INSTALL)
 	@$$(MKDIR_P) $$(@D)
 	$$(am.INSTALL_$(_am.primary))
 
-    am.out_$(_am.primary) := $$(patsubst $(am.syspat_$(_am.dirname)_$(_am.primary)),$(am.outpat_$(_am.dirname)_$(_am.primary)),$$(notdir $(foreach v,$(_am.var_out),$$($v)) ))
-    am.sys_$(_am.primary) := $$(addprefix $$($(_am.dirname)dir)/,$$(notdir                                                               $(foreach v,$(_am.var_sys),$$($v)) ))
+    # dist
+    $$(addprefix $$(DESTDIR)$$($(_am.dirname)dir)/,$$(notdir $$(dist_$(_am.dirname)_$(_am.primary)) )): \
+    $$(DESTDIR)$$($(_am.dirname)dir)/$(am.syspat_$(_am.dirname)_$(_am.primary)): $(call at.addprefix,$(srcdir),$(am.outpat_$(_am.dirname)_$(_am.primary)))
+	@$$(NORMAL_INSTALL)
+	@$$(MKDIR_P) $$(@D)
+	$$(am.INSTALL_$(_am.primary))
+
+    am.out_$(_am.primary) := $$(patsubst $(am.syspat_$(_am.dirname)_$(_am.primary)),$(am.outpat_$(_am.dirname)_$(_am.primary)),$$(notdir $$(nodist_$(_am.dirname)_$(_am.primary)) ))
+    am.sys_$(_am.primary) := $$(addprefix $$($(_am.dirname)dir)/,$$(notdir                                                               $$(nodist_$(_am.dirname)_$(_am.primary)) $$(dist_$(_am.dirname)_$(_am.primary)) ))
 
     undefine $(_am.dirname)_$(_am.primary)
     undefine dist_$(_am.dirname)_$(_am.primary)

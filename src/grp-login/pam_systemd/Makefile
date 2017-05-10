@@ -47,7 +47,7 @@ pamlib_LTLIBRARIES = \
 	pam_systemd.la
 
 ifneq ($(ENABLE_PAM_CONFIG),)
-dist_pamconf_DATA = \
+nodist_pamconf_DATA = \
 	src/login/systemd-user
 endif
 
