@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
  ***/
 
-#include "alloc-util.h"
-#include "dns-domain.h"
-#include "macro.h"
-#include "string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-shared/dns-domain.h"
 
 static void test_dns_label_unescape_one(const char *what, const char *expect, size_t buffer_sz, int ret) {
         char buffer[buffer_sz];
