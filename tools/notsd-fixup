@@ -19,7 +19,7 @@ main() {
 	find "$@" -type l -name GNUmakefile -delete
 	# It's OK for the top-level one to fail
 	find "$@" -type f -name Makefile -printf '%h\0' |
-		xargs -r0 -I {} ln -s -t {} GNUmakefile
+		xargs -r0 -I {} ln -s -r -t {} GNUmakefile
 
 	# C includes
 	rm -rf -- "$0"--includes.cache

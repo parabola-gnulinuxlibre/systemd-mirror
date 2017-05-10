@@ -359,7 +359,7 @@ move_files() (
 	   src/login/*.rules \
 	   src/login/*.rules.in \
 	   src/login/org.*
-	mv -T src/login/systemd-user.m4 src/systemd-logind/systemd-user.pam.m4
+	mv -T src/login/systemd-user.m4 src/pam_systemd/systemd-user.pam.m4
 	rmdir src/login
 
 	# src/timedate => src/...
