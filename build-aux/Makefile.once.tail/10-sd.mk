@@ -106,7 +106,7 @@ EXTRA_DIST += \
         tools/gdb-sd_dump_hashmaps.py
 
 list-keys:
-	gpg --verbose --no-options --no-default-keyring --no-auto-key-locate --batch --trust-model=always --keyring=$(srcdir)/src/import/import-pubring.gpg --list-keys
+	gpg --verbose --no-options --no-default-keyring --no-auto-key-locate --batch --trust-model=always --keyring=$(srcdir)/src/grp-machine/grp-import/systemd-pull/import-pubring.gpg --list-keys
 
 add-key:
-	gpg --verbose --no-options --no-default-keyring --no-auto-key-locate --batch --trust-model=always --keyring=$(srcdir)/src/import/import-pubring.gpg --import -
+	gpg --verbose --no-options --no-default-keyring --no-auto-key-locate --batch --trust-model=always --keyring=$(srcdir)/src/grp-machine/grp-import/systemd-pull/import-pubring.gpg --import -
