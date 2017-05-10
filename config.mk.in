@@ -295,8 +295,6 @@ pkglibexecdir = $(libexecdir)/@PACKAGE@
 pkgpyexecdir = @pkgpyexecdir@
 pkgpythondir = @pkgpythondir@
 
-INSTALL = install -D
-
 INTLTOOL_EXTRACT = @INTLTOOL_EXTRACT@
 INTLTOOL_MERGE = @INTLTOOL_MERGE@
 INTLTOOL_PERL = @INTLTOOL_PERL@

@@ -54,7 +54,7 @@ _am.primaries += HEADERS
 _am.primaries += MANS
 #_am.primaries += TEXINFOS
 
-# Used by the per_PROGRAM and per_LTLIBRARY passes
+# Used by the PROGRAMS and LTLIBRARIES passes
 _am.file2var = $(subst -,_,$(subst .,_,$1))
 _am.file2sources  = $(addprefix $(srcdir)/,$(notdir $($(_am.file2var)_SOURCES)))
 _am.file2sources += $(addprefix $(outdir)/,$(notdir $(nodist_$(_am.file2var)_SOURCES)))
@@ -72,7 +72,9 @@ define _am.pass0.doc
 #
 # Split man_MANS into man$n_MANS 
 endef
-define _am.pass0
+_am.pass0 = $(value _am.pass0_)
+define _am.pass0_
+# == Pass 0: man_MANS ==
 man_MANS ?=
 _am.man_MANS := $(man_MANS)
 undefine man_MANS
@@ -91,29 +93,58 @@ mann_MANS += $(foreach _am.tmp,$(_am.man_MANS),$(if $(findstring .n,$(suffix $(_
 endef
 
 define _am.pass1.doc
-# == Pass 1: _am.per_primary ==
+# == Pass 1: initialize variables ==
+# Inputs: (used to detect a list of $(dirname)s)
+#  - Directory variable :        `$(dirname)_$(primary)`
+#  - Directory variable : `nodist_$(dirname)_$(primary)`
+#  - Directory variable :   `dist_$(dirname)_$(primary)`
+# Outputs:
+#  - Directory variable : `noinst_$(primary) ?=`
+#  - Directory variable : `check_$(primary)  ?=`
+#  - Directory variable : `       $(dirname)_$(primary) ?=`
+#  - Directory variable : `  dist_$(dirname)_$(primary) ?=`
+#  - Directory variable : `nodist_$(dirname)_$(primary) ?=`
+#  - Global variable    : `am.outpat_$(dirname)_$(primary) ?= %`
+#  - Global variable    : `am.syspat_$(dirname)_$(primary) ?= %`
+#
+# Make sure that several variabes are initialized
+endef
+
+# Utility (reused in pass 2)
+_am.primary2dirs = $(filter $(patsubst %dir,%,$(filter %dir,$(.VARIABLES))),\
+                            $(patsubst nodist_%,%,$(patsubst dist_%,%,$(patsubst %_$1,%,$(filter %_$1,$(.VARIABLES))))))
+
+define _am.pass1
+# == Pass 1: initialize variables ==
+$(foreach _am.primary,$(_am.primaries),
+  $(foreach _am.dirname,$(call _am.primary2dirs,$(_am.primary)),
+    am.outpat_$(_am.dirname)_$(_am.primary) ?= %
+    am.syspat_$(_am.dirname)_$(_am.primary) ?= %))
+endef
+
+define _am.pass2.doc
+# == Pass 2: Uniform Naming Scheme ==
 # Inputs:
+#   - Global variable    : `NORMAL_INSTALL`
+#   - Global variable    : `MKDIR_P`
 #   - Global variable    : `am.INSTALL_$(primary)`
-#   - Global variable    : `am.sys2out_$(primary)`
+#   - Global variable    : `am.outpat_$(dirname)_$(primary)`
+#   - Global variable    : `am.syspat_$(dirname)_$(primary)
 #   - Global variable    : `$(dirname)dir`
 # Erased inputs:
-#   - Directory variable : `$(dirname)_$(primary)` [1] [2]
-#   - Directory variable : `dist_$(dirname)_$(primary)` [1] [2]
-#   - Directory variable : `nodist_$(dirname)_$(primary)` [1] [2]
-#   - Directory variable : `noinst_$(primary)` [2]
-#   - Directory variable : `check_$(primary)` [2]
+#   - Directory variable : `noinst_$(primary)`
+#   - Directory variable :  `check_$(primary)`
+#
+#   - Directory variable :        `$(dirname)_$(primary)`
+#   - Directory variable :   `dist_$(dirname)_$(primary)`
+#   - Directory variable : `nodist_$(dirname)_$(primary)`
 # Outputs:
-#   - Directory variable : `am.sys_$(primary)`
+#   - Directory variable : `am.chk_$(primary)`
 #   - Directory variable : `am.out_$(primary)`
-#   - Directory variable : `am.check_$(primary)`
-#   - Target variable    : `am.INSTALL`
+#   - Directory variable : `am.sys_$(primary)`
+#   - Targets            : `$(addprefix $(DESTDIR)$(dirname)/,$(notdir $({,dist_,nodist_}$(dirname)_$(primary))))`
 #
-# [1]: HACK: Each of these is first passed through `$(dir ...)`.
-#
-# [2]: HACK: For `am.out_*` each of these are turned into
-#      $(DESTDIR)-relative paths (ie, as if for `am.sys_*`), then turned
-#      back into $(outdir)-relative paths with `$(call
-#      am.sys2out_$(primary),...)`.
+# TODO
 endef
 
 # Default values
@@ -123,52 +154,66 @@ am.INSTALL_LTLIBRARIES ?= $(INSTALL) $< $@
 am.INSTALL_DATA        ?= $(INSTALL_DATA) $< $@
 am.INSTALL_HEADERS     ?= $(INSTALL_DATA) $< $@
 am.INSTALL_MANS        ?= $(INSTALL_DATA) $< $@
-$(eval $(foreach p,$(_am.primaries),am.sys2out_$p ?= $$(notdir $$1)$(at.nl)))
 
-# Utility functions
-_am.primary2dirs = $(filter $(patsubst %dir,%,$(filter %dir,$(.VARIABLES))),\
-                            $(patsubst nodist_%,%,$(patsubst dist_%,%,$(patsubst %_$1,%,$(filter %_$1,$(.VARIABLES))))))
+# Utility
+_am.var_out  =        $(_am.dirname)_$(_am.primary)
+_am.var_out += nodist_$(_am.dirname)_$(_am.primary)
+#_am.var_out += noinst_$(_am.primary)
+#_am.var_out +=  check_$(_am.primary)
 
-_am.pass1 = $(eval $(foreach p,$(_am.primaries)  ,$(call _am.per_primary,$p)$(at.nl)))
-define _am.per_primary
-# Initialize input variables
-$(foreach d,$(call _am.primary2dirs,$1),\
-  $d_$1        ?=$(at.nl)\
-  dist_$d_$1   ?=$(at.nl)\
-  nodist_$d_$1 ?=$(at.nl))
-noinst_$1 ?=
-check_$1  ?=
+_am.var_sys  =        $(_am.dirname)_$(_am.primary)
+_am.var_sys += nodist_$(_am.dirname)_$(_am.primary)
+_am.var_sys +=   dist_$(_am.dirname)_$(_am.primary)
 
-# Directory variable outputs
-am.check_$1 := $$(check_$1)
-am.sys_$1 :=                       $(foreach d,$(call _am.primary2dirs,$1),$$(addprefix $$($ddir)/,$$(notdir $$($d_$1) $$(dist_$d_$1) $$(nodist_$d_$1))))
-am.out_$1 := $$(call am.sys2out_$1,$(foreach d,$(call _am.primary2dirs,$1),$$(addprefix $$($ddir)/,$$(notdir $$($d_$1)                $$(nodist_$d_$1)))) $$(noinst_$1))
-#                                                                                                                                                     ^^^              ^
-#                                                                                                                                              notdir-'||              |
-#                                                                                                                                           addprefix--'|              |
-#                                                                                                                                           foreach d---'              |
-#                                                                                                                                          am.sys2out------------------'
+define _am.pass2
+# == Pass 2: Uniform Naming Scheme ==
+$(foreach _am.primary,$(_am.primaries),
+  ## primary: $(_am.primary)
+  noinst_$(_am.primary) ?=
+  check_$(_am.primary)  ?=
 
-# Erase appropriate inputs
-$(foreach d,$(call _am.primary2dirs,$1),undefine $d_$1$(at.nl)undefine dist_$d_$1$(at.nl)undefine nodist_$d_$1$(at.nl))
-undefine noinst_$1
-undefine check_$1
+  am.chk_$(_am.primary) := $$(check_$(_am.primary))
+  am.out_$(_am.primary) := $$(noinst_$(_am.primary))
+  am.sys_$(_am.primary) :=
 
-# Target variable outputs
-$$(addprefix $$(DESTDIR),$$(am.sys_$1)): private am.INSTALL = $$(am.INSTALL_$1)
+  $(foreach _am.dirname,$(call _am.primary2dirs,$(_am.primary)),
+    ## dirname: $(_am.dirname) ($(_am.primary))
+    $(_am.dirname)_$(_am.primary)           ?=
+    dist_$(_am.dirname)_$(_am.primary)      ?=
+    nodist_$(_am.dirname)_$(_am.primary)    ?=
+
+    $$(addprefix $$(DESTDIR)$$($(_am.dirname)dir)/,$$(notdir $(foreach v,$(_am.var_sys),$$($v)) )): \
+    $$(DESTDIR)$$($(_am.dirname)dir)/$(am.syspat_$(_am.dirname)_$(_am.primary)): $(call at.addprefix,$(outdir),$(am.outpat_$(_am.dirname)_$(_am.primary)))
+	@$$(NORMAL_INSTALL)
+	@$$(MKDIR_P) $$(@D)
+	$$(am.INSTALL_$(_am.primary))
+
+    am.out_$(_am.primary) := $$(patsubst $(am.syspat_$(_am.dirname)_$(_am.primary)),$(am.outpat_$(_am.dirname)_$(_am.primary)),$$(notdir $(foreach v,$(_am.var_out),$$($v)) ))
+    am.sys_$(_am.primary) := $$(addprefix $$($(_am.dirname)dir)/,$$(notdir                                                               $(foreach v,$(_am.var_sys),$$($v)) ))
+
+    undefine $(_am.dirname)_$(_am.primary)
+    undefine dist_$(_am.dirname)_$(_am.primary)
+    undefine nodist_$(_am.dirname)_$(_am.primary)
+    ## (end dirname)
+  )
+
+  undefine noinst_$(_am.primary)
+  undefine check_$(_am.primary)
+  ## (end primary)
+)
 endef
 
-define _am.pass2.doc
-# == Pass 2: _am.per_PROGRAM ==
+define _am.pass3.doc
+# == Pass 3: PROGRAMS ==
 # Inputs:
 #   - Directory variable : `am.out_PROGRAMS`
 # Erased inputs:
-#   - Directory variable : `$(program)_SOURCES`
+#   - Directory variable :        `$(program)_SOURCES`
 #   - Directory variable : `nodist_$(program)_SOURCES`
-#   - Directory variable : `$(program)_CFLAGS`
-#   - Directory variable : `$(program)_CPPFLAGS`
-#   - Directory variable : `$(program)_LDFLAGS`
-#   - Directory variable : `$(program)_LDADD`
+#   - Directory variable :        `$(program)_CFLAGS`
+#   - Directory variable :        `$(program)_CPPFLAGS`
+#   - Directory variable :        `$(program)_LDFLAGS`
+#   - Directory variable :        `$(program)_LDADD`
 # Outputs:
 #   - Directory variable : `am.CPPFLAGS`
 #   - Directory variable : `am.CFLAGS`
@@ -179,37 +224,51 @@ define _am.pass2.doc
 # TODO: I'm not in love with how it figures out `am.subdirs`.
 # TODO: I'm not in love with how it does the `install` dependencies.
 endef
-_am.pass2 = $(eval $(foreach f,$(am.out_PROGRAMS)   ,$(call _am.per_PROGRAM,$f,$(call _am.file2var,$f))$(at.nl)))
-_am.var_PROGRAMS    = $1_SOURCES nodist_$1_SOURCES $1_CFLAGS $1_CPPFLAGS $1_LDFLAGS $1_LDADD
-# $1 = filename
-# $2 = varname
-define _am.per_PROGRAM
-$(foreach var,_am.depends $(call _am.var_PROGRAMS,$2),$(var) ?=$(at.nl))
-_am.depends += $$(call at.path,$$(call _am.file2.o,$1)  $$(call _am.file2lib,$1,LDADD))
-am.CPPFLAGS +=                 $$($2_CPPFLAGS)          $$(call _am.file2cpp,$1,LDADD)
-am.CFLAGS   +=                 $$($2_CFLAGS)
-$$(outdir)/$1: private am.LDFLAGS := $$($2_LDFLAGS)
-$$(outdir)/$1: $$(_am.depends)
-$$(outdir)/install: $$(addsuffix install,$$(dir $$(filter %.la,$$(_am.depends))))
-am.subdirs := $$(sort $$(am.subdirs)\
-                      $$(filter-out $$(abspath $$(srcdir)),\
-                                    $$(abspath $$(dir $$(filter-out -l% /%,$$(_am.depends))))))
-am.CPPFLAGS := $$(am.CPPFLAGS)
-am.CFLAGS := $$(am.CFLAGS)
-$(foreach var,_am.depends $(call _am.var_PROGRAMS,$2),undefine $(var)$(at.nl))
+
+# Utility
+_am.var_PROGRAMS  =        $(_am.var)_SOURCES
+_am.var_PROGRAMS += nodist_$(_am.var)_SOURCES
+_am.var_PROGRAMS +=        $(_am.var)_CFLAGS
+_am.var_PROGRAMS +=        $(_am.var)_CPPFLAGS
+_am.var_PROGRAMS +=        $(_am.var)_LDFLAGS
+_am.var_PROGRAMS +=        $(_am.var)_LDADD
+
+define _am.pass3
+# == Pass 3: PROGRAMS ==
+$(foreach _am.file,$(am.out_PROGRAMS),
+  $(eval _am.var = $(call _am.file2var,$(_am.file)))
+  ## PROGRAM: $(_am.file) ($(_am.var))
+  $(foreach var,_am.depends $(_am.var_PROGRAMS),
+    $(var) ?=)
+
+  _am.depends += $$(call at.path,$$(call _am.file2.o,$(_am.file))  $$(call _am.file2lib,$(_am.file),LDADD))
+  am.CPPFLAGS +=                 $$($(_am.var)_CPPFLAGS)           $$(call _am.file2cpp,$(_am.file),LDADD)
+  am.CFLAGS   +=                 $$($(_am.var)_CFLAGS)
+  $$(outdir)/$(_am.file): private am.LDFLAGS := $$($(_am.var)_LDFLAGS)
+  $$(outdir)/$(_am.file): $$(_am.depends)
+  $$(outdir)/install: $$(addsuffix install,$$(dir $$(filter %.la,$$(_am.depends))))
+  am.subdirs := $$(sort $$(am.subdirs)\
+                        $$(filter-out $$(abspath $$(srcdir)),\
+                                      $$(abspath $$(dir $$(filter-out -l% /%,$$(_am.depends))))))
+
+  am.CPPFLAGS := $$(am.CPPFLAGS)
+  am.CFLAGS := $$(am.CFLAGS)
+
+  $(foreach var,_am.depends $(_am.var_PROGRAMS),
+    undefine $(var)))
 endef
 
-define _am.pass3.doc
-# == Pass 3: _am.per_LTLIBRARY ==
+define _am.pass4.doc
+# == Pass 4: LTLIBRARIES ==
 # Inputs:
 #   - Directory variable : `am.out_LTLIBRARIES`
 # Erased inputs:
-#   - Directory variable : `$(library)_SOURCES`
+#   - Directory variable :        `$(library)_SOURCES`
 #   - Directory variable : `nodist_$(library)_SOURCES`
-#   - Directory variable : `$(library)_CFLAGS`
-#   - Directory variable : `$(library)_CPPFLAGS`
-#   - Directory variable : `$(library)_LDFLAGS`
-#   - Directory variable : `$(library)_LIBADD`
+#   - Directory variable :        `$(library)_CFLAGS`
+#   - Directory variable :        `$(library)_CPPFLAGS`
+#   - Directory variable :        `$(library)_LDFLAGS`
+#   - Directory variable :        `$(library)_LIBADD`
 # Outputs:
 #   - Directory variable : `am.CPPFLAGS`
 #   - Directory variable : `am.CFLAGS`
@@ -220,48 +279,37 @@ define _am.pass3.doc
 # TODO: I'm not in love with how it figures out `am.subdirs`.
 # TODO: I'm not in love with how it does the `install` dependencies.
 endef
-_am.pass3 = $(eval $(foreach f,$(am.out_LTLIBRARIES),$(call _am.per_LTLIBRARY,$f,$(call _am.file2var,$f))$(at.nl)))
-_am.var_LTLIBRARIES = $1_SOURCES nodist_$1_SOURCES $1_CFLAGS $1_CPPFLAGS $1_LDFLAGS $1_LIBADD
-# $1 = filename
-# $2 = varname
-define _am.per_LTLIBRARY
-$(foreach var,_am.depends $(call _am.var_LTLIBRARIES,$2),$(var) ?=$(at.nl))
-_am.depends += $$(call at.path,$$(call _am.file2.lo,$1) $$(call _am.file2lib,$1,LIBADD))
-am.CPPFLAGS +=                 $$($2_CPPFLAGS)          $$(call _am.file2cpp,$1,LIBADD)
-am.CFLAGS   +=                 $$($2_CFLAGS)
-$$(outdir)/$1: private am.LDFLAGS := $$($2_LDFLAGS)
-$$(outdir)/$1: $$(_am.depends)
-$$(outdir)/install: $$(addsuffix install,$$(dir $$(filter %.la,$$(_am.depends))))
-am.subdirs := $$(sort $$(am.subdirs)\
-                      $$(filter-out $$(abspath $$(srcdir)),\
-                                    $$(abspath $$(dir $$(filter-out -l% /%,$$(_am.depends))))))
-am.CPPFLAGS := $$(am.CPPFLAGS)
-am.CFLAGS := $$(am.CFLAGS)
-$(foreach var,_am.depends $(call _am.var_LTLIBRARIES,$2),undefine $(var)$(at.nl))
-endef
-
-define _am.pass4.doc
-# == Pass 4: Install rules / _am.per_directory ==
-# Inputs:
-#   - Directory variable : `am.sys_$(primary)`
-# Outputs:
-#   - Target : `$(DESTDIR)/$($(dirname)dir)/%`
-#
-# Creates simple `install` rules.  You will need to define your own rules if
-# `am.sys2out_$(primary)` changed the notdir part of the filename.
-endef
 
-# Utility functions
-_am.sys2dirs = $(sort $(patsubst %/,%,$(dir $(foreach p,$(_am.primaries),$(am.sys_$p)))))
+# Utility
+_am.var_LTLIBRARIES  =        $(_am.var)_SOURCES
+_am.var_LTLIBRARIES += nodist_$(_am.var)_SOURCES
+_am.var_LTLIBRARIES +=        $(_am.var)_CFLAGS
+_am.var_LTLIBRARIES +=        $(_am.var)_CPPFLAGS
+_am.var_LTLIBRARIES +=        $(_am.var)_LDFLAGS
+_am.var_LTLIBRARIES +=        $(_am.var)_LIBADD
 
-_am.pass4 = $(eval $(foreach d,$(_am.sys2dirs)  ,$(call _am.per_directory,$d)$(at.nl)))
-define _am.per_directory
-$$(DESTDIR)$1/%: $$(outdir)/%
-	@$$(NORMAL_INSTALL)
-	$$(am.INSTALL)
-$$(DESTDIR)$1/%: $$(srcdir)/%
-	@$$(NORMAL_INSTALL)
-	$$(am.INSTALL)
+define _am.pass4
+# == Pass 4: LTLIBRARIES ==
+$(foreach _am.file,$(am.out_LTLIBRARIES),
+  $(eval _am.var = $(call _am.file2var,$(_am.file)))
+  ## LTLIBRARY: $(_am.file) ($(_am.var))
+  $(foreach var,_am.depends $(_am.var_LTLIBRARIES),
+    $(var) ?=)
+
+  _am.depends += $$(call at.path,$$(call _am.file2.lo,$(_am.file)) $$(call _am.file2lib,$(_am.file),LIBADD))
+  am.CPPFLAGS +=                 $$($(_am.var)_CPPFLAGS)           $$(call _am.file2cpp,$(_am.file),LIBADD)
+  am.CFLAGS   +=                 $$($(_am.var)_CFLAGS)
+  $$(outdir)/$(_am.file): private am.LDFLAGS := $$($(_am.var)_LDFLAGS)
+  $$(outdir)/$(_am.file): $$(_am.depends)
+  $$(outdir)/install: $$(addsuffix install,$$(dir $$(filter %.la,$$(_am.depends))))
+  am.subdirs := $$(sort $$(am.subdirs)\
+                        $$(filter-out $$(abspath $$(srcdir)),\
+                                      $$(abspath $$(dir $$(filter-out -l% /%,$$(_am.depends))))))
+
+  am.CPPFLAGS := $$(am.CPPFLAGS)
+  am.CFLAGS := $$(am.CFLAGS)
+  $(foreach var,_am.depends $(_am.var_LTLIBRARIES),
+    undefine $(var)))
 endef
 
 mod.am.depends += files
@@ -278,9 +326,11 @@ define _am.pass5.doc
 #   - Directory variable : `files.out.all`
 #   - Directory variable : `files.out.check`
 endef
-define _am.pass5
+_am.pass5 = $(value _am.pass5_)
+define _am.pass5_
+# == Pass 4: export ==
 at.subdirs += $(am.subdirs)
-files.sys.all += $(foreach p,$(_am.primaries),$(am.sys_$p))
+files.out.check += $(foreach p,$(_am.primaries),$(am.chk_$p))
 files.out.all += $(foreach p,$(_am.primaries),$(am.out_$p))
-files.out.check += $(foreach p,$(_am.primaries),$(am.check_$p))
+files.sys.all += $(foreach p,$(_am.primaries),$(am.sys_$p))
 endef

@@ -1,6 +1,12 @@
-$(eval $(value _am.pass0))
-$(eval $(value _am.pass1))
-$(eval $(value _am.pass2))
-$(eval $(value _am.pass3))
-$(eval $(value _am.pass4))
-$(eval $(value _am.pass5))
+$(file >$(outdir)/.am.0.mk,$(_am.pass0))
+include $(outdir)/.am.0.mk
+$(file >$(outdir)/.am.1.mk,$(_am.pass1))
+include $(outdir)/.am.1.mk
+$(file >$(outdir)/.am.2.mk,$(_am.pass2))
+include $(outdir)/.am.2.mk
+$(file >$(outdir)/.am.3.mk,$(_am.pass3))
+include $(outdir)/.am.3.mk
+$(file >$(outdir)/.am.4.mk,$(_am.pass4))
+include $(outdir)/.am.4.mk
+$(file >$(outdir)/.am.5.mk,$(_am.pass5))
+include $(outdir)/.am.5.mk

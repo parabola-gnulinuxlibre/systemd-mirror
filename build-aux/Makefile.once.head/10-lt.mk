@@ -26,7 +26,7 @@ define mod.lt.doc
 #
 # So, our workaround: don't pass any .la libraries to libtool/ld when
 # linking a convenience library, but then run a post-libtool command to
-# insert them into the .la file's dependency_libs. This uses the
+# insert them into the .la file's dependency_libs.  This uses the
 # emptiness of lt.lib.rpath to determine if a library is a static
 # convenience library or not.
 endef

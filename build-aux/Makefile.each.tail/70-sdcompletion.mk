@@ -20,4 +20,4 @@ bashcompletion_DATA ?=
 zshcompletion_DATA ?=
 # We use `dist_` to trick `am` into not putting it in `am.out_DATA`
 dist_bashcompletion_DATA := $(sort $(bashcompletion_DATA) $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS))
-dist_zshcompletion_DATA := $(sort $(zshcompletion_DATA) $(addprefix _,$(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS)))
+dist_zshcompletion_DATA := $(sort $(zshcompletion_DATA) $(addprefix _,$(notdir $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS))))

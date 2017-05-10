@@ -22,20 +22,27 @@ define mod.amcfg.doc
 endef
 mod.amcfg.doc := $(value mod.amcfg.doc)
 
-am.sys2out_DATA = \
-        $(notdir \
-        $(patsubst $(pamconfdir)/%,%.pam,\
-        $(patsubst $(tmpfilesdir)/%.conf,%.tmpfiles,\
-        $(patsubst $(sysusersdir)/%.conf,%.sysusers,\
-        $(patsubst $(sysctldir)/%.conf,%.sysctl,\
-        $(patsubst $(bashcompletiondir)/%,%.completion.bash,\
-        $(patsubst $(zshcompletiondir)/_%,%.completion.zsh,\
-        $1)))))))
-am.sys2out_SCRIPTS = \
-        $(notdir \
-        $(patsubst $(xinitrcdir)/%.sh,%.xinitrc,\
-        $1))
-am.sys2out_HEADERS = $(abspath $(addprefix $(srcdir)/include/,$(notdir $1)))
+am.outpat_pamconf_DATA = %.pam
+
+am.outpat_tmpfiles_DATA = %.tmpfiles
+am.syspat_tmpfiles_DATA = %.conf
+
+am.outpat_sysusers_DATA = %.sysusers
+am.syspat_sysusers_DATA = %.conf
+
+am.outpat_sysctl_DATA = %.sysctl
+am.syspat_sysctl_DATA = %.conf
+
+am.outpat_bashcompletion_DATA = %.completion.bash
+
+am.outpat_zshcompletion_DATA = %.completion.zsh
+am.syspat_zshcompletion_DATA = _%
+
+am.outpat_xinitrc_SCRIPTS = %.xinitrc
+am.syspat_xinitrc_SCRIPTS = %.sh
+
+am.outpat_include_HEADERS = $(abspath $(srcdir)/include)/%.h
+am.syspat_include_HEADERS = %.h
 
 V ?=
 

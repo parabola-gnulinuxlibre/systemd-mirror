@@ -88,7 +88,7 @@ $(outdir)/%.c: $(srcdir)/%.gperf
 $(outdir)/%.c: $(outdir)/%.gperf
 	$(AM_V_GPERF)$(GPERF) < $< > $@
 
-$(outdir)/%: $(srcdir)/%.m4 $(top_builddir)/config.status
+$(addprefix $(outdir)/,_bogus_m4 $(patsubst %.m4,%,$(filter %.m4,$(files.src)))): $(outdir)/%: $(srcdir)/%.m4 $(top_builddir)/config.status
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@
-$(outdir)/%: $(outdir)/%.m4 $(top_builddir)/config.status
+$(addprefix $(outdir)/,_bogus_m4_in $(patsubst %.m4.in,%,$(filter %.m4.in,$(files.src)))): $(outdir)/%: $(outdir)/%.m4 $(top_builddir)/config.status
 	$(AM_V_M4)$(M4) -P $(M4_DEFINES) < $< > $@

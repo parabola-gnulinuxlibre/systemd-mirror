@@ -26,9 +26,9 @@ _sd.autogen_files = aclocal.m4 automake.mk.in config.h.in configure po/Makefile.
 $(addprefix %/,$(_sd.autogen_files)): %/configure.ac %/autogen.sh
 	cd $(topsrcdir) && ./autogen.sh
 
-config_files = config.mk automake.mk autoconf.mk gnustandards.mk po/Makefile.in
-config_headers = config.h
-config_commands = depfiles libtool po/stamp-it
+config_files = config.mk automake.mk po/Makefile.in # AC_CONFIG_FILES
+config_headers = config.h # AC_CONFIG_HEADERS
+config_commands = libtool po/stamp-it
 $(topoutdir)/config.status: $(topsrcdir)/configure
 	cd $(topoutdir) && ./config.status --recheck
 $(addprefix $(topoutdir)/,$(config_files)): $(topoutdir)/%: $(topoutdir)/config.status $(topsrcdir)/%.in

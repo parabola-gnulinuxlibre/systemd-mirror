@@ -103,6 +103,7 @@ test_libsystemd_sym_LDADD = \
 
 $(DESTDIR)$(pkgincludedir)/%.h: $(srcdir)/include/systemd/%.h
 	@$(NORMAL_INSTALL)
+	@$(MKDIR_P) $(@D)
 	$(am.INSTALL_HEADERS)
 
 files.sys.all += $(addprefix $(pkgincludedir)/,$(notdir $(_pkginclude_HEADERS)))
