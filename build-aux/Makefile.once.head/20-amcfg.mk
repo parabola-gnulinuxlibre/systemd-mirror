@@ -41,7 +41,7 @@ am.syspat_zshcompletion_DATA = _%
 am.outpat_xinitrc_SCRIPTS = %.xinitrc
 am.syspat_xinitrc_SCRIPTS = %.sh
 
-am.outpat_include_HEADERS = $(abspath $(srcdir)/include)/%.h
+am.outpat_include_HEADERS = include/%.h
 am.syspat_include_HEADERS = %.h
 
 V ?=

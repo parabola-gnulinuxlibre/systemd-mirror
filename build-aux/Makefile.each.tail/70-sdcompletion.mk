@@ -17,10 +17,18 @@ rootbin_PROGRAMS ?=
 bin_PROGRAMS ?=
 dist_bin_SCRIPTS ?=
 
-_bashcompletion_DATA := $(sort $(bashcompletion_DATA) $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS))
-dist_bashcompletion_DATA   += $(filter     $(files.src),$(_bashcompletion_DATA))
-nodist_bashcompletion_DATA += $(filter-out $(files.src),$(_bashcompletion_DATA))
+_pf = $(patsubst $1,$2,$(filter $1,$3))
 
-_zshcompletion_DATA := $(sort $(zshcompletion_DATA) $(addprefix _,$(notdir $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS))))
-dist_zshcompletion_DATA   += $(filter     $(files.src),$(_zshcompletion_DATA))
-nodist_zshcompletion_DATA += $(filter-out $(files.src),$(_zshcompletion_DATA))
+dist_bashcompletion_DATA ?=
+nodist_bashcompletion_DATA ?=
+_bashcompletion_DATA := $(notdir $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS))
+dist_bashcompletion_DATA   := $(sort   $(dist_bashcompletion_DATA) $(filter     $(call _pf,%.completion.bash,%,$(files.src)),$(_bashcompletion_DATA)))
+nodist_bashcompletion_DATA := $(sort $(nodist_bashcompletion_DATA) $(filter-out $(call _pf,%.completion.bash,%,$(files.src)),$(_bashcompletion_DATA)))
+undefine _bashcompletion_DATA
+
+dist_zshcompletion_DATA ?=
+nodist_zshcompletion_DATA ?=
+_zshcompletion_DATA := $(addprefix _,$(notdir $(rootbin_PROGRAMS) $(bin_PROGRAMS) $(dist_bin_SCRIPTS)))
+dist_zshcompletion_DATA   := $(sort   $(dist_zshcompletion_DATA) $(filter     $(call _pf,%.completion.zsh,_%,$(files.src)),$(_zshcompletion_DATA)))
+nodist_zshcompletion_DATA := $(sort $(nodist_zshcompletion_DATA) $(filter-out $(call _pf,%.completion.zsh,_%,$(files.src)),$(_zshcompletion_DATA)))
+undefine _zshcompletion_DATA
