@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "strv.h"
-#include "time-util.h"
-#include "random-util.h"
+#include "systemd-basic/random-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/time-util.h"
 
 static void test_parse_sec(void) {
         usec_t u;

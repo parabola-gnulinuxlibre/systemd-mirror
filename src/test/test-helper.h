@@ -19,9 +19,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sd-daemon.h"
+#include <systemd/sd-daemon.h>
 
-#include "macro.h"
+#include "systemd-basic/macro.h"
 
 #define TEST_REQ_RUNNING_SYSTEMD(x)                                 \
         if (sd_booted() > 0) {                                      \
