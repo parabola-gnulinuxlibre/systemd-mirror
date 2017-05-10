@@ -23,6 +23,11 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))/../../../config.mk
 include $(topsrcdir)/build-aux/Makefile.head.mk
 
+ifneq ($(ENABLE_TMPFILES),)
+dist_tmpfiles_DATA += \
+	tmpfiles.d/systemd-remote.conf
+endif # ENABLE_TMPFILES
+
 nested.subdirs += libsystemd-microhttpd
 nested.subdirs += systemd-journal-gatewayd
 nested.subdirs += systemd-journal-remote

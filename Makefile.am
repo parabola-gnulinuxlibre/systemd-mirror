@@ -4257,7 +4257,7 @@ systemd_journal_remote_CFLAGS = \
 systemd_journal_remote_LDADD += \
 	$(MICROHTTPD_LIBS)
 
-#@src/grp-journal/grp-remote/Makfile
+#@src/grp-journal/grp-remote/Makefile
 if ENABLE_TMPFILES
 dist_tmpfiles_DATA += \
 	tmpfiles.d/systemd-remote.conf
