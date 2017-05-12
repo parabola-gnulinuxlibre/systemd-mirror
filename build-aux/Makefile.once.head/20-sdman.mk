@@ -67,6 +67,11 @@ AM_V_LN_ ?= $(AM_V_LN_$(AM_DEFAULT_VERBOSITY))
 AM_V_LN_0 ?= @echo "  LN      " $@;
 AM_V_LN_1 ?=
 
+AM_V_SOELIM ?= $(AM_V_SOELIM_$(V))
+AM_V_SOELIM_ ?= $(AM_V_SOELIM_$(AM_DEFAULT_VERBOSITY))
+AM_V_SOELIM_0 ?= @echo "  SOELIM  " $@;
+AM_V_SOELIM_1 ?=
+
 AM_V_XSLT ?= $(AM_V_XSLT_$(V))
 AM_V_XSLT_ ?= $(AM_V_XSLT_$(AM_DEFAULT_VERBOSITY))
 AM_V_XSLT_0 ?= @echo "  XSLT    " $@;
@@ -89,5 +94,14 @@ _sdman.XSLTPROC_PROCESS_MAN = \
 _sdman.XSLTPROC_PROCESS_HTML = \
 	$(AM_V_XSLT)$(_sdman.XSLT) -o $@ $(_sdman.XSLTPROC_FLAGS) $(srcdir)/man/custom-html.xsl $<
 
+# Because the docbooc-xsl authors are assholes, they ignore everything but the
+# directory of '-o' and instead choose filenames in it based on <refname>
+# elements, with no option to override that from the command line.  This is a
+# nice feature, until we have to rectify it with Make's poor support for
+# commands with multiple outputs.  So, we'll let it do its thing, but have a
+# rule for manually re-creating an alias without re-running xsltproc in case it
+# gets removed.
+sdman.man-alias = \
+	$(AM_V_LN)$(PRINTF) '.so %s\n' $(<F) > $@
 sdman.html-alias = \
-	$(AM_V_LN)$(LN_S) -f $(notdir $<) $@
+	$(AM_V_LN)$(LN_S) -f $(<F) $@

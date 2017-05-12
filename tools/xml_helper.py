@@ -18,11 +18,17 @@
 #  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 
 from lxml import etree as tree
+import os.path
 
 class CustomResolver(tree.Resolver):
     def resolve(self, url, id, context):
-        if 'custom-entities.ent' in url:
-            return self.resolve_filename('man/custom-entities.ent', context)
+        if not os.path.exists(url):
+            srcdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            basename = os.path.basename(url)
+            if basename == 'custom-entities.ent':
+                basename = 'custom-entities.ent.in'
+            url = os.path.join(srcdir, 'man', basename)
+        return self.resolve_filename(url, context)
 
 _parser = tree.XMLParser()
 _parser.resolvers.add(CustomResolver())

@@ -45,10 +45,10 @@
   </refmeta>
 
   <refnamediv>
+    <refname>systemd-sleep</refname>
     <refname>systemd-suspend.service</refname>
     <refname>systemd-hibernate.service</refname>
     <refname>systemd-hybrid-sleep.service</refname>
-    <refname>systemd-sleep</refname>
     <refpurpose>System sleep state logic</refpurpose>
   </refnamediv>
 

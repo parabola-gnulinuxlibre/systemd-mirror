@@ -26,12 +26,12 @@ _sdman.man_xml = $(foreach _sdman.tmp,$(filter %.xml,$(files.src.src)),$(if $(fi
 ifneq ($(_sdman.man_xml),)
 
 $(srcdir)/Makefile-man.mk: $(topsrcdir)/tools/make-man-rules.py $(topsrcdir)/tools/xml_helper.py $(topsrcdir)/man/custom-entities.ent.in $(outdir)/.var._sdman.man_xml $(call at.addprefix,$(srcdir),$(_sdman.man_xml))
-	$(AM_V_GEN)$(PYTHON) $< $(filter %.xml,$^) | $(WRITE_ATOMIC) $@
+	$(AM_V_GEN)$< $(filter %.xml,$^) | $(WRITE_ATOMIC) $@
 files.src.gen += Makefile-man.mk
 
 sdman.MANPAGES =
 sdman.MANPAGES_ALIAS =
-#-include $(srcdir)/Makefile-man.mk
+-include $(srcdir)/Makefile-man.mk
 
 _sdman.XML_FILES = \
 	${patsubst %.1,%.xml,${patsubst %.3,%.xml,${patsubst %.5,%.xml,${patsubst %.7,%.xml,${patsubst %.8,%.xml,$(sdman.MANPAGES)}}}}}

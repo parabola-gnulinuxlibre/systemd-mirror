@@ -43,11 +43,11 @@
   </refmeta>
 
   <refnamediv>
+    <refname>systemd-shutdown</refname>
     <refname>systemd-halt.service</refname>
     <refname>systemd-poweroff.service</refname>
     <refname>systemd-reboot.service</refname>
     <refname>systemd-kexec.service</refname>
-    <refname>systemd-shutdown</refname>
     <refpurpose>System shutdown logic</refpurpose>
   </refnamediv>
 

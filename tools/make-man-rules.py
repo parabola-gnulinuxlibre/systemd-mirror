@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #  -*- Mode: python; coding: utf-8; indent-tabs-mode: nil -*- */
 #
 #  This file is part of systemd.
@@ -52,8 +53,13 @@ HEADER = '''\
 # to <refentry> element.
 '''
 
+MAN_ALIAS_RULE = '''\
+$(outdir)/{}: $(outdir)/{}
+	$(sdman.man-alias)
+'''
+
 HTML_ALIAS_RULE = '''\
-{}.html: {}.html
+$(outdir)/{}.html: $(outdir)/{}.html
 	$(sdman.html-alias)
 '''
 
@@ -66,10 +72,10 @@ EXTRA_DIST += \\
 '''
 
 def man(page, number):
-    return 'man/{}.{}'.format(page, number)
+    return '{}.{}'.format(page, number)
 
 def xml(file):
-    return 'man/{}'.format(os.path.basename(file))
+    return '{}'.format(os.path.basename(file))
 
 def add_rules(rules, name):
     xml = xml_parse(name)
@@ -111,7 +117,7 @@ def make_makefile(rules, dist_files):
         (CONDITIONAL if conditional else SECTION).format(
             manpages=mjoin(set(rulegroup.values())),
             aliases=mjoin(k for k,v in rulegroup.items() if k != v),
-            rules='\n'.join('{}: {}'.format(k,v)
+            rules='\n'.join(MAN_ALIAS_RULE.format(k,v)
                             for k,v in sorted(rulegroup.items())
                             if k != v),
             htmlrules='\n'.join(HTML_ALIAS_RULE.format(k[:-2],v[:-2])
