@@ -22,6 +22,8 @@ import os.path
 
 class CustomResolver(tree.Resolver):
     def resolve(self, url, id, context):
+        if ':' in url:
+            return None
         if not os.path.exists(url):
             srcdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             basename = os.path.basename(url)
