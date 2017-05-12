@@ -31,11 +31,17 @@ class CustomResolver(tree.Resolver):
         basename = os.path.basename(url)
         if not basename in shared:
             return None
-        if basename == 'custom-entities.ent':
-            basename += '.in'
+
         topsrcdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        _deps.add(os.path.join('$(topsrcdir)', 'man', basename))
-        return self.resolve_filename(os.path.join(topsrcdir, 'man', basename), context)
+
+        makename = os.path.join('$(topsrcdir)', 'man', basename)
+        lxmlname = os.path.join(topsrcdir, 'man', basename)
+        if basename == 'custom-entities.ent':
+            makename = os.path.join('$(topoutdir)', 'man', basename)
+            lxmlname += '.in'
+
+        _deps.add(makename)
+        return self.resolve_filename(lxmlname, context)
 
 _parser = tree.XMLParser()
 _parser.resolvers.add(CustomResolver())
