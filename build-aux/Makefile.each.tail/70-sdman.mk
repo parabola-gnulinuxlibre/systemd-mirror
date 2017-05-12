@@ -52,22 +52,4 @@ endif # ENABLE_MANPAGES
 
 at.subdirs += $(abspath $(topoutdir)/man)
 
-$(outdir)/%.1: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
-	$(_sdman.XSLTPROC_PROCESS_MAN)
-
-$(outdir)/%.3: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
-	$(_sdman.XSLTPROC_PROCESS_MAN)
-
-$(outdir)/%.5: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
-	$(_sdman.XSLTPROC_PROCESS_MAN)
-
-$(outdir)/%.7: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
-	$(_sdman.XSLTPROC_PROCESS_MAN)
-
-$(outdir)/%.8: $(srcdir)/%.xml $(topsrcdir)/man/custom-man.xsl $(topoutdir)/man/custom-entities.ent
-	$(_sdman.XSLTPROC_PROCESS_MAN)
-
-$(outdir)/%.html: $(srcdir)/%.xml $(topsrcdir)/man/custom-html.xsl $(topoutdir)/man/custom-entities.ent
-	$(_sdman.XSLTPROC_PROCESS_HTML)
-
 endif # _sdman.man_xml

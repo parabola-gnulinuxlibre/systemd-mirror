@@ -78,7 +78,7 @@ def check_id(page, t):
 def make_index(pages):
     index = collections.defaultdict(list)
     for p in pages:
-        t = xml_parse(p)
+        t, _ = xml_parse(p)
         check_id(p, t)
         section = t.find('./refmeta/manvolnum').text
         refname = t.find('./refnamediv/refname').text

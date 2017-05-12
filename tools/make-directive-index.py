@@ -180,7 +180,7 @@ referring to {pages} individual manual pages.
 '''
 
 def _extract_directives(directive_groups, formatting, page):
-    t = xml_parse(page)
+    t, _ = xml_parse(page)
     section = t.find('./refmeta/manvolnum').text
     pagename = t.find('./refmeta/refentrytitle').text
 

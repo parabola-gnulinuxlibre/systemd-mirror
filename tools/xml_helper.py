@@ -20,23 +20,30 @@
 from lxml import etree as tree
 import os.path
 
+shared = { 'custom-entities.ent',
+           'less-variables.xml',
+           'standard-conf.xml',
+           'standard-options.xml',
+           'user-system-options.xml' }
+
 class CustomResolver(tree.Resolver):
     def resolve(self, url, id, context):
-        if ':' in url:
+        basename = os.path.basename(url)
+        if not basename in shared:
             return None
-        if not os.path.exists(url):
-            srcdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            basename = os.path.basename(url)
-            if basename == 'custom-entities.ent':
-                basename = 'custom-entities.ent.in'
-            url = os.path.join(srcdir, 'man', basename)
-        return self.resolve_filename(url, context)
+        if basename == 'custom-entities.ent':
+            basename += '.in'
+        topsrcdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        _deps.add(os.path.join('$(topsrcdir)', 'man', basename))
+        return self.resolve_filename(os.path.join(topsrcdir, 'man', basename), context)
 
 _parser = tree.XMLParser()
 _parser.resolvers.add(CustomResolver())
+_deps = set()
 def xml_parse(page):
+    _deps.clear()
     doc = tree.parse(page, _parser)
     doc.xinclude()
-    return doc
+    return doc, _deps
 def xml_print(xml):
     return tree.tostring(xml, pretty_print=True, encoding='utf-8')
