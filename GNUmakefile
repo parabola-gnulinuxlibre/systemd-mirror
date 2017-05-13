@@ -11,3 +11,4 @@ $(target):
 	@+$(MAKE) -f Makefile --no-builtin-rules --no-builtin-variables --warn-undefined-variables $(MAKECMDGOALS)
 $(or $(call rest,$(MAKECMDGOALS)),_$(target)): $(target)
 	@:
+.PHONY: $(sort $(target) _$(target) $(MAKECMDGOALS))
