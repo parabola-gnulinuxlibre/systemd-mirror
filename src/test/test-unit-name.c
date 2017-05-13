@@ -24,20 +24,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "alloc-util.h"
-#include "glob-util.h"
-#include "hostname-util.h"
-#include "macro.h"
-#include "manager.h"
-#include "path-util.h"
-#include "specifier.h"
-#include "string-util.h"
-#include "test-helper.h"
-#include "unit-name.h"
+#include "core/manager.h"
+#include "core/unit.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/glob-util.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/unit-name.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/specifier.h"
 #include "unit-printf.h"
-#include "unit.h"
-#include "user-util.h"
-#include "util.h"
+
+#include "test-helper.h"
 
 static void test_unit_name_is_valid(void) {
         assert_se(unit_name_is_valid("foo.service", UNIT_NAME_ANY));

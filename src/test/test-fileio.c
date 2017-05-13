@@ -17,22 +17,22 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <ctype.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "ctype.h"
-#include "def.h"
-#include "env-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "io-util.h"
-#include "parse-util.h"
-#include "process-util.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/env-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/io-util.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/process-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
 
 static void test_parse_env_file(void) {
         char    t[] = "/tmp/test-fileio-in-XXXXXX",

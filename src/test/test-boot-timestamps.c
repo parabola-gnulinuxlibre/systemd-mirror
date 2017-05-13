@@ -18,11 +18,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "acpi-fpdt.h"
-#include "boot-timestamps.h"
-#include "efivars.h"
-#include "log.h"
-#include "util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/acpi-fpdt.h"
+#include "systemd-shared/boot-timestamps.h"
+#include "systemd-shared/efivars.h"
 
 static int test_acpi_fpdt(void) {
         usec_t loader_start;

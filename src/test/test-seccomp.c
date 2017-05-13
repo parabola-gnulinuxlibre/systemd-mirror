@@ -21,12 +21,12 @@
 #include <sys/eventfd.h>
 #include <unistd.h>
 
-#include "fd-util.h"
-#include "macro.h"
-#include "process-util.h"
-#include "seccomp-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/process-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/seccomp-util.h"
 
 static void test_seccomp_arch_to_string(void) {
         uint32_t a, b;

@@ -19,16 +19,16 @@
 
 #include <string.h>
 
-#include "sd-daemon.h"
-#include "sd-id128.h"
+#include <systemd/sd-daemon.h>
+#include <systemd/sd-id128.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "id128-util.h"
-#include "macro.h"
-#include "string-util.h"
-#include "util.h"
+#include "sd-id128/id128-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 #define ID128_WALDI SD_ID128_MAKE(01, 02, 03, 04, 05, 06, 07, 08, 09, 0a, 0b, 0c, 0d, 0e, 0f, 10)
 #define STR_WALDI "0102030405060708090a0b0c0d0e0f10"
