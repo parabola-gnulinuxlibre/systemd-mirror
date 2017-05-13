@@ -45,6 +45,7 @@ nested.subdirs += libsystemd-gcrypt
 nested.subdirs += libsystemd-network
 nested.subdirs += libsystemd-shared
 nested.subdirs += libudev
+nested.subdirs += manpages
 nested.subdirs += nss-myhostname
 nested.subdirs += nss-systemd
 nested.subdirs += systemd-ask-password
