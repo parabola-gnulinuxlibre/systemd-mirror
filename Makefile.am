@@ -6893,6 +6893,7 @@ sd.CPPFLAGS += $(libsystemd-network.CPPFLAGS)
 #@src/libsystemd-gcrypt/src/Makefile
 #@src/libsystemd/src/sd-bus/Makefile
 #@src/libsystemd/src/sd-hwdb/Makefile
+#@src/manpages/Makefile
 #@all
 
 include $(topsrcdir)/build-aux/Makefile.tail.mk
