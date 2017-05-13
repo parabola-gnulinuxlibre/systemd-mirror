@@ -83,6 +83,9 @@ endif
 #	$(SED_PROCESS)
 #	$(AM_V_GEN)chmod +x $@
 
+$(addprefix $(DESTDIR),$(INSTALL_DIRS)): %:
+	mkdir -p -- $@
+
 $(outdir)/%.c: $(srcdir)/%.gperf
 	$(AM_V_GPERF)$(GPERF) < $< > $@
 $(outdir)/%.c: $(outdir)/%.gperf
