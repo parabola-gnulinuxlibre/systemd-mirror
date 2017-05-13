@@ -50,6 +50,6 @@ def xml_parse(page):
     _deps.clear()
     doc = tree.parse(page, _parser)
     doc.xinclude()
-    return doc, _deps
+    return doc, _deps.copy()
 def xml_print(xml):
     return tree.tostring(xml, pretty_print=True, encoding='utf-8')
