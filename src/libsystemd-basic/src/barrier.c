@@ -33,11 +33,13 @@
 
 /**
  * Barriers
+ *
  * This barrier implementation provides a simple synchronization method based
  * on file-descriptors that can safely be used between threads and processes. A
  * barrier object contains 2 shared counters based on eventfd. Both processes
  * can now place barriers and wait for the other end to reach a random or
  * specific barrier.
+ *
  * Barriers are numbered, so you can either wait for the other end to reach any
  * barrier or the last barrier that you placed. This way, you can use barriers
  * for one-way *and* full synchronization. Note that even-though barriers are
@@ -56,6 +58,7 @@
  * barriers that are linked to a barrier we already placed. If the other side
  * already placed more barriers than we did, barrier_sync_next() returns
  * immediately.
+ *
  * barrier_sync() extends barrier_sync_next() and waits until the other end
  * placed as many barriers via barrier_place() as we did. If they already placed
  * as many as we did (or more), it returns immediately.
@@ -67,6 +70,7 @@
  * return false on both sides (otherwise, they always return true).
  * barrier_abort() can be called multiple times on both ends and will be a
  * no-op if already called on this side.
+ *
  * barrier_wait_abortion() can be used to wait for the other side to call
  * barrier_abort() and is the only wait/sync call that does not return
  * immediately if we aborted outself. It only returns once the other side
