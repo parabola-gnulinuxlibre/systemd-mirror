@@ -25,6 +25,8 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 
 rootlibexec_PROGRAMS += systemd
 systemd_SOURCES = \
+	src/core/machine-id-setup.c \
+	src/core/machine-id-setup.h \
 	src/core/main.c
 
 systemd_CFLAGS = \

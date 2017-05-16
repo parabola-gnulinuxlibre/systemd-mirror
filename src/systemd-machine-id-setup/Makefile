@@ -25,11 +25,12 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 
 rootbin_PROGRAMS += systemd-machine-id-setup
 systemd_machine_id_setup_SOURCES = \
+	src/core/machine-id-setup.c \
+	src/core/machine-id-setup.h \
 	src/machine-id-setup/machine-id-setup-main.c
 
 systemd_machine_id_setup_LDADD = \
-	libsystemd-basic.la \
-	libcore.la 
+	libsystemd-internal.la
 
 SYSINIT_TARGET_WANTS += \
 	systemd-machine-id-commit.service

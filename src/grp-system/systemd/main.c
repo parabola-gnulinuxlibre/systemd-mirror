@@ -47,7 +47,6 @@
 #include "core/loopback-setup.h"
 #include "core/manager.h"
 #include "core/mount-setup.h"
-#include "machine-id-setup.h"
 #include "sd-bus/bus-error.h"
 #include "sd-bus/bus-util.h"
 #include "systemd-basic/alloc-util.h"
@@ -90,6 +89,8 @@
 #include "systemd-basic/virt.h"
 #include "systemd-shared/switch-root.h"
 #include "systemd-shared/watchdog.h"
+
+#include "machine-id-setup.h"
 
 static enum {
         ACTION_RUN,

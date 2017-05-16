@@ -125,8 +125,6 @@ libcore_la_SOURCES = \
 	src/core/locale-setup.c \
 	src/core/hostname-setup.c \
 	src/core/hostname-setup.h \
-	src/core/machine-id-setup.c \
-	src/core/machine-id-setup.h \
 	src/core/mount-setup.c \
 	src/core/mount-setup.h \
 	src/core/kmod-setup.c \
