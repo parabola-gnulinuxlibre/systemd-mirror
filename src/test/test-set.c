@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "set.h"
+#include "systemd-basic/set.h"
 
 static void test_set_steal_first(void) {
         _cleanup_set_free_ Set *m = NULL;

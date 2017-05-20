@@ -19,13 +19,13 @@
 
 #include <sys/stat.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "log.h"
-#include "selinux-util.h"
-#include "string-util.h"
-#include "time-util.h"
-#include "util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/selinux-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/time-util.h"
+#include "systemd-basic/util.h"
 
 static void test_testing(void) {
         bool b;
