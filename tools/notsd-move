@@ -124,6 +124,8 @@ move_files() (
 	mv -t src/systemd-shutdown \
 	   src/core/shutdown* \
 	   src/core/umount*
+	mv -t src/systemd-machine-id-setup \
+	   src/core/machine-id-setup*
 	mv -T src/{,lib}core
 
 	mv -T src/{,libsystemd-}basic
