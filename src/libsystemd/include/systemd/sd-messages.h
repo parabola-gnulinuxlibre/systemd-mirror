@@ -21,7 +21,7 @@
 ***/
 
 #include "_sd-common.h"
-#include "sd-id128.h"
+#include "sd-id128-static.h"
 
 _SD_BEGIN_DECLARATIONS;
 

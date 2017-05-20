@@ -27,6 +27,8 @@
 
 #include <linux/fs.h>
 
+#include <systemd/sd-id128.h>
+
 #include "core/loopback-setup.h"
 #include "core/namespace.h"
 #include "systemd-basic/alloc-util.h"

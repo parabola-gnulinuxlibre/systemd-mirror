@@ -33,8 +33,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <systemd/sd-messages.h>
-
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/fd-util.h"
 #include "systemd-basic/formats-util.h"
@@ -45,6 +43,7 @@
 #include "systemd-basic/parse-util.h"
 #include "systemd-basic/proc-cmdline.h"
 #include "systemd-basic/process-util.h"
+#include "systemd-basic/sd-messages.h"
 #include "systemd-basic/signal-util.h"
 #include "systemd-basic/socket-util.h"
 #include "systemd-basic/stdio-util.h"

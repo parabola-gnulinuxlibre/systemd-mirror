@@ -22,6 +22,8 @@
 
 #include <linux/if.h>
 
+#include <systemd/sd-id128.h>
+
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/ether-addr-util.h"
 #include "systemd-basic/hexdecoct.h"

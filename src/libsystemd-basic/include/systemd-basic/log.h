@@ -27,9 +27,8 @@
 #include <sys/socket.h>
 #include <syslog.h>
 
-#include <systemd/sd-id128.h>
-
 #include "macro.h"
+#include "sd-id128-static.h"
 
 typedef enum LogTarget{
         LOG_TARGET_CONSOLE,

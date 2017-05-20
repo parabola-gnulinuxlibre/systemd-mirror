@@ -23,8 +23,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 
-#include <systemd/sd-id128.h>
-
+#include "sd-id128-static.h"
 #include "time-util.h"
 
 typedef struct BtrfsSubvolInfo {

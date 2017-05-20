@@ -22,6 +22,8 @@
 #include <shadow.h>
 #include <unistd.h>
 
+#include <systemd/sd-id128.h>
+
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/copy.h"
 #include "systemd-basic/fd-util.h"

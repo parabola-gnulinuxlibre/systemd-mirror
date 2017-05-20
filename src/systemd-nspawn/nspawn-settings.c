@@ -17,6 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <systemd/sd-id128.h>
+
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/cap-list.h"
 #include "systemd-basic/parse-util.h"
