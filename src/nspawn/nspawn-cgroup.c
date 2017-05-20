@@ -125,11 +125,11 @@ static int chown_cgroup(pid_t pid, uid_t uid_shift) {
 
         r = cg_pid_get_path(NULL, pid, &path);
         if (r < 0)
-                return log_error_errno(r, "Failed to get container cgroup path: %m");
+                return log_error_errno(r, "Failed to get host cgroup of the container: %m");
 
         r = cg_get_path(SYSTEMD_CGROUP_CONTROLLER, path, NULL, &fs);
         if (r < 0)
-                return log_error_errno(r, "Failed to get file system path for container cgroup: %m");
+                return log_error_errno(r, "Failed to get host file system path for container cgroup: %m");
 
         r = chown_cgroup_path(fs, uid_shift);
         if (r < 0)
@@ -142,12 +142,14 @@ static int sync_cgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner
         _cleanup_free_ char *cgroup = NULL;
         char mountpoint[] = "/tmp/containerXXXXXX", pid_string[DECIMAL_STR_MAX(pid) + 1];
         bool undo_mount = false;
-        const char *fn;
+        const char *fn, *inner_hier;
         int r;
+
+#define LOG_PFIX "PID " PID_FMT ": sync host cgroup -> container cgroup"
 
         unified = cg_unified(SYSTEMD_CGROUP_CONTROLLER);
         if (unified < 0)
-                return log_error_errno(unified, "Failed to determine whether the unified hierarchy is used: %m");
+                return log_error_errno(unified, LOG_PFIX ": failed to determine host cgroup version: %m", pid);
 
         if ((outer_cgver >= CGROUP_UNIFIED_SYSTEMD) == (inner_cgver >= CGROUP_UNIFIED_SYSTEMD))
                 return 0;
@@ -159,20 +161,27 @@ static int sync_cgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner
 
         r = cg_pid_get_path(SYSTEMD_CGROUP_CONTROLLER, pid, &cgroup);
         if (r < 0)
-                return log_error_errno(r, "Failed to get control group of " PID_FMT ": %m", pid);
+                return log_error_errno(r, LOG_PFIX ": failed to determine host cgroup: %m", pid);
 
         /* In order to access the container's hierarchy we need to mount it */
         if (!mkdtemp(mountpoint))
-                return log_error_errno(errno, "Failed to generate temporary mount point for container hierarchy: %m");
+                return log_error_errno(errno, LOG_PFIX ": failed to create temporary mount point for container cgroup hierarchy: %m", pid);
 
         if (outer_cgver >= CGROUP_UNIFIED_SYSTEMD) {
+                /* host: v2 ; container: v1 */
+                inner_hier = "?:name=systemd";
                 r = mount_verbose(LOG_ERR, "cgroup", mountpoint, "cgroup",
                                   MS_NOSUID|MS_NOEXEC|MS_NODEV, "none,name=systemd,xattr");
-        else
+        } else {
+                /* host: v1 ; container: v2 */
+                inner_hier = "0:";
                 r = mount_verbose(LOG_ERR, "cgroup", mountpoint, "cgroup2",
                                   MS_NOSUID|MS_NOEXEC|MS_NODEV, NULL);
-        if (r < 0)
+        }
+        if (r < 0) {
+                log_error(LOG_PFIX ": failed to mount container cgroup hierarchy", pid);
                 goto finish;
+        }
 
         undo_mount = true;
 
@@ -188,17 +197,20 @@ static int sync_cgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner
         sprintf(pid_string, PID_FMT, pid);
         r = write_string_file(fn, pid_string, 0);
         if (r < 0) {
-                log_error_errno(r, "Failed to move process: %m");
+                log_error_errno(r, LOG_PFIX ": failed to move process to `%s:%s': %m", pid, inner_hier, cgroup);
                 goto finish;
         }
 
         fn = strjoina(mountpoint, cgroup);
         r = chown_cgroup_path(fn, uid_shift);
         if (r < 0)
-                log_error_errno(r, "Failed to chown() cgroup %s: %m", fn);
+                log_error_errno(r, LOG_PFIX ": chown(path=\"%s\", uid=" UID_FMT "): %m", pid, fn, uid_shift);
 finish:
-        if (undo_mount)
-                (void) umount_verbose(mountpoint);
+        if (undo_mount) {
+                r = umount_verbose(mountpoint);
+                if (r < 0)
+                        log_error_errno(r, LOG_PFIX ": umount(\"%s\"): %m", pid, mountpoint);
+        }
 
         (void) rmdir(mountpoint);
         return r;
@@ -221,21 +233,21 @@ static int create_subcgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified 
 
         r = cg_mask_supported(&supported);
         if (r < 0)
-                return log_error_errno(r, "Failed to determine supported controllers: %m");
+                return log_error_errno(r, "Failed to create host subcgroup: Failed to determine supported controllers: %m");
 
         r = cg_pid_get_path(SYSTEMD_CGROUP_CONTROLLER, 0, &cgroup);
         if (r < 0)
-                return log_error_errno(r, "Failed to get our control group: %m");
+                return log_error_errno(r, "Failed to create host subcgroup: Failed to get our control group: %m");
 
         child = strjoina(cgroup, "/payload");
         r = cg_create_and_attach(SYSTEMD_CGROUP_CONTROLLER, child, pid);
         if (r < 0)
-                return log_error_errno(r, "Failed to create %s subcgroup: %m", child);
+                return log_error_errno(r, "Failed to create host subcgroup: Failed to create %s subcgroup: %m", child);
 
         child = strjoina(cgroup, "/supervisor");
         r = cg_create_and_attach(SYSTEMD_CGROUP_CONTROLLER, child, 0);
         if (r < 0)
-                return log_error_errno(r, "Failed to create %s subcgroup: %m", child);
+                return log_error_errno(r, "Failed to create host subcgroup: Failed to create %s subcgroup: %m", child);
 
         /* Try to enable as many controllers as possible for the new payload. */
         (void) cg_enable_everywhere(supported, supported, cgroup);

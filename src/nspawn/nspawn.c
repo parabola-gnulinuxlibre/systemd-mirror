@@ -340,7 +340,7 @@ static int pick_cgroup_version(const char *directory, CGroupUnified outer) {
                  * false negative here for 230. */
                 r = systemd_installation_has_version(directory, 230);
                 if (r < 0)
-                        return log_error_errno(r, "Failed to determine systemd version in container: %m");
+                        return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
                 else
@@ -350,7 +350,7 @@ static int pick_cgroup_version(const char *directory, CGroupUnified outer) {
                 /* Mixed cgroup hierarchy support was added in 232 */
                 r = systemd_installation_has_version(directory, 232);
                 if (r < 0)
-                        return log_error_errno(r, "Failed to determine systemd version in container: %m");
+                        return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD;
                 else
