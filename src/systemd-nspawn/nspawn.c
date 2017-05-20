@@ -326,7 +326,7 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
         if (e) {
                 r = parse_boolean(e);
                 if (r < 0)
-                        return log_error_errno(r, "Failed to parse $UNIFIED_CGROUP_HIERARCHY.");
+                        return log_error_errno(r, "Failed to decide cgroup version to use: Failed to parse $UNIFIED_CGROUP_HIERARCHY.");
                 if (r > 0)
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
                 else
@@ -339,8 +339,7 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
         systemd_unified = cg_unified(SYSTEMD_CGROUP_CONTROLLER);
 
         if (all_unified < 0 || systemd_unified < 0)
-                return log_error_errno(all_unified < 0 ? all_unified : systemd_unified,
-                                       "Failed to determine whether the unified cgroups hierarchy is used: %m");
+                return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine what the host system uses: %m");
 
         /* Otherwise inherit the default from the host system */
         if (all_unified > 0) {
@@ -348,7 +347,7 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                  * routine only detects 231, so we'll have a false negative here for 230. */
                 r = systemd_installation_has_version(directory, 230);
                 if (r < 0)
-                        return log_error_errno(r, "Failed to determine systemd version in container: %m");
+                        return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
                 else
@@ -357,7 +356,7 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                 /* Mixed cgroup hierarchy support was added in 232 */
                 r = systemd_installation_has_version(directory, 232);
                 if (r < 0)
-                        return log_error_errno(r, "Failed to determine systemd version in container: %m");
+                        return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD;
                 else
