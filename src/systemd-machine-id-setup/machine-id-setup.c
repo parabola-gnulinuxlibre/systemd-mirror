@@ -24,7 +24,6 @@
 
 #include <systemd/sd-id128.h>
 
-#include "core/machine-id-setup.h"
 #include "sd-id128/id128-util.h"
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/fd-util.h"
@@ -40,6 +39,8 @@
 #include "systemd-basic/umask-util.h"
 #include "systemd-basic/util.h"
 #include "systemd-basic/virt.h"
+
+#include "machine-id-setup.h"
 
 static int generate_machine_id(const char *root, sd_id128_t *ret) {
         const char *dbus_machine_id;

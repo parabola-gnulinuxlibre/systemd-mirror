@@ -22,10 +22,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "core/machine-id-setup.h"
 #include "systemd-basic/log.h"
 #include "systemd-basic/path-util.h"
 #include "systemd-basic/util.h"
+
+#include "machine-id-setup.h"
 
 static char *arg_root = NULL;
 static bool arg_commit = false;
