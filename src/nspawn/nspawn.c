@@ -332,7 +332,7 @@ static int pick_cgroup_version(const char *directory, CGroupUnified outer_cgver)
                  * to sniff the systemd version) was only added in 231, so we'll have a false negative here for 230. */
                 r = systemd_installation_has_version(directory, 230);
                 if (r < 0)
-                        return log_error_errno(r, "Failed to determine systemd version in container: %m");
+                        return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
                 else
@@ -342,7 +342,7 @@ static int pick_cgroup_version(const char *directory, CGroupUnified outer_cgver)
                 /* systemd v233+ -style mixed cgroup hierarchy */
                 r = systemd_installation_has_version(directory, 233);
                 if (r < 0)
-                        return log_error_errno(r, "Failed to determine systemd version in container: %m");
+                        return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD233;
                 else
