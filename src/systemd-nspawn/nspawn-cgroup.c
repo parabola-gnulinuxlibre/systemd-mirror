@@ -27,6 +27,7 @@
 #include "systemd-basic/rm-rf.h"
 #include "systemd-basic/string-util.h"
 #include "systemd-basic/strv.h"
+#include "systemd-basic/user-util.h"
 #include "systemd-basic/util.h"
 
 #include "nspawn-cgroup.h"
@@ -58,6 +59,12 @@ static int chown_cgroup_path(const char *path, uid_t uid_shift) {
 int chown_cgroup(pid_t pid, uid_t uid_shift) {
         _cleanup_free_ char *path = NULL, *fs = NULL;
         int r;
+
+        /* If uid_shift == UID_INVALID, then chown_cgroup_path() is a no-op, and there isn't really a point to actually
+         * doing any of this work.  Of course, it would still be "safe" to continue, just pointless; and another
+         * opportunity for cgroup-util to screw up on non-systemd systems. */
+        if (uid_shift == UID_INVALID)
+                return 0;
 
         r = cg_pid_get_path(NULL, pid, &path);
         if (r < 0)
