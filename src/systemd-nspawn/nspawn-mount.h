@@ -22,7 +22,7 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/cgroup2-util.h"
 
 typedef enum VolatileMode {
         VOLATILE_NO,

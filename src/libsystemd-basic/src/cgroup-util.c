@@ -2281,8 +2281,10 @@ static int cg_update_unified(void) {
         if (F_TYPE_EQUAL(fs.f_type, CGROUP2_SUPER_MAGIC))
                 unified_cache = CGROUP_UNIFIED_ALL;
         else if (F_TYPE_EQUAL(fs.f_type, TMPFS_MAGIC)) {
-                if (statfs("/sys/fs/cgroup/systemd/", &fs) < 0)
-                        return -errno;
+                if (statfs("/sys/fs/cgroup/systemd/", &fs) < 0) {
+                        unified_cache = CGROUP_UNIFIED_NONE;
+                        return 0;
+                }
 
                 unified_cache = F_TYPE_EQUAL(fs.f_type, CGROUP2_SUPER_MAGIC) ?
                         CGROUP_UNIFIED_SYSTEMD : CGROUP_UNIFIED_NONE;

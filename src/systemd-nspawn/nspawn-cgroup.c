@@ -57,7 +57,9 @@ static int chown_cgroup_path(const char *path, uid_t uid_shift) {
 }
 
 int chown_cgroup(pid_t pid, uid_t uid_shift) {
-        _cleanup_free_ char *path = NULL, *fs = NULL;
+        _cleanup_sdcgroupfree_ SdCGroup cgroup;
+        _cleanup_free_ char *fs = NULL;
+
         int r;
 
         /* If uid_shift == UID_INVALID, then chown_cgroup_path() is a no-op, and there isn't really a point to actually
@@ -66,12 +68,12 @@ int chown_cgroup(pid_t pid, uid_t uid_shift) {
         if (uid_shift == UID_INVALID)
                 return 0;
 
-        r = cg_pid_get_path(NULL, pid, &path);
+        r = cg2_sd_pid_get_cgroup(pid, &cgroup);
         if (r < 0)
                 return log_error_errno(r, "Failed to get host cgroup of the container: %m");
 
-        r = cg_get_path(SYSTEMD_CGROUP_CONTROLLER, path, NULL, &fs);
-        if (r < 0)
+        fs = cg2_sd_cgroup_get_filepath(cgroup);
+        if (!fs)
                 return log_error_errno(-ENOMEM, "Failed to get host file system path for container cgroup: %m");
 
         r = chown_cgroup_path(fs, uid_shift);
@@ -81,20 +83,22 @@ int chown_cgroup(pid_t pid, uid_t uid_shift) {
         return 0;
 }
 
-int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
-        _cleanup_free_ char *cgroup = NULL;
+int sync_cgroup(pid_t pid, SdCGroupVersion inner_cgver, uid_t uid_shift) {
+        _cleanup_sdcgroupfree_ SdCGroup outer_cgroup;
+        _cleanup_free_ char *cgpath = NULL;
         char mountpoint[] = "/tmp/containerXXXXXX", pid_string[DECIMAL_STR_MAX(pid) + 1];
         bool undo_mount = false;
         const char *fn, *inner_hier;
-        int unified, r;
+        int r;
+        SdCGroupVersion outer_cgver;
 
 #define LOG_PFIX "PID " PID_FMT ": sync host cgroup -> container cgroup"
 
-        unified = cg_unified(SYSTEMD_CGROUP_CONTROLLER);
-        if (unified < 0)
+        r = cg2_sd_get_version(&outer_cgver);
+        if (r < 0)
                 return log_error_errno(r, LOG_PFIX ": failed to determine host cgroup version: %m", pid);
 
-        if ((unified > 0) == (unified_requested >= CGROUP_UNIFIED_SYSTEMD))
+        if (cg2_sd_ver_get_hier_ver(outer_cgver) == cg2_sd_ver_get_hier_ver(inner_cgver))
                 return 0;
 
         /* When the host uses the legacy cgroup setup, but the
@@ -102,15 +106,18 @@ int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
          * we copy the path from the name=systemd hierarchy into the
          * unified hierarchy. Similar for the reverse situation. */
 
-        r = cg_pid_get_path(SYSTEMD_CGROUP_CONTROLLER, pid, &cgroup);
+        r = cg2_sd_pid_get_cgroup(pid, &outer_cgroup);
         if (r < 0)
                 return log_error_errno(r, LOG_PFIX ": failed to determine host cgroup: %m", pid);
+        cgpath = cg2_sd_cgroup_get_cgpath(outer_cgroup);
+        if (!cgpath)
+                return log_error_errno(-ENOMEM, LOG_PFIX ": %m", pid);
 
         /* In order to access the container's hierarchy we need to mount it */
         if (!mkdtemp(mountpoint))
                 return log_error_errno(errno, LOG_PFIX ": failed to create temporary mount point for container cgroup hierarchy: %m", pid);
 
-        if (unified) {
+        if (cg2_sd_ver_get_hier_ver(outer_cgver) == 2) {
                 /* host: v2 ; container: v1 */
                 inner_hier = "?:name=systemd";
                 r = mount_verbose(LOG_ERR, "cgroup", mountpoint, "cgroup",
@@ -157,11 +164,12 @@ finish:
         return r;
 }
 
-int create_subcgroup(pid_t pid, CGroupUnified unified_requested) {
+int create_subcgroup(pid_t pid, SdCGroupVersion inner_cgver) {
         _cleanup_free_ char *cgroup = NULL;
         const char *child;
-        int unified, r;
+        int r;
         CGroupMask supported;
+        SdCGroupVersion outer_cgver;
 
         /* In the unified hierarchy inner nodes may only contain
          * subgroups, but not processes. Hence, if we running in the
@@ -169,13 +177,14 @@ int create_subcgroup(pid_t pid, CGroupUnified unified_requested) {
          * did not create a scope unit for the container move us and
          * the container into two separate subcgroups. */
 
-        if (unified_requested == CGROUP_UNIFIED_NONE)
+        if (inner_cgver == CGROUP_VER_1)
                 return 0;
 
-        unified = cg_unified(SYSTEMD_CGROUP_CONTROLLER);
-        if (unified < 0)
+        r = cg2_sd_get_version(&outer_cgver);
+        if (r < 0)
                 return log_error_errno(r, "Failed to create host subcgroup: Failed to determine cgroup version: %m");
-        if (unified == 0)
+
+        if (outer_cgver == CGROUP_VER_1)
                 return 0;
 
         r = cg_mask_supported(&supported);

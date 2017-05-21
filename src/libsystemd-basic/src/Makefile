@@ -166,6 +166,8 @@ libsystemd_basic_la_SOURCES = \
 	src/basic/mkdir.h \
 	src/basic/cgroup-util.c \
 	src/basic/cgroup-util.h \
+	src/basic/cgroup2-util.c \
+	src/basic/cgroup2-util.h \
 	src/basic/errno-list.c \
 	src/basic/errno-list.h \
 	src/basic/af-list.c \

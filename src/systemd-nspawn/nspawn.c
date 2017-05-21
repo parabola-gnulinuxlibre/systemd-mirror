@@ -51,7 +51,7 @@
 #include "systemd-basic/btrfs-util.h"
 #include "systemd-basic/cap-list.h"
 #include "systemd-basic/capability-util.h"
-#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/cgroup2-util.h"
 #include "systemd-basic/copy.h"
 #include "systemd-basic/env-util.h"
 #include "systemd-basic/fd-util.h"
@@ -188,7 +188,7 @@ static UserNamespaceMode arg_userns_mode = USER_NAMESPACE_NO;
 static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
 static bool arg_userns_chown = false;
 static int arg_kill_signal = 0;
-static CGroupUnified arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_UNKNOWN;
+static SdCGroupVersion arg_cgroup_version = CGROUP_VER_UNKNOWN;
 static SettingsMask arg_settings_mask = 0;
 static int arg_settings_trusted = -1;
 static char **arg_parameters = NULL;
@@ -324,7 +324,7 @@ static int custom_mounts_prepare(void) {
 static int detect_unified_cgroup_hierarchy(const char *directory) {
         const char *e;
         int r;
-        CGroupUnified outer;
+        SdCGroupVersion outer;
 
         /* Allow the user to control whether the unified hierarchy is used */
         e = getenv("UNIFIED_CGROUP_HIERARCHY");
@@ -333,48 +333,53 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to parse $UNIFIED_CGROUP_HIERARCHY.");
                 if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
+                        arg_cgroup_version = CGROUP_VER_2;
                 else
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                        arg_cgroup_version = CGROUP_VER_1;
 
                 return 0;
         }
 
-        r = cg_version(&outer);
+        r = cg2_sd_get_version(&outer);
         if (r < 0)
                 return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine what the host system uses: %m");
 
         /* Otherwise inherit the default from the host system, unless
          * the container doesn't have a new enough systemd (detected
-         * by checking libsystemd-shared). */
+         * by checking libsystemd-shared).
+         *
+         * But archroot containers don't even have any part of systemd
+         * installed, so why do we care about that? */
+        arg_cgroup_version = outer;
         switch (outer) {
-        case CGROUP_UNIFIED_UNKNOWN:
+        case CGROUP_VER_UNKNOWN:
                 assert_not_reached("Unknown host cgroup version");
                 break;
-        case CGROUP_UNIFIED_NONE: /* cgroup v1 */
-                arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+        case CGROUP_VER_1:
                 break;
-        case CGROUP_UNIFIED_ALL: /* cgroup v2 */
+        case CGROUP_VER_2:
                 /* Unified cgroup hierarchy support was added in 230. Unfortunately libsystemd-shared,
                  * which we use to sniff the systemd version, was only added in 231, so we'll have a
                  * false negative here for 230. */
                 r = systemd_installation_has_version(directory, 230);
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
-                if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
-                else
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                if (r == 0)
+                        arg_cgroup_version = CGROUP_VER_1;
                 break;
-        case CGROUP_UNIFIED_SYSTEMD: /* cgroup v1 & v2 mixed; but v2 for systemd */
-                /* Mixed cgroup hierarchy support was added in 232 */
+        case CGROUP_VER_MIXED_SD232:
                 r = systemd_installation_has_version(directory, 232);
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
-                if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD;
-                else
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                if (r == 0)
+                        arg_cgroup_version = CGROUP_VER_1;
+                break;
+        case CGROUP_VER_MIXED_SD233:
+                r = systemd_installation_has_version(directory, 233);
+                if (r < 0)
+                        return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
+                if (r == 0)
+                        arg_cgroup_version = CGROUP_VER_1;
                 break;
         }
 
@@ -482,6 +487,7 @@ static int parse_argv(int argc, char *argv[]) {
         const char *p, *e;
         uint64_t plus = 0, minus = 0;
         bool mask_all_settings = false, mask_no_settings = false;
+        _cleanup_sdcgroupfree_ SdCGroup cgroup;
 
         assert(argc >= 0);
         assert(argv);
@@ -1096,7 +1102,9 @@ static int parse_argv(int argc, char *argv[]) {
         if (arg_userns_mode == USER_NAMESPACE_PICK)
                 arg_userns_chown = true;
 
-        if (arg_keep_unit && cg_pid_get_owner_uid(0, NULL) >= 0) {
+        if (arg_keep_unit &&
+            cg2_sd_pid_get_cgroup(0, &cgroup) >= 0 &&
+            cg2_sd_cgroup_get_owner_uid(cgroup, NULL) >= 0) {
                 log_error("--keep-unit may not be used when invoked from a user session.");
                 return -EINVAL;
         }
@@ -1170,7 +1178,7 @@ static int parse_argv(int argc, char *argv[]) {
 
         r = getenv_bool("SYSTEMD_NSPAWN_USE_CGNS");
         if (r < 0)
-                arg_use_cgns = cg_ns_supported();
+                arg_use_cgns = cg2_ns_supported();
         else
                 arg_use_cgns = r;
 
@@ -2684,7 +2692,7 @@ static int inner_child(
         assert(directory);
         assert(kmsg_socket >= 0);
 
-        cg_unified_flush();
+        cg2_flush();
 
         if (arg_userns_mode != USER_NAMESPACE_NO) {
                 /* Tell the parent, that it now can write the UID map. */
@@ -2723,13 +2731,13 @@ static int inner_child(
                 return -ESRCH;
         }
 
-        if (arg_use_cgns && cg_ns_supported()) {
+        if (arg_use_cgns && cg2_ns_supported()) {
                 r = unshare(CLONE_NEWCGROUP);
                 if (r < 0)
                         return log_error_errno(errno, "Failed to unshare cgroup namespace");
                 r = mount_cgroups(
                                 "",
-                                arg_unified_cgroup_hierarchy,
+                                arg_cgroup_version,
                                 arg_userns_mode != USER_NAMESPACE_NO,
                                 arg_uid_shift,
                                 arg_uid_range,
@@ -2738,7 +2746,7 @@ static int inner_child(
                 if (r < 0)
                         return r;
         } else {
-                r = mount_systemd_cgroup_writable("", arg_unified_cgroup_hierarchy);
+                r = mount_systemd_cgroup_writable("", arg_cgroup_version);
                 if (r < 0)
                         return r;
         }
@@ -2950,7 +2958,7 @@ static int outer_child(
         assert(notify_socket >= 0);
         assert(kmsg_socket >= 0);
 
-        cg_unified_flush();
+        cg2_flush();
 
         if (prctl(PR_SET_PDEATHSIG, SIGKILL) < 0)
                 return log_error_errno(errno, "PR_SET_PDEATHSIG failed: %m");
@@ -3137,10 +3145,10 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        if (!arg_use_cgns || !cg_ns_supported()) {
+        if (!arg_use_cgns || !cg2_ns_supported()) {
                 r = mount_cgroups(
                                 directory,
-                                arg_unified_cgroup_hierarchy,
+                                arg_cgroup_version,
                                 arg_userns_mode != USER_NAMESPACE_NO,
                                 arg_uid_shift,
                                 arg_uid_range,
@@ -3892,12 +3900,12 @@ static int run(int master,
                         return r;
         }
 
-        r = sync_cgroup(*pid, arg_unified_cgroup_hierarchy, arg_uid_shift);
+        r = sync_cgroup(*pid, arg_cgroup_version, arg_uid_shift);
         if (r < 0)
                 return r;
 
         if (arg_keep_unit) {
-                r = create_subcgroup(*pid, arg_unified_cgroup_hierarchy);
+                r = create_subcgroup(*pid, arg_cgroup_version);
                 if (r < 0)
                         return r;
         }

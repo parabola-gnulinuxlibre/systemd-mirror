@@ -22,8 +22,8 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/cgroup2-util.h"
 
 int chown_cgroup(pid_t pid, uid_t uid_shift);
-int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift);
-int create_subcgroup(pid_t pid, CGroupUnified unified_requested);
+int sync_cgroup(pid_t pid, SdCGroupVersion inner_cgver, uid_t uid_shift);
+int create_subcgroup(pid_t pid, SdCGroupVersion inner_cgver);
