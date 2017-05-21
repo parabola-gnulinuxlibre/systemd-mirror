@@ -2461,6 +2461,17 @@ int cg_unified_flush(void) {
         return cg_unified_update();
 }
 
+int cg_version(CGroupUnified *ver) {
+        int r;
+
+        r = cg_unified_update();
+        if (r < 0)
+                return r;
+
+        *ver = unified_cache;
+        return 0;
+}
+
 int cg_enable_everywhere(CGroupMask supported, CGroupMask mask, const char *p) {
         _cleanup_free_ char *fs = NULL;
         CGroupController c;

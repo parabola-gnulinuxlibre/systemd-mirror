@@ -247,6 +247,7 @@ int cg_all_unified(void);
 int cg_hybrid_unified(void);
 int cg_unified_controller(const char *controller);
 int cg_unified_flush(void);
+int cg_version(CGroupUnified *ver);
 
 bool cg_is_unified_wanted(void);
 bool cg_is_legacy_wanted(void);
