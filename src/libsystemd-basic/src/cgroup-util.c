@@ -2311,6 +2311,17 @@ int cg_all_unified(void) {
         return cg_unified(NULL);
 }
 
+int cg_version(CGroupUnified *ver) {
+        int r;
+
+        r = cg_update_unified();
+        if (r < 0)
+                return r;
+
+        *ver = unified_cache;
+        return 0;
+}
+
 void cg_unified_flush(void) {
         unified_cache = CGROUP_UNIFIED_UNKNOWN;
 }
