@@ -23,43 +23,7 @@
 
 #include "systemd-basic/macro.h"
 
-#include "nspawn-expose-ports.h"
-#include "nspawn-mount.h"
-
-typedef enum StartMode {
-        START_PID1, /* Run parameters as command line as process 1 */
-        START_PID2, /* Use stub init process as PID 1, run parameters as command line as process 2 */
-        START_BOOT, /* Search for init system, pass arguments as parameters */
-        _START_MODE_MAX,
-        _START_MODE_INVALID = -1
-} StartMode;
-
-typedef enum UserNamespaceMode {
-        USER_NAMESPACE_NO,
-        USER_NAMESPACE_FIXED,
-        USER_NAMESPACE_PICK,
-        _USER_NAMESPACE_MODE_MAX,
-        _USER_NAMESPACE_MODE_INVALID = -1,
-} UserNamespaceMode;
-
-typedef enum SettingsMask {
-        SETTING_START_MODE        = 1 << 0,
-        SETTING_ENVIRONMENT       = 1 << 1,
-        SETTING_USER              = 1 << 2,
-        SETTING_CAPABILITY        = 1 << 3,
-        SETTING_KILL_SIGNAL       = 1 << 4,
-        SETTING_PERSONALITY       = 1 << 5,
-        SETTING_MACHINE_ID        = 1 << 6,
-        SETTING_NETWORK           = 1 << 7,
-        SETTING_EXPOSE_PORTS      = 1 << 8,
-        SETTING_READ_ONLY         = 1 << 9,
-        SETTING_VOLATILE_MODE     = 1 << 10,
-        SETTING_CUSTOM_MOUNTS     = 1 << 11,
-        SETTING_WORKING_DIRECTORY = 1 << 12,
-        SETTING_USERNS            = 1 << 13,
-        SETTING_NOTIFY_READY      = 1 << 14,
-        _SETTINGS_MASK_ALL        = (1 << 15) -1
-} SettingsMask;
+#include "nspawn-types.h"
 
 typedef struct Settings {
         /* [Run] */

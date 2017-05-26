@@ -27,12 +27,7 @@
 #include "systemd-basic/list.h"
 #include "systemd-staging/sd-netlink.h"
 
-typedef struct ExposePort {
-        int protocol;
-        uint16_t host_port;
-        uint16_t container_port;
-        LIST_FIELDS(struct ExposePort, ports);
-} ExposePort;
+#include "nspawn-types.h"
 
 void expose_port_free_all(ExposePort *p);
 int expose_port_parse(ExposePort **l, const char *s);

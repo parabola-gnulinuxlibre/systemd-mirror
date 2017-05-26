@@ -28,6 +28,7 @@
 #include "systemd-basic/alloc-util.h"     /* mfree, _cleanup_free_ */
 #include "systemd-basic/btrfs-util.h"     /* btrfs_subvol_snapshot */
 #include "systemd-basic/cap-list.h"       /* capability_from_name */
+#include "systemd-basic/cgroup-util.h"
 #include "systemd-basic/env-util.h"       /* getenv_bool */
 #include "systemd-basic/fd-util.h"        /* _cleanup_fclose_ */
 #include "systemd-basic/fileio.h"         /* tempfn_random */
@@ -38,7 +39,7 @@
 #include "systemd-basic/path-util.h"      /* path_equal, systemd_installation_has_version, parse_path_argument_and_warn */
 #include "systemd-basic/process-util.h"   /* PERSONALITY_INVALID */
 #include "systemd-basic/random-util.h"    /* random_u64 */
-#include "systemd-basic/signal-util.h"    /* signal_from_String_try_harder */
+#include "systemd-basic/signal-util.h"    /* signal_from_string_try_harder */
 #include "systemd-basic/socket-util.h"    /* ifname_valid */
 #include "systemd-basic/stdio-util.h"     /* xsprintf */
 #include "systemd-basic/string-util.h"    /* free_and_strdup, strappend, isempty, streq */
@@ -47,7 +48,10 @@
 #include "systemd-shared/machine-image.h" /* Image, image_find, IMAGE_RAW */
 
 #include "nspawn-args.h"
-#include "nspawn-network.h" /* veth_extra_parse */
+#include "nspawn-expose-ports.h" /* expose_port_parse */
+#include "nspawn-mount.h"        /* custom_mount_compare, tmpfs_mount_parse */
+#include "nspawn-network.h"      /* veth_extra_parse */
+#include "nspawn-settings.h"
 
 /* Note that devpts's gid= parameter parses GIDs as signed values, hence we stay away from the upper half of the 32bit
  * UID range here. We leave a bit of room at the lower end and a lot of room at the upper end, so that other subsystems
@@ -1726,9 +1730,6 @@ int lock_tree_plain(LockFile *ret_global_lock, LockFile *ret_local_lock) {
 int lock_tree_image(LockFile *ret_global_lock, LockFile *ret_local_lock) {
         int r;
         char template[] = "/tmp/nspawn-root-XXXXXX";
-
-        assert(args->arg_image);
-        assert(!args->arg_template);
 
         r = image_path_lock(args->arg_image, (args->arg_read_only ? LOCK_SH : LOCK_EX) | LOCK_NB, ret_global_lock, ret_local_lock);
         if (r == -EBUSY)

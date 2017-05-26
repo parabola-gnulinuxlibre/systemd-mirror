@@ -24,31 +24,7 @@
 
 #include "systemd-basic/cgroup-util.h"
 
-typedef enum VolatileMode {
-        VOLATILE_NO,
-        VOLATILE_YES,
-        VOLATILE_STATE,
-        _VOLATILE_MODE_MAX,
-        _VOLATILE_MODE_INVALID = -1
-} VolatileMode;
-
-typedef enum CustomMountType {
-        CUSTOM_MOUNT_BIND,
-        CUSTOM_MOUNT_TMPFS,
-        CUSTOM_MOUNT_OVERLAY,
-        _CUSTOM_MOUNT_TYPE_MAX,
-        _CUSTOM_MOUNT_TYPE_INVALID = -1
-} CustomMountType;
-
-typedef struct CustomMount {
-        CustomMountType type;
-        bool read_only;
-        char *source; /* for overlayfs this is the upper directory */
-        char *destination;
-        char *options;
-        char *work_dir;
-        char **lower;
-} CustomMount;
+#include "nspawn-types.h"
 
 CustomMount* custom_mount_add(CustomMount **l, unsigned *n, CustomMountType t);
 

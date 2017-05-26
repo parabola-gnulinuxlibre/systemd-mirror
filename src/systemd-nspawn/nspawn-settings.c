@@ -30,6 +30,8 @@
 #include "systemd-basic/util.h"
 #include "systemd-shared/conf-parser.h"
 
+#include "nspawn-expose-ports.h"
+#include "nspawn-mount.h"
 #include "nspawn-network.h"
 #include "nspawn-settings.h"
 
