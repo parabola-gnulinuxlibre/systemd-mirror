@@ -26,6 +26,8 @@ include $(topsrcdir)/build-aux/Makefile.head.mk
 bin_PROGRAMS += systemd-nspawn
 systemd_nspawn_SOURCES = \
 	src/nspawn/nspawn.c \
+	src/nspawn/nspawn-args.c \
+	src/nspawn/nspawn-args.h \
 	src/nspawn/nspawn-settings.c \
 	src/nspawn/nspawn-settings.h \
 	src/nspawn/nspawn-mount.c \

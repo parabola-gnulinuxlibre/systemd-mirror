@@ -90,6 +90,7 @@
 #include "systemd-shared/ptyfwd.h"
 #include "systemd-shared/udev-util.h"
 
+#include "nspawn-args.h"
 #include "nspawn-cgroup.h"
 #include "nspawn-expose-ports.h"
 #include "nspawn-mount.h"
@@ -101,12 +102,6 @@
 #include "nspawn-setuid.h"
 #include "nspawn-stub-pid1.h"
 
-/* Note that devpts's gid= parameter parses GIDs as signed values, hence we stay away from the upper half of the 32bit
- * UID range here. We leave a bit of room at the lower end and a lot of room at the upper end, so that other subsystems
- * may have their own allocation ranges too. */
-#define UID_SHIFT_PICK_MIN ((uid_t) UINT32_C(0x00080000))
-#define UID_SHIFT_PICK_MAX ((uid_t) UINT32_C(0x6FFF0000))
-
 /* nspawn is listening on the socket at the path in the constant nspawn_notify_socket_path
  * nspawn_notify_socket_path is relative to the container
  * the init process in the container pid can send messages to nspawn following the sd_notify(3) protocol */
@@ -117,26 +112,28 @@ typedef enum ContainerStatus {
         CONTAINER_REBOOTED
 } ContainerStatus;
 
+static const Args * args;
+
 static int userns_lchown(const char *p, uid_t uid, gid_t gid) {
         assert(p);
 
-        if (arg_userns_mode == USER_NAMESPACE_NO)
+        if (args->arg_userns_mode == USER_NAMESPACE_NO)
                 return 0;
 
         if (uid == UID_INVALID && gid == GID_INVALID)
                 return 0;
 
         if (uid != UID_INVALID) {
-                uid += arg_uid_shift;
+                uid += args->arg_uid_shift;
 
-                if (uid < arg_uid_shift || uid >= arg_uid_shift + arg_uid_range)
+                if (uid < args->arg_uid_shift || uid >= args->arg_uid_shift + args->arg_uid_range)
                         return -EOVERFLOW;
         }
 
         if (gid != GID_INVALID) {
-                gid += (gid_t) arg_uid_shift;
+                gid += (gid_t) args->arg_uid_shift;
 
-                if (gid < (gid_t) arg_uid_shift || gid >= (gid_t) (arg_uid_shift + arg_uid_range))
+                if (gid < (gid_t) args->arg_uid_shift || gid >= (gid_t) (args->arg_uid_shift + args->arg_uid_range))
                         return -EOVERFLOW;
         }
 
@@ -232,7 +229,7 @@ static int setup_resolv_conf(const char *dest) {
 
         assert(dest);
 
-        if (arg_private_network)
+        if (args->arg_private_network)
                 return 0;
 
         /* Fix resolv.conf, if possible */
@@ -364,16 +361,16 @@ static int setup_pts(const char *dest) {
         int r;
 
 #ifdef HAVE_SELINUX
-        if (arg_selinux_apifs_context)
+        if (args->arg_selinux_apifs_context)
                 (void) asprintf(&options,
                                 "newinstance,ptmxmode=0666,mode=620,gid=" GID_FMT ",context=\"%s\"",
-                                arg_uid_shift + TTY_GID,
-                                arg_selinux_apifs_context);
+                                args->arg_uid_shift + TTY_GID,
+                                args->arg_selinux_apifs_context);
         else
 #endif
                 (void) asprintf(&options,
                                 "newinstance,ptmxmode=0666,mode=620,gid=" GID_FMT,
-                                arg_uid_shift + TTY_GID);
+                                args->arg_uid_shift + TTY_GID);
 
         if (!options)
                 return log_oom();
@@ -416,7 +413,7 @@ static int setup_dev_console(const char *dest, const char *console) {
 
         u = umask(0000);
 
-        r = chmod_and_chown(console, 0600, arg_uid_shift, arg_uid_shift);
+        r = chmod_and_chown(console, 0600, args->arg_uid_shift, args->arg_uid_shift);
         if (r < 0)
                 return log_error_errno(r, "Failed to correct access mode for TTY: %m");
 
@@ -482,16 +479,16 @@ static int on_address_change(sd_netlink *rtnl, sd_netlink_message *m, void *user
         assert(m);
         assert(exposed);
 
-        expose_port_execute(rtnl, arg_expose_ports, exposed);
+        expose_port_execute(rtnl, args->arg_expose_ports, exposed);
         return 0;
 }
 
 static int setup_hostname(void) {
 
-        if ((arg_clone_ns_flags & CLONE_NEWUTS) == 0)
+        if ((args->arg_clone_ns_flags & CLONE_NEWUTS) == 0)
                 return 0;
 
-        if (sethostname_idempotent(arg_machine) < 0)
+        if (sethostname_idempotent(args->arg_machine) < 0)
                 return -errno;
 
         return 0;
@@ -506,21 +503,21 @@ static int setup_journal(const char *directory) {
         int r;
 
         /* Don't link journals in ephemeral mode */
-        if (arg_ephemeral)
+        if (args->arg_ephemeral)
                 return 0;
 
-        if (arg_link_journal == LINK_NO)
+        if (args->arg_link_journal == LINK_NO)
                 return 0;
 
-        try = arg_link_journal_try || arg_link_journal == LINK_AUTO;
+        try = args->arg_link_journal_try || args->arg_link_journal == LINK_AUTO;
 
         r = sd_id128_get_machine(&this_id);
         if (r < 0)
                 return log_error_errno(r, "Failed to retrieve machine ID: %m");
 
-        if (sd_id128_equal(arg_uuid, this_id)) {
+        if (sd_id128_equal(args->arg_uuid, this_id)) {
                 log_full(try ? LOG_WARNING : LOG_ERR,
-                         "Host and machine ids are equal (%s): refusing to link journals", sd_id128_to_string(arg_uuid, id));
+                         "Host and machine ids are equal (%s): refusing to link journals", sd_id128_to_string(args->arg_uuid, id));
                 if (try)
                         return 0;
                 return -EEXIST;
@@ -538,7 +535,7 @@ static int setup_journal(const char *directory) {
         if (r < 0)
                 return log_error_errno(r, "Failed to create /var/log/journal: %m");
 
-        (void) sd_id128_to_string(arg_uuid, id);
+        (void) sd_id128_to_string(args->arg_uuid, id);
 
         p = strjoina("/var/log/journal/", id);
         q = prefix_roota(directory, p);
@@ -561,8 +558,8 @@ static int setup_journal(const char *directory) {
 
         r = readlink_and_make_absolute(p, &d);
         if (r >= 0) {
-                if ((arg_link_journal == LINK_GUEST ||
-                     arg_link_journal == LINK_AUTO) &&
+                if ((args->arg_link_journal == LINK_GUEST ||
+                     args->arg_link_journal == LINK_AUTO) &&
                     path_equal(d, q)) {
 
                         r = userns_mkdir(directory, p, 0755, 0, 0);
@@ -575,7 +572,7 @@ static int setup_journal(const char *directory) {
                         return log_error_errno(errno, "Failed to remove symlink %s: %m", p);
         } else if (r == -EINVAL) {
 
-                if (arg_link_journal == LINK_GUEST &&
+                if (args->arg_link_journal == LINK_GUEST &&
                     rmdir(p) < 0) {
 
                         if (errno == ENOTDIR) {
@@ -587,7 +584,7 @@ static int setup_journal(const char *directory) {
         } else if (r != -ENOENT)
                 return log_error_errno(r, "readlink(%s) failed: %m", p);
 
-        if (arg_link_journal == LINK_GUEST) {
+        if (args->arg_link_journal == LINK_GUEST) {
 
                 if (symlink(q, p) < 0) {
                         if (try) {
@@ -603,7 +600,7 @@ static int setup_journal(const char *directory) {
                 return 0;
         }
 
-        if (arg_link_journal == LINK_HOST) {
+        if (args->arg_link_journal == LINK_HOST) {
                 /* don't create parents here — if the host doesn't have
                  * permanent journal set up, don't force it here */
 
@@ -633,14 +630,14 @@ static int setup_journal(const char *directory) {
 }
 
 static int drop_capabilities(void) {
-        return capability_bounding_set_drop(arg_caps_retain, false);
+        return capability_bounding_set_drop(args->arg_caps_retain, false);
 }
 
 static int reset_audit_loginuid(void) {
         _cleanup_free_ char *p = NULL;
         int r;
 
-        if ((arg_clone_ns_flags & CLONE_NEWPID) == 0)
+        if ((args->arg_clone_ns_flags & CLONE_NEWPID) == 0)
                 return 0;
 
         r = read_one_line_file("/proc/self/loginuid", &p);
@@ -675,7 +672,7 @@ static int setup_propagate(const char *root) {
 
         (void) mkdir_p("/run/systemd/nspawn/", 0755);
         (void) mkdir_p("/run/systemd/nspawn/propagate", 0600);
-        p = strjoina("/run/systemd/nspawn/propagate/", arg_machine);
+        p = strjoina("/run/systemd/nspawn/propagate/", args->arg_machine);
         (void) mkdir_p(p, 0600);
 
         r = userns_mkdir(root, "/run/systemd", 0755, 0, 0);
@@ -715,19 +712,19 @@ static int setup_image(char **device_path, int *loop_nr) {
 
         assert(device_path);
         assert(loop_nr);
-        assert(arg_image);
+        assert(args->arg_image);
 
-        fd = open(arg_image, O_CLOEXEC|(arg_read_only ? O_RDONLY : O_RDWR)|O_NONBLOCK|O_NOCTTY);
+        fd = open(args->arg_image, O_CLOEXEC|(args->arg_read_only ? O_RDONLY : O_RDWR)|O_NONBLOCK|O_NOCTTY);
         if (fd < 0)
-                return log_error_errno(errno, "Failed to open %s: %m", arg_image);
+                return log_error_errno(errno, "Failed to open %s: %m", args->arg_image);
 
         if (fstat(fd, &st) < 0)
-                return log_error_errno(errno, "Failed to stat %s: %m", arg_image);
+                return log_error_errno(errno, "Failed to stat %s: %m", args->arg_image);
 
         if (S_ISBLK(st.st_mode)) {
                 char *p;
 
-                p = strdup(arg_image);
+                p = strdup(args->arg_image);
                 if (!p)
                         return log_oom();
 
@@ -742,7 +739,7 @@ static int setup_image(char **device_path, int *loop_nr) {
         }
 
         if (!S_ISREG(st.st_mode)) {
-                log_error("%s is not a regular file or block device.", arg_image);
+                log_error("%s is not a regular file or block device.", args->arg_image);
                 return -EINVAL;
         }
 
@@ -757,14 +754,14 @@ static int setup_image(char **device_path, int *loop_nr) {
         if (asprintf(&loopdev, "/dev/loop%i", nr) < 0)
                 return log_oom();
 
-        loop = open(loopdev, O_CLOEXEC|(arg_read_only ? O_RDONLY : O_RDWR)|O_NONBLOCK|O_NOCTTY);
+        loop = open(loopdev, O_CLOEXEC|(args->arg_read_only ? O_RDONLY : O_RDWR)|O_NONBLOCK|O_NOCTTY);
         if (loop < 0)
                 return log_error_errno(errno, "Failed to open loop device %s: %m", loopdev);
 
         if (ioctl(loop, LOOP_SET_FD, fd) < 0)
                 return log_error_errno(errno, "Failed to set loopback file descriptor on %s: %m", loopdev);
 
-        if (arg_read_only)
+        if (args->arg_read_only)
                 info.lo_flags |= LO_FLAGS_READ_ONLY;
 
         if (ioctl(loop, LOOP_SET_STATUS64, &info) < 0)
@@ -824,7 +821,7 @@ static int dissect_image(
         assert(srv_device);
         assert(esp_device);
         assert(secondary);
-        assert(arg_image);
+        assert(args->arg_image);
 
         b = blkid_new_probe();
         if (!b)
@@ -847,7 +844,7 @@ static int dissect_image(
         if (r == -2 || r == 1) {
                 log_error("Failed to identify any partition table on\n"
                           "    %s\n"
-                          PARTITION_TABLE_BLURB, arg_image);
+                          PARTITION_TABLE_BLURB, args->arg_image);
                 return -EINVAL;
         } else if (r != 0) {
                 if (errno == 0)
@@ -863,7 +860,7 @@ static int dissect_image(
         if (!is_gpt && !is_mbr) {
                 log_error("No GPT or MBR partition table discovered on\n"
                           "    %s\n"
-                          PARTITION_TABLE_BLURB, arg_image);
+                          PARTITION_TABLE_BLURB, args->arg_image);
                 return -EINVAL;
         }
 
@@ -873,7 +870,7 @@ static int dissect_image(
                 if (errno == 0)
                         return log_oom();
 
-                log_error("Failed to list partitions of %s", arg_image);
+                log_error("Failed to list partitions of %s", args->arg_image);
                 return -errno;
         }
 
@@ -906,7 +903,7 @@ static int dissect_image(
 
                 r = udev_enumerate_scan_devices(e);
                 if (r < 0)
-                        return log_error_errno(r, "Failed to scan for partition devices of %s: %m", arg_image);
+                        return log_error_errno(r, "Failed to scan for partition devices of %s: %m", args->arg_image);
 
                 /* Count the partitions enumerated by the kernel */
                 n = 0;
@@ -975,7 +972,7 @@ static int dissect_image(
                         if (!errno)
                                 errno = ENOMEM;
 
-                        return log_error_errno(errno, "Failed to get partition device of %s: %m", arg_image);
+                        return log_error_errno(errno, "Failed to get partition device of %s: %m", args->arg_image);
                 }
 
                 qn = udev_device_get_devnum(q);
@@ -1133,7 +1130,7 @@ static int dissect_image(
                 if (multiple_generic) {
                         log_error("Identified multiple bootable Linux partitions on\n"
                                   "    %s\n"
-                                  PARTITION_TABLE_BLURB, arg_image);
+                                  PARTITION_TABLE_BLURB, args->arg_image);
                         return -EINVAL;
                 }
 
@@ -1145,7 +1142,7 @@ static int dissect_image(
         } else {
                 log_error("Failed to identify root partition in disk image\n"
                           "    %s\n"
-                          PARTITION_TABLE_BLURB, arg_image);
+                          PARTITION_TABLE_BLURB, args->arg_image);
                 return -EINVAL;
         }
 
@@ -1184,7 +1181,7 @@ static int mount_device(const char *what, const char *where, const char *directo
         assert(what);
         assert(where);
 
-        if (arg_read_only)
+        if (args->arg_read_only)
                 rw = false;
 
         if (directory)
@@ -1244,51 +1241,15 @@ static int mount_device(const char *what, const char *where, const char *directo
 #endif
 }
 
-static int setup_machine_id(const char *directory) {
-        const char *etc_machine_id;
-        sd_id128_t id;
-        int r;
-
-        /* If the UUID in the container is already set, then that's what counts, and we use. If it isn't set, and the
-         * caller passed --uuid=, then we'll pass it in the $container_uuid env var to PID 1 of the container. The
-         * assumption is that PID 1 will then write it to /etc/machine-id to make it persistent. If --uuid= is not
-         * passed we generate a random UUID, and pass it via $container_uuid. In effect this means that /etc/machine-id
-         * in the container and our idea of the container UUID will always be in sync (at least if PID 1 in the
-         * container behaves nicely). */
-
-        etc_machine_id = prefix_roota(directory, "/etc/machine-id");
-
-        r = id128_read(etc_machine_id, ID128_PLAIN, &id);
-        if (r < 0) {
-                if (!IN_SET(r, -ENOENT, -ENOMEDIUM)) /* If the file is missing or empty, we don't mind */
-                        return log_error_errno(r, "Failed to read machine ID from container image: %m");
-
-                if (sd_id128_is_null(arg_uuid)) {
-                        r = sd_id128_randomize(&arg_uuid);
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to acquire randomized machine UUID: %m");
-                }
-        } else {
-                if (sd_id128_is_null(id)) {
-                        log_error("Machine ID in container image is zero, refusing.");
-                        return -EINVAL;
-                }
-
-                arg_uuid = id;
-        }
-
-        return 0;
-}
-
 static int recursive_chown(const char *directory, uid_t shift, uid_t range) {
         int r;
 
         assert(directory);
 
-        if (arg_userns_mode == USER_NAMESPACE_NO || !arg_userns_chown)
+        if (args->arg_userns_mode == USER_NAMESPACE_NO || !args->arg_userns_chown)
                 return 0;
 
-        r = path_patch_uid(directory, arg_uid_shift, arg_uid_range);
+        r = path_patch_uid(directory, args->arg_uid_shift, args->arg_uid_range);
         if (r == -EOPNOTSUPP)
                 return log_error_errno(r, "Automatic UID/GID adjusting is only supported for UID/GID ranges starting at multiples of 2^16 with a range of 2^16.");
         if (r == -EBADE)
@@ -1314,19 +1275,19 @@ static int mount_devices(
         assert(where);
 
         if (root_device) {
-                r = mount_device(root_device, arg_directory, NULL, root_device_rw);
+                r = mount_device(root_device, args->arg_directory, NULL, root_device_rw);
                 if (r < 0)
                         return log_error_errno(r, "Failed to mount root directory: %m");
         }
 
         if (home_device) {
-                r = mount_device(home_device, arg_directory, "/home", home_device_rw);
+                r = mount_device(home_device, args->arg_directory, "/home", home_device_rw);
                 if (r < 0)
                         return log_error_errno(r, "Failed to mount home directory: %m");
         }
 
         if (srv_device) {
-                r = mount_device(srv_device, arg_directory, "/srv", srv_device_rw);
+                r = mount_device(srv_device, args->arg_directory, "/srv", srv_device_rw);
                 if (r < 0)
                         return log_error_errno(r, "Failed to mount server data directory: %m");
         }
@@ -1337,16 +1298,16 @@ static int mount_devices(
                 /* Mount the ESP to /efi if it exists and is empty. If it doesn't exist, use /boot instead. */
 
                 mp = "/efi";
-                x = strjoina(arg_directory, mp);
+                x = strjoina(args->arg_directory, mp);
                 r = dir_is_empty(x);
                 if (r == -ENOENT) {
                         mp = "/boot";
-                        x = strjoina(arg_directory, mp);
+                        x = strjoina(args->arg_directory, mp);
                         r = dir_is_empty(x);
                 }
 
                 if (r > 0) {
-                        r = mount_device(esp_device, arg_directory, mp, true);
+                        r = mount_device(esp_device, args->arg_directory, mp, true);
                         if (r < 0)
                                 return log_error_errno(r, "Failed to  mount ESP: %m");
                 }
@@ -1409,21 +1370,21 @@ static int wait_for_container(pid_t pid, ContainerStatus *container) {
 
         case CLD_EXITED:
                 if (status.si_status == 0)
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s exited successfully.", arg_machine);
+                        log_full(args->arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s exited successfully.", args->arg_machine);
                 else
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s failed with error code %i.", arg_machine, status.si_status);
+                        log_full(args->arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s failed with error code %i.", args->arg_machine, status.si_status);
 
                 *container = CONTAINER_TERMINATED;
                 return status.si_status;
 
         case CLD_KILLED:
                 if (status.si_status == SIGINT) {
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s has been shut down.", arg_machine);
+                        log_full(args->arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s has been shut down.", args->arg_machine);
                         *container = CONTAINER_TERMINATED;
                         return 0;
 
                 } else if (status.si_status == SIGHUP) {
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s is being rebooted.", arg_machine);
+                        log_full(args->arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s is being rebooted.", args->arg_machine);
                         *container = CONTAINER_REBOOTED;
                         return 0;
                 }
@@ -1431,11 +1392,11 @@ static int wait_for_container(pid_t pid, ContainerStatus *container) {
                 /* CLD_KILLED fallthrough */
 
         case CLD_DUMPED:
-                log_error("Container %s terminated by signal %s.", arg_machine, signal_to_string(status.si_status));
+                log_error("Container %s terminated by signal %s.", args->arg_machine, signal_to_string(status.si_status));
                 return -EIO;
 
         default:
-                log_error("Container %s failed due to unknown reason.", arg_machine);
+                log_error("Container %s failed due to unknown reason.", args->arg_machine);
                 return -EIO;
         }
 }
@@ -1445,7 +1406,7 @@ static int on_orderly_shutdown(sd_event_source *s, const struct signalfd_siginfo
 
         pid = PTR_TO_PID(userdata);
         if (pid > 0) {
-                if (kill(pid, arg_kill_signal) >= 0) {
+                if (kill(pid, args->arg_kill_signal) >= 0) {
                         log_info("Trying to halt container. Send SIGTERM again to trigger immediate termination.");
                         sd_event_source_set_userdata(s, NULL);
                         return 0;
@@ -1453,117 +1414,6 @@ static int on_orderly_shutdown(sd_event_source *s, const struct signalfd_siginfo
         }
 
         sd_event_exit(sd_event_source_get_event(s), 0);
-        return 0;
-}
-
-static int determine_names(void) {
-        int r;
-
-        if (arg_template && !arg_directory && arg_machine) {
-
-                /* If --template= was specified then we should not
-                 * search for a machine, but instead create a new one
-                 * in /var/lib/machine. */
-
-                arg_directory = strjoin("/var/lib/machines/", arg_machine, NULL);
-                if (!arg_directory)
-                        return log_oom();
-        }
-
-        if (!arg_image && !arg_directory) {
-                if (arg_machine) {
-                        _cleanup_(image_unrefp) Image *i = NULL;
-
-                        r = image_find(arg_machine, &i);
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to find image for machine '%s': %m", arg_machine);
-                        else if (r == 0) {
-                                log_error("No image for machine '%s': %m", arg_machine);
-                                return -ENOENT;
-                        }
-
-                        if (i->type == IMAGE_RAW)
-                                r = free_and_strdup(&arg_image, i->path);
-                        else
-                                r = free_and_strdup(&arg_directory, i->path);
-                        if (r < 0)
-                                return log_error_errno(r, "Invalid image directory: %m");
-
-                        if (!arg_ephemeral)
-                                arg_read_only = arg_read_only || i->read_only;
-                } else
-                        arg_directory = get_current_dir_name();
-
-                if (!arg_directory && !arg_machine) {
-                        log_error("Failed to determine path, please use -D or -i.");
-                        return -EINVAL;
-                }
-        }
-
-        if (!arg_machine) {
-                if (arg_directory && path_equal(arg_directory, "/"))
-                        arg_machine = gethostname_malloc();
-                else
-                        arg_machine = strdup(basename(arg_image ?: arg_directory));
-
-                if (!arg_machine)
-                        return log_oom();
-
-                hostname_cleanup(arg_machine);
-                if (!machine_name_is_valid(arg_machine)) {
-                        log_error("Failed to determine machine name automatically, please use -M.");
-                        return -EINVAL;
-                }
-
-                if (arg_ephemeral) {
-                        char *b;
-
-                        /* Add a random suffix when this is an
-                         * ephemeral machine, so that we can run many
-                         * instances at once without manually having
-                         * to specify -M each time. */
-
-                        if (asprintf(&b, "%s-%016" PRIx64, arg_machine, random_u64()) < 0)
-                                return log_oom();
-
-                        free(arg_machine);
-                        arg_machine = b;
-                }
-        }
-
-        return 0;
-}
-
-static int determine_uid_shift(const char *directory) {
-        int r;
-
-        if (arg_userns_mode == USER_NAMESPACE_NO) {
-                arg_uid_shift = 0;
-                return 0;
-        }
-
-        if (arg_uid_shift == UID_INVALID) {
-                struct stat st;
-
-                r = stat(directory, &st);
-                if (r < 0)
-                        return log_error_errno(errno, "Failed to determine UID base of %s: %m", directory);
-
-                arg_uid_shift = st.st_uid & UINT32_C(0xffff0000);
-
-                if (arg_uid_shift != (st.st_gid & UINT32_C(0xffff0000))) {
-                        log_error("UID and GID base of %s don't match.", directory);
-                        return -EINVAL;
-                }
-
-                arg_uid_range = UINT32_C(0x10000);
-        }
-
-        if (arg_uid_shift > (uid_t) -1 - arg_uid_range) {
-                log_error("UID base too high for UID range.");
-                return -EINVAL;
-        }
-
         return 0;
 }
 
@@ -1599,7 +1449,7 @@ static int inner_child(
         assert(directory);
         assert(kmsg_socket >= 0);
 
-        if (arg_userns_mode != USER_NAMESPACE_NO) {
+        if (args->arg_userns_mode != USER_NAMESPACE_NO) {
                 /* Tell the parent, that it now can write the UID map. */
                 (void) barrier_place(barrier); /* #1 */
 
@@ -1615,12 +1465,12 @@ static int inner_child(
                 return log_error_errno(r, "Couldn't become new root: %m");
 
         r = mount_all(NULL,
-                      arg_userns_mode != USER_NAMESPACE_NO,
+                      args->arg_userns_mode != USER_NAMESPACE_NO,
                       true,
-                      arg_private_network,
-                      arg_uid_shift,
-                      arg_uid_range,
-                      arg_selinux_apifs_context);
+                      args->arg_private_network,
+                      args->arg_uid_shift,
+                      args->arg_uid_range,
+                      args->arg_selinux_apifs_context);
 
         if (r < 0)
                 return r;
@@ -1636,22 +1486,22 @@ static int inner_child(
                 return -ESRCH;
         }
 
-        if (arg_use_cgns && cg_ns_supported()) {
+        if (args->arg_use_cgns && cg_ns_supported()) {
                 r = unshare(CLONE_NEWCGROUP);
                 if (r < 0)
                         return log_error_errno(errno, "Failed to unshare cgroup namespace");
                 r = mount_cgroups(
                                 "",
-                                arg_unified_cgroup_hierarchy,
-                                arg_userns_mode != USER_NAMESPACE_NO,
-                                arg_uid_shift,
-                                arg_uid_range,
-                                arg_selinux_apifs_context,
+                                args->arg_unified_cgroup_hierarchy,
+                                args->arg_userns_mode != USER_NAMESPACE_NO,
+                                args->arg_uid_shift,
+                                args->arg_uid_range,
+                                args->arg_selinux_apifs_context,
                                 true);
                 if (r < 0)
                         return r;
         } else {
-                r = mount_systemd_cgroup_writable("", arg_unified_cgroup_hierarchy);
+                r = mount_systemd_cgroup_writable("", args->arg_unified_cgroup_hierarchy);
                 if (r < 0)
                         return r;
         }
@@ -1670,10 +1520,10 @@ static int inner_child(
         if (setsid() < 0)
                 return log_error_errno(errno, "setsid() failed: %m");
 
-        if (arg_private_network)
+        if (args->arg_private_network)
                 loopback_setup();
 
-        if (arg_expose_ports) {
+        if (args->arg_expose_ports) {
                 r = expose_port_send_rtnl(rtnl_socket);
                 if (r < 0)
                         return r;
@@ -1686,8 +1536,8 @@ static int inner_child(
 
         setup_hostname();
 
-        if (arg_personality != PERSONALITY_INVALID) {
-                if (personality(arg_personality) < 0)
+        if (args->arg_personality != PERSONALITY_INVALID) {
+                if (personality(args->arg_personality) < 0)
                         return log_error_errno(errno, "personality() failed: %m");
         } else if (secondary) {
                 if (personality(PER_LINUX32) < 0)
@@ -1695,30 +1545,30 @@ static int inner_child(
         }
 
 #ifdef HAVE_SELINUX
-        if (arg_selinux_context)
-                if (setexeccon(arg_selinux_context) < 0)
-                        return log_error_errno(errno, "setexeccon(\"%s\") failed: %m", arg_selinux_context);
+        if (args->arg_selinux_context)
+                if (setexeccon(args->arg_selinux_context) < 0)
+                        return log_error_errno(errno, "setexeccon(\"%s\") failed: %m", args->arg_selinux_context);
 #endif
 
-        r = change_uid_gid(arg_user, &home);
+        r = change_uid_gid(args->arg_user, &home);
         if (r < 0)
                 return r;
 
         /* LXC sets container=lxc, so follow the scheme here */
-        envp[n_env++] = strjoina("container=", arg_container_service_name);
+        envp[n_env++] = strjoina("container=", args->arg_container_service_name);
 
         envp[n_env] = strv_find_prefix(environ, "TERM=");
         if (envp[n_env])
                 n_env++;
 
         if ((asprintf((char**)(envp + n_env++), "HOME=%s", home ? home: "/root") < 0) ||
-            (asprintf((char**)(envp + n_env++), "USER=%s", arg_user ? arg_user : "root") < 0) ||
-            (asprintf((char**)(envp + n_env++), "LOGNAME=%s", arg_user ? arg_user : "root") < 0))
+            (asprintf((char**)(envp + n_env++), "USER=%s", args->arg_user ? args->arg_user : "root") < 0) ||
+            (asprintf((char**)(envp + n_env++), "LOGNAME=%s", args->arg_user ? args->arg_user : "root") < 0))
                 return log_oom();
 
-        assert(!sd_id128_is_null(arg_uuid));
+        assert(!sd_id128_is_null(args->arg_uuid));
 
-        if (asprintf((char**)(envp + n_env++), "container_uuid=%s", id128_to_uuid_string(arg_uuid, as_uuid)) < 0)
+        if (asprintf((char**)(envp + n_env++), "container_uuid=%s", id128_to_uuid_string(args->arg_uuid, as_uuid)) < 0)
                 return log_oom();
 
         if (fdset_size(fds) > 0) {
@@ -1733,7 +1583,7 @@ static int inner_child(
         if (asprintf((char **)(envp + n_env++), "NOTIFY_SOCKET=%s", NSPAWN_NOTIFY_SOCKET_PATH) < 0)
                 return log_oom();
 
-        env_use = strv_env_merge(2, envp, arg_setenv);
+        env_use = strv_env_merge(2, envp, args->arg_setenv);
         if (!env_use)
                 return log_oom();
 
@@ -1745,11 +1595,11 @@ static int inner_child(
                 return -ESRCH;
         }
 
-        if (arg_chdir)
-                if (chdir(arg_chdir) < 0)
-                        return log_error_errno(errno, "Failed to change to specified working directory %s: %m", arg_chdir);
+        if (args->arg_chdir)
+                if (chdir(args->arg_chdir) < 0)
+                        return log_error_errno(errno, "Failed to change to specified working directory %s: %m", args->arg_chdir);
 
-        if (arg_start_mode == START_PID2) {
+        if (args->arg_start_mode == START_PID2) {
                 r = stub_pid1();
                 if (r < 0)
                         return r;
@@ -1766,15 +1616,15 @@ static int inner_child(
         log_close();
         (void) fdset_close_others(fds);
 
-        if (arg_start_mode == START_BOOT) {
+        if (args->arg_start_mode == START_BOOT) {
                 char **a;
                 size_t m;
 
                 /* Automatically search for the init system */
 
-                m = strv_length(arg_parameters);
+                m = strv_length(args->arg_parameters);
                 a = newa(char*, m + 2);
-                memcpy_safe(a + 1, arg_parameters, m * sizeof(char*));
+                memcpy_safe(a + 1, args->arg_parameters, m * sizeof(char*));
                 a[1 + m] = NULL;
 
                 a[0] = (char*) "/usr/lib/systemd/systemd";
@@ -1785,10 +1635,10 @@ static int inner_child(
 
                 a[0] = (char*) "/sbin/init";
                 execve(a[0], a, env_use);
-        } else if (!strv_isempty(arg_parameters))
-                execvpe(arg_parameters[0], arg_parameters, env_use);
+        } else if (!strv_isempty(args->arg_parameters))
+                execvpe(args->arg_parameters[0], args->arg_parameters, env_use);
         else {
-                if (!arg_chdir)
+                if (!args->arg_chdir)
                         /* If we cannot change the directory, we'll end up in /, that is expected. */
                         (void) chdir(home ?: "/root");
 
@@ -1909,32 +1759,13 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        if (arg_userns_mode != USER_NAMESPACE_NO) {
-                /* Let the parent know which UID shift we read from the image */
-                l = send(uid_shift_socket, &arg_uid_shift, sizeof(arg_uid_shift), MSG_NOSIGNAL);
-                if (l < 0)
-                        return log_error_errno(errno, "Failed to send UID shift: %m");
-                if (l != sizeof(arg_uid_shift)) {
-                        log_error("Short write while sending UID shift.");
-                        return -EIO;
-                }
+        r = detect_unified_cgroup_hierarchy(directory);
+        if (r < 0)
+                return r;
 
-                if (arg_userns_mode == USER_NAMESPACE_PICK) {
-                        /* When we are supposed to pick the UID shift, the parent will check now whether the UID shift
-                         * we just read from the image is available. If yes, it will send the UID shift back to us, if
-                         * not it will pick a different one, and send it back to us. */
-
-                        l = recv(uid_shift_socket, &arg_uid_shift, sizeof(arg_uid_shift), 0);
-                        if (l < 0)
-                                return log_error_errno(errno, "Failed to recv UID shift: %m");
-                        if (l != sizeof(arg_uid_shift)) {
-                                log_error("Short read while receiving UID shift.");
-                                return -EIO;
-                        }
-                }
-
-                log_info("Selected user namespace base " UID_FMT " and range " UID_FMT ".", arg_uid_shift, arg_uid_range);
-        }
+        r = negotiate_uid_outer_child(uid_shift_socket);
+        if (r < 0)
+	        return r;
 
         /* Turn directory into bind mount */
         r = mount_verbose(LOG_ERR, directory, directory, NULL, MS_BIND|MS_REC, NULL);
@@ -1951,47 +1782,47 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = recursive_chown(directory, arg_uid_shift, arg_uid_range);
+        r = recursive_chown(directory, args->arg_uid_shift, args->arg_uid_range);
         if (r < 0)
                 return r;
 
         r = setup_volatile(
                         directory,
-                        arg_volatile_mode,
-                        arg_userns_mode != USER_NAMESPACE_NO,
-                        arg_uid_shift,
-                        arg_uid_range,
-                        arg_selinux_context);
+                        args->arg_volatile_mode,
+                        args->arg_userns_mode != USER_NAMESPACE_NO,
+                        args->arg_uid_shift,
+                        args->arg_uid_range,
+                        args->arg_selinux_context);
         if (r < 0)
                 return r;
 
         r = setup_volatile_state(
                         directory,
-                        arg_volatile_mode,
-                        arg_userns_mode != USER_NAMESPACE_NO,
-                        arg_uid_shift,
-                        arg_uid_range,
-                        arg_selinux_context);
+                        args->arg_volatile_mode,
+                        args->arg_userns_mode != USER_NAMESPACE_NO,
+                        args->arg_uid_shift,
+                        args->arg_uid_range,
+                        args->arg_selinux_context);
         if (r < 0)
                 return r;
 
-        r = base_filesystem_create(directory, arg_uid_shift, (gid_t) arg_uid_shift);
+        r = base_filesystem_create(directory, args->arg_uid_shift, (gid_t) args->arg_uid_shift);
         if (r < 0)
                 return r;
 
-        if (arg_read_only) {
+        if (args->arg_read_only) {
                 r = bind_remount_recursive(directory, true, NULL);
                 if (r < 0)
                         return log_error_errno(r, "Failed to make tree read-only: %m");
         }
 
         r = mount_all(directory,
-                      arg_userns_mode != USER_NAMESPACE_NO,
+                      args->arg_userns_mode != USER_NAMESPACE_NO,
                       false,
-                      arg_private_network,
-                      arg_uid_shift,
-                      arg_uid_range,
-                      arg_selinux_apifs_context);
+                      args->arg_private_network,
+                      args->arg_uid_shift,
+                      args->arg_uid_range,
+                      args->arg_selinux_apifs_context);
         if (r < 0)
                 return r;
 
@@ -1999,7 +1830,7 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        dev_setup(directory, arg_uid_shift, arg_uid_shift);
+        dev_setup(directory, args->arg_uid_shift, args->arg_uid_shift);
 
         r = setup_pts(directory);
         if (r < 0)
@@ -2013,7 +1844,7 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = setup_seccomp(arg_caps_retain);
+        r = setup_seccomp(args->arg_caps_retain);
         if (r < 0)
                 return r;
 
@@ -2035,23 +1866,23 @@ static int outer_child(
 
         r = mount_custom(
                         directory,
-                        arg_custom_mounts,
-                        arg_n_custom_mounts,
-                        arg_userns_mode != USER_NAMESPACE_NO,
-                        arg_uid_shift,
-                        arg_uid_range,
-                        arg_selinux_apifs_context);
+                        args->arg_custom_mounts,
+                        args->arg_n_custom_mounts,
+                        args->arg_userns_mode != USER_NAMESPACE_NO,
+                        args->arg_uid_shift,
+                        args->arg_uid_range,
+                        args->arg_selinux_apifs_context);
         if (r < 0)
                 return r;
 
-        if (!arg_use_cgns || !cg_ns_supported()) {
+        if (!args->arg_use_cgns || !cg_ns_supported()) {
                 r = mount_cgroups(
                                 directory,
-                                arg_unified_cgroup_hierarchy,
-                                arg_userns_mode != USER_NAMESPACE_NO,
-                                arg_uid_shift,
-                                arg_uid_range,
-                                arg_selinux_apifs_context,
+                                args->arg_unified_cgroup_hierarchy,
+                                args->arg_userns_mode != USER_NAMESPACE_NO,
+                                args->arg_uid_shift,
+                                args->arg_uid_range,
+                                args->arg_selinux_apifs_context,
                                 false);
                 if (r < 0)
                         return r;
@@ -2066,9 +1897,9 @@ static int outer_child(
                 return fd;
 
         pid = raw_clone(SIGCHLD|CLONE_NEWNS|
-                        arg_clone_ns_flags |
-                        (arg_private_network ? CLONE_NEWNET : 0) |
-                        (arg_userns_mode != USER_NAMESPACE_NO ? CLONE_NEWUSER : 0));
+                        args->arg_clone_ns_flags |
+                        (args->arg_private_network ? CLONE_NEWNET : 0) |
+                        (args->arg_userns_mode != USER_NAMESPACE_NO ? CLONE_NEWUSER : 0));
         if (pid < 0)
                 return log_error_errno(errno, "Failed to fork inner child: %m");
         if (pid == 0) {
@@ -2096,13 +1927,9 @@ static int outer_child(
                 return -EIO;
         }
 
-        l = send(uuid_socket, &arg_uuid, sizeof(arg_uuid), MSG_NOSIGNAL);
-        if (l < 0)
-                return log_error_errno(errno, "Failed to send machine ID: %m");
-        if (l != sizeof(arg_uuid)) {
-                log_error("Short write while sending machine ID.");
-                return -EIO;
-        }
+        r = negotiate_uuid_outer_child(uuid_socket);
+        if (r < 0)
+	        return r;
 
         l = send_one_fd(notify_socket, fd, 0);
         if (l < 0)
@@ -2117,61 +1944,6 @@ static int outer_child(
         return 0;
 }
 
-static int uid_shift_pick(uid_t *shift, LockFile *ret_lock_file) {
-        unsigned n_tries = 100;
-        uid_t candidate;
-        int r;
-
-        assert(shift);
-        assert(ret_lock_file);
-        assert(arg_userns_mode == USER_NAMESPACE_PICK);
-        assert(arg_uid_range == 0x10000U);
-
-        candidate = *shift;
-
-        (void) mkdir("/run/systemd/nspawn-uid", 0755);
-
-        for (;;) {
-                char lock_path[strlen("/run/systemd/nspawn-uid/") + DECIMAL_STR_MAX(uid_t) + 1];
-                _cleanup_release_lock_file_ LockFile lf = LOCK_FILE_INIT;
-
-                if (--n_tries <= 0)
-                        return -EBUSY;
-
-                if (candidate < UID_SHIFT_PICK_MIN || candidate > UID_SHIFT_PICK_MAX)
-                        goto next;
-                if ((candidate & UINT32_C(0xFFFF)) != 0)
-                        goto next;
-
-                xsprintf(lock_path, "/run/systemd/nspawn-uid/" UID_FMT, candidate);
-                r = make_lock_file(lock_path, LOCK_EX|LOCK_NB, &lf);
-                if (r == -EBUSY) /* Range already taken by another nspawn instance */
-                        goto next;
-                if (r < 0)
-                        return r;
-
-                /* Make some superficial checks whether the range is currently known in the user database */
-                if (getpwuid(candidate))
-                        goto next;
-                if (getpwuid(candidate + UINT32_C(0xFFFE)))
-                        goto next;
-                if (getgrgid(candidate))
-                        goto next;
-                if (getgrgid(candidate + UINT32_C(0xFFFE)))
-                        goto next;
-
-                *ret_lock_file = lf;
-                lf = (struct LockFile) LOCK_FILE_INIT;
-                *shift = candidate;
-                return 0;
-
-        next:
-                random_bytes(&candidate, sizeof(candidate));
-                candidate = (candidate % (UID_SHIFT_PICK_MAX - UID_SHIFT_PICK_MIN)) + UID_SHIFT_PICK_MIN;
-                candidate &= (uid_t) UINT32_C(0xFFFF0000);
-        }
-}
-
 static int setup_uid_map(pid_t pid) {
         char uid_map[strlen("/proc//uid_map") + DECIMAL_STR_MAX(uid_t) + 1], line[DECIMAL_STR_MAX(uid_t)*3+3+1];
         int r;
@@ -2179,7 +1951,7 @@ static int setup_uid_map(pid_t pid) {
         assert(pid > 1);
 
         xsprintf(uid_map, "/proc/" PID_FMT "/uid_map", pid);
-        xsprintf(line, UID_FMT " " UID_FMT " " UID_FMT "\n", 0, arg_uid_shift, arg_uid_range);
+        xsprintf(line, UID_FMT " " UID_FMT " " UID_FMT "\n", 0, args->arg_uid_shift, args->arg_uid_range);
         r = write_string_file(uid_map, line, 0);
         if (r < 0)
                 return log_error_errno(r, "Failed to write UID map: %m");
@@ -2323,7 +2095,7 @@ static int run(int master,
         assert_se(sigemptyset(&mask_chld) == 0);
         assert_se(sigaddset(&mask_chld, SIGCHLD) == 0);
 
-        if (arg_userns_mode == USER_NAMESPACE_PICK) {
+        if (args->arg_userns_mode == USER_NAMESPACE_PICK) {
                 /* When we shall pick the UID/GID range, let's first lock /etc/passwd, so that we can safely
                  * check with getpwuid() if the specific user already exists. Note that /etc might be
                  * read-only, in which case this will fail with EROFS. But that's really OK, as in that case we
@@ -2355,7 +2127,7 @@ static int run(int master,
         if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, notify_socket_pair) < 0)
                 return log_error_errno(errno, "Failed to create notify socket pair: %m");
 
-        if (arg_userns_mode != USER_NAMESPACE_NO)
+        if (args->arg_userns_mode != USER_NAMESPACE_NO)
                 if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, uid_shift_socket_pair) < 0)
                         return log_error_errno(errno, "Failed to create uid shift socket pair: %m");
 
@@ -2392,7 +2164,7 @@ static int run(int master,
                 (void) reset_signal_mask();
 
                 r = outer_child(&barrier,
-                                arg_directory,
+                                args->arg_directory,
                                 console,
                                 root_device, root_device_rw,
                                 home_device, home_device_rw,
@@ -2424,35 +2196,9 @@ static int run(int master,
         notify_socket_pair[1] = safe_close(notify_socket_pair[1]);
         uid_shift_socket_pair[1] = safe_close(uid_shift_socket_pair[1]);
 
-        if (arg_userns_mode != USER_NAMESPACE_NO) {
-                /* The child just let us know the UID shift it might have read from the image. */
-                l = recv(uid_shift_socket_pair[0], &arg_uid_shift, sizeof arg_uid_shift, 0);
-                if (l < 0)
-                        return log_error_errno(errno, "Failed to read UID shift: %m");
-
-                if (l != sizeof arg_uid_shift) {
-                        log_error("Short read while reading UID shift.");
-                        return -EIO;
-                }
-
-                if (arg_userns_mode == USER_NAMESPACE_PICK) {
-                        /* If we are supposed to pick the UID shift, let's try to use the shift read from the
-                         * image, but if that's already in use, pick a new one, and report back to the child,
-                         * which one we now picked. */
-
-                        r = uid_shift_pick(&arg_uid_shift, &uid_shift_lock);
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to pick suitable UID/GID range: %m");
-
-                        l = send(uid_shift_socket_pair[0], &arg_uid_shift, sizeof arg_uid_shift, MSG_NOSIGNAL);
-                        if (l < 0)
-                                return log_error_errno(errno, "Failed to send UID shift: %m");
-                        if (l != sizeof arg_uid_shift) {
-                                log_error("Short write while writing UID shift.");
-                                return -EIO;
-                        }
-                }
-        }
+        r = negotiate_uid_parent(uid_shift_socket_pair[0], &uid_shift_lock);
+        if (r < 0)
+	        return r;
 
         /* Wait for the outer child. */
         r = wait_for_terminate_and_warn("namespace helper", *pid, NULL);
@@ -2469,13 +2215,9 @@ static int run(int master,
         }
 
         /* We also retrieve container UUID in case it was generated by outer child */
-        l = recv(uuid_socket_pair[0], &arg_uuid, sizeof arg_uuid, 0);
-        if (l < 0)
-                return log_error_errno(errno, "Failed to read container machine ID: %m");
-        if (l != sizeof(arg_uuid)) {
-                log_error("Short read while reading container machined ID.");
-                return -EIO;
-        }
+        r = negotiate_uuid_parent(uuid_socket_pair[0]);
+        if (r < 0)
+	        return r;
 
         /* We also retrieve the socket used for notifications generated by outer child */
         notify_socket = receive_one_fd(notify_socket_pair[0], 0);
@@ -2485,7 +2227,7 @@ static int run(int master,
 
         log_debug("Init process invoked as PID "PID_FMT, *pid);
 
-        if (arg_userns_mode != USER_NAMESPACE_NO) {
+        if (args->arg_userns_mode != USER_NAMESPACE_NO) {
                 if (!barrier_place_and_sync(&barrier)) { /* #1 */
                         log_error("Child died too early.");
                         return -ESRCH;
@@ -2498,30 +2240,30 @@ static int run(int master,
                 (void) barrier_place(&barrier); /* #2 */
         }
 
-        if (arg_private_network) {
+        if (args->arg_private_network) {
 
-                r = move_network_interfaces(*pid, arg_network_interfaces);
+                r = move_network_interfaces(*pid, args->arg_network_interfaces);
                 if (r < 0)
                         return r;
 
-                if (arg_network_veth) {
-                        r = setup_veth(arg_machine, *pid, veth_name,
-                                       arg_network_bridge || arg_network_zone);
+                if (args->arg_network_veth) {
+                        r = setup_veth(args->arg_machine, *pid, veth_name,
+                                       args->arg_network_bridge || args->arg_network_zone);
                         if (r < 0)
                                 return r;
                         else if (r > 0)
                                 ifi = r;
 
-                        if (arg_network_bridge) {
+                        if (args->arg_network_bridge) {
                                 /* Add the interface to a bridge */
-                                r = setup_bridge(veth_name, arg_network_bridge, false);
+                                r = setup_bridge(veth_name, args->arg_network_bridge, false);
                                 if (r < 0)
                                         return r;
                                 if (r > 0)
                                         ifi = r;
-                        } else if (arg_network_zone) {
+                        } else if (args->arg_network_zone) {
                                 /* Add the interface to a bridge, possibly creating it */
-                                r = setup_bridge(veth_name, arg_network_zone, true);
+                                r = setup_bridge(veth_name, args->arg_network_zone, true);
                                 if (r < 0)
                                         return r;
                                 if (r > 0)
@@ -2529,7 +2271,7 @@ static int run(int master,
                         }
                 }
 
-                r = setup_veth_extra(arg_machine, *pid, arg_network_veth_extra);
+                r = setup_veth_extra(args->arg_machine, *pid, args->arg_network_veth_extra);
                 if (r < 0)
                         return r;
 
@@ -2539,43 +2281,43 @@ static int run(int master,
                    remove them on its own, since they cannot be referenced by anything yet. */
                 *veth_created = true;
 
-                r = setup_macvlan(arg_machine, *pid, arg_network_macvlan);
+                r = setup_macvlan(args->arg_machine, *pid, args->arg_network_macvlan);
                 if (r < 0)
                         return r;
 
-                r = setup_ipvlan(arg_machine, *pid, arg_network_ipvlan);
+                r = setup_ipvlan(args->arg_machine, *pid, args->arg_network_ipvlan);
                 if (r < 0)
                         return r;
         }
 
-        if (arg_register) {
+        if (args->arg_register) {
                 r = register_machine(
-                                arg_machine,
+                                args->arg_machine,
                                 *pid,
-                                arg_directory,
-                                arg_uuid,
+                                args->arg_directory,
+                                args->arg_uuid,
                                 ifi,
-                                arg_slice,
-                                arg_custom_mounts, arg_n_custom_mounts,
-                                arg_kill_signal,
-                                arg_property,
-                                arg_keep_unit,
-                                arg_container_service_name);
+                                args->arg_slice,
+                                args->arg_custom_mounts, args->arg_n_custom_mounts,
+                                args->arg_kill_signal,
+                                args->arg_property,
+                                args->arg_keep_unit,
+                                args->arg_container_service_name);
                 if (r < 0)
                         return r;
         }
 
-        r = sync_cgroup(*pid, arg_unified_cgroup_hierarchy, arg_uid_shift);
+        r = sync_cgroup(*pid, args->arg_unified_cgroup_hierarchy, args->arg_uid_shift);
         if (r < 0)
                 return r;
 
-        if (arg_keep_unit) {
-                r = create_subcgroup(*pid, arg_unified_cgroup_hierarchy);
+        if (args->arg_keep_unit) {
+                r = create_subcgroup(*pid, args->arg_unified_cgroup_hierarchy);
                 if (r < 0)
                         return r;
         }
 
-        r = chown_cgroup(*pid, arg_uid_shift);
+        r = chown_cgroup(*pid, args->arg_uid_shift);
         if (r < 0)
                 return r;
 
@@ -2615,10 +2357,10 @@ static int run(int master,
         sd_notifyf(false,
                    "STATUS=Container running.\n"
                    "X_NSPAWN_LEADER_PID=" PID_FMT, *pid);
-        if (!arg_notify_ready)
+        if (!args->arg_notify_ready)
                 sd_notify(false, "READY=1\n");
 
-        if (arg_kill_signal > 0) {
+        if (args->arg_kill_signal > 0) {
                 /* Try to kill the init system on SIGINT or SIGTERM */
                 sd_event_add_signal(event, NULL, SIGINT, on_orderly_shutdown, PID_TO_PTR(*pid));
                 sd_event_add_signal(event, NULL, SIGTERM, on_orderly_shutdown, PID_TO_PTR(*pid));
@@ -2631,12 +2373,12 @@ static int run(int master,
         /* simply exit on sigchld */
         sd_event_add_signal(event, NULL, SIGCHLD, NULL, NULL);
 
-        if (arg_expose_ports) {
+        if (args->arg_expose_ports) {
                 r = expose_port_watch_rtnl(event, rtnl_socket_pair[0], on_address_change, exposed, &rtnl);
                 if (r < 0)
                         return r;
 
-                (void) expose_port_execute(rtnl, arg_expose_ports, exposed);
+                (void) expose_port_execute(rtnl, args->arg_expose_ports, exposed);
         }
 
         rtnl_socket_pair[0] = safe_close(rtnl_socket_pair[0]);
@@ -2655,11 +2397,11 @@ static int run(int master,
 
         forward = pty_forward_free(forward);
 
-        if (!arg_quiet && last_char != '\n')
+        if (!args->arg_quiet && last_char != '\n')
                 putc('\n', stdout);
 
         /* Kill if it is not dead yet anyway */
-        if (arg_register && !arg_keep_unit)
+        if (args->arg_register && !args->arg_keep_unit)
                 terminate_machine(*pid);
 
         /* Normally redundant, but better safe than sorry */
@@ -2685,7 +2427,7 @@ static int run(int master,
 
         /* CONTAINER_REBOOTED, loop again */
 
-        if (arg_keep_unit) {
+        if (args->arg_keep_unit) {
                 /* Special handling if we are running as a service: instead of simply
                  * restarting the machine we want to restart the entire service, so let's
                  * inform systemd about this with the special exit code 133. The service
@@ -2696,9 +2438,9 @@ static int run(int master,
                 return 133;
         }
 
-        expose_port_flush(arg_expose_ports, exposed);
+        expose_port_flush(args->arg_expose_ports, exposed);
 
-        (void) remove_veth_links(veth_name, arg_network_veth_extra);
+        (void) remove_veth_links(veth_name, args->arg_network_veth_extra);
         *veth_created = false;
         return 1; /* loop again */
 }
@@ -2716,6 +2458,8 @@ int main(int argc, char *argv[]) {
         union in_addr_union exposed = {};
         _cleanup_release_lock_file_ LockFile tree_global_lock = LOCK_FILE_INIT, tree_local_lock = LOCK_FILE_INIT;
         bool interactive, veth_created = false;
+
+        args = get_args();
 
         log_parse_environment();
         log_open();
@@ -2755,126 +2499,63 @@ int main(int argc, char *argv[]) {
                 }
         }
 
-        if (arg_directory) {
-                assert(!arg_image);
+        if (args->arg_directory) {
+                assert(!args->arg_image);
 
-                if (path_equal(arg_directory, "/") && !arg_ephemeral) {
+                if (path_equal(args->arg_directory, "/") && !args->arg_ephemeral) {
                         log_error("Spawning container on root directory is not supported. Consider using --ephemeral.");
                         r = -EINVAL;
                         goto finish;
                 }
 
-                if (arg_ephemeral) {
-                        _cleanup_free_ char *np = NULL;
-
-                        /* If the specified path is a mount point we
-                         * generate the new snapshot immediately
-                         * inside it under a random name. However if
-                         * the specified is not a mount point we
-                         * create the new snapshot in the parent
-                         * directory, just next to it. */
-                        r = path_is_mount_point(arg_directory, 0);
-                        if (r < 0) {
-                                log_error_errno(r, "Failed to determine whether directory %s is mount point: %m", arg_directory);
+                if (args->arg_ephemeral) {
+                        r = lock_tree_ephemeral(&tree_global_lock, &tree_local_lock);
+                        if (r < 0)
                                 goto finish;
-                        }
-                        if (r > 0)
-                                r = tempfn_random_child(arg_directory, "machine.", &np);
-                        else
-                                r = tempfn_random(arg_directory, "machine.", &np);
-                        if (r < 0) {
-                                log_error_errno(r, "Failed to generate name for snapshot: %m");
-                                goto finish;
-                        }
-
-                        r = image_path_lock(np, (arg_read_only ? LOCK_SH : LOCK_EX) | LOCK_NB, &tree_global_lock, &tree_local_lock);
-                        if (r < 0) {
-                                log_error_errno(r, "Failed to lock %s: %m", np);
-                                goto finish;
-                        }
-
-                        r = btrfs_subvol_snapshot(arg_directory, np, (arg_read_only ? BTRFS_SNAPSHOT_READ_ONLY : 0) | BTRFS_SNAPSHOT_FALLBACK_COPY | BTRFS_SNAPSHOT_RECURSIVE | BTRFS_SNAPSHOT_QUOTA);
-                        if (r < 0) {
-                                log_error_errno(r, "Failed to create snapshot %s from %s: %m", np, arg_directory);
-                                goto finish;
-                        }
-
-                        free(arg_directory);
-                        arg_directory = np;
-                        np = NULL;
 
                         remove_subvol = true;
 
                 } else {
-                        r = image_path_lock(arg_directory, (arg_read_only ? LOCK_SH : LOCK_EX) | LOCK_NB, &tree_global_lock, &tree_local_lock);
-                        if (r == -EBUSY) {
-                                log_error_errno(r, "Directory tree %s is currently busy.", arg_directory);
+                        r = lock_tree_plain(&tree_global_lock, &tree_local_lock);
+                        if (r < 0)
                                 goto finish;
-                        }
-                        if (r < 0) {
-                                log_error_errno(r, "Failed to lock %s: %m", arg_directory);
-                                goto finish;
-                        }
 
-                        if (arg_template) {
-                                r = btrfs_subvol_snapshot(arg_template, arg_directory, (arg_read_only ? BTRFS_SNAPSHOT_READ_ONLY : 0) | BTRFS_SNAPSHOT_FALLBACK_COPY | BTRFS_SNAPSHOT_RECURSIVE | BTRFS_SNAPSHOT_QUOTA);
+                        if (args->arg_template) {
+                                r = btrfs_subvol_snapshot(args->arg_template, args->arg_directory, (args->arg_read_only ? BTRFS_SNAPSHOT_READ_ONLY : 0) | BTRFS_SNAPSHOT_FALLBACK_COPY | BTRFS_SNAPSHOT_RECURSIVE | BTRFS_SNAPSHOT_QUOTA);
                                 if (r == -EEXIST) {
-                                        if (!arg_quiet)
-                                                log_info("Directory %s already exists, not populating from template %s.", arg_directory, arg_template);
+                                        if (!args->arg_quiet)
+                                                log_info("Directory %s already exists, not populating from template %s.", args->arg_directory, args->arg_template);
                                 } else if (r < 0) {
-                                        log_error_errno(r, "Couldn't create snapshot %s from %s: %m", arg_directory, arg_template);
+                                        log_error_errno(r, "Couldn't create snapshot %s from %s: %m", args->arg_directory, args->arg_template);
                                         goto finish;
                                 } else {
-                                        if (!arg_quiet)
-                                                log_info("Populated %s from template %s.", arg_directory, arg_template);
+                                        if (!args->arg_quiet)
+                                                log_info("Populated %s from template %s.", args->arg_directory, args->arg_template);
                                 }
                         }
                 }
 
-                if (arg_start_mode == START_BOOT) {
-                        if (path_is_os_tree(arg_directory) <= 0) {
-                                log_error("Directory %s doesn't look like an OS root directory (os-release file is missing). Refusing.", arg_directory);
+                if (args->arg_start_mode == START_BOOT) {
+                        if (path_is_os_tree(args->arg_directory) <= 0) {
+                                log_error("Directory %s doesn't look like an OS root directory (os-release file is missing). Refusing.", args->arg_directory);
                                 r = -EINVAL;
                                 goto finish;
                         }
                 } else {
                         const char *p;
 
-                        p = strjoina(arg_directory, "/usr/");
+                        p = strjoina(args->arg_directory, "/usr/");
                         if (laccess(p, F_OK) < 0) {
-                                log_error("Directory %s doesn't look like it has an OS tree. Refusing.", arg_directory);
+                                log_error("Directory %s doesn't look like it has an OS tree. Refusing.", args->arg_directory);
                                 r = -EINVAL;
                                 goto finish;
                         }
                 }
 
         } else {
-                char template[] = "/tmp/nspawn-root-XXXXXX";
-
-                assert(arg_image);
-                assert(!arg_template);
-
-                r = image_path_lock(arg_image, (arg_read_only ? LOCK_SH : LOCK_EX) | LOCK_NB, &tree_global_lock, &tree_local_lock);
-                if (r == -EBUSY) {
-                        r = log_error_errno(r, "Disk image %s is currently busy.", arg_image);
+                r = lock_tree_image(&tree_global_lock, &tree_local_lock);
+                if (r < 0)
                         goto finish;
-                }
-                if (r < 0) {
-                        r = log_error_errno(r, "Failed to create image lock: %m");
-                        goto finish;
-                }
-
-                if (!mkdtemp(template)) {
-                        log_error_errno(errno, "Failed to create temporary directory: %m");
-                        r = -errno;
-                        goto finish;
-                }
-
-                arg_directory = strdup(template);
-                if (!arg_directory) {
-                        r = log_oom();
-                        goto finish;
-                }
 
                 image_fd = setup_image(&device_path, &loop_nr);
                 if (image_fd < 0) {
@@ -2916,8 +2597,8 @@ int main(int argc, char *argv[]) {
                 goto finish;
         }
 
-        if (arg_selinux_apifs_context) {
-                r = mac_selinux_apply(console, arg_selinux_apifs_context);
+        if (args->arg_selinux_apifs_context) {
+                r = mac_selinux_apply(console, args->arg_selinux_apifs_context);
                 if (r < 0)
                         goto finish;
         }
@@ -2927,9 +2608,9 @@ int main(int argc, char *argv[]) {
                 goto finish;
         }
 
-        if (!arg_quiet)
+        if (!args->arg_quiet)
                 log_info("Spawning container %s on %s.\nPress ^] three times within 1s to kill container.",
-                         arg_machine, arg_image ?: arg_directory);
+                         args->arg_machine, args->arg_image ?: args->arg_directory);
 
         assert_se(sigprocmask_many(SIG_BLOCK, NULL, SIGCHLD, SIGWINCH, SIGTERM, SIGINT, -1) >= 0);
 
@@ -2968,42 +2649,42 @@ finish:
 
         loop_remove(loop_nr, &image_fd);
 
-        if (remove_subvol && arg_directory) {
+        if (remove_subvol && args->arg_directory) {
                 int k;
 
-                k = btrfs_subvol_remove(arg_directory, BTRFS_REMOVE_RECURSIVE|BTRFS_REMOVE_QUOTA);
+                k = btrfs_subvol_remove(args->arg_directory, BTRFS_REMOVE_RECURSIVE|BTRFS_REMOVE_QUOTA);
                 if (k < 0)
-                        log_warning_errno(k, "Cannot remove subvolume '%s', ignoring: %m", arg_directory);
+                        log_warning_errno(k, "Cannot remove subvolume '%s', ignoring: %m", args->arg_directory);
         }
 
-        if (arg_machine) {
+        if (args->arg_machine) {
                 const char *p;
 
-                p = strjoina("/run/systemd/nspawn/propagate/", arg_machine);
+                p = strjoina("/run/systemd/nspawn/propagate/", args->arg_machine);
                 (void) rm_rf(p, REMOVE_ROOT);
         }
 
-        expose_port_flush(arg_expose_ports, &exposed);
+        expose_port_flush(args->arg_expose_ports, &exposed);
 
         if (veth_created)
-                (void) remove_veth_links(veth_name, arg_network_veth_extra);
-        (void) remove_bridge(arg_network_zone);
+                (void) remove_veth_links(veth_name, args->arg_network_veth_extra);
+        (void) remove_bridge(args->arg_network_zone);
 
-        free(arg_directory);
-        free(arg_template);
-        free(arg_image);
-        free(arg_machine);
-        free(arg_user);
-        free(arg_chdir);
-        strv_free(arg_setenv);
-        free(arg_network_bridge);
-        strv_free(arg_network_interfaces);
-        strv_free(arg_network_macvlan);
-        strv_free(arg_network_ipvlan);
-        strv_free(arg_network_veth_extra);
-        strv_free(arg_parameters);
-        custom_mount_free_all(arg_custom_mounts, arg_n_custom_mounts);
-        expose_port_free_all(arg_expose_ports);
+        free(args->arg_directory);
+        free(args->arg_template);
+        free(args->arg_image);
+        free(args->arg_machine);
+        free(args->arg_user);
+        free(args->arg_chdir);
+        strv_free(args->arg_setenv);
+        free(args->arg_network_bridge);
+        strv_free(args->arg_network_interfaces);
+        strv_free(args->arg_network_macvlan);
+        strv_free(args->arg_network_ipvlan);
+        strv_free(args->arg_network_veth_extra);
+        strv_free(args->arg_parameters);
+        custom_mount_free_all(args->arg_custom_mounts, args->arg_n_custom_mounts);
+        expose_port_free_all(args->arg_expose_ports);
 
         return r < 0 ? EXIT_FAILURE : ret;
 }
