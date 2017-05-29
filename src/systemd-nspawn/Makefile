@@ -30,6 +30,7 @@ systemd_nspawn_SOURCES = \
 	src/nspawn/nspawn-args.h \
 	src/nspawn/nspawn-settings.c \
 	src/nspawn/nspawn-settings.h \
+	src/nspawn/nspawn-settings-gperf.h \
 	src/nspawn/nspawn-mount.c \
 	src/nspawn/nspawn-mount.h \
 	src/nspawn/nspawn-network.c \
@@ -50,10 +51,10 @@ systemd_nspawn_SOURCES = \
 	src/nspawn/nspawn-patch-uid.h
 
 nodist_systemd_nspawn_SOURCES = \
-	src/nspawn/nspawn-gperf.c
+	src/nspawn/nspawn-settings-gperf.c
 
 gperf_gperf_sources += \
-	src/nspawn/nspawn-gperf.gperf
+	src/nspawn/nspawn-settings-gperf.gperf
 
 systemd_nspawn_CFLAGS = \
 	$(ACL_CFLAGS) \

@@ -33,6 +33,7 @@
 #include "nspawn-expose-ports.h"
 #include "nspawn-mount.h"
 #include "nspawn-network.h"
+#include "nspawn-settings-gperf.h"
 #include "nspawn-settings.h"
 
 int settings_load(FILE *f, const char *path, Settings **ret) {

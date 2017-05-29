@@ -3,8 +3,8 @@
 
 #include "systemd-shared/conf-parser.h"
 
-#include "nspawn-expose-ports.h"
 #include "nspawn-settings.h"
+#include "nspawn-settings-gperf.h"
 %}
 struct ConfigPerfItem;
 %null_strings
