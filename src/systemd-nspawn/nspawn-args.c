@@ -136,7 +136,7 @@ static Args _args = {
 
 static Args * const args = &_args;
 
-Args const *get_args(void) {
+Args const *args_get(void) {
         return args;
 }
 

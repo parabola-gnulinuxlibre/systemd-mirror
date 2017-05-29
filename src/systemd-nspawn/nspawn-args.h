@@ -24,7 +24,7 @@
 
 #include "nspawn-types.h"
 
-Args const *get_args(void);
+Args const *args_get(void);
 
 // parent:main()
 int parse_argv(int argc, char *argv[]);

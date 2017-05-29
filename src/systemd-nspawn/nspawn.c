@@ -2455,7 +2455,7 @@ int main(int argc, char *argv[]) {
         _cleanup_release_lock_file_ LockFile tree_global_lock = LOCK_FILE_INIT, tree_local_lock = LOCK_FILE_INIT;
         bool interactive, veth_created = false;
 
-        args = get_args();
+        args = args_get();
 
         log_parse_environment();
         log_open();
