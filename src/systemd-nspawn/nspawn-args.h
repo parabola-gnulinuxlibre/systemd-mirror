@@ -26,22 +26,22 @@
 
 Args const *get_args(void);
 
+// parent:main()
 int parse_argv(int argc, char *argv[]);
 int determine_names(void);
 int load_settings(void);
 int verify_arguments(void);
-
-int detect_unified_cgroup_hierarchy(const char *directory);
-int setup_machine_id(const char *directory);
-int determine_uid_shift(const char *directory);
-int custom_mounts_prepare(void);
-
-int negotiate_uid_outer_child(int fd);
-int negotiate_uid_parent(int fd, LockFile *ret_lock_file);
-
-int negotiate_uuid_outer_child(int fd);
-int negotiate_uuid_parent(int fd);
-
 int lock_tree_ephemeral(LockFile *ret_global_lock, LockFile *ret_local_lock);
 int lock_tree_plain(LockFile *ret_global_lock, LockFile *ret_local_lock);
 int lock_tree_image(LockFile *ret_global_lock, LockFile *ret_local_lock);
+int custom_mounts_prepare(void);
+// parent:run()
+int negotiate_uid_parent(int fd, LockFile *ret_lock_file);
+int negotiate_uuid_parent(int fd);
+
+// outer_child()
+int determine_uid_shift(const char *directory);
+int detect_unified_cgroup_hierarchy(const char *directory);
+int negotiate_uid_outer_child(int fd);
+int setup_machine_id(const char *directory);
+int negotiate_uuid_outer_child(int fd);
