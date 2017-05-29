@@ -1748,3 +1748,21 @@ int lock_tree_image(LockFile *ret_global_lock, LockFile *ret_local_lock) {
 
         return 0;
 }
+
+void args_free(void) {
+        free(args->arg_directory);
+        free(args->arg_template);
+        free(args->arg_image);
+        free(args->arg_machine);
+        free(args->arg_user);
+        free(args->arg_chdir);
+        strv_free(args->arg_setenv);
+        free(args->arg_network_bridge);
+        strv_free(args->arg_network_interfaces);
+        strv_free(args->arg_network_macvlan);
+        strv_free(args->arg_network_ipvlan);
+        strv_free(args->arg_network_veth_extra);
+        strv_free(args->arg_parameters);
+        custom_mount_free_all(args->arg_custom_mounts, args->arg_n_custom_mounts);
+        expose_port_free_all(args->arg_expose_ports);
+}

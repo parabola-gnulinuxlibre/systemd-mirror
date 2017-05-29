@@ -38,6 +38,8 @@ int custom_mounts_prepare(void);
 // parent:run()
 int negotiate_uid_parent(int fd, LockFile *ret_lock_file);
 int negotiate_uuid_parent(int fd);
+// parent:main()
+void args_free(void);
 
 // outer_child()
 int determine_uid_shift(const char *directory);
