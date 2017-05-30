@@ -1792,16 +1792,6 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = setup_volatile_state(
-                        directory,
-                        args->arg_volatile_mode,
-                        args->arg_userns_mode != USER_NAMESPACE_NO,
-                        args->arg_uid_shift,
-                        args->arg_uid_range,
-                        args->arg_selinux_context);
-        if (r < 0)
-                return r;
-
         r = base_filesystem_create(directory, args->arg_uid_shift, (gid_t) args->arg_uid_shift);
         if (r < 0)
                 return r;

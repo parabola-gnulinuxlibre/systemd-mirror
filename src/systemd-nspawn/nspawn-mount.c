@@ -1033,43 +1033,6 @@ int mount_systemd_cgroup_writable(
                              MS_BIND|MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_RDONLY, NULL);
 }
 
-int setup_volatile_state(
-                const char *directory,
-                VolatileMode mode,
-                bool userns, uid_t uid_shift, uid_t uid_range,
-                const char *selinux_apifs_context) {
-
-        _cleanup_free_ char *buf = NULL;
-        const char *p, *options;
-        int r;
-
-        assert(directory);
-
-        if (mode != VOLATILE_STATE)
-                return 0;
-
-        /* --volatile=state means we simply overmount /var
-           with a tmpfs, and the rest read-only. */
-
-        r = bind_remount_recursive(directory, true, NULL);
-        if (r < 0)
-                return log_error_errno(r, "Failed to remount %s read-only: %m", directory);
-
-        p = prefix_roota(directory, "/var");
-        r = mkdir(p, 0755);
-        if (r < 0 && errno != EEXIST)
-                return log_error_errno(errno, "Failed to create %s: %m", directory);
-
-        options = "mode=755";
-        r = tmpfs_patch_options(options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
-        if (r < 0)
-                return log_oom();
-        if (r > 0)
-                options = buf;
-
-        return mount_verbose(LOG_ERR, "tmpfs", p, "tmpfs", MS_STRICTATIME, options);
-}
-
 int setup_volatile(
                 const char *directory,
                 VolatileMode mode,
@@ -1084,65 +1047,91 @@ int setup_volatile(
 
         assert(directory);
 
-        if (mode != VOLATILE_YES)
+        switch (mode) {
+        default:
+                assert_not_reached("Unrecognized VolatileMode");
+                return -EINVAL;
+        case VOLATILE_NO:
+                return 0;
+        case VOLATILE_STATE:
+                /* --volatile=state means we simply overmount /var
+                   with a tmpfs, and the rest read-only. */
+
+                r = bind_remount_recursive(directory, true, NULL);
+                if (r < 0)
+                        return log_error_errno(r, "Failed to remount %s read-only: %m", directory);
+
+                t = prefix_roota(directory, "/var");
+                r = mkdir(t, 0755);
+                if (r < 0 && errno != EEXIST)
+                        return log_error_errno(errno, "Failed to create %s: %m", t);
+
+                options = "mode=755";
+                r = tmpfs_patch_options(options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
+                if (r < 0)
+                        return log_oom();
+                if (r > 0)
+                        options = buf;
+
+                return mount_verbose(LOG_ERR, "tmpfs", t, "tmpfs", MS_STRICTATIME, options);
+        case VOLATILE_YES:
+                /* --volatile=yes means we mount a tmpfs to the root dir, and
+                   the original /usr to use inside it, and that read-only. */
+
+                if (!mkdtemp(template))
+                        return log_error_errno(errno, "Failed to create temporary directory: %m");
+
+                options = "mode=755";
+                r = tmpfs_patch_options(options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
+                if (r < 0)
+                        return log_oom();
+                if (r > 0)
+                        options = buf;
+
+                r = mount_verbose(LOG_ERR, "tmpfs", template, "tmpfs", MS_STRICTATIME, options);
+                if (r < 0)
+                        goto fail;
+
+                tmpfs_mounted = true;
+
+                f = prefix_roota(directory, "/usr");
+                t = prefix_roota(template, "/usr");
+
+                r = mkdir(t, 0755);
+                if (r < 0 && errno != EEXIST) {
+                        r = log_error_errno(errno, "Failed to create %s: %m", t);
+                        goto fail;
+                }
+
+                r = mount_verbose(LOG_ERR, f, t, NULL, MS_BIND|MS_REC, NULL);
+                if (r < 0)
+                        goto fail;
+
+                bind_mounted = true;
+
+                r = bind_remount_recursive(t, true, NULL);
+                if (r < 0) {
+                        log_error_errno(r, "Failed to remount %s read-only: %m", t);
+                        goto fail;
+                }
+
+                r = mount_verbose(LOG_ERR, template, directory, NULL, MS_MOVE, NULL);
+                if (r < 0)
+                        goto fail;
+
+                (void) rmdir(template);
+
                 return 0;
 
-        /* --volatile=yes means we mount a tmpfs to the root dir, and
-           the original /usr to use inside it, and that read-only. */
+        fail:
+                if (bind_mounted)
+                        (void) umount_verbose(t);
 
-        if (!mkdtemp(template))
-                return log_error_errno(errno, "Failed to create temporary directory: %m");
-
-        options = "mode=755";
-        r = tmpfs_patch_options(options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
-        if (r < 0)
-                return log_oom();
-        if (r > 0)
-                options = buf;
-
-        r = mount_verbose(LOG_ERR, "tmpfs", template, "tmpfs", MS_STRICTATIME, options);
-        if (r < 0)
-                goto fail;
-
-        tmpfs_mounted = true;
-
-        f = prefix_roota(directory, "/usr");
-        t = prefix_roota(template, "/usr");
-
-        r = mkdir(t, 0755);
-        if (r < 0 && errno != EEXIST) {
-                r = log_error_errno(errno, "Failed to create %s: %m", t);
-                goto fail;
+                if (tmpfs_mounted)
+                        (void) umount_verbose(template);
+                (void) rmdir(template);
+                return r;
         }
-
-        r = mount_verbose(LOG_ERR, f, t, NULL, MS_BIND|MS_REC, NULL);
-        if (r < 0)
-                goto fail;
-
-        bind_mounted = true;
-
-        r = bind_remount_recursive(t, true, NULL);
-        if (r < 0) {
-                log_error_errno(r, "Failed to remount %s read-only: %m", t);
-                goto fail;
-        }
-
-        r = mount_verbose(LOG_ERR, template, directory, NULL, MS_MOVE, NULL);
-        if (r < 0)
-                goto fail;
-
-        (void) rmdir(template);
-
-        return 0;
-
-fail:
-        if (bind_mounted)
-                (void) umount_verbose(t);
-
-        if (tmpfs_mounted)
-                (void) umount_verbose(template);
-        (void) rmdir(template);
-        return r;
 }
 
 VolatileMode volatile_mode_from_string(const char *s) {

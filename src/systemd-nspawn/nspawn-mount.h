@@ -49,4 +49,3 @@ int mount_systemd_cgroup_writable(const char *dest, CGroupUnified unified_reques
 int mount_custom(const char *dest, CustomMount *mounts, unsigned n, bool userns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
 
 int setup_volatile(const char *directory, VolatileMode mode, bool userns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
-int setup_volatile_state(const char *directory, VolatileMode mode, bool userns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
