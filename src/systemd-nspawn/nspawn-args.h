@@ -26,8 +26,9 @@
 
 Args const *args_get(void);
 
-// parent:main()
+/* parent:main() ****************************************************/
 int parse_argv(int argc, char *argv[]);
+/* geteuid() == 0 */
 int determine_names(void);
 int load_settings(void);
 int verify_arguments(void);
@@ -35,15 +36,45 @@ int lock_tree_ephemeral(LockFile *ret_global_lock, LockFile *ret_local_lock);
 int lock_tree_plain(LockFile *ret_global_lock, LockFile *ret_local_lock);
 int lock_tree_image(LockFile *ret_global_lock, LockFile *ret_local_lock);
 int custom_mounts_prepare(void);
-// parent:run()
+/* set up the PTY */
+/* parent:run() *****************************************************/
+/* ... */
+/* if (raw_clone() == 0) { exit(outer_child() == 0 ? EXIT_SUCCESS : EXIT_FAILURE); } */
 int negotiate_uid_parent(int fd, LockFile *ret_lock_file);
-int negotiate_uuid_parent(int fd);
-// parent:main()
+/* wait_for_terminate_and_warn("namespace helper, *pid, NULL) */
+/* recv(pid_socket_pair[0], pid, sizeof *pid, 0) */
+int recv_uuid_parent(int fd);
+/* ... */
+/* parent:main() ****************************************************/
+/* some more teardown */
 void args_free(void);
 
-// outer_child()
+/* outer_child() ****************************************************/
+/* ... */
 int determine_uid_shift(const char *directory);
 int detect_unified_cgroup_hierarchy(const char *directory);
 int negotiate_uid_outer_child(int fd);
+/* setup_volatile(...) */
+/* setup_volatile_state(...) */
+/* ... */
+/* mount_all(in_userns=false, ...) */
+/* ... */
 int setup_machine_id(const char *directory);
-int negotiate_uuid_outer_child(int fd);
+/* ... */
+int send_uuid_outer_child(int fd);
+/* mount_custom(...) */
+/* if (!args->arg_use_cgns || !cg_ns_supported()) { mount_cgroups(...); } */
+/* ... */
+/* if (raw_clone() == 0) { exit(inner_child() == 0 ? EXIT_SUCCESS : EXIT_FAILURE); } */
+/* ... */
+
+/* inner_child() ****************************************************/
+/*
+   mount_all(in_userns=true, ...);
+   mount_sysfs(NULL);
+   if (args->use_cgns && cgns_supported())
+        mount_cgroups(...);
+   else
+        mount_systemd_cgroup_writable(...);
+   ...
+*/

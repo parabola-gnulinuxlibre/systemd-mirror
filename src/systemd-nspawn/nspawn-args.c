@@ -1652,7 +1652,7 @@ int negotiate_uid_parent(int fd, LockFile *ret_lock_file) {
         return 0;
 }
 
-int negotiate_uuid_outer_child(int fd) {
+int send_uuid_outer_child(int fd) {
         ssize_t l;
         
         l = send(fd, &args->arg_uuid, sizeof(args->arg_uuid), MSG_NOSIGNAL);
@@ -1666,7 +1666,7 @@ int negotiate_uuid_outer_child(int fd) {
         return 0;
 }
 
-int negotiate_uuid_parent(int fd) {
+int recv_uuid_parent(int fd) {
         ssize_t l;
 
         l = recv(fd, &args->arg_uuid, sizeof args->arg_uuid, 0);

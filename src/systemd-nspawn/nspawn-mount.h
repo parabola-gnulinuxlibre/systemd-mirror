@@ -26,6 +26,8 @@
 
 #include "nspawn-types.h"
 
+/* used by `args`/`settings` ****************************************/
+
 CustomMount* custom_mount_add(CustomMount **l, unsigned *n, CustomMountType t);
 
 void custom_mount_free_all(CustomMount *l, unsigned n);
@@ -33,6 +35,10 @@ int bind_mount_parse(CustomMount **l, unsigned *n, const char *s, bool read_only
 int tmpfs_mount_parse(CustomMount **l, unsigned *n, const char *s);
 
 int custom_mount_compare(const void *a, const void *b);
+
+VolatileMode volatile_mode_from_string(const char *s);
+
+/* used by nspawn.c *************************************************/
 
 int mount_all(const char *dest, bool use_userns, bool in_userns, bool use_netns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
 int mount_sysfs(const char *dest);
@@ -44,5 +50,3 @@ int mount_custom(const char *dest, CustomMount *mounts, unsigned n, bool userns,
 
 int setup_volatile(const char *directory, VolatileMode mode, bool userns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
 int setup_volatile_state(const char *directory, VolatileMode mode, bool userns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
-
-VolatileMode volatile_mode_from_string(const char *s);
