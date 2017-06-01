@@ -233,7 +233,7 @@ static int tmpfs_patch_options(
         return !!buf;
 }
 
-int mount_sysfs(const char *dest) {
+static int mount_sysfs(const char *dest) {
         const char *full, *top, *x;
         int r;
 
@@ -355,7 +355,7 @@ static int mkdir_userns_p(const char *prefix, const char *path, mode_t mode, boo
         return mkdir_userns(path, mode, in_userns, uid_shift);
 }
 
-int mount_all(const char *dest,
+static int mount_all(const char *dest,
               bool use_userns, bool in_userns,
               bool use_netns,
               uid_t uid_shift, uid_t uid_range,
@@ -448,6 +448,35 @@ int mount_all(const char *dest,
         }
 
         return 0;
+}
+
+int mount_post_userns(const char *dest,
+                     bool use_userns,
+                     bool use_netns,
+                     uid_t uid_shift,
+                     uid_t uid_range,
+                     const char *selinux_apifs_context) {
+
+        int r;
+
+        r = mount_all(NULL, use_userns, false, use_netns, uid_shift, uid_range, selinux_apifs_context);
+        if (r < 0)
+                return r;
+
+        r = mount_sysfs(NULL);
+        if (r < 0)
+                return r;
+
+        return 0;
+}
+
+int mount_pre_userns(const char *dest,
+                     bool use_userns,
+                     bool use_netns,
+                     uid_t uid_shift,
+                     uid_t uid_range,
+                     const char *selinux_apifs_context) {
+        return mount_all(dest, use_userns, true, use_netns, uid_shift, uid_range, selinux_apifs_context);
 }
 
 static int parse_mount_bind_options(const char *options, unsigned long *mount_flags, char **mount_opts) {

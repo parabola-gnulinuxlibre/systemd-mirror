@@ -40,8 +40,8 @@ VolatileMode volatile_mode_from_string(const char *s);
 
 /* used by nspawn.c *************************************************/
 
-int mount_all(const char *dest, bool use_userns, bool in_userns, bool use_netns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
-int mount_sysfs(const char *dest);
+int mount_pre_userns(const char *dest, bool use_userns, bool use_netns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
+int mount_post_userns(bool use_userns, bool use_netns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
 
 int mount_cgroups(const char *dest, CGroupUnified unified_requested, bool userns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context, bool use_cgns);
 int mount_systemd_cgroup_writable(const char *dest, CGroupUnified unified_requested);

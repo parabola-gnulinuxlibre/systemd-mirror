@@ -1460,18 +1460,11 @@ static int inner_child(
         if (r < 0)
                 return log_error_errno(r, "Couldn't become new root: %m");
 
-        r = mount_all(NULL,
-                      args->arg_userns_mode != USER_NAMESPACE_NO,
-                      true,
-                      args->arg_private_network,
-                      args->arg_uid_shift,
-                      args->arg_uid_range,
-                      args->arg_selinux_apifs_context);
-
-        if (r < 0)
-                return r;
-
-        r = mount_sysfs(NULL);
+        r = mount_post_userns(args->arg_userns_mode != USER_NAMESPACE_NO,
+                              args->arg_private_network,
+                              args->arg_uid_shift,
+                              args->arg_uid_range,
+                              args->arg_selinux_apifs_context);
         if (r < 0)
                 return r;
 
@@ -1809,13 +1802,12 @@ static int outer_child(
                         return log_error_errno(r, "Failed to make tree read-only: %m");
         }
 
-        r = mount_all(args->arg_directory,
-                      args->arg_userns_mode != USER_NAMESPACE_NO,
-                      false,
-                      args->arg_private_network,
-                      args->arg_uid_shift,
-                      args->arg_uid_range,
-                      args->arg_selinux_apifs_context);
+        r = mount_pre_userns(args->arg_directory,
+                             args->arg_userns_mode != USER_NAMESPACE_NO,
+                             args->arg_private_network,
+                             args->arg_uid_shift,
+                             args->arg_uid_range,
+                             args->arg_selinux_apifs_context);
         if (r < 0)
                 return r;
 
