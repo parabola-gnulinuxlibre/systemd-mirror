@@ -32,6 +32,7 @@ systemd_nspawn_SOURCES = \
 	src/nspawn/nspawn-settings.h \
 	src/nspawn/nspawn-settings-gperf.h \
 	src/nspawn/nspawn-mount.c \
+	src/nspawn/nspawn-mount-cgroup.c \
 	src/nspawn/nspawn-mount.h \
 	src/nspawn/nspawn-network.c \
 	src/nspawn/nspawn-network.h \
