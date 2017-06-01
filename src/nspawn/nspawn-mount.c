@@ -288,10 +288,17 @@ int mount_sysfs(const char *dest) {
         x = prefix_roota(top, "/fs/kdbus");
         (void) mkdir_p(x, 0755);
 
-        /* Create mountpoint for cgroups. Otherwise we are not allowed since we
-         * remount /sys read-only.
-         */
-        if (cg_ns_supported()) {
+        /* We need to ensure that /sys/fs/cgroup exists before we remount /sys read-only.
+         *
+         * If !use_cgns, then this was already done by the outer child; so we only need to do it here it if use_cgns.
+         * This function doesn't know whether use_cgns, but !cg_ns_supported()⇒!use_cgns, so we can "optimize" the case
+         * where we _know_ !use_cgns, and deal with a no-op mkdir_p() in the false-positive where cgns_supported() but
+         * !use_cgns.
+         *
+         * But is it really much of an optimization?  We're potentially spending an access(2) (cg_ns_supported() could
+         * be cached from a previous call) to potentially save an lstat(2) and mkdir(2); and all of them are on virtual
+         * fileystems, so they should all be pretty cheap. */
+        if (cg_ns_supported()) { /* if (use_cgns) { */
                 x = prefix_roota(top, "/fs/cgroup");
                 (void) mkdir_p(x, 0755);
         }
