@@ -124,7 +124,7 @@ static Args _args = {
         .arg_uid_shift = UID_INVALID, .arg_uid_range = 0x10000U,
         .arg_userns_chown = false,
         .arg_kill_signal = 0,
-        .arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_UNKNOWN,
+        .arg_cgroup_ver = CGROUP_VER_INVALID,
         .arg_settings_mask = 0,
         .arg_settings_trusted = -1,
         .arg_parameters = NULL,
@@ -264,65 +264,82 @@ int custom_mounts_prepare(void) {
         return 0;
 }
 
-int detect_unified_cgroup_hierarchy(const char *directory) {
+int pick_cgroup_ver(const char *directory, CGroupMode *ret_cgver) {
         const char *e;
         int r;
         CGroupUnified outer;
 
-        /* Allow the user to control whether the unified hierarchy is used */
         e = getenv("UNIFIED_CGROUP_HIERARCHY");
         if (e) {
                 r = parse_boolean(e);
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to parse $UNIFIED_CGROUP_HIERARCHY.");
-                if (r > 0)
-                        args->arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
-                else
-                        args->arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                if (r > 0) {
+                        *ret_cgver = CGROUP_VER_2;
+                        return 0;
+                } else {
+                        *ret_cgver = CGROUP_VER_1_SD;
+                        return 0;
+                }
+        } else {
+                /* Otherwise inherit the from the host system, unless we can tell that the container uses systemd and
+                 * the container doesn't have a new enough systemd (detected by checking libsystemd-shared) to properly
+                 * inherit the host's cgroups. */
 
-                return 0;
+                r = cg_version(&outer);
+                if (r < 0) {
+                        /* Huh, we can't detect what cgroup version the host system is using.  Default to letting the
+                         * container inherit that weirdness. */
+                        *ret_cgver = CGROUP_VER_INHERIT;
+                        return 0;
+                }
+
+                if (systemd_installation(directory) < 1) {
+                        /* It appears that the container isn't using systemd.  Default to inheriting from the host
+                         * system. */
+                        *ret_cgver = CGROUP_VER_INHERIT;
+                        return 0;
+                }
+
+                switch (outer) {
+                case CGROUP_UNIFIED_UNKNOWN:
+                        assert_not_reached("Unknown host cgroup version");
+                        *ret_cgver = CGROUP_VER_INVALID;
+                        return 0;
+                case CGROUP_UNIFIED_NONE: /* cgroup v1-sd */
+                        /* All versions of systemd should be able to inherit this. */
+                        *ret_cgver = CGROUP_VER_INHERIT;
+                        return 0;
+                case CGROUP_UNIFIED_ALL: /* cgroup v2 */
+                        /* Unified cgroup hierarchy support was added in 230. Unfortunately libsystemd-shared,
+                         * which we use to sniff the systemd version, was only added in 231, so we'll have a
+                         * false negative here for 230. */
+                        r = systemd_installation_has_version(directory, 230);
+                        if (r < 0)
+                                return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
+                        if (r > 0) {
+                                *ret_cgver = CGROUP_VER_INHERIT;
+                                return 0;
+                        } else {
+                                *ret_cgver = CGROUP_VER_1_SD;
+                                return 0;
+                        }
+                case CGROUP_UNIFIED_SYSTEMD: /* cgroup mixed-sd232 */
+                        /* Mixed cgroup hierarchy support was added in 232 */
+                        r = systemd_installation_has_version(directory, 232);
+                        if (r < 0)
+                                return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
+                        if (r > 0) {
+                                *ret_cgver = CGROUP_VER_INHERIT;
+                                return 0;
+                        } else {
+                                *ret_cgver = CGROUP_VER_1_SD;
+                                return 0;
+                        }
+                }
         }
-
-        r = cg_version(&outer);
-        if (r < 0)
-                return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine what the host system uses: %m");
-
-        /* Otherwise inherit the default from the host system, unless
-         * the container doesn't have a new enough systemd (detected
-         * by checking libsystemd-shared). */
-        switch (outer) {
-        case CGROUP_UNIFIED_UNKNOWN:
-                assert_not_reached("Unknown host cgroup version");
-                break;
-        case CGROUP_UNIFIED_NONE: /* cgroup v1 */
-                args->arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-                break;
-        case CGROUP_UNIFIED_ALL: /* cgroup v2 */
-                /* Unified cgroup hierarchy support was added in 230. Unfortunately libsystemd-shared,
-                 * which we use to sniff the systemd version, was only added in 231, so we'll have a
-                 * false negative here for 230. */
-                r = systemd_installation_has_version(directory, 230);
-                if (r < 0)
-                        return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
-                if (r > 0)
-                        args->arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
-                else
-                        args->arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-                break;
-        case CGROUP_UNIFIED_SYSTEMD: /* cgroup v1 & v2 mixed; but v2 for systemd */
-                /* Mixed cgroup hierarchy support was added in 232 */
-                r = systemd_installation_has_version(directory, 232);
-                if (r < 0)
-                        return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
-                if (r > 0)
-                        args->arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD;
-                else
-                        args->arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-                break;
-        }
-
-        return 0;
 }
+
 
 static void parse_share_ns_env(const char *name, unsigned long ns_flag) {
         int r;
@@ -369,6 +386,7 @@ int parse_argv(int argc, char *argv[]) {
                 ARG_CHDIR,
                 ARG_PRIVATE_USERS_CHOWN,
                 ARG_NOTIFY_READY,
+                ARG_CGROUP_VERSION,
         };
 
         static const struct option options[] = {
@@ -418,6 +436,7 @@ int parse_argv(int argc, char *argv[]) {
                 { "settings",              required_argument, NULL, ARG_SETTINGS            },
                 { "chdir",                 required_argument, NULL, ARG_CHDIR               },
                 { "notify-ready",          required_argument, NULL, ARG_NOTIFY_READY        },
+                { "cgroup-version",        required_argument, NULL, ARG_CGROUP_VERSION      },
                 {}
         };
 
@@ -1013,6 +1032,23 @@ int parse_argv(int argc, char *argv[]) {
                         }
                         args->arg_notify_ready = r;
                         args->arg_settings_mask |= SETTING_NOTIFY_READY;
+                        break;
+
+                case ARG_CGROUP_VERSION:
+                        if (streq(optarg, "none"))
+                                args->arg_cgroup_ver = CGROUP_VER_NONE;
+                        if (streq(optarg, "inherit"))
+                                args->arg_cgroup_ver = CGROUP_VER_INHERIT;
+                        else if (streq(optarg, "v1-sd"))
+                                args->arg_cgroup_ver = CGROUP_VER_1_SD;
+                        else if (streq(optarg, "v2"))
+                                args->arg_cgroup_ver = CGROUP_VER_2;
+                        else if (streq(optarg, "mixed-sd") || streq(optarg, "mixed-sd232"))
+                                args->arg_cgroup_ver = CGROUP_VER_MIXED_SD232;
+                        else {
+                                log_error("Unknown cgroup version: %s" optarg);
+                                return -EINVAL;
+                        }
                         break;
 
                 case '?':

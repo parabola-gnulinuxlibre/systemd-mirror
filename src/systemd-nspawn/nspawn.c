@@ -1595,51 +1595,63 @@ static int inner_child(
                 if (chdir(args->arg_chdir) < 0)
                         return log_error_errno(errno, "Failed to change to specified working directory %s: %m", args->arg_chdir);
 
-        if (args->arg_start_mode == START_PID2) {
+        switch (args->arg_start_mode) {
+        default:
+                assert_not_reached("Unrecognized args->arg_start_mode");
+                return -EINVAL;
+        case START_PID2:
                 r = stub_pid1();
                 if (r < 0)
                         return r;
-        }
+                /* fall through */
+        case START_PID1:
+                /* Now, explicitly close the log, so that we
+                 * then can close all remaining fds. Closing
+                 * the log explicitly first has the benefit
+                 * that the logging subsystem knows about it,
+                 * and is thus ready to be reopened should we
+                 * need it again. Note that the other fds
+                 * closed here are at least the locking and
+                 * barrier fds. */
+                log_close();
+                (void) fdset_close_others(fds);
 
-        /* Now, explicitly close the log, so that we
-         * then can close all remaining fds. Closing
-         * the log explicitly first has the benefit
-         * that the logging subsystem knows about it,
-         * and is thus ready to be reopened should we
-         * need it again. Note that the other fds
-         * closed here are at least the locking and
-         * barrier fds. */
-        log_close();
-        (void) fdset_close_others(fds);
+                if (!strv_isempty(args->arg_parameters))
+                        execvpe(args->arg_parameters[0], args->arg_parameters, env_use);
+                else {
+                        if (!args->arg_chdir)
+                                /* If we cannot change the directory, we'll end up in /, that is expected. */
+                                (void) chdir(home ?: "/root");
 
-        if (args->arg_start_mode == START_BOOT) {
-                char **a;
-                size_t m;
+                        execle("/bin/bash", "-bash", NULL, env_use);
+                        execle("/bin/sh", "-sh", NULL, env_use);
+                }
+                break;
+        case START_BOOT:
+                log_close(); /* see the above comment */
+                (void) fdset_close_others(fds);
 
-                /* Automatically search for the init system */
+                if (true) { /* to create a stack to put `a` and `m` on */
+                        char **a;
+                        size_t m;
 
-                m = strv_length(args->arg_parameters);
-                a = newa(char*, m + 2);
-                memcpy_safe(a + 1, args->arg_parameters, m * sizeof(char*));
-                a[1 + m] = NULL;
+                        /* Automatically search for the init system */
 
-                a[0] = (char*) "/usr/lib/systemd/systemd";
-                execve(a[0], a, env_use);
+                        m = strv_length(args->arg_parameters);
+                        a = newa(char*, m + 2);
+                        memcpy_safe(a + 1, args->arg_parameters, m * sizeof(char*));
+                        a[1 + m] = NULL;
 
-                a[0] = (char*) "/lib/systemd/systemd";
-                execve(a[0], a, env_use);
+                        a[0] = (char*) "/usr/lib/systemd/systemd";
+                        execve(a[0], a, env_use);
 
-                a[0] = (char*) "/sbin/init";
-                execve(a[0], a, env_use);
-        } else if (!strv_isempty(args->arg_parameters))
-                execvpe(args->arg_parameters[0], args->arg_parameters, env_use);
-        else {
-                if (!args->arg_chdir)
-                        /* If we cannot change the directory, we'll end up in /, that is expected. */
-                        (void) chdir(home ?: "/root");
+                        a[0] = (char*) "/lib/systemd/systemd";
+                        execve(a[0], a, env_use);
 
-                execle("/bin/bash", "-bash", NULL, env_use);
-                execle("/bin/sh", "-sh", NULL, env_use);
+                        a[0] = (char*) "/sbin/init";
+                        execve(a[0], a, env_use);
+                }
+                break;
         }
 
         r = -errno;
@@ -1680,7 +1692,6 @@ static int setup_sd_notify_child(void) {
 
 static int outer_child(
                 Barrier *barrier,
-                const char *directory,
                 const char *console,
                 const char *root_device, bool root_device_rw,
                 const char *home_device, bool home_device_rw,
@@ -1702,7 +1713,7 @@ static int outer_child(
         _cleanup_close_ int fd = -1;
 
         assert(barrier);
-        assert(directory);
+        assert(args->arg_directory);
         assert(console);
         assert(pid_socket >= 0);
         assert(uuid_socket >= 0);
@@ -1743,7 +1754,7 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = mount_devices(directory,
+        r = mount_devices(args->arg_directory,
                           root_device, root_device_rw,
                           home_device, home_device_rw,
                           srv_device, srv_device_rw,
@@ -1751,11 +1762,7 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = determine_uid_shift(directory);
-        if (r < 0)
-                return r;
-
-        r = detect_unified_cgroup_hierarchy(directory);
+        r = determine_uid_shift(args->arg_directory);
         if (r < 0)
                 return r;
 
@@ -1764,7 +1771,7 @@ static int outer_child(
                 return r;
 
         /* Turn directory into bind mount */
-        r = mount_verbose(LOG_ERR, directory, directory, NULL, MS_BIND|MS_REC, NULL);
+        r = mount_verbose(LOG_ERR, args->arg_directory, args->arg_directory, NULL, MS_BIND|MS_REC, NULL);
         if (r < 0)
                 return r;
 
@@ -1774,16 +1781,16 @@ static int outer_child(
          * See https://github.com/systemd/systemd/issues/3860
          * Further submounts (such as /dev) done after this will inherit the
          * shared propagation mode.*/
-        r = mount_verbose(LOG_ERR, NULL, directory, NULL, MS_SHARED|MS_REC, NULL);
+        r = mount_verbose(LOG_ERR, NULL, args->arg_directory, NULL, MS_SHARED|MS_REC, NULL);
         if (r < 0)
                 return r;
 
-        r = recursive_chown(directory, args->arg_uid_shift, args->arg_uid_range);
+        r = recursive_chown(args->arg_directory, args->arg_uid_shift, args->arg_uid_range);
         if (r < 0)
                 return r;
 
         r = setup_volatile(
-                        directory,
+                        args->arg_directory,
                         args->arg_volatile_mode,
                         args->arg_userns_mode != USER_NAMESPACE_NO,
                         args->arg_uid_shift,
@@ -1792,17 +1799,17 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = base_filesystem_create(directory, args->arg_uid_shift, (gid_t) args->arg_uid_shift);
+        r = base_filesystem_create(args->arg_directory, args->arg_uid_shift, (gid_t) args->arg_uid_shift);
         if (r < 0)
                 return r;
 
         if (args->arg_read_only) {
-                r = bind_remount_recursive(directory, true, NULL);
+                r = bind_remount_recursive(args->arg_directory, true, NULL);
                 if (r < 0)
                         return log_error_errno(r, "Failed to make tree read-only: %m");
         }
 
-        r = mount_all(directory,
+        r = mount_all(args->arg_directory,
                       args->arg_userns_mode != USER_NAMESPACE_NO,
                       false,
                       args->arg_private_network,
@@ -1812,21 +1819,21 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = copy_devnodes(directory);
+        r = copy_devnodes(args->arg_directory);
         if (r < 0)
                 return r;
 
-        dev_setup(directory, args->arg_uid_shift, args->arg_uid_shift);
+        dev_setup(args->arg_directory, args->arg_uid_shift, args->arg_uid_shift);
 
-        r = setup_pts(directory);
+        r = setup_pts(args->arg_directory);
         if (r < 0)
                 return r;
 
-        r = setup_propagate(directory);
+        r = setup_propagate(args->arg_directory);
         if (r < 0)
                 return r;
 
-        r = setup_dev_console(directory, console);
+        r = setup_dev_console(args->arg_directory, console);
         if (r < 0)
                 return r;
 
@@ -1834,24 +1841,24 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = setup_timezone(directory);
+        r = setup_timezone(args->arg_directory);
         if (r < 0)
                 return r;
 
-        r = setup_resolv_conf(directory);
+        r = setup_resolv_conf(args->arg_directory);
         if (r < 0)
                 return r;
 
-        r = setup_machine_id(directory);
+        r = setup_machine_id(args->arg_directory);
         if (r < 0)
                 return r;
 
-        r = setup_journal(directory);
+        r = setup_journal(args->arg_directory);
         if (r < 0)
                 return r;
 
         r = mount_custom(
-                        directory,
+                        args->arg_directory,
                         args->arg_custom_mounts,
                         args->arg_n_custom_mounts,
                         args->arg_userns_mode != USER_NAMESPACE_NO,
@@ -1863,7 +1870,7 @@ static int outer_child(
 
         if (!args->arg_use_cgns || !cg_ns_supported()) {
                 r = mount_cgroups(
-                                directory,
+                                args->arg_directory,
                                 args->arg_unified_cgroup_hierarchy,
                                 args->arg_userns_mode != USER_NAMESPACE_NO,
                                 args->arg_uid_shift,
@@ -1874,7 +1881,7 @@ static int outer_child(
                         return r;
         }
 
-        r = mount_move_root(directory);
+        r = mount_move_root(args->arg_directory);
         if (r < 0)
                 return log_error_errno(r, "Failed to move root directory: %m");
 
@@ -1898,7 +1905,7 @@ static int outer_child(
                  * requested, so that we all are owned by the user if
                  * user namespaces are turned on. */
 
-                r = inner_child(barrier, directory, secondary, kmsg_socket, rtnl_socket, fds);
+                r = inner_child(barrier, args->arg_directory, secondary, kmsg_socket, rtnl_socket, fds);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
@@ -2150,7 +2157,6 @@ static int run(int master,
                 (void) reset_signal_mask();
 
                 r = outer_child(&barrier,
-                                args->arg_directory,
                                 console,
                                 root_device, root_device_rw,
                                 home_device, home_device_rw,
@@ -2293,17 +2299,10 @@ static int run(int master,
                         return r;
         }
 
-        r = sync_cgroup(*pid, args->arg_unified_cgroup_hierarchy, args->arg_uid_shift);
-        if (r < 0)
-                return r;
-
-        if (args->arg_keep_unit) {
-                r = create_subcgroup(*pid, args->arg_unified_cgroup_hierarchy);
-                if (r < 0)
-                        return r;
-        }
-
-        r = chown_cgroup(*pid, args->arg_uid_shift);
+        r = setup_cgroup(*pid,
+                         args->arg_uid_shift,
+                         args->arg_cgroup_ver,
+                         args->arg_keep_unit);
         if (r < 0)
                 return r;
 
@@ -2569,9 +2568,11 @@ int main(int argc, char *argv[]) {
         if (r < 0)
                 goto finish;
 
-        r = detect_unified_cgroup_hierarchy(arg_directory);
-        if (r < 0)
-                goto finish;
+        if (args->arg_cgroup_ver == CGROUP_VER_INVALID) {
+                r = pick_cgroup_ver(args->arg_directory, &args->arg_cgroup_ver);
+                if (r < 0)
+                        goto finish;
+        }
 
         interactive =
                 isatty(STDIN_FILENO) > 0 &&

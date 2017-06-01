@@ -36,10 +36,11 @@ int lock_tree_ephemeral(LockFile *ret_global_lock, LockFile *ret_local_lock);
 int lock_tree_plain(LockFile *ret_global_lock, LockFile *ret_local_lock);
 int lock_tree_image(LockFile *ret_global_lock, LockFile *ret_local_lock);
 int custom_mounts_prepare(void);
+int pick_cgroup_ver(const char *directory, CGroupMode *ret_cgver);
 /* set up the PTY */
 /* parent:run() *****************************************************/
 /* ... */
-/* if (raw_clone() == 0) { exit(outer_child() == 0 ? EXIT_SUCCESS : EXIT_FAILURE); } */
+/* if (raw_clone(UNSHARE_MOUNT) == 0) { exit(outer_child() == 0 ? EXIT_SUCCESS : EXIT_FAILURE); } */
 int negotiate_uid_parent(int fd, LockFile *ret_lock_file);
 /* wait_for_terminate_and_warn("namespace helper, *pid, NULL) */
 /* recv(pid_socket_pair[0], pid, sizeof *pid, 0) */
@@ -52,7 +53,6 @@ void args_free(void);
 /* outer_child() ****************************************************/
 /* ... */
 int determine_uid_shift(const char *directory);
-int detect_unified_cgroup_hierarchy(const char *directory);
 int negotiate_uid_outer_child(int fd);
 /* setup_volatile(...) */
 /* setup_volatile_state(...) */

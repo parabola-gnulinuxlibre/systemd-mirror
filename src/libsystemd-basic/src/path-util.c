@@ -830,6 +830,38 @@ bool is_deviceallow_pattern(const char *path) {
                startswith(path, "char-");
 }
 
+int systemd_installation(const char *root) {
+        const char *file;
+        int r;
+
+        /* Try to guess if directory is a systemd installation. This
+         * is hacky and likely to yield false negatives, particularly if the installation
+         * is non-standard. False positives should be relatively rare.
+         */
+
+        NULSTR_FOREACH(file,
+                       /* /lib works for systems without usr-merge, and for systems with a sane
+                        * usr-merge, where /lib is a symlink to /usr/lib. /usr/lib is necessary
+                        * for Gentoo which does a merge without making /lib a symlink.
+                        */
+                       "lib/systemd/systemd\0"
+                       "usr/lib/systemd/systemd\0") {
+
+                _cleanup_free_ char *path = NULL;
+                char *c, **name;
+
+                path = prefix_root(root, file);
+                if (!path)
+                        return -ENOMEM;
+
+                if (laccess(path, X_OK) >= 0)
+                        return true;
+        }
+
+        return false;
+}
+
+
 int systemd_installation_has_version(const char *root, unsigned minimal_version) {
         const char *pattern;
         int r;

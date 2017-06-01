@@ -109,6 +109,7 @@ typedef enum CGroupMode {
         CGROUP_VER_1_SD,
         CGROUP_VER_2,
         CGROUP_VER_MIXED_SD232,
+        CGROUP_VER_INVALID = -1
 } CGroupMode;
 
 typedef struct Args {
@@ -150,7 +151,7 @@ typedef struct Args {
         uid_t arg_uid_shift, arg_uid_range;
         bool arg_userns_chown;
         int arg_kill_signal;
-        CGroupMode arg_unified_cgroup_hierarchy;
+        CGroupMode arg_cgroup_ver;
         SettingsMask arg_settings_mask;
         int arg_settings_trusted;
         char **arg_parameters;

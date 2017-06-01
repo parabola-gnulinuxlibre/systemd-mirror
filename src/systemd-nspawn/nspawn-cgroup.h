@@ -27,3 +27,19 @@
 int chown_cgroup(pid_t pid, uid_t uid_shift);
 int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift);
 int create_subcgroup(pid_t pid, CGroupUnified unified_requested);
+
+static int setup_cgroup(pid_t pid, uid_t uid_shift, CGroupMode cgver, bool keep_unit) {
+        r = sync_cgroup(pid, cgver, uid_shift);
+        if (r < 0)
+                return r;
+
+        if (keep_unit) {
+                r = create_subcgroup(pid, cgver);
+                if (r < 0)
+                        return r;
+        }
+
+        r = chown_cgroup(pid, cgver);
+        if (r < 0)
+                return r;
+}
