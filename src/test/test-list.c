@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "list.h"
-#include "util.h"
+#include "systemd-basic/list.h"
+#include "systemd-basic/util.h"
 
 int main(int argc, const char *argv[]) {
         size_t i;

@@ -20,16 +20,16 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "alloc-util.h"
-#include "conf-files.h"
-#include "fs-util.h"
-#include "macro.h"
-#include "parse-util.h"
-#include "rm-rf.h"
-#include "string-util.h"
-#include "strv.h"
-#include "user-util.h"
-#include "util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/conf-files.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
 
 static void setup_test_dir(char *tmp_dir, const char *files, ...) {
         va_list ap;
