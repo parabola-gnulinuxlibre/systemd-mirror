@@ -1479,17 +1479,18 @@ static int inner_child(
                 r = unshare(CLONE_NEWCGROUP);
                 if (r < 0)
                         return log_error_errno(errno, "Failed to unshare cgroup namespace");
-                r = mount_cgroups(
-                                "",
-                                args->arg_unified_cgroup_hierarchy,
-                                args->arg_userns_mode != USER_NAMESPACE_NO,
-                                args->arg_uid_shift,
-                                args->arg_uid_range,
-                                args->arg_selinux_apifs_context,
-                                true);
-                if (r < 0)
-                        return r;
-        } else {
+        }
+        r = mount_cgroups(
+                        "",
+                        args->arg_unified_cgroup_hierarchy,
+                        args->arg_userns_mode != USER_NAMESPACE_NO,
+                        args->arg_uid_shift,
+                        args->arg_uid_range,
+                        args->arg_selinux_apifs_context,
+                        args->arg_use_cgns);
+        if (r < 0)
+                return r;
+        if (!args->arg_use_cgns) {
                 r = mount_systemd_cgroup_writable("", args->arg_unified_cgroup_hierarchy);
                 if (r < 0)
                         return r;
@@ -1859,19 +1860,6 @@ static int outer_child(
                         args->arg_selinux_apifs_context);
         if (r < 0)
                 return r;
-
-        if (!args->arg_use_cgns) {
-                r = mount_cgroups(
-                                args->arg_directory,
-                                args->arg_unified_cgroup_hierarchy,
-                                args->arg_userns_mode != USER_NAMESPACE_NO,
-                                args->arg_uid_shift,
-                                args->arg_uid_range,
-                                args->arg_selinux_apifs_context,
-                                false);
-                if (r < 0)
-                        return r;
-        }
 
         r = mount_move_root(args->arg_directory);
         if (r < 0)
