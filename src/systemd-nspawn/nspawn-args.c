@@ -1151,7 +1151,7 @@ int parse_argv(int argc, char *argv[]) {
         if (r < 0)
                 args->arg_use_cgns = cg_ns_supported();
         else
-                args->arg_use_cgns = r;
+                args->arg_use_cgns = r && cg_ns_supported();
 
         return 1;
 }

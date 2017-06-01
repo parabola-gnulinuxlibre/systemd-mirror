@@ -63,7 +63,7 @@ int setup_machine_id(const char *directory);
 /* ... */
 int send_uuid_outer_child(int fd);
 /* mount_custom(...) */
-/* if (!args->arg_use_cgns || !cg_ns_supported()) { mount_cgroups(...); } */
+/* if (!args->arg_use_cgns) { mount_cgroups(...); } */
 /* ... */
 /* if (raw_clone() == 0) { exit(inner_child() == 0 ? EXIT_SUCCESS : EXIT_FAILURE); } */
 /* ... */

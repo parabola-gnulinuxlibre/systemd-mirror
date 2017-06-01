@@ -1482,7 +1482,7 @@ static int inner_child(
                 return -ESRCH;
         }
 
-        if (args->arg_use_cgns && cg_ns_supported()) {
+        if (args->arg_use_cgns) {
                 r = unshare(CLONE_NEWCGROUP);
                 if (r < 0)
                         return log_error_errno(errno, "Failed to unshare cgroup namespace");
@@ -1868,7 +1868,7 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        if (!args->arg_use_cgns || !cg_ns_supported()) {
+        if (!args->arg_use_cgns) {
                 r = mount_cgroups(
                                 args->arg_directory,
                                 args->arg_unified_cgroup_hierarchy,
