@@ -79,7 +79,7 @@ efi_ldflags = \
 ifneq ($(ARCH_AARCH64),)
 efi_ldflags += --defsym=EFI_SUBSYSTEM=0xa
 EFI_FORMAT = -O binary
-else
+else # ARCH_AARCH64
 EFI_FORMAT = --target=efi-app-$(EFI_ARCH)
 endif # ARCH_AARCH64
 

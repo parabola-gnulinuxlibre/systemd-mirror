@@ -49,7 +49,7 @@ pamlib_LTLIBRARIES = \
 ifneq ($(ENABLE_PAM_CONFIG),)
 nodist_pamconf_DATA = \
 	src/login/systemd-user
-endif
+endif # ENABLE_PAM_CONFIG
 
 EXTRA_DIST += \
 	src/login/systemd-user.m4

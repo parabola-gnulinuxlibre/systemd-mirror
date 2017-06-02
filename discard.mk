@@ -64,8 +64,8 @@ TESTS = $(tests)
 ifneq ($(ENABLE_UNSAFE_TESTS),)
 TESTS += \
 	$(unsafe_tests)
-endif
-else
+endif # ENABLE_UNSAFE_TESTS
+else # ENABLE_TESTS
 noinst_PROGRAMS =
 TESTS =
 endif # ENABLE_TESTS
@@ -579,7 +579,7 @@ coverage-sync: coverage
 	test "$(builddir)" = "$(srcdir)"
 	rsync -rlv --delete --omit-dir-times coverage/ $(www_target)/coverage
 
-else
+else # ENABLE_COVERAGE
 lcov-run lcov-report:
 	echo "Need to reconfigure with --enable-coverage"
 endif # ENABLE_COVERAGE
@@ -903,7 +903,7 @@ ifneq ($(HAVE_SYSV_COMPAT),)
 DISTCHECK_CONFIGURE_FLAGS += \
 	--with-sysvinit-path=$$dc_install_base/$(sysvinitdir) \
 	--with-sysvrcnd-path=$$dc_install_base/$(sysvrcnddir)
-else
+else # HAVE_SYSV_COMPAT
 DISTCHECK_CONFIGURE_FLAGS += \
 	--with-sysvinit-path= \
 	--with-sysvrcnd-path=
@@ -912,7 +912,7 @@ endif # HAVE_SYSV_COMPAT
 ifneq ($(ENABLE_SPLIT_USR),)
 DISTCHECK_CONFIGURE_FLAGS += \
 	--enable-split-usr
-else
+else # ENABLE_SPLIT_USR
 DISTCHECK_CONFIGURE_FLAGS += \
 	--disable-split-usr
 endif # ENABLE_SPLIT_USR

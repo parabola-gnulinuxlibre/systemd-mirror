@@ -109,7 +109,7 @@ test_compress_CFLAGS += \
 	$(LZ4_CFLAGA)
 test_compress_LDADD += \
 	$(LZ4_LIBS)
-endif
+endif # HAVE_LZ4
 
 test_compress_benchmark_SOURCES = \
 	src/journal/test-compress-benchmark.c

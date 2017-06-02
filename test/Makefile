@@ -142,7 +142,7 @@ endif # HAVE_ACL
 ifneq ($(HAVE_SECCOMP),)
 tests += \
 	test-seccomp
-endif
+endif # HAVE_SECCOMP
 
 EXTRA_DIST += \
 	test/a.service \

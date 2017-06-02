@@ -147,8 +147,8 @@ TESTS = $(tests)
 if ENABLE_UNSAFE_TESTS
 TESTS += \
 	$(unsafe_tests)
-endif
-else
+endif # ENABLE_UNSAFE_TESTS
+else # ENABLE_TESTS
 noinst_PROGRAMS =
 TESTS =
 endif # ENABLE_TESTS
@@ -1653,7 +1653,7 @@ endif # HAVE_ACL
 if HAVE_SECCOMP
 tests += \
 	test-seccomp
-endif
+endif # HAVE_SECCOMP
 
 EXTRA_DIST += \
 	test/a.service \
@@ -2517,7 +2517,7 @@ coverage-sync: coverage
 	test "$(builddir)" = "$(srcdir)"
 	rsync -rlv --delete --omit-dir-times coverage/ $(www_target)/coverage
 
-else
+else # ENABLE_COVERAGE
 lcov-run lcov-report:
 	echo "Need to reconfigure with --enable-coverage"
 endif # ENABLE_COVERAGE
@@ -2966,7 +2966,7 @@ efi_ldflags = \
 if ARCH_AARCH64
 efi_ldflags += --defsym=EFI_SUBSYSTEM=0xa
 EFI_FORMAT = -O binary
-else
+else # ARCH_AARCH64
 EFI_FORMAT = --target=efi-app-$(EFI_ARCH)
 endif # ARCH_AARCH64
 endif # HAVE_GNUEFI
@@ -4404,7 +4404,7 @@ test_compress_CFLAGS += \
 	$(LZ4_CFLAGA)
 test_compress_LDADD += \
 	$(LZ4_LIBS)
-endif
+endif # HAVE_LZ4
 
 test_compress_benchmark_SOURCES = \
 	src/journal/test-compress-benchmark.c
@@ -6150,7 +6150,7 @@ pamlib_LTLIBRARIES = \
 if ENABLE_PAM_CONFIG
 dist_pamconf_DATA = \
 	src/login/systemd-user
-endif
+endif # ENABLE_PAM_CONFIG
 
 EXTRA_DIST += \
 	src/login/systemd-user.m4
@@ -6636,7 +6636,7 @@ if HAVE_SYSV_COMPAT
 DISTCHECK_CONFIGURE_FLAGS += \
 	--with-sysvinit-path=$$dc_install_base/$(sysvinitdir) \
 	--with-sysvrcnd-path=$$dc_install_base/$(sysvrcnddir)
-else
+else # HAVE_SYSV_COMPAT
 DISTCHECK_CONFIGURE_FLAGS += \
 	--with-sysvinit-path= \
 	--with-sysvrcnd-path=
@@ -6645,7 +6645,7 @@ endif # HAVE_SYSV_COMPAT
 if ENABLE_SPLIT_USR
 DISTCHECK_CONFIGURE_FLAGS += \
 	--enable-split-usr
-else
+else # ENABLE_SPLIT_USR
 DISTCHECK_CONFIGURE_FLAGS += \
 	--disable-split-usr
 endif # ENABLE_SPLIT_USR
