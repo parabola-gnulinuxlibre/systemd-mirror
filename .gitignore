@@ -27,7 +27,9 @@
 /TAGS
 /ata_id
 /bootctl
-/build-aux
+/build-aux/*
+!/build-aux/Makefile*
+!/build-aux/write-ifchanged
 /busctl
 /cdrom_id
 /collect
@@ -309,3 +311,8 @@ config.status
 configure
 stamp-*
 .tmp*
+/autoconf.mk
+/automake.mk.in
+/automake.mk
+/config.mk
+/gnustandards.mk
