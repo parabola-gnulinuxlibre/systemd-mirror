@@ -138,11 +138,11 @@ TESTS = $(tests)
 if ENABLE_UNSAFE_TESTS
 TESTS += \
 	$(unsafe_tests)
-endif
-else
+endif # ENABLE_UNSAFE_TESTS
+else # ENABLE_TESTS
 noinst_PROGRAMS =
 TESTS =
-endif
+endif # ENABLE_TESTS
 AM_TESTS_ENVIRONMENT = \
 	export SYSTEMD_KBD_MODEL_MAP=$(abs_top_srcdir)/src/locale/kbd-model-map; \
 	export SYSTEMD_LANGUAGE_FALLBACK_MAP=$(abs_top_srcdir)/src/locale/language-fallback-map;
@@ -150,11 +150,11 @@ AM_TESTS_ENVIRONMENT = \
 if ENABLE_BASH_COMPLETION
 dist_bashcompletion_DATA = $(dist_bashcompletion_data)
 nodist_bashcompletion_DATA = $(nodist_bashcompletion_data)
-endif
+endif # ENABLE_BASH_COMPLETION
 if ENABLE_ZSH_COMPLETION
 dist_zshcompletion_DATA = $(dist_zshcompletion_data)
 nodist_zshcompletion_DATA = $(nodist_zshcompletion_data)
-endif
+endif # ENABLE_ZSH_COMPLETION
 udevlibexec_PROGRAMS =
 gperf_gperf_sources =
 rootlib_LTLIBRARIES =
@@ -403,7 +403,7 @@ rootlibexec_PROGRAMS = \
 if HAVE_UTMP
 rootlibexec_PROGRAMS += \
 	systemd-update-utmp
-endif
+endif # HAVE_UTMP
 
 systemgenerator_PROGRAMS = \
 	systemd-getty-generator \
@@ -558,7 +558,7 @@ if HAVE_UTMP
 nodist_systemunit_DATA += \
 	units/systemd-update-utmp.service \
 	units/systemd-update-utmp-runlevel.service
-endif
+endif # HAVE_UTMP
 
 dist_userunit_DATA = \
 	units/user/basic.target \
@@ -625,7 +625,7 @@ nodist_systemunit_DATA += \
 systemgenerator_PROGRAMS += \
 	systemd-sysv-generator \
 	systemd-rc-local-generator
-endif
+endif # HAVE_SYSV_COMPAT
 
 EXTRA_DIST += \
 	src/systemctl/systemd-sysv-install.SKELETON \
@@ -684,7 +684,7 @@ noinst_DATA += \
 	$(HTML_FILES) \
 	$(HTML_ALIAS) \
 	docs/html/man
-endif
+endif # ENABLE_MANPAGES
 
 CLEANFILES += \
 	$(man_MANS) \
@@ -702,7 +702,7 @@ man/index.html: man/systemd.index.html
 if HAVE_PYTHON
 noinst_DATA += \
 	man/index.html
-endif
+endif # HAVE_PYTHON
 
 CLEANFILES += \
 	man/index.html
@@ -1050,19 +1050,19 @@ libshared_la_SOURCES = \
 if HAVE_UTMP
 libshared_la_SOURCES += \
 	src/shared/utmp-wtmp.c
-endif
+endif # HAVE_UTMP
 
 if HAVE_SECCOMP
 libshared_la_SOURCES += \
 	src/shared/seccomp-util.h \
 	src/shared/seccomp-util.c
-endif
+endif # HAVE_SECCOMP
 
 if HAVE_ACL
 libshared_la_SOURCES += \
 	src/shared/acl-util.c \
 	src/shared/acl-util.h
-endif
+endif # HAVE_ACL
 
 libshared_la_CFLAGS = \
 	$(AM_CFLAGS) \
@@ -1132,7 +1132,7 @@ libfirewall_la_CFLAGS = \
 
 libfirewall_la_LIBADD = \
 	$(LIBIPTC_LIBS)
-endif
+endif # HAVE_LIBIPTC
 
 # -----------------------------------------------------------------------------
 if ENABLE_LDCONFIG
@@ -1141,7 +1141,7 @@ dist_systemunit_DATA += \
 
 SYSINIT_TARGET_WANTS += \
 	ldconfig.service
-endif
+endif # ENABLE_LDCONFIG
 
 # ------------------------------------------------------------------------------
 noinst_LTLIBRARIES += \
@@ -1377,7 +1377,7 @@ src/basic/cap-from-name.h: src/basic/cap-from-name.gperf
 audit_list_includes = -include linux/audit.h -include missing.h
 if HAVE_AUDIT
 audit_list_includes += -include libaudit.h
-endif
+endif # HAVE_AUDIT
 
 src/journal/audit_type-list.txt:
 	$(AM_V_at)$(MKDIR_P) $(dir $@)
@@ -1457,12 +1457,12 @@ unsafe_tests = \
 if HAVE_LIBIPTC
 manual_tests += \
 	test-firewall-util
-endif
+endif # HAVE_LIBIPTC
 
 if HAVE_KMOD
 manual_tests += \
 	test-netlink-manual
-endif
+endif # HAVE_KMOD
 
 tests += \
 	test-daemon \
@@ -1555,12 +1555,12 @@ tests += \
 if HAVE_ACL
 tests += \
 	test-acl-util
-endif
+endif # HAVE_ACL
 
 if HAVE_SECCOMP
 tests += \
 	test-seccomp
-endif
+endif # HAVE_SECCOMP
 
 EXTRA_DIST += \
 	test/a.service \
@@ -1761,7 +1761,7 @@ test_boot_timestamps_SOURCES = \
 
 test_boot_timestamps_LDADD = \
 	libsystemd-shared.la
-endif
+endif # ENABLE_EFI
 
 test_unit_name_SOURCES = \
 	src/test/test-unit-name.c
@@ -2203,7 +2203,7 @@ test_firewall_util_LDADD = \
 	libfirewall.la \
 	libsystemd-shared.la \
 	$(LIBIPTC_LIBS)
-endif
+endif # HAVE_LIBIPTC
 
 test_netlink_manual_SOURCES = \
 	src/test/test-netlink-manual.c
@@ -2424,10 +2424,10 @@ coverage-sync: coverage
 	test "$(builddir)" = "$(srcdir)"
 	rsync -rlv --delete --omit-dir-times coverage/ $(www_target)/coverage
 
-else
+else # ENABLE_COVERAGE
 lcov-run lcov-report:
 	echo "Need to reconfigure with --enable-coverage"
-endif
+endif # ENABLE_COVERAGE
 
 # ------------------------------------------------------------------------------
 systemd_analyze_SOURCES = \
@@ -2510,8 +2510,8 @@ nodist_systemunit_DATA += \
 
 SYSINIT_TARGET_WANTS += \
 	kmod-static-nodes.service
-endif
-endif
+endif # ENABLE_TMPFILES
+endif # HAVE_KMOD
 
 EXTRA_DIST += \
 	units/systemd-modules-load.service.in \
@@ -2557,7 +2557,7 @@ dist_tmpfiles_DATA = \
 if HAVE_SYSV_COMPAT
 dist_tmpfiles_DATA += \
 	tmpfiles.d/legacy.conf
-endif
+endif # HAVE_SYSV_COMPAT
 
 SYSINIT_TARGET_WANTS += \
 	systemd-tmpfiles-setup-dev.service \
@@ -2572,7 +2572,7 @@ TIMERS_TARGET_WANTS += \
 INSTALL_DIRS += \
 	$(tmpfilesdir) \
 	$(sysconfdir)/tmpfiles.d
-endif
+endif # ENABLE_TMPFILES
 
 EXTRA_DIST += \
 	tmpfiles.d/systemd.conf.m4 \
@@ -2605,11 +2605,11 @@ nodist_sysusers_DATA = \
 if HAVE_REMOTE
 nodist_sysusers_DATA += \
 	sysusers.d/systemd-remote.conf
-endif
+endif # HAVE_REMOTE
 
 INSTALL_DIRS += \
 	$(sysusersdir)
-endif
+endif # ENABLE_SYSUSERS
 
 EXTRA_DIST += \
 	units/systemd-sysusers.service.in \
@@ -2625,7 +2625,7 @@ if HAVE_PAM
 dist_factory_pam_DATA = \
 	factory/etc/pam.d/system-auth \
 	factory/etc/pam.d/other
-endif
+endif # HAVE_PAM
 
 # ------------------------------------------------------------------------------
 if ENABLE_FIRSTBOOT
@@ -2644,7 +2644,7 @@ nodist_systemunit_DATA += \
 
 SYSINIT_TARGET_WANTS += \
 	systemd-firstboot.service
-endif
+endif # ENABLE_FIRSTBOOT
 
 EXTRA_DIST += \
 	units/systemd-firstboot.service.in
@@ -2763,7 +2763,7 @@ nodist_systemunit_DATA += \
 	units/systemd-hibernate.service \
 	units/systemd-hibernate-resume@.service \
 	units/systemd-hybrid-sleep.service
-endif
+endif # ENABLE_HIBERNATE
 
 EXTRA_DIST += \
 	units/systemd-hibernate.service.in \
@@ -2797,7 +2797,7 @@ dist_bashcompletion_data += \
 
 dist_zshcompletion_data += \
 	shell-completion/zsh/_bootctl
-endif
+endif # HAVE_BLKID
 
 # ------------------------------------------------------------------------------
 if HAVE_GNUEFI
@@ -2831,13 +2831,13 @@ efi_cflags += \
 	-mno-mmx \
 	-DEFI_FUNCTION_WRAPPER \
 	-DGNU_EFI_USE_MS_ABI
-endif
+endif # ARCH_X86_64
 
 if ARCH_IA32
 efi_cflags += \
 	-mno-sse \
 	-mno-mmx
-endif
+endif # ARCH_IA32
 
 efi_ldflags = \
 	$(EFI_LDFLAGS) \
@@ -2854,11 +2854,11 @@ efi_ldflags = \
 if ARCH_AARCH64
 efi_ldflags += --defsym=EFI_SUBSYSTEM=0xa
 EFI_FORMAT = -O binary
-else
+else # ARCH_AARCH64
 EFI_FORMAT = --target=efi-app-$(EFI_ARCH)
-endif
-endif
-endif
+endif # ARCH_AARCH64
+endif # HAVE_GNUEFI
+endif # ENABLE_EFI
 
 # ------------------------------------------------------------------------------
 systemd_boot_headers = \
@@ -2900,8 +2900,8 @@ $(systemd_boot_solib): $(systemd_boot_objects)
 $(systemd_boot): $(systemd_boot_solib)
 	$(AM_V_GEN)$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic \
 	  -j .dynsym -j .rel -j .rela -j .reloc $(EFI_FORMAT) $< $@
-endif
-endif
+endif # HAVE_GNUEFI
+endif # ENABLE_EFI
 
 CLEANFILES += $(systemd_boot_objects) $(systemd_boot_solib) $(systemd_boot)
 
@@ -2950,8 +2950,8 @@ $(stub_solib): $(stub_objects)
 $(stub): $(stub_solib)
 	$(AM_V_GEN)$(OBJCOPY) -j .text -j .sdata -j .data -j .dynamic \
 	  -j .dynsym -j .rel -j .rela -j .reloc $(EFI_FORMAT) $< $@
-endif
-endif
+endif # HAVE_GNUEFI
+endif # ENABLE_EFI
 
 CLEANFILES += $(stub_objects) $(stub_solib) $(stub)
 
@@ -2983,7 +2983,7 @@ systemd_gpt_auto_generator_LDADD = \
 systemd_gpt_auto_generator_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(BLKID_CFLAGS)
-endif
+endif # HAVE_BLKID
 
 # ------------------------------------------------------------------------------
 dist_xinitrc_SCRIPTS = \
@@ -3126,7 +3126,7 @@ systemd_nspawn_LDADD = \
 if HAVE_LIBIPTC
 systemd_nspawn_LDADD += \
 	libfirewall.la
-endif
+endif # HAVE_LIBIPTC
 
 test_patch_uid_SOURCES = \
 	src/nspawn/nspawn-patch-uid.c \
@@ -3792,12 +3792,12 @@ libudev_core_la_SOURCES += \
 
 dist_udevrules_DATA += \
 	rules/80-drivers.rules
-endif
+endif # HAVE_KMOD
 
 if HAVE_BLKID
 libudev_core_la_SOURCES += \
 	src/udev/udev-builtin-blkid.c
-endif
+endif # HAVE_BLKID
 
 if HAVE_ACL
 libudev_core_la_SOURCES += \
@@ -3805,7 +3805,7 @@ libudev_core_la_SOURCES += \
 	src/login/logind-acl.c \
 	src/libsystemd/sd-login/sd-login.c \
 	src/systemd/sd-login.h
-endif
+endif # HAVE_ACL
 
 systemd_udevd_SOURCES = \
 	src/udev/udevd.c
@@ -3876,7 +3876,7 @@ INSTALL_DATA_HOOKS += \
 
 hwdb-remove-hook:
 	-test -n "$(DESTDIR)" || rm -f /etc/udev/hwdb.bin
-endif
+endif # ENABLE_HWDB
 
 EXTRA_DIST += \
 	units/systemd-hwdb-update.service.in \
@@ -3896,9 +3896,9 @@ TESTS += \
 if HAVE_SYSV_COMPAT
 TESTS += \
 	test/sysv-generator-test.py
-endif
-endif
-endif
+endif # HAVE_SYSV_COMPAT
+endif # HAVE_PYTHON
+endif # ENABLE_TESTS
 
 tests += \
 	test-libudev
@@ -3925,7 +3925,7 @@ test_udev_LDADD = \
 if ENABLE_TESTS
 check_DATA += \
 	test/sys
-endif
+endif # ENABLE_TESTS
 
 # packed sysfs test tree
 test/sys: test/sys.tar.xz
@@ -4078,7 +4078,7 @@ nodist_systemunit_DATA += \
 
 nodist_pkgsysconf_DATA += \
         src/journal-remote/journal-upload.conf
-endif
+endif # HAVE_LIBCURL
 
 EXTRA_DIST += \
         units/systemd-journal-upload.service.in \
@@ -4113,12 +4113,12 @@ systemd_journal_remote_LDADD += \
 if ENABLE_TMPFILES
 dist_tmpfiles_DATA += \
 	tmpfiles.d/systemd-remote.conf
-endif
+endif # ENABLE_TMPFILES
 
 if HAVE_GNUTLS
 systemd_journal_remote_LDADD += \
 	$(GNUTLS_LIBS)
-endif
+endif # HAVE_GNUTLS
 
 # systemd-journal-remote make sense mostly with full crypto stack
 dist_systemunit_DATA += \
@@ -4141,7 +4141,7 @@ EXTRA_DIST += \
 	units/systemd-journal-remote.service.in \
 	src/journal-remote/journal-remote.conf.in \
 	src/journal-remote/log-generator.py
-endif
+endif # HAVE_MICROHTTPD
 
 # using _CFLAGS = in the conditional below would suppress AM_CFLAGS
 journalctl_CFLAGS = \
@@ -4164,7 +4164,7 @@ journalctl_CFLAGS += \
 
 journalctl_LDADD += \
 	$(QRENCODE_LIBS)
-endif
+endif # HAVE_QRENCODE
 
 test_journal_SOURCES = \
 	src/journal/test-journal.c
@@ -4251,7 +4251,7 @@ test_compress_LDADD = \
 if HAVE_LZ4
 test_compress_LDADD += \
 	-llz4
-endif
+endif # HAVE_LZ4
 
 test_compress_benchmark_SOURCES = \
 	src/journal/test-compress-benchmark.c
@@ -4343,7 +4343,7 @@ if HAVE_COMPRESSION
 tests += \
 	test-compress \
 	test-compress-benchmark
-endif
+endif # HAVE_COMPRESSION
 
 pkginclude_HEADERS += \
 	src/systemd/sd-journal.h \
@@ -4393,12 +4393,12 @@ libsystemd_journal_internal_la_CFLAGS += \
 
 libsystemd_journal_internal_la_LIBADD += \
 	$(XZ_LIBS)
-endif
+endif # HAVE_XZ
 
 if HAVE_LZ4
 libsystemd_journal_internal_la_LIBADD += \
 	-llz4
-endif
+endif # HAVE_LZ4
 
 if HAVE_GCRYPT
 libsystemd_journal_internal_la_SOURCES += \
@@ -4414,7 +4414,7 @@ libsystemd_journal_internal_la_LIBADD += \
 libsystemd_journal_internal_la_CFLAGS += \
 	$(GCRYPT_CFLAGS) \
 	-Wno-pointer-arith
-endif
+endif # HAVE_GCRYPT
 
 noinst_LTLIBRARIES += \
 	libsystemd-journal-internal.la
@@ -4501,7 +4501,7 @@ systemd_journal_gatewayd_LDADD = \
 if HAVE_GNUTLS
 systemd_journal_gatewayd_LDADD += \
 	$(GNUTLS_LIBS)
-endif
+endif # HAVE_GNUTLS
 
 systemd_journal_gatewayd_CFLAGS = \
 	$(AM_CFLAGS) \
@@ -4520,7 +4520,7 @@ nodist_systemunit_DATA += \
 dist_gatewayddocumentroot_DATA = \
 	src/journal-remote/browse.html
 
-endif
+endif # HAVE_MICROHTTPD
 
 EXTRA_DIST += \
 	units/systemd-journal-gatewayd.service.in
@@ -4555,7 +4555,7 @@ systemd_coredump_SOURCES += \
 
 systemd_coredump_LDADD += \
 	$(ELFUTILS_LIBS)
-endif
+endif # HAVE_ELFUTILS
 
 nodist_systemunit_DATA += \
 	units/systemd-coredump@.service
@@ -4603,7 +4603,7 @@ nodist_sysctl_DATA = \
 
 CLEANFILES += \
 	sysctl.d/50-coredump.conf
-endif
+endif # ENABLE_COREDUMP
 
 EXTRA_DIST += \
 	sysctl.d/50-coredump.conf.in \
@@ -4635,7 +4635,7 @@ SYSINIT_TARGET_WANTS += \
 	systemd-binfmt.service \
 	proc-sys-fs-binfmt_misc.automount
 
-endif
+endif # ENABLE_BINFMT
 
 EXTRA_DIST += \
 	units/systemd-binfmt.service.in
@@ -4656,7 +4656,7 @@ nodist_udevrules_DATA += \
 
 nodist_systemunit_DATA += \
 	units/systemd-vconsole-setup.service
-endif
+endif # ENABLE_VCONSOLE
 
 EXTRA_DIST += \
 	src/vconsole/90-vconsole.rules.in \
@@ -4675,7 +4675,7 @@ systemd_quotacheck_SOURCES = \
 
 systemd_quotacheck_LDADD = \
 	libsystemd-shared.la
-endif
+endif # ENABLE_QUOTACHECK
 
 EXTRA_DIST += \
 	units/systemd-quotacheck.service.in
@@ -4700,7 +4700,7 @@ systemd_random_seed_LDADD = \
 SYSINIT_TARGET_WANTS += \
 	systemd-random-seed.service
 
-endif
+endif # ENABLE_RANDOMSEED
 
 EXTRA_DIST += \
 	units/systemd-random-seed.service.in
@@ -4718,7 +4718,7 @@ systemd_backlight_SOURCES = \
 
 systemd_backlight_LDADD = \
 	libsystemd-shared.la
-endif
+endif # ENABLE_BACKLIGHT
 
 EXTRA_DIST += \
 	units/systemd-backlight@.service.in
@@ -4739,7 +4739,7 @@ systemd_rfkill_SOURCES = \
 
 systemd_rfkill_LDADD = \
 	libsystemd-shared.la
-endif
+endif # ENABLE_RFKILL
 
 EXTRA_DIST += \
 	units/systemd-rfkill.service.in
@@ -4776,7 +4776,7 @@ systemd_cryptsetup_generator_LDADD = \
 SYSINIT_TARGET_WANTS += \
 	cryptsetup.target
 
-endif
+endif # HAVE_LIBCRYPTSETUP
 
 # ------------------------------------------------------------------------------
 if ENABLE_HOSTNAMED
@@ -4824,7 +4824,7 @@ dist_bashcompletion_data += \
 
 dist_zshcompletion_data += \
 	shell-completion/zsh/_hostnamectl
-endif
+endif # ENABLE_HOSTNAMED
 
 polkitpolicy_in_files += \
 	src/hostname/org.freedesktop.hostname1.policy.in
@@ -4908,7 +4908,7 @@ dist_bashcompletion_data += \
 
 dist_zshcompletion_data += \
 	shell-completion/zsh/_localectl
-endif
+endif # ENABLE_LOCALED
 
 .PHONY: update-kbd-model-map
 
@@ -4964,7 +4964,7 @@ dist_bashcompletion_data += \
 
 dist_zshcompletion_data += \
 	shell-completion/zsh/_timedatectl
-endif
+endif # ENABLE_TIMEDATED
 
 polkitpolicy_in_files += \
 	src/timedate/org.freedesktop.timedate1.policy.in
@@ -5003,7 +5003,7 @@ GENERAL_ALIASES += \
 nodist_pkgsysconf_DATA += \
 	src/timesync/timesyncd.conf
 
-endif
+endif # ENABLE_TIMESYNCD
 
 gperf_gperf_sources += \
 	src/timesync/timesyncd-gperf.gperf
@@ -5066,7 +5066,7 @@ libnss_myhostname_la_LIBADD = \
 
 rootlib_LTLIBRARIES += \
 	libnss_myhostname.la
-endif
+endif # HAVE_MYHOSTNAME
 
 # ------------------------------------------------------------------------------
 if ENABLE_MACHINED
@@ -5166,7 +5166,7 @@ libnss_mymachines_la_LIBADD = \
 rootlib_LTLIBRARIES += \
 	libnss_mymachines.la
 
-endif
+endif # ENABLE_MACHINED
 
 polkitpolicy_in_files += \
 	src/machine/org.freedesktop.machine1.policy.in
@@ -5323,13 +5323,13 @@ test_qcow2_LDADD = \
 	libsystemd-shared.la \
 	$(ZLIB_LIBS)
 
-endif
-endif
-endif
-endif
-endif
+endif # HAVE_GCRYPT
+endif # HAVE_BZIP2
+endif # HAVE_ZLIB
+endif # HAVE_XZ
+endif # HAVE_LIBCURL
 
-endif
+endif # ENABLE_IMPORTD
 
 polkitpolicy_in_files += \
 	src/import/org.freedesktop.import1.policy.in
@@ -5568,7 +5568,7 @@ test_dnssec_complex_SOURCES = \
 test_dnssec_complex_LDADD = \
 	libsystemd-shared.la
 
-endif
+endif # ENABLE_RESOLVED
 
 gperf_txt_sources += \
 	src/resolve/dns_type-list.txt
@@ -5597,7 +5597,7 @@ systemd_networkd_LDADD = \
 if HAVE_LIBIPTC
 systemd_networkd_LDADD += \
 	libfirewall.la
-endif
+endif # HAVE_LIBIPTC
 
 noinst_LTLIBRARIES += \
 	libnetworkd-core.la
@@ -5719,7 +5719,7 @@ test_network_LDADD = \
 if HAVE_LIBIPTC
 test_network_LDADD += \
 	libfirewall.la
-endif
+endif # HAVE_LIBIPTC
 
 test_network_tables_SOURCES = \
 	src/network/test-network-tables.c \
@@ -5732,7 +5732,7 @@ test_network_tables_LDADD = \
 if HAVE_LIBIPTC
 test_network_tables_LDADD += \
 	libfirewall.la
-endif
+endif # HAVE_LIBIPTC
 
 tests += \
 	test-networkd-conf \
@@ -5766,7 +5766,7 @@ SYSTEM_UNIT_ALIASES += \
 BUSNAMES_TARGET_WANTS += \
 	org.freedesktop.network1.busname
 
-endif
+endif # ENABLE_NETWORKD
 
 gperf_gperf_sources += \
 	src/network/networkd-gperf.gperf \
@@ -5821,7 +5821,7 @@ liblogind_core_la_LIBADD = \
 if HAVE_ACL
 liblogind_core_la_SOURCES += \
 	src/login/logind-acl.c
-endif
+endif # HAVE_ACL
 
 noinst_LTLIBRARIES += \
 	liblogind-core.la
@@ -5915,11 +5915,11 @@ pamlib_LTLIBRARIES = \
 if ENABLE_PAM_CONFIG
 dist_pamconf_DATA = \
 	src/login/systemd-user
-endif
+endif # ENABLE_PAM_CONFIG
 
 EXTRA_DIST += \
 	src/login/systemd-user.m4
-endif
+endif # HAVE_PAM
 
 nodist_systemunit_DATA += \
 	units/systemd-logind.service
@@ -5962,7 +5962,7 @@ nodist_udevrules_DATA += \
 	src/login/71-seat.rules \
 	src/login/73-seat-late.rules
 
-endif
+endif # ENABLE_LOGIND
 
 polkitpolicy_in_files += \
 	src/login/org.freedesktop.login1.policy.in
@@ -5994,7 +5994,7 @@ nodist_systemunit_DATA += \
 MULTI_USER_TARGET_WANTS += \
 	systemd-user-sessions.service
 
-endif
+endif # HAVE_PAM
 
 EXTRA_DIST += \
 	units/systemd-user-sessions.service.in
@@ -6181,7 +6181,7 @@ if ENABLE_POLKIT
 nodist_polkitpolicy_DATA = \
 	$(polkitpolicy_files) \
 	$(polkitpolicy_in_in_files:.policy.in.in=.policy)
-endif
+endif # ENABLE_POLKIT
 
 EXTRA_DIST += \
 	$(polkitpolicy_in_files) \
@@ -6257,7 +6257,7 @@ docs/var-log/README: docs/var-log/README.in
 CLEANFILES += \
 	docs/sysvinit/README \
 	docs/var-log/README
-endif
+endif # HAVE_SYSV_COMPAT
 
 EXTRA_DIST += \
 	docs/sysvinit/README.in \
@@ -6274,11 +6274,11 @@ GRAPHICAL_TARGET_WANTS += \
 	systemd-update-utmp-runlevel.service
 RESCUE_TARGET_WANTS += \
 	systemd-update-utmp-runlevel.service
-endif
+endif # HAVE_SYSV_COMPAT
 
 SYSINIT_TARGET_WANTS += \
 	systemd-update-utmp.service
-endif
+endif # HAVE_UTMP
 
 SYSINIT_TARGET_WANTS += \
 	systemd-update-done.service
@@ -6310,7 +6310,7 @@ SYSTEM_UNIT_ALIASES += \
 	multi-user.target runlevel4.target \
 	graphical.target runlevel5.target \
 	reboot.target runlevel6.target
-endif
+endif # HAVE_SYSV_COMPAT
 
 SYSTEM_UNIT_ALIASES += \
 	graphical.target default.target \
@@ -6330,7 +6330,7 @@ INSTALL_DIRS += \
 	$(systemunitdir)/runlevel3.target.wants \
 	$(systemunitdir)/runlevel4.target.wants \
 	$(systemunitdir)/runlevel5.target.wants
-endif
+endif # HAVE_SYSV_COMPAT
 
 INSTALL_DIRS += \
 	$(prefix)/lib/modules-load.d \
@@ -6382,19 +6382,19 @@ if HAVE_SYSV_COMPAT
 DISTCHECK_CONFIGURE_FLAGS += \
 	--with-sysvinit-path=$$dc_install_base/$(sysvinitdir) \
 	--with-sysvrcnd-path=$$dc_install_base/$(sysvrcnddir)
-else
+else # HAVE_SYSV_COMPAT
 DISTCHECK_CONFIGURE_FLAGS += \
 	--with-sysvinit-path= \
 	--with-sysvrcnd-path=
-endif
+endif # HAVE_SYSV_COMPAT
 
 if ENABLE_SPLIT_USR
 DISTCHECK_CONFIGURE_FLAGS += \
 	--enable-split-usr
-else
+else # ENABLE_SPLIT_USR
 DISTCHECK_CONFIGURE_FLAGS += \
 	--disable-split-usr
-endif
+endif # ENABLE_SPLIT_USR
 
 .PHONY: dist-check-help
 dist-check-help: $(rootbin_PROGRAMS) $(bin_PROGRAMS)
