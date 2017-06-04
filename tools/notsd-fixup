@@ -17,9 +17,10 @@ main() {
 
 	# GNUmakefiles
 	find "$@" -type l -name GNUmakefile -delete
-	# It's OK for the top-level one to fail
-	find "$@" -type f -name Makefile -printf '%h\0' |
-		xargs -r0 -I {} ln -s -r -t {} GNUmakefile
+	find "$@" -name Makefile -printf '%h\0' |
+		xargs -r0 realpath -z --relative-to=. -- |
+		grep -Zz -vFx . |
+		xargs -r0 -n1 sh -c 'ln -s -r -t "$1" GNUmakefile || exit 255' --
 
 	# C includes
 	rm -rf -- "$0"--includes.cache
