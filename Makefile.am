@@ -3098,7 +3098,7 @@ systemd_gpt_auto_generator_CFLAGS = \
 	$(BLKID_CFLAGS)
 endif # HAVE_BLKID
 
-# ------------------------------------------------------------------------------
+#@src/grp-system/systemd/Makefile ----------------------------------------------
 dist_xinitrc_SCRIPTS = \
 	xorg/50-systemd-user.sh
 
@@ -3264,7 +3264,7 @@ systemd_run_SOURCES = \
 systemd_run_LDADD = \
 	libsystemd-shared.la
 
-#@src/systemd-mount/Makefile ---------------------------------------------------
+#@auto/systemd-mount/Makefile --------------------------------------------------
 systemd_mount_SOURCES = \
 	src/mount/mount-tool.c
 
@@ -4317,6 +4317,7 @@ journalctl_LDADD += \
 	$(QRENCODE_LIBS)
 endif # HAVE_QRENCODE
 
+#@src/grp-journal/Makefile
 test_journal_SOURCES = \
 	src/journal/test-journal.c
 
@@ -4449,6 +4450,7 @@ libjournal_core_la_LIBADD = \
 noinst_LTLIBRARIES += \
 	libjournal-core.la
 
+#@src/grp-journal/Makefile
 journal-install-hook:
 	-$(MKDIR_P) $(DESTDIR)/var/log/journal
 	-chown 0:0 $(DESTDIR)/var/log/journal
@@ -5203,7 +5205,7 @@ EXTRA_DIST += \
 	units/systemd-timesyncd.service.in \
 	src/timesync/timesyncd.conf.in
 
-# ------------------------------------------------------------------------------
+#@discard.mk -------------------------------------------------------------------
 test_nss_SOURCES = \
 	src/test/test-nss.c
 
@@ -5215,7 +5217,7 @@ test_nss_LDADD = \
 manual_tests += \
 	test-nss
 
-# ------------------------------------------------------------------------------
+#@auto/nss-systemd/Makefile ----------------------------------------------------
 libnss_systemd_la_SOURCES = \
 	src/nss-systemd/nss-systemd.sym \
 	src/nss-systemd/nss-systemd.c
