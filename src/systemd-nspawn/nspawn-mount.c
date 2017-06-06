@@ -184,21 +184,17 @@ int tmpfs_mount_parse(CustomMount **l, unsigned *n, const char *s) {
 
 static int tmpfs_patch_options(
                 const char *options,
-                bool userns,
-                uid_t uid_shift, uid_t uid_range,
-                bool patch_ids,
+                uid_t uid,
                 const char *selinux_apifs_context,
                 char **ret) {
 
         char *buf = NULL;
 
-        if ((userns && uid_shift != 0) || patch_ids) {
-                assert(uid_shift != UID_INVALID);
-
+        if (uid >= 0) {
                 if (options)
-                        (void) asprintf(&buf, "%s,uid=" UID_FMT ",gid=" UID_FMT, options, uid_shift, uid_shift);
+                        (void) asprintf(&buf, "%s,uid=" UID_FMT ",gid=" UID_FMT, options, uid, uid);
                 else
-                        (void) asprintf(&buf, "uid=" UID_FMT ",gid=" UID_FMT, uid_shift, uid_shift);
+                        (void) asprintf(&buf, "uid=" UID_FMT ",gid=" UID_FMT, uid, uid);
                 if (!buf)
                         return -ENOMEM;
 
@@ -434,10 +430,7 @@ static int mount_all(const char *dest,
 
                 o = mount_table[k].options;
                 if (streq_ptr(mount_table[k].type, "tmpfs")) {
-                        if (in_userns)
-                                r = tmpfs_patch_options(o, use_userns, 0, uid_range, true, selinux_apifs_context, &options);
-                        else
-                                r = tmpfs_patch_options(o, use_userns, uid_shift, uid_range, false, selinux_apifs_context, &options);
+                        r = tmpfs_patch_options(o, in_userns ? 0 : uid_shift, selinux_apifs_context, &options);
                         if (r < 0)
                                 return log_oom();
                         if (r > 0)
@@ -584,7 +577,7 @@ static int mount_bind(const char *dest, CustomMount *m) {
 static int mount_tmpfs(
                 const char *dest,
                 CustomMount *m,
-                bool userns, uid_t uid_shift, uid_t uid_range,
+                uid_t uid_shift,
                 const char *selinux_apifs_context) {
 
         const char *where, *options;
@@ -600,7 +593,7 @@ static int mount_tmpfs(
         if (r < 0 && r != -EEXIST)
                 return log_error_errno(r, "Creating mount point for tmpfs %s failed: %m", where);
 
-        r = tmpfs_patch_options(m->options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
+        r = tmpfs_patch_options(m->options, uid_shift, selinux_apifs_context, &buf);
         if (r < 0)
                 return log_oom();
         options = r > 0 ? buf : m->options;
@@ -673,7 +666,7 @@ static int mount_overlay(const char *dest, CustomMount *m) {
 int mount_custom(
                 const char *dest,
                 CustomMount *mounts, unsigned n,
-                bool userns, uid_t uid_shift, uid_t uid_range,
+                uid_t uid_shift
                 const char *selinux_apifs_context) {
 
         unsigned i;
@@ -691,7 +684,7 @@ int mount_custom(
                         break;
 
                 case CUSTOM_MOUNT_TMPFS:
-                        r = mount_tmpfs(dest, m, userns, uid_shift, uid_range, selinux_apifs_context);
+                        r = mount_tmpfs(dest, m, uid_shift, selinux_apifs_context);
                         break;
 
                 case CUSTOM_MOUNT_OVERLAY:
@@ -743,7 +736,7 @@ int setup_volatile(
                         return log_error_errno(errno, "Failed to create %s: %m", t);
 
                 options = "mode=755";
-                r = tmpfs_patch_options(options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
+                r = tmpfs_patch_options(options, uid_shift, selinux_apifs_context, &buf);
                 if (r < 0)
                         return log_oom();
                 if (r > 0)
@@ -758,7 +751,7 @@ int setup_volatile(
                         return log_error_errno(errno, "Failed to create temporary directory: %m");
 
                 options = "mode=755";
-                r = tmpfs_patch_options(options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
+                r = tmpfs_patch_options(options, uid_shift, selinux_apifs_context, &buf);
                 if (r < 0)
                         return log_oom();
                 if (r > 0)

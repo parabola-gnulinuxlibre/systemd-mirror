@@ -1854,9 +1854,7 @@ static int outer_child(
                         args->arg_directory,
                         args->arg_custom_mounts,
                         args->arg_n_custom_mounts,
-                        args->arg_userns_mode != USER_NAMESPACE_NO,
-                        args->arg_uid_shift,
-                        args->arg_uid_range,
+                        args->arg_userns_mode != USER_NAMESPACE_NO ? args->arg_uid_shift : 0,
                         args->arg_selinux_apifs_context);
         if (r < 0)
                 return r;

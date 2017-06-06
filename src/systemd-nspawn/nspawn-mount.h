@@ -46,6 +46,6 @@ int mount_post_userns(bool use_userns, bool use_netns, uid_t uid_shift, uid_t ui
 int mount_cgroups(const char *dest, CGroupUnified unified_requested, bool userns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context, bool use_cgns);
 int mount_systemd_cgroup_writable(const char *dest, CGroupUnified unified_requested);
 
-int mount_custom(const char *dest, CustomMount *mounts, unsigned n, bool userns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
+int mount_custom(const char *dest, CustomMount *mounts, unsigned n, uid_t uid_shift, const char *selinux_apifs_context);
 
 int setup_volatile(const char *directory, VolatileMode mode, bool userns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
