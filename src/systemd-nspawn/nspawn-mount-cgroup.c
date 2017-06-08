@@ -40,6 +40,213 @@
 
 #include "nspawn-mount.h"
 
+typedef enum CGMountType {
+        CGMOUNT_SYMLINK,
+        CGMOUNT_TMPFS,
+        CGMOUNT_CGROUP1,
+        CGMOUNT_CGROUP2,
+        CGMOUNT_MAX
+} CGMountType;
+
+struct cgmount {
+        CGMountType type;
+        char *src;
+        char *dst;
+};
+
+static int cgpath_count_procs(const char *cgpath) {
+        char line[LINE_MAX];
+        int n = 0;
+        _cleanup_fclose_ FILE *procs = NULL;
+
+        procs = fopen(root_prefixa(cgpath, "cgroup.procs"), "re");
+        if (!procs)
+                return -errno;
+
+        FOREACH_LINE(line, procs, return -errno)
+                n++;
+
+        return n;
+}
+
+int cgmount_mount_cg(const char *fstype, const char *mountpoint, const char *opts, bool use_cgns) {
+        const char *cgpath;
+        int r;
+
+        /* First the base mount; this is always RW. */
+        r = mount_verbose(LOG_ERR, "cgroup", mountpoint, fstype, MS_NOSUID|MS_NOEXEC|MS_NODEV, opts);
+        if (r < 0)
+                return r;
+
+        /* A couple of things below need to know the abspath to our cgroup within the mountpoint; go ahead and figure
+         * that out now. */
+        if (use_cgns)
+                cgpath = mountpoint;
+        else {
+                const char *scontroller, *state, *cgroup = NULL;
+                size_t controller_len;
+                FOREACH_WORD_SEPARATOR(scontroller, controller_len, opts, state) {
+                        _cleanup_free_ const char *controller = strndup(scontroller, controller_len);
+                        if (cg_pid_get_path2(controller, 0, &cgroup) == 0)
+                                break;
+                }
+                if (!cgroup)
+                        return -EBADMSG;
+                cgpath = root_prefixa(mountpoint, cgroup);
+        }
+
+        /* If we are using a userns (uid_shift > 1), then we always let it be RW, because we can count on the shifted
+         * root user to not have access to the things that would make us want to mount it RO.  Otherwise, we give the
+         * container RW access to its cgroups if it isn't sharing them with other processes. */
+        if ( (uid_shift > 1) || (cgpath_count_procs(cgpath) == 1)) {
+                /* RW */
+                if (!use_cgns) {
+                        r = mount_verbose(LOG_ERR, cgpath, cgpath, NULL, MS_BIND, NULL);
+                        if (r < 0)
+                                return r;
+                        r = mount_verbose(LOG_ERR, NULL, mountpoint, NULL,
+                                          MS_BIND|MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_RDONLY, NULL);
+                        if (r < 0)
+                                return r;
+                }
+        } else {
+                /* RO */
+                r = mount_verbose(LOG_ERR, NULL, mountpoint, NULL,
+                                  MS_BIND|MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_RDONLY, NULL);
+                if (r < 0)
+                        return r;
+        }
+
+        return 0;
+}
+
+int cgmount_mount(struct cgmount m, bool use_cgns, const char *selinux_apifs_context) {
+        _cleanup_free_ char *options = NULL;
+        int r;
+        char *dst;
+
+        dst = root_prefixa("/sys/fs/cgroup", dst);
+
+        switch (m.type) {
+        case CGMOUNT_SYMLINK:
+                (void) mkdir_parents(dst, 0755);
+                return symlink_idempotent(m.src, dst);
+        case CGMOUNT_TMPFS:
+                r = path_is_mount_point(dst, AT_SYMLINK_FOLLOW);
+                if (r < 0)
+                        return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
+                (void) mkdir_p(dst, 0755);
+                r = tmpfs_patch_options(m.src, 0, selinux_apifs_context, &options);
+                if (r < 0)
+                        return log_oom;
+                return mount_verbose(LOG_ERR, /*name*/"tmpfs", dst, /*fstype*/"tmpfs",
+                                     MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME, options);
+        case CGMOUNT_CGROUP1:
+                r = path_is_mount_point(dst, 0);
+                if (r < 0 && r != -ENOENT)
+                        return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
+                (void) mkdir_p(dst, 0755);
+                return cgmount_mount_cg("cgroup", dst, m.src, use_cgns);
+        case CGMOUNT_CGROUP2:
+                r = path_is_mount_point(dst, 0);
+                if (r < 0 && r != -ENOENT)
+                        return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
+                (void) mkdir_p(dst, 0755);
+                return cgmount_mount_cg("cgroup2", dst, m.src, use_cgns);
+        }
+}
+
+int cgmount_enumerate(cgmount *ret_mounts, size_t *ret_n) {
+        _cleanup_fclose_ FILE *proc_self_mountinfo = NULL;
+        cgmount *mounts = NULL;
+        size_t n;
+        int r;
+
+        proc_self_mountinfo = fopen("/proc/self/mountinfo", "re");
+        if (!proc_self_mountinfo)
+                return -errno;
+
+        for (;;) {
+                _cleanup_free_ char *escmountpoint = NULL, *mountpoint = NULL, *fstype = NULL, *superopts = NULL;
+                char *controller;
+                CGMountType type;
+                cgmount *t;
+                int k;
+
+                k = fscanf(proc_self_mountinfo,
+                           "%*s "       /* (1) mount id */
+                           "%*s "       /* (2) parent id */
+                           "%*s "       /* (3) major:minor */
+                           "%*s "       /* (4) root */
+                           "%ms "       /* (5) mount point */
+                           "%*s"        /* (6) per-mount options */
+                           "%*[^-]"     /* (7) optional fields */
+                           "- "         /* (8) separator */
+                           "%ms "       /* (9) file system type */
+                           "%*s"        /* (10) mount source */
+                           "%ms"        /* (11) per-superblock options */
+                           "%*[^\n]",   /* some rubbish at the end */
+                           &escmountpoint,
+                           &fstype,
+                           &superopts
+                );
+                if (k != 3) {
+                        if (k == EOF)
+                                break;
+
+                        continue;
+                }
+
+                r = cunescape(escmountpont, UNESCAPE_RELAX, &mountpoint);
+                if (r < 0)
+                        goto free;
+
+                controller = path_startswith(mountpoint, "/sys/fs/cgroup");
+                if (!controller)
+                        continue;
+
+                if (streq(fstype, "tmpfs"))
+                        type = CGMOUNT_TMPFS;
+                else if(streq(fstype, "cgroup"))
+                        type = CGMOUNT_CGROUP1;
+                else if (streq(fstype, "cgroup2"))
+                        type = CGMOUNT_CGROUP2;
+                else
+                        continue;
+
+                t = realloc_multiply(mounts, sizeof(struct cgmount), n);
+                if (!t) {
+                        r = -ENOMEM;
+                        goto free;
+                }
+                mounts = t;
+                n++;
+
+                mounts[n].type = type;
+                mounts[n].dst = strdup(controller);
+                mounts[n].src = strdup(superopts);
+                if (!mounts[n].dst || !mounts[n].src) {
+                        r = -ENOMEM;
+                        goto free;
+                }
+        }
+
+        *ret_mounts = mounts;
+        *ret_n = n;
+        return 0;
+ err:
+        cgmount_free_all(mounts, n);
+        return r;
+}
+
+void cgmount_free_all(cgmount *mounts, size_t n) {
+        for (size_t i = 0; i < n; i++) {
+                free(mounts[i].src);
+                free(mounts[i].dst);
+        }
+        free(mounts);
+}
+
 /* Retrieve existing subsystems. This function is called in a new cgroup
  * namespace.
  */

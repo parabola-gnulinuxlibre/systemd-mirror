@@ -921,7 +921,13 @@ int cg_get_xattr(const char *controller, const char *path, const char *name, voi
         return (int) n;
 }
 
-int cg_pid_get_path(const char *controller, pid_t pid, char **path) {
+/**
+ * Returns the cgroup path of the process under the hierarchy specified by the `controller` argument.
+ *
+ *     controller         : the cgroup v1 hierarchy with this controller bound to it
+ *     controller == NULL : the cgroup v2 (unified) hierarchy
+ */
+int cg_pid_get_path2(const char *controller, pid_t pid, char **path) {
         _cleanup_fclose_ FILE *f = NULL;
         char line[LINE_MAX];
         const char *fs;
@@ -931,17 +937,8 @@ int cg_pid_get_path(const char *controller, pid_t pid, char **path) {
         assert(path);
         assert(pid >= 0);
 
-        if (controller) {
-                if (!cg_controller_is_valid(controller))
-                        return -EINVAL;
-        } else
-                controller = SYSTEMD_CGROUP_CONTROLLER;
-
-        unified = cg_unified(controller);
-        if (unified < 0)
-                return unified;
-        if (unified == 0)
-                cs = strlen(controller);
+        if (controller && !cg_controller_is_valid(controller))
+                return -EINVAL;
 
         fs = procfs_file_alloca(pid, "cgroup");
         f = fopen(fs, "re");
@@ -953,7 +950,7 @@ int cg_pid_get_path(const char *controller, pid_t pid, char **path) {
 
                 truncate_nl(line);
 
-                if (unified) {
+                if (!controller) {
                         e = startswith(line, "0:");
                         if (!e)
                                 continue;
@@ -997,6 +994,35 @@ int cg_pid_get_path(const char *controller, pid_t pid, char **path) {
         }
 
         return -ENODATA;
+}
+
+/**
+ * Returns the cgroup path of the process under the hierarchy specified by the `controller` argument.
+ *
+ *     controller         : whichever hierarchy has this controller bound to it
+ *     controller == NULL : whichever hierarchy systemd is using
+ */
+int cg_pid_get_path(const char *controller, pid_t pid, char **path) {
+        _cleanup_fclose_ FILE *f = NULL;
+        char line[LINE_MAX];
+        const char *fs;
+        size_t cs = 0;
+        int unified;
+
+        assert(path);
+        assert(pid >= 0);
+
+        if (controller) {
+                if (!cg_controller_is_valid(controller))
+                        return -EINVAL;
+        } else
+                controller = SYSTEMD_CGROUP_CONTROLLER;
+
+        unified = cg_unified(controller);
+        if (unified < 0)
+                return unified;
+
+        return cg_pid_get_path2(unified ? NULL : controller, pid, path);
 }
 
 int cg_install_release_agent(const char *controller, const char *agent) {
