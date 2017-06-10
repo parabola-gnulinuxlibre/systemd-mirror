@@ -2292,9 +2292,9 @@ int cg_kernel_controllers(Set *controllers) {
         assert(controllers);
 
         /* Determines the full list of kernel-known controllers. Might
-         * include controllers we don't actually support, arbitrary
-         * named hierarchies and controllers that aren't currently
-         * accessible (because not mounted). */
+         * include controllers we don't actually support and
+         * controllers that aren't currently accessible (because not
+         * mounted). */
 
         f = fopen("/proc/cgroups", "re");
         if (!f) {
