@@ -1480,21 +1480,9 @@ static int inner_child(
                 if (r < 0)
                         return log_error_errno(errno, "Failed to unshare cgroup namespace");
         }
-        r = mount_cgroups(
-                        "",
-                        args->arg_unified_cgroup_hierarchy,
-                        args->arg_userns_mode != USER_NAMESPACE_NO,
-                        args->arg_uid_shift,
-                        args->arg_uid_range,
-                        args->arg_selinux_apifs_context,
-                        args->arg_use_cgns);
+        r = cgroup_setup_mount(mounts, args->arg_use_cgns, args->arg_uid_shift > 0, args->arg_selinux_apifs_context);
         if (r < 0)
                 return r;
-        if (!args->arg_use_cgns) {
-                r = mount_systemd_cgroup_writable("", args->arg_unified_cgroup_hierarchy);
-                if (r < 0)
-                        return r;
-        }
 
         r = setup_boot_id(NULL);
         if (r < 0)

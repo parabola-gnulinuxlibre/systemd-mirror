@@ -112,6 +112,12 @@ typedef enum CGroupMode {
         CGROUP_VER_INVALID = -1
 } CGroupMode;
 
+typedef struct CGMount CGMount;
+typedef struct CGMounts {
+        CGMount *mounts;
+        size_t n;
+} CGMounts;
+
 typedef struct Args {
         char *arg_directory;
         char *arg_template;
