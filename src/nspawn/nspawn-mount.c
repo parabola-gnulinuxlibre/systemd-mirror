@@ -182,17 +182,13 @@ int tmpfs_mount_parse(CustomMount **l, unsigned *n, const char *s) {
 
 static int tmpfs_patch_options(
                 const char *options,
-                bool userns,
-                uid_t uid_shift, uid_t uid_range,
-                bool patch_ids,
+                uid_t uid_shift,
                 const char *selinux_apifs_context,
                 char **ret) {
 
         char *buf = NULL;
 
-        if ((userns && uid_shift != 0) || patch_ids) {
-                assert(uid_shift != UID_INVALID);
-
+        if (uid_shift != UID_INVALID) {
                 if (options)
                         (void) asprintf(&buf, "%s,uid=" UID_FMT ",gid=" UID_FMT, options, uid_shift, uid_shift);
                 else
@@ -361,9 +357,9 @@ static int mkdir_userns_p(const char *prefix, const char *path, mode_t mode, boo
 }
 
 int mount_all(const char *dest,
-              bool use_userns, bool in_userns,
+              bool in_userns,
               bool use_netns,
-              uid_t uid_shift, uid_t uid_range,
+              uid_t uid_shift,
               const char *selinux_apifs_context) {
 
         typedef struct MountPoint {
@@ -432,10 +428,7 @@ int mount_all(const char *dest,
 
                 o = mount_table[k].options;
                 if (streq_ptr(mount_table[k].type, "tmpfs")) {
-                        if (in_userns)
-                                r = tmpfs_patch_options(o, use_userns, 0, uid_range, true, selinux_apifs_context, &options);
-                        else
-                                r = tmpfs_patch_options(o, use_userns, uid_shift, uid_range, false, selinux_apifs_context, &options);
+                        r = tmpfs_patch_options(o, in_userns ? 0 : uid_shift, selinux_apifs_context, &options);
                         if (r < 0)
                                 return log_oom();
                         if (r > 0)
@@ -569,7 +562,7 @@ static int mount_tmpfs(
         if (r < 0 && r != -EEXIST)
                 return log_error_errno(r, "Creating mount point for tmpfs %s failed: %m", where);
 
-        r = tmpfs_patch_options(m->options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
+        r = tmpfs_patch_options(m->options, uid_shift == 0 ? UID_INVALID : uid_shift, selinux_apifs_context, &buf);
         if (r < 0)
                 return log_oom();
         options = r > 0 ? buf : m->options;
@@ -790,7 +783,7 @@ static int mount_legacy_cgns_supported(
                  * uid/gid as seen from e.g. /proc/1/mountinfo. So we simply
                  * pass uid 0 and not uid_shift to tmpfs_patch_options().
                  */
-                r = tmpfs_patch_options("mode=755", userns, 0, uid_range, true, selinux_apifs_context, &options);
+                r = tmpfs_patch_options("mode=755", 0, selinux_apifs_context, &options);
                 if (r < 0)
                         return log_oom();
 
@@ -883,7 +876,7 @@ static int mount_legacy_cgns_unsupported(
         if (r == 0) {
                 _cleanup_free_ char *options = NULL;
 
-                r = tmpfs_patch_options("mode=755", userns, uid_shift, uid_range, false, selinux_apifs_context, &options);
+                r = tmpfs_patch_options("mode=755", uid_shift == 0 ? UID_INVALID : uid_shift, selinux_apifs_context, &options);
                 if (r < 0)
                         return log_oom();
 
@@ -1066,7 +1059,7 @@ int setup_volatile_state(
                 return log_error_errno(errno, "Failed to create %s: %m", directory);
 
         options = "mode=755";
-        r = tmpfs_patch_options(options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
+        r = tmpfs_patch_options(options, uid_shift == 0 ? UID_INVALID : uid_shift, selinux_apifs_context, &buf);
         if (r < 0)
                 return log_oom();
         if (r > 0)
@@ -1099,7 +1092,7 @@ int setup_volatile(
                 return log_error_errno(errno, "Failed to create temporary directory: %m");
 
         options = "mode=755";
-        r = tmpfs_patch_options(options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
+        r = tmpfs_patch_options(options, uid_shift == 0 ? UID_INVALID : uid_shift, selinux_apifs_context, &buf);
         if (r < 0)
                 return log_oom();
         if (r > 0)
