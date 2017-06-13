@@ -1379,7 +1379,7 @@ static int parse_argv(int argc, char *argv[]) {
         if (r < 0)
                 arg_use_cgns = cg_ns_supported();
         else
-                arg_use_cgns = r;
+                arg_use_cgns = r && cg_ns_supported();
 
         r = custom_mount_check_all();
         if (r < 0)
@@ -2601,7 +2601,7 @@ static int inner_child(
                 return -ESRCH;
         }
 
-        if (arg_use_cgns && cg_ns_supported()) {
+        if (arg_use_cgns) {
                 r = unshare(CLONE_NEWCGROUP);
                 if (r < 0)
                         return log_error_errno(errno, "Failed to unshare cgroup namespace: %m");
@@ -3065,7 +3065,7 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        if (!arg_use_cgns || !cg_ns_supported()) {
+        if (!arg_use_cgns) {
                 r = mount_cgroups(
                                 directory,
                                 arg_inner_cgver,
