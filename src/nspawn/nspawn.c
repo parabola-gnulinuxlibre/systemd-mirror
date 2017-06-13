@@ -2685,11 +2685,9 @@ static int inner_child(
                 return log_error_errno(r, "Couldn't become new root: %m");
 
         r = mount_all(NULL,
-                      arg_userns_mode != USER_NAMESPACE_NO,
                       true,
                       arg_private_network,
                       arg_uid_shift,
-                      arg_uid_range,
                       arg_selinux_apifs_context);
 
         if (r < 0)
@@ -3056,11 +3054,9 @@ static int outer_child(
         }
 
         r = mount_all(directory,
-                      arg_userns_mode != USER_NAMESPACE_NO,
                       false,
                       arg_private_network,
                       arg_uid_shift,
-                      arg_uid_range,
                       arg_selinux_apifs_context);
         if (r < 0)
                 return r;
