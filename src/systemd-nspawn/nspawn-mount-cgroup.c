@@ -22,6 +22,7 @@
 #include <linux/magic.h>
 
 #include "systemd-basic/alloc-util.h"
+#include "systemd-basic/cgroup-util.h"
 #include "systemd-basic/escape.h"
 #include "systemd-basic/fd-util.h"
 #include "systemd-basic/fileio.h"
@@ -38,6 +39,7 @@
 #include "systemd-basic/user-util.h"
 #include "systemd-basic/util.h"
 
+#include "nspawn-cgroup.h"
 #include "nspawn-mount.h"
 
 /* Code for managing the list of CGMounts ***************************/
@@ -57,7 +59,7 @@ struct CGMount {
 };
 
 static CGMount *cgmount_add(CGMounts *mounts, CGMountType type, const char *src, const char *dst) {
-        const char *hsrc = NULL, *hdst = NULL;
+        char *hsrc = NULL, *hdst = NULL;
         CGMount *c, *ret;
 
         assert(mounts);
@@ -65,7 +67,7 @@ static CGMount *cgmount_add(CGMounts *mounts, CGMountType type, const char *src,
         assert(src);
         assert(dst);
 
-        hsrc = strdup(str);
+        hsrc = strdup(src);
         hdst = strdup(dst);
         if (!hsrc || !hdst) {
                 free(hsrc);
@@ -78,7 +80,7 @@ static CGMount *cgmount_add(CGMounts *mounts, CGMountType type, const char *src,
                 return NULL;
 
         mounts->mounts = c;
-        ret = (mounts->mounts)[mounts->n];
+        ret = &(mounts->mounts)[mounts->n];
         (mounts->n)++;
 
         *ret = (CGMount) {
@@ -89,34 +91,21 @@ static CGMount *cgmount_add(CGMounts *mounts, CGMountType type, const char *src,
         return ret;
 }
 
-static void cgmount_free_all(CGMounts mounts) {
-        for (size_t i = 0; i < mounts.n; i++) {
-                free(mounts.mounts[i].src);
-                free(mounts.mounts[i].dst);
+void cgroup_free_mounts(CGMounts *mounts) {
+        for (size_t i = 0; i < mounts->n; i++) {
+                free(mounts->mounts[i].src);
+                free(mounts->mounts[i].dst);
         }
-        free(mounts.mounts);
+        mounts->mounts = mfree(mounts->mounts);
+        mounts->n = 0;
 }
-
-DEFINE_TRIVIAL_CLEANUP_FUNC(CGMounts, cgmount_free_all);
 
 /* Code that recieves CGMounts **************************************/
 
-static int cgpath_count_procs(const char *cgpath) {
-        char line[LINE_MAX];
-        int n = 0;
-        _cleanup_fclose_ FILE *procs = NULL;
-
-        procs = fopen(root_prefixa(cgpath, "cgroup.procs"), "re");
-        if (!procs)
-                return -errno;
-
-        FOREACH_LINE(line, procs, return -errno)
-                n++;
-
-        return n;
-}
-
-static int cgroup_setup_mount_cg(const char *mountpoint, const char *opts, const char *fstype, bool use_cgns, bool use_userns) {
+static int cgroup_mount_cg(
+                const char *mountpoint, const char *opts, const char *fstype, bool writable,
+                bool use_cgns
+) {
         const char *cgpath;
         int r;
 
@@ -130,22 +119,30 @@ static int cgroup_setup_mount_cg(const char *mountpoint, const char *opts, const
         if (use_cgns)
                 cgpath = mountpoint;
         else {
-                const char *scontroller, *state, *cgroup = NULL;
-                size_t controller_len;
-                FOREACH_WORD_SEPARATOR(scontroller, controller_len, opts, state) {
-                        _cleanup_free_ const char *controller = strndup(scontroller, controller_len);
-                        if (cg_pid_get_path2(controller, 0, &cgroup) == 0)
-                                break;
+                char *cgroup = NULL;
+                if (streq(fstype, "cgroup2")) {
+                        r = cg_pid_get_path2(NULL, 0, &cgroup);
+                        if (r < 0)
+                                return log_error_errno(r, "Failed to get child's cgroup v2 path");
+                } else {
+                        const char *scontroller, *state;
+                        size_t controller_len;
+                        FOREACH_WORD_SEPARATOR(scontroller, controller_len, opts, ",", state) {
+                                _cleanup_free_ const char *controller = strndup(scontroller, controller_len);
+                                if (cg_pid_get_path2(controller, 0, &cgroup) == 0)
+                                        break;
+                        }
+                        if (!cgroup)
+                                return log_error_errno(EBADMSG, "Failed to associate mounted cgroup hierarchy %s with numbered cgroup hierarchy", mountpoint);
                 }
-                if (!cgroup)
-                        return log_error_errno(EBADMSG, "Failed to associate mounted cgroup hierarchy %s with numbered cgroup hierarchy");
+                cgpath = prefix_roota(mountpoint, cgroup);
         }
 
         /* If we are using a userns, then we always let it be RW, because we can count on the shifted root user to not
          * have access to the things that would make us want to mount it RO.  Otherwise, we give the container RW
          * access to its cgroups if it isn't sharing them with other processes (presumably, this is the systemd
          * controller and not really any others). */
-        if ( use_userns || (cgpath_count_procs(cgpath) == 1)) {
+        if (writable) {
                 /* RW */
                 if (!use_cgns) {
                         /* emulate cgns by mounting everything but our subcgroup RO */
@@ -168,12 +165,12 @@ static int cgroup_setup_mount_cg(const char *mountpoint, const char *opts, const
         return 0;
 }
 
-static int cgroup_setup_mount_one(CGMount m, bool use_cgns, bool use_userns, const char *selinux_apifs_context) {
+static int cgroup_mount_one(CGMount m, bool use_cgns, bool use_userns, const char *selinux_apifs_context) {
         _cleanup_free_ char *options = NULL;
-        char *dst;
+        const char *dst;
         int r;
 
-        dst = root_prefixa("/sys/fs/cgroup", dst);
+        dst = prefix_roota("/sys/fs/cgroup", m.dst);
 
         /* The checks here to see if things are already mounted are kind of primative.  Perhaps they should actually
          * check the statfs() f_type to verify that the thing mounted is what we want to be mounted (similar to
@@ -200,38 +197,38 @@ static int cgroup_setup_mount_one(CGMount m, bool use_cgns, bool use_userns, con
                 if (r < 0 && r != -ENOENT)
                         return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
                 if (r > 0) {
-                        if (access(prefix_roota(dst, "cgroup.procs")) >= 0)
+                        if (access(prefix_roota(dst, "cgroup.procs"), F_OK) >= 0)
                                 return 0;
                         if (errno != ENOENT)
                                 return log_error_errno(errno, "Failed to determine if mount point %s is a cgroup hierarchy: %m", dst);
                         return log_error_errno(EINVAL, "%s is already mounted but not a cgroup hierarchy. Refusing.", dst);
                 }
                 (void) mkdir_p(dst, 0755);
-                return cgroup_setup_mount_cg(dst, m.src, "cgroup", use_cgns, use_userns);
+                return cgroup_mount_cg(dst, m.src, "cgroup", use_cgns, use_userns);
         case CGMOUNT_CGROUP2:
                 r = path_is_mount_point(dst, 0);
                 if (r < 0 && r != -ENOENT)
                         return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
                 if (r > 0) {
-                        if (access(prefix_roota(dst, "cgroup.procs")) >= 0)
+                        if (access(prefix_roota(dst, "cgroup.procs"), F_OK) >= 0)
                                 return 0;
                         if (errno != ENOENT)
                                 return log_error_errno(errno, "Failed to determine if mount point %s is a cgroup hierarchy: %m", dst);
                         return log_error_errno(EINVAL, "%s is already mounted but not a cgroup hierarchy. Refusing.", dst);
                 }
                 (void) mkdir_p(dst, 0755);
-                return cgroup_setup_mount_cg(dst, m.src, "cgroup2", use_cgns, use_userns);
+                return cgroup_mount_cg(dst, m.src, "cgroup2", use_cgns, use_userns);
         default:
                 assert_not_reached("Invalid CGMount type");
                 return -EINVAL;
         }
 }
 
-int cgroup_setup_mount(CGMounts mounts, bool use_cgns, bool use_userns, const char *selinux_apifs_context) {
+int cgroup_mount_mounts(CGMounts mounts, bool use_cgns, bool use_userns, const char *selinux_apifs_context) {
         int r;
 
         for (size_t i = 0; i < mounts.n; i++) {
-                r = cgroup_setup_mount_one(mounts.mounts[i], use_cgns, use_userns, selinux_apifs_context);
+                r = cgroup_mount_one(mounts.mounts[i], use_cgns, use_userns, selinux_apifs_context);
                 if (r < 0)
                         return r;
         }
@@ -241,9 +238,9 @@ int cgroup_setup_mount(CGMounts mounts, bool use_cgns, bool use_userns, const ch
 
 /* Code that creates CGMounts ***************************************/
 
-static int cgroup_setup_enumerate_inherit(CGMounts *ret_mounts) {
+static int cgroup_decide_mounts_inherit(CGMounts *ret_mounts) {
         _cleanup_fclose_ FILE *proc_self_mountinfo = NULL;
-        _cleanup_(cgmount_free_allp) CGMounts mounts = {};
+        _cleanup_(cgroup_free_mounts) CGMounts mounts = {};
         int r;
 
         proc_self_mountinfo = fopen("/proc/self/mountinfo", "re");
@@ -310,8 +307,6 @@ static int cgroup_setup_enumerate_inherit(CGMounts *ret_mounts) {
         }
 
         *ret_mounts = mounts;
-        *ret_n = n;
-
         mounts.mounts = NULL;
         mounts.n = 0;
 
@@ -376,11 +371,10 @@ static const char *controller_to_dirname(const char *controller) {
         return controller;
 }
 
-static int cgroup_setup_enumerate_sd(CGMounts *ret_mounts, CGroupMode outer_cgver, CGroupMode inner_cgver, bool use_cgns)  {
-        CGMount *mounts = NULL;
-        size_t n = 0;
+static int cgroup_decide_mounts_sd(CGMounts *ret_mounts, CGroupMode outer_cgver, CGroupMode inner_cgver, bool use_cgns)  {
+        CGMounts mounts = {};
 
-        if (!cgmount_add(&mounts, &n, CGMOUNT_TMPFS, "mode=755", ""))
+        if (!cgmount_add(&mounts, CGMOUNT_TMPFS, "mode=755", ""))
                 return log_oom();
 
         /* There's no "good" reason to have the behavior be different based on use_cgns; it's there for historical
@@ -397,7 +391,7 @@ static int cgroup_setup_enumerate_sd(CGMounts *ret_mounts, CGroupMode outer_cgve
                 /* If the outer_cgver == CGROUP_VER_2, then `hierarchies` will be empty, and this will be a no-op.
                  * That's OK. */
                 hierarchies = set_new(&string_hash_ops);
-                if (!)
+                if (!hierarchies)
                         return log_oom();
                 r = get_v1_hierarchies(hierarchies);
                 if (r < 0)
@@ -405,7 +399,7 @@ static int cgroup_setup_enumerate_sd(CGMounts *ret_mounts, CGroupMode outer_cgve
 
                 for (;;) {
                         _cleanup_free_ const char *hierarchy = NULL;
-                        const char c;
+                        const char *c;
 
                         hierarchy = set_steal_first(hierarchies);
                         if (!hierarchy)
@@ -416,7 +410,7 @@ static int cgroup_setup_enumerate_sd(CGMounts *ret_mounts, CGroupMode outer_cgve
                         if (streq(hierarchy, "name=systemd"))
                                 continue;
 
-                        if (!cgmount_add(&mounts, &n, CGMOUNT_CGROUP1, hierarchy, controller_to_dirname(hierarchy)))
+                        if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, hierarchy, controller_to_dirname(hierarchy)))
                                 return log_oom();
 
                         /* When multiple hierarchies are co-mounted, make their
@@ -425,7 +419,7 @@ static int cgroup_setup_enumerate_sd(CGMounts *ret_mounts, CGroupMode outer_cgve
                          */
                         c = hierarchy;
                         for (;;) {
-                                _cleanup_free_ const char *controller = NULL;
+                                _cleanup_free_ char *controller = NULL;
 
                                 r = extract_first_word(&c, &controller, ",", 0);
                                 if (r < 0)
@@ -436,7 +430,7 @@ static int cgroup_setup_enumerate_sd(CGMounts *ret_mounts, CGroupMode outer_cgve
                                 if (streq(controller, hierarchy))
                                         break;
 
-                                if (!cgmount_add(&mounts, &n, CGMOUNT_SYMLINK, controller_to_dirname(hierarchy), controller_to_dirname(controller)))
+                                if (!cgmount_add(&mounts, CGMOUNT_SYMLINK, controller_to_dirname(hierarchy), controller_to_dirname(controller)))
                                         return log_oom();
 
                         }
@@ -464,7 +458,7 @@ static int cgroup_setup_enumerate_sd(CGMounts *ret_mounts, CGroupMode outer_cgve
                         if (r == -EINVAL) {
                                 /* Not a symbolic link, but directly a single cgroup hierarchy */
 
-                                if (!cgmount_add(&mounts, &n, CGMOUNT_CGROUP1, controller, controller))
+                                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, controller, controller))
                                         return log_oom();
 
                         } else if (r < 0)
@@ -479,10 +473,10 @@ static int cgroup_setup_enumerate_sd(CGMounts *ret_mounts, CGroupMode outer_cgve
                                         continue;
                                 }
 
-                                if (!cgmount_add(&mounts, &n, CGMOUNT_CGROUP1, combined, combined))
+                                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, combined, combined))
                                         return log_oom();
 
-                                if (!cgmount_add(&mounts, &n, CGMOUNT_SYMLINK, combined, controller))
+                                if (!cgmount_add(&mounts, CGMOUNT_SYMLINK, combined, controller))
                                         return log_oom();
                         }
                 }
@@ -490,23 +484,24 @@ static int cgroup_setup_enumerate_sd(CGMounts *ret_mounts, CGroupMode outer_cgve
 
         switch (inner_cgver) {
         case CGROUP_VER_1_SD:
-                if (!cgmount_add(&mounts, &n, CGMOUNT_CGROUP1, "name=systemd", "systemd"))
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, "name=systemd", "systemd"))
                         log_oom();
+                break;
         case CGROUP_VER_MIXED_SD232:
-                if (!cgmount_add(&mounts, &n, CGMOUNT_CGROUP2, "", "systemd"))
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "", "systemd"))
                         log_oom();
+                break;
         default:
                 assert_not_reached("non-legacy cgroup version desired in legacy setup function");
                 return -EINVAL;
         }
 
         *ret_mounts = mounts;
-        *ret_n = n;
 
         return 0;
 }
 
-int cgroup_setup_enumerate(
+int cgroup_decide_mounts(
                 CGMounts *ret_mounts,
                 CGroupMode outer_cgver, CGroupMode inner_cgver,
                 bool use_cgns
@@ -515,14 +510,14 @@ int cgroup_setup_enumerate(
         case CGROUP_VER_NONE:
                 return 0;
         case CGROUP_VER_INHERIT:
-                return cgroup_setup_enumerate_inherit(ret_mounts);
+                return cgroup_decide_mounts_inherit(ret_mounts);
         case CGROUP_VER_2:
                 if (!cgmount_add(ret_mounts, CGMOUNT_CGROUP2, "cgroup", ""))
                         return log_oom();
                 return 0;
         case CGROUP_VER_1_SD:
         case CGROUP_VER_MIXED_SD232:
-                return cgroup_setup_enumerate_sd(ret_mounts, outer_cgver, inner_cgver, use_cgns);
+                return cgroup_decide_mounts_sd(ret_mounts, outer_cgver, inner_cgver, use_cgns);
         default:
                 assert_not_reached("Invalid cgroup ver requested");
                 return -EINVAL;

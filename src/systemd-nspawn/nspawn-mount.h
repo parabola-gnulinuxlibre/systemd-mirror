@@ -22,8 +22,6 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "systemd-basic/cgroup-util.h"
-
 #include "nspawn-types.h"
 
 /* used by `args`/`settings` ****************************************/
@@ -43,9 +41,10 @@ VolatileMode volatile_mode_from_string(const char *s);
 int mount_pre_userns(const char *dest, bool use_userns, bool use_netns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
 int mount_post_userns(bool use_userns, bool use_netns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
 
-int cgroup_setup_enumerate(CGMounts *ret_mounts, CGroupMode outer_cgver, CGroupMode inner_cgver, bool use_cgns);
-int cgroup_setup_mount(CGMounts mounts, bool use_cgns, bool use_userns, const char *selinux_apifs_context);
-
 int mount_custom(const char *dest, CustomMount *mounts, unsigned n, uid_t uid_shift, const char *selinux_apifs_context);
 
 int setup_volatile(const char *directory, VolatileMode mode, bool userns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
+
+/* used internally and by `cgroups` *********************************/
+
+int tmpfs_patch_options(const char *options, uid_t uid, const char *selinux_apifs_context, char **ret);

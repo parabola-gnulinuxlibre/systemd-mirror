@@ -182,7 +182,7 @@ int tmpfs_mount_parse(CustomMount **l, unsigned *n, const char *s) {
         return 0;
 }
 
-static int tmpfs_patch_options(
+int tmpfs_patch_options(
                 const char *options,
                 uid_t uid,
                 const char *selinux_apifs_context,
@@ -190,7 +190,7 @@ static int tmpfs_patch_options(
 
         char *buf = NULL;
 
-        if (uid >= 0) {
+        if (uid > 0) {
                 if (options)
                         (void) asprintf(&buf, "%s,uid=" UID_FMT ",gid=" UID_FMT, options, uid, uid);
                 else
@@ -286,20 +286,10 @@ static int mount_sysfs(const char *dest) {
         x = prefix_roota(top, "/fs/kdbus");
         (void) mkdir_p(x, 0755);
 
-        /* We need to ensure that /sys/fs/cgroup exists before we remount /sys read-only.
-         *
-         * If !use_cgns, then this was already done by the outer child; so we only need to do it here it if use_cgns.
-         * This function doesn't know whether use_cgns, but !cg_ns_supported()⇒!use_cgns, so we can "optimize" the case
-         * where we _know_ !use_cgns, and deal with a no-op mkdir_p() in the false-positive where cgns_supported() but
-         * !use_cgns.
-         *
-         * But is it really much of an optimization?  We're potentially spending an access(2) (cg_ns_supported() could
-         * be cached from a previous call) to potentially save an lstat(2) and mkdir(2); and all of them are on virtual
-         * fileystems, so they should all be pretty cheap. */
-        if (cg_ns_supported()) { /* if (use_cgns) { */
-                x = prefix_roota(top, "/fs/cgroup");
-                (void) mkdir_p(x, 0755);
-        }
+        /* Ensure that /sys/fs/cgroup exists before we remount /sys readonly.  If !use_cgns then it was already created
+         * by the outer child; but if use_cgns then it doesn't exist yet so we need to mkdir it. */
+        x = prefix_roota(top, "/fs/cgroup");
+        (void) mkdir_p(x, 0755);
 
         return mount_verbose(LOG_ERR, NULL, top, NULL,
                              MS_BIND|MS_RDONLY|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_REMOUNT, NULL);
@@ -450,12 +440,11 @@ static int mount_all(const char *dest,
         return 0;
 }
 
-int mount_post_userns(const char *dest,
-                     bool use_userns,
-                     bool use_netns,
-                     uid_t uid_shift,
-                     uid_t uid_range,
-                     const char *selinux_apifs_context) {
+int mount_post_userns(bool use_userns,
+                      bool use_netns,
+                      uid_t uid_shift,
+                      uid_t uid_range,
+                      const char *selinux_apifs_context) {
 
         int r;
 
@@ -666,7 +655,7 @@ static int mount_overlay(const char *dest, CustomMount *m) {
 int mount_custom(
                 const char *dest,
                 CustomMount *mounts, unsigned n,
-                uid_t uid_shift
+                uid_t uid_shift,
                 const char *selinux_apifs_context) {
 
         unsigned i;

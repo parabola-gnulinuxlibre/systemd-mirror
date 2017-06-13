@@ -36,7 +36,7 @@ int lock_tree_ephemeral(LockFile *ret_global_lock, LockFile *ret_local_lock);
 int lock_tree_plain(LockFile *ret_global_lock, LockFile *ret_local_lock);
 int lock_tree_image(LockFile *ret_global_lock, LockFile *ret_local_lock);
 int custom_mounts_prepare(void);
-int pick_cgroup_ver(const char *directory, CGroupMode *ret_cgver);
+int pick_cgroup_ver(const char *directory);
 /* set up the PTY */
 /* parent:run() *****************************************************/
 /* ... */

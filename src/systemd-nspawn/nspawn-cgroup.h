@@ -22,24 +22,12 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
-#include "systemd-basic/cgroup-util.h"
+#include "systemd-basic/macro.h"
 
-int chown_cgroup(pid_t pid, uid_t uid_shift);
-int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift);
-int create_subcgroup(pid_t pid, CGroupUnified unified_requested);
+#include "nspawn-types.h"
 
-static int setup_cgroup(pid_t pid, uid_t uid_shift, CGroupMode cgver, bool keep_unit) {
-        r = sync_cgroup(pid, cgver, uid_shift);
-        if (r < 0)
-                return r;
-
-        if (keep_unit) {
-                r = create_subcgroup(pid, cgver);
-                if (r < 0)
-                        return r;
-        }
-
-        r = chown_cgroup(pid, cgver);
-        if (r < 0)
-                return r;
-}
+CGroupMode cgroup_outerver(void);
+int cgroup_setup(pid_t pid, CGroupMode outer_cgver, CGroupMode inner_cgver, uid_t uid_shift, bool keep_unit);
+int cgroup_decide_mounts(CGMounts *ret_mounts, CGroupMode outer_cgver, CGroupMode inner_cgver, bool use_cgns);
+int cgroup_mount_mounts(CGMounts mounts, bool use_cgns, bool use_userns, const char *selinux_apifs_context);
+void cgroup_free_mounts(CGMounts *mounts);

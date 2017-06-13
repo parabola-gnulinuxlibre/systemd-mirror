@@ -51,8 +51,8 @@
 #include "systemd-basic/btrfs-util.h"
 #include "systemd-basic/cap-list.h"
 #include "systemd-basic/capability-util.h"
-#include "systemd-basic/cgroup-util.h"
 #include "systemd-basic/copy.h"
+#include "systemd-basic/def.h"
 #include "systemd-basic/env-util.h"
 #include "systemd-basic/fd-util.h"
 #include "systemd-basic/fileio.h"
@@ -1385,7 +1385,7 @@ static int wait_for_container(pid_t pid, ContainerStatus *container) {
                         return 0;
                 }
 
-                /* CLD_KILLED fallthrough */
+                /* fall through */
 
         case CLD_DUMPED:
                 log_error("Container %s terminated by signal %s.", args->arg_machine, signal_to_string(status.si_status));
@@ -1416,6 +1416,7 @@ static int on_orderly_shutdown(sd_event_source *s, const struct signalfd_siginfo
 static int inner_child(
                 Barrier *barrier,
                 const char *directory,
+                CGMounts cgmounts,
                 bool secondary,
                 int kmsg_socket,
                 int rtnl_socket,
@@ -1445,15 +1446,15 @@ static int inner_child(
         assert(directory);
         assert(kmsg_socket >= 0);
 
-        if (args->arg_userns_mode != USER_NAMESPACE_NO) {
-                /* Tell the parent, that it now can write the UID map. */
-                (void) barrier_place(barrier); /* #1 */
+        /* Tell the parent, that it can now configure our process; write
+         * the UID map (if use_userns), place us in the correct cgroup (if
+         * use_cgns), et c. */
+        (void) barrier_place(barrier); /* #1 */
 
-                /* Wait until the parent wrote the UID map */
-                if (!barrier_place_and_sync(barrier)) { /* #2 */
-                        log_error("Parent died too early");
-                        return -ESRCH;
-                }
+        /* Wait until the parent says that we are fully configured. */
+        if (!barrier_place_and_sync(barrier)) { /* #2 */
+                log_error("Parent died too early");
+                return -ESRCH;
         }
 
         r = reset_uid_gid();
@@ -1468,21 +1469,15 @@ static int inner_child(
         if (r < 0)
                 return r;
 
-        /* Wait until we are cgroup-ified, so that we
-         * can mount the right cgroup path writable */
-        if (!barrier_place_and_sync(barrier)) { /* #3 */
-                log_error("Parent died too early");
-                return -ESRCH;
-        }
-
         if (args->arg_use_cgns) {
                 r = unshare(CLONE_NEWCGROUP);
                 if (r < 0)
                         return log_error_errno(errno, "Failed to unshare cgroup namespace");
+                r = cgroup_mount_mounts(cgmounts,
+                                        args->arg_use_cgns, args->arg_uid_shift > 0, args->arg_selinux_apifs_context);
+                if (r < 0)
+                        return r;
         }
-        r = cgroup_setup_mount(mounts, args->arg_use_cgns, args->arg_uid_shift > 0, args->arg_selinux_apifs_context);
-        if (r < 0)
-                return r;
 
         r = setup_boot_id(NULL);
         if (r < 0)
@@ -1566,9 +1561,9 @@ static int inner_child(
                 return log_oom();
 
         /* Let the parent know that we are ready and
-         * wait until the parent is ready with the
+         * wait until the parent is ready with its own
          * setup, too... */
-        if (!barrier_place_and_sync(barrier)) { /* #4 */
+        if (!barrier_place_and_sync(barrier)) { /* #3 */
                 log_error("Parent died too early");
                 return -ESRCH;
         }
@@ -1673,7 +1668,8 @@ static int setup_sd_notify_child(void) {
 }
 
 static int outer_child(
-                Barrier *barrier,
+                Barrier *inner_barrier,
+                Barrier *outer_barrier,
                 const char *console,
                 const char *root_device, bool root_device_rw,
                 const char *home_device, bool home_device_rw,
@@ -1687,14 +1683,17 @@ static int outer_child(
                 int kmsg_socket,
                 int rtnl_socket,
                 int uid_shift_socket,
-                FDSet *fds) {
+                FDSet *fds,
+                CGroupMode outer_cgver) {
 
         pid_t pid;
         ssize_t l;
         int r;
+        _cleanup_(cgroup_free_mounts) CGMounts cgmounts = {};
         _cleanup_close_ int fd = -1;
 
-        assert(barrier);
+        assert(inner_barrier);
+        assert(outer_barrier);
         assert(args->arg_directory);
         assert(console);
         assert(pid_socket >= 0);
@@ -1749,6 +1748,12 @@ static int outer_child(
                 return r;
 
         r = negotiate_uid_outer_child(uid_shift_socket);
+        if (r < 0)
+                return r;
+
+        r = cgroup_decide_mounts(&cgmounts,
+                                 outer_cgver, args->arg_cgroup_ver,
+                                 args->arg_use_cgns);
         if (r < 0)
                 return r;
 
@@ -1871,7 +1876,7 @@ static int outer_child(
                  * requested, so that we all are owned by the user if
                  * user namespaces are turned on. */
 
-                r = inner_child(barrier, args->arg_directory, secondary, kmsg_socket, rtnl_socket, fds);
+                r = inner_child(inner_barrier, args->arg_directory, cgmounts, secondary, kmsg_socket, rtnl_socket, fds);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
@@ -1899,6 +1904,21 @@ static int outer_child(
         notify_socket = safe_close(notify_socket);
         kmsg_socket = safe_close(kmsg_socket);
         rtnl_socket = safe_close(rtnl_socket);
+
+        /* Wait for the parent move the inner child into its final cgroup. */
+        if (!barrier_place_and_sync(outer_barrier)) { /* #A */
+                log_error("Parent died too early");
+                return -ESRCH;
+        }
+
+        /* If !use_cgns, then we need to do this here because without cgns cgroups can't be mounted inside of a
+         * userns. */
+        if (!args->arg_use_cgns) {
+                r = cgroup_mount_mounts(cgmounts,
+                                        args->arg_use_cgns, args->arg_uid_shift > 0, args->arg_selinux_apifs_context);
+                if (r < 0)
+                        return r;
+        }
 
         return 0;
 }
@@ -2024,7 +2044,8 @@ static int run(int master,
                FDSet *fds,
                char veth_name[IFNAMSIZ], bool *veth_created,
                union in_addr_union *exposed,
-               pid_t *pid, int *ret) {
+               CGroupMode outer_cgver,
+               pid_t *pid_main, pid_t *pid_helper, int *ret) {
 
         static const struct sigaction sa = {
                 .sa_handler = nop_signal_handler,
@@ -2041,7 +2062,7 @@ static int run(int master,
                 notify_socket_pair[2] = { -1, -1 },
                 uid_shift_socket_pair[2] = { -1, -1 };
         _cleanup_close_ int notify_socket= -1;
-        _cleanup_(barrier_destroy) Barrier barrier = BARRIER_NULL;
+        _cleanup_(barrier_destroy) Barrier inner_barrier = BARRIER_NULL, outer_barrier = BARRIER_NULL;
         _cleanup_(sd_event_unrefp) sd_event *event = NULL;
         _cleanup_(pty_forward_freep) PTYForward *forward = NULL;
         _cleanup_(sd_netlink_unrefp) sd_netlink *rtnl = NULL;
@@ -2067,7 +2088,11 @@ static int run(int master,
                         return log_error_errno(etc_passwd_lock, "Failed to take /etc/passwd lock: %m");
         }
 
-        r = barrier_create(&barrier);
+        r = barrier_create(&inner_barrier);
+        if (r < 0)
+                return log_error_errno(r, "Cannot initialize IPC barrier: %m");
+
+        r = barrier_create(&outer_barrier);
         if (r < 0)
                 return log_error_errno(r, "Cannot initialize IPC barrier: %m");
 
@@ -2100,15 +2125,16 @@ static int run(int master,
         if (r < 0)
                 return log_error_errno(errno, "Failed to install SIGCHLD handler: %m");
 
-        *pid = raw_clone(SIGCHLD|CLONE_NEWNS);
-        if (*pid < 0)
+        *pid_helper = raw_clone(SIGCHLD|CLONE_NEWNS);
+        if (*pid_helper < 0)
                 return log_error_errno(errno, "clone() failed%s: %m",
                                        errno == EINVAL ?
                                        ", do you have namespace support enabled in your kernel? (You need UTS, IPC, PID and NET namespacing built in)" : "");
 
-        if (*pid == 0) {
+        if (*pid_helper == 0) {
                 /* The outer child only has a file system namespace. */
-                barrier_set_role(&barrier, BARRIER_CHILD);
+                barrier_set_role(&inner_barrier, BARRIER_CHILD);
+                barrier_set_role(&outer_barrier, BARRIER_CHILD);
 
                 master = safe_close(master);
 
@@ -2122,7 +2148,8 @@ static int run(int master,
                 (void) reset_all_signal_handlers();
                 (void) reset_signal_mask();
 
-                r = outer_child(&barrier,
+                r = outer_child(&inner_barrier,
+                                &outer_barrier,
                                 console,
                                 root_device, root_device_rw,
                                 home_device, home_device_rw,
@@ -2136,14 +2163,16 @@ static int run(int master,
                                 kmsg_socket_pair[1],
                                 rtnl_socket_pair[1],
                                 uid_shift_socket_pair[1],
-                                fds);
+                                fds,
+                                outer_cgver);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
                 _exit(EXIT_SUCCESS);
         }
 
-        barrier_set_role(&barrier, BARRIER_PARENT);
+        barrier_set_role(&inner_barrier, BARRIER_PARENT);
+        barrier_set_role(&outer_barrier, BARRIER_PARENT);
 
         fds = fdset_free(fds);
 
@@ -2158,16 +2187,11 @@ static int run(int master,
         if (r < 0)
                 return r;
 
-        /* Wait for the outer child. */
-        r = wait_for_terminate_and_warn("namespace helper", *pid, NULL);
-        if (r != 0)
-                return r < 0 ? r : -EIO;
-
         /* And now retrieve the PID of the inner child. */
-        l = recv(pid_socket_pair[0], pid, sizeof *pid, 0);
+        l = recv(pid_socket_pair[0], pid_main, sizeof *pid_main, 0);
         if (l < 0)
                 return log_error_errno(errno, "Failed to read inner child PID: %m");
-        if (l != sizeof *pid) {
+        if (l != sizeof *pid_main) {
                 log_error("Short read while reading inner child PID.");
                 return -EIO;
         }
@@ -2183,29 +2207,26 @@ static int run(int master,
                 return log_error_errno(notify_socket,
                                        "Failed to receive notification socket from the outer child: %m");
 
-        log_debug("Init process invoked as PID "PID_FMT, *pid);
+        log_debug("Init process invoked as PID "PID_FMT, *pid_main);
 
-        if (args->arg_userns_mode != USER_NAMESPACE_NO) {
-                if (!barrier_place_and_sync(&barrier)) { /* #1 */
-                        log_error("Child died too early.");
-                        return -ESRCH;
-                }
-
-                r = setup_uid_map(*pid);
-                if (r < 0)
-                        return r;
-
-                (void) barrier_place(&barrier); /* #2 */
+        /* Wait until the child gives us the OK co configure it. */
+        if (!barrier_place_and_sync(&inner_barrier)) { /* #1 */
+                log_error("Child died too early.");
+                return -ESRCH;
         }
+
+        r = setup_uid_map(*pid_main);
+        if (r < 0)
+                return r;
 
         if (args->arg_private_network) {
 
-                r = move_network_interfaces(*pid, args->arg_network_interfaces);
+                r = move_network_interfaces(*pid_main, args->arg_network_interfaces);
                 if (r < 0)
                         return r;
 
                 if (args->arg_network_veth) {
-                        r = setup_veth(args->arg_machine, *pid, veth_name,
+                        r = setup_veth(args->arg_machine, *pid_main, veth_name,
                                        args->arg_network_bridge || args->arg_network_zone);
                         if (r < 0)
                                 return r;
@@ -2229,7 +2250,7 @@ static int run(int master,
                         }
                 }
 
-                r = setup_veth_extra(args->arg_machine, *pid, args->arg_network_veth_extra);
+                r = setup_veth_extra(args->arg_machine, *pid_main, args->arg_network_veth_extra);
                 if (r < 0)
                         return r;
 
@@ -2239,19 +2260,21 @@ static int run(int master,
                    remove them on its own, since they cannot be referenced by anything yet. */
                 *veth_created = true;
 
-                r = setup_macvlan(args->arg_machine, *pid, args->arg_network_macvlan);
+                r = setup_macvlan(args->arg_machine, *pid_main, args->arg_network_macvlan);
                 if (r < 0)
                         return r;
 
-                r = setup_ipvlan(args->arg_machine, *pid, args->arg_network_ipvlan);
+                r = setup_ipvlan(args->arg_machine, *pid_main, args->arg_network_ipvlan);
                 if (r < 0)
                         return r;
         }
 
         if (args->arg_register) {
+                /* If the child is to be placed into a different cgroup,
+                 * this is what does it. */
                 r = register_machine(
                                 args->arg_machine,
-                                *pid,
+                                *pid_main,
                                 args->arg_directory,
                                 args->arg_uuid,
                                 ifi,
@@ -2265,18 +2288,26 @@ static int run(int master,
                         return r;
         }
 
-        r = setup_cgroup(*pid,
-                         args->arg_uid_shift,
-                         args->arg_cgroup_ver,
-                         args->arg_keep_unit);
+        r = cgroup_setup(*pid_main,
+                         outer_cgver, args->arg_cgroup_ver,
+                         args->arg_uid_shift, args->arg_keep_unit);
         if (r < 0)
                 return r;
+
+        /* Notify the namespace helper that it can do its part (if any) in setting up the cgroups now. */
+        (void) barrier_place(&outer_barrier); /* #A */
+
+        /* Wait for the outer child. */
+        r = wait_for_terminate_and_warn("namespace helper", *pid_helper, NULL);
+        *pid_helper = 0;
+        if (r != 0)
+                return r < 0 ? r : -EIO;
 
         /* Notify the child that the parent is ready with all
          * its setup (including cgroup-ification), and that
          * the child can now hand over control to the code to
          * run inside the container. */
-        (void) barrier_place(&barrier); /* #3 */
+        (void) barrier_place(&inner_barrier); /* #2 */
 
         /* Block SIGCHLD here, before notifying child.
          * process_pty() will handle it with the other signals. */
@@ -2291,12 +2322,12 @@ static int run(int master,
         if (r < 0)
                 return log_error_errno(r, "Failed to get default event source: %m");
 
-        r = setup_sd_notify_parent(event, notify_socket, PID_TO_PTR(*pid));
+        r = setup_sd_notify_parent(event, notify_socket, PID_TO_PTR(*pid_main));
         if (r < 0)
                 return r;
 
         /* Let the child know that we are ready and wait that the child is completely ready now. */
-        if (!barrier_place_and_sync(&barrier)) { /* #4 */
+        if (!barrier_place_and_sync(&inner_barrier)) { /* #3 */
                 log_error("Child died too early.");
                 return -ESRCH;
         }
@@ -2307,14 +2338,14 @@ static int run(int master,
 
         sd_notifyf(false,
                    "STATUS=Container running.\n"
-                   "X_NSPAWN_LEADER_PID=" PID_FMT, *pid);
+                   "X_NSPAWN_LEADER_PID=" PID_FMT, *pid_main);
         if (!args->arg_notify_ready)
                 sd_notify(false, "READY=1\n");
 
         if (args->arg_kill_signal > 0) {
                 /* Try to kill the init system on SIGINT or SIGTERM */
-                sd_event_add_signal(event, NULL, SIGINT, on_orderly_shutdown, PID_TO_PTR(*pid));
-                sd_event_add_signal(event, NULL, SIGTERM, on_orderly_shutdown, PID_TO_PTR(*pid));
+                sd_event_add_signal(event, NULL, SIGINT, on_orderly_shutdown, PID_TO_PTR(*pid_main));
+                sd_event_add_signal(event, NULL, SIGTERM, on_orderly_shutdown, PID_TO_PTR(*pid_main));
         } else {
                 /* Immediately exit */
                 sd_event_add_signal(event, NULL, SIGINT, NULL, NULL);
@@ -2353,13 +2384,13 @@ static int run(int master,
 
         /* Kill if it is not dead yet anyway */
         if (args->arg_register && !args->arg_keep_unit)
-                terminate_machine(*pid);
+                terminate_machine(*pid_main);
 
         /* Normally redundant, but better safe than sorry */
-        kill(*pid, SIGKILL);
+        kill(*pid_main, SIGKILL);
 
-        r = wait_for_container(*pid, &container_status);
-        *pid = 0;
+        r = wait_for_container(*pid_main, &container_status);
+        *pid_main = 0;
 
         if (r < 0)
                 /* We failed to wait for the container, or the container exited abnormally. */
@@ -2405,16 +2436,17 @@ int main(int argc, char *argv[]) {
         int r, n_fd_passed, loop_nr = -1, ret = EXIT_SUCCESS;
         char veth_name[IFNAMSIZ] = "";
         bool secondary = false, remove_subvol = false;
-        pid_t pid = 0;
+        pid_t pid_main = 0, pid_helper = 0;
         union in_addr_union exposed = {};
         _cleanup_release_lock_file_ LockFile tree_global_lock = LOCK_FILE_INIT, tree_local_lock = LOCK_FILE_INIT;
         bool interactive, veth_created = false;
+        CGroupMode outer_cgver;
 
         args = args_get();
 
         log_parse_environment();
         log_open();
-        cg_unified_flush();
+        outer_cgver = cgroup_outerver();
 
         /* Make sure rename_process() in the stub init process can work */
         saved_argv = argv;
@@ -2535,7 +2567,7 @@ int main(int argc, char *argv[]) {
                 goto finish;
 
         if (args->arg_cgroup_ver == CGROUP_VER_INVALID) {
-                r = pick_cgroup_ver(args->arg_directory, &args->arg_cgroup_ver);
+                r = pick_cgroup_ver(args->arg_directory);
                 if (r < 0)
                         goto finish;
         }
@@ -2589,7 +2621,8 @@ int main(int argc, char *argv[]) {
                         fds,
                         veth_name, &veth_created,
                         &exposed,
-                        &pid, &ret);
+                        outer_cgver,
+                        &pid_main, &pid_helper, &ret);
                 if (r <= 0)
                         break;
         }
@@ -2599,8 +2632,10 @@ finish:
                   "STOPPING=1\n"
                   "STATUS=Terminating...");
 
-        if (pid > 0)
-                kill(pid, SIGKILL);
+        if (pid_main > 0)
+                kill(pid_main, SIGKILL);
+        if (pid_helper > 0)
+                kill(pid_helper, SIGKILL);
 
         /* Try to flush whatever is still queued in the pty */
         if (master >= 0)

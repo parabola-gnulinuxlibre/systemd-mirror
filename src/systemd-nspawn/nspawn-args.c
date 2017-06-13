@@ -264,7 +264,7 @@ int custom_mounts_prepare(void) {
         return 0;
 }
 
-int pick_cgroup_ver(const char *directory, CGroupMode *ret_cgver) {
+int pick_cgroup_ver(const char *directory) {
         const char *e;
         int r;
         CGroupUnified outer;
@@ -275,10 +275,10 @@ int pick_cgroup_ver(const char *directory, CGroupMode *ret_cgver) {
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to parse $UNIFIED_CGROUP_HIERARCHY.");
                 if (r > 0) {
-                        *ret_cgver = CGROUP_VER_2;
+                        args->arg_cgroup_ver = CGROUP_VER_2;
                         return 0;
                 } else {
-                        *ret_cgver = CGROUP_VER_1_SD;
+                        args->arg_cgroup_ver = CGROUP_VER_1_SD;
                         return 0;
                 }
         } else {
@@ -290,25 +290,26 @@ int pick_cgroup_ver(const char *directory, CGroupMode *ret_cgver) {
                 if (r < 0) {
                         /* Huh, we can't detect what cgroup version the host system is using.  Default to letting the
                          * container inherit that weirdness. */
-                        *ret_cgver = CGROUP_VER_INHERIT;
+                        args->arg_cgroup_ver = CGROUP_VER_INHERIT;
                         return 0;
                 }
 
                 if (systemd_installation(directory) < 1) {
                         /* It appears that the container isn't using systemd.  Default to inheriting from the host
                          * system. */
-                        *ret_cgver = CGROUP_VER_INHERIT;
+                        args->arg_cgroup_ver = CGROUP_VER_INHERIT;
                         return 0;
                 }
 
                 switch (outer) {
+                default:
                 case CGROUP_UNIFIED_UNKNOWN:
                         assert_not_reached("Unknown host cgroup version");
-                        *ret_cgver = CGROUP_VER_INVALID;
+                        args->arg_cgroup_ver = CGROUP_VER_INVALID;
                         return 0;
                 case CGROUP_UNIFIED_NONE: /* cgroup v1-sd */
                         /* All versions of systemd should be able to inherit this. */
-                        *ret_cgver = CGROUP_VER_INHERIT;
+                        args->arg_cgroup_ver = CGROUP_VER_INHERIT;
                         return 0;
                 case CGROUP_UNIFIED_ALL: /* cgroup v2 */
                         /* Unified cgroup hierarchy support was added in 230. Unfortunately libsystemd-shared,
@@ -318,10 +319,10 @@ int pick_cgroup_ver(const char *directory, CGroupMode *ret_cgver) {
                         if (r < 0)
                                 return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                         if (r > 0) {
-                                *ret_cgver = CGROUP_VER_INHERIT;
+                                args->arg_cgroup_ver = CGROUP_VER_INHERIT;
                                 return 0;
                         } else {
-                                *ret_cgver = CGROUP_VER_1_SD;
+                                args->arg_cgroup_ver = CGROUP_VER_1_SD;
                                 return 0;
                         }
                 case CGROUP_UNIFIED_SYSTEMD: /* cgroup mixed-sd232 */
@@ -330,10 +331,10 @@ int pick_cgroup_ver(const char *directory, CGroupMode *ret_cgver) {
                         if (r < 0)
                                 return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                         if (r > 0) {
-                                *ret_cgver = CGROUP_VER_INHERIT;
+                                args->arg_cgroup_ver = CGROUP_VER_INHERIT;
                                 return 0;
                         } else {
-                                *ret_cgver = CGROUP_VER_1_SD;
+                                args->arg_cgroup_ver = CGROUP_VER_1_SD;
                                 return 0;
                         }
                 }
@@ -633,9 +634,9 @@ int parse_argv(int argc, char *argv[]) {
                                 r = free_and_strdup(&args->arg_machine, optarg);
                                 if (r < 0)
                                         return log_oom();
-
-                                break;
                         }
+
+                        break;
 
                 case 'Z':
                         args->arg_selinux_context = optarg;
@@ -1046,7 +1047,7 @@ int parse_argv(int argc, char *argv[]) {
                         else if (streq(optarg, "mixed-sd") || streq(optarg, "mixed-sd232"))
                                 args->arg_cgroup_ver = CGROUP_VER_MIXED_SD232;
                         else {
-                                log_error("Unknown cgroup version: %s" optarg);
+                                log_error("Unknown cgroup version: %s", optarg);
                                 return -EINVAL;
                         }
                         break;
@@ -1567,7 +1568,7 @@ int negotiate_uid_outer_child(int fd) {
 
         if (args->arg_userns_mode == USER_NAMESPACE_NO)
                 return 0;
-                        
+
         /* Let the parent know which UID shift we read from the image */
         l = send(fd, &args->arg_uid_shift, sizeof(args->arg_uid_shift), MSG_NOSIGNAL);
         if (l < 0)
@@ -1653,10 +1654,10 @@ static int uid_shift_pick(uid_t *shift, LockFile *ret_lock_file) {
 int negotiate_uid_parent(int fd, LockFile *ret_lock_file) {
         int r;
         ssize_t l;
-        
+
         if (args->arg_userns_mode == USER_NAMESPACE_NO)
                 return 0;
-        
+
         /* The child just let us know the UID shift it might have read from the image. */
         l = recv(fd, &args->arg_uid_shift, sizeof args->arg_uid_shift, 0);
         if (l < 0)
@@ -1690,7 +1691,7 @@ int negotiate_uid_parent(int fd, LockFile *ret_lock_file) {
 
 int send_uuid_outer_child(int fd) {
         ssize_t l;
-        
+
         l = send(fd, &args->arg_uuid, sizeof(args->arg_uuid), MSG_NOSIGNAL);
         if (l < 0)
                 return log_error_errno(errno, "Failed to send machine ID: %m");

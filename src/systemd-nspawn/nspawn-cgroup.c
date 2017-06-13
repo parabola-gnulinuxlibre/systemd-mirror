@@ -20,6 +20,7 @@
 #include <sys/mount.h>
 
 #include "systemd-basic/alloc-util.h"
+#include "systemd-basic/cgroup-util.h"
 #include "systemd-basic/fd-util.h"
 #include "systemd-basic/fileio.h"
 #include "systemd-basic/mkdir.h"
@@ -31,6 +32,28 @@
 #include "systemd-basic/util.h"
 
 #include "nspawn-cgroup.h"
+
+CGroupMode cgroup_outerver(void) {
+        int r;
+        CGroupUnified rawver;
+
+        cg_unified_flush();
+
+        if (cg_version(&rawver) < 0)
+                rawver = CGROUP_UNIFIED_UKNOWN;
+
+        switch (rawver) {
+        default:
+        case CGROUP_UNIFIED_UNKNOWN:
+                return CGROUP_VER_INVALID;
+        case CGROUP_UNIFIED_NONE:
+                return CGROUP_VER_1_SD;
+        case CGROUP_UNIFIED_ALL:
+                return CGROUP_VER_2;
+        case CGROUP_UNIFIED_SYSTEMD:
+                return CGROUP_VER_MIXED_SD232;
+        }
+}
 
 static int chown_cgroup_path(const char *path, uid_t uid_shift) {
         _cleanup_close_ int fd = -1;
@@ -56,7 +79,7 @@ static int chown_cgroup_path(const char *path, uid_t uid_shift) {
         return 0;
 }
 
-int chown_cgroup(pid_t pid, uid_t uid_shift) {
+static int chown_cgroup(pid_t pid, uid_t uid_shift) {
         _cleanup_free_ char *path = NULL, *fs = NULL;
         int r;
 
@@ -81,7 +104,7 @@ int chown_cgroup(pid_t pid, uid_t uid_shift) {
         return 0;
 }
 
-int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
+static int sync_cgroup(pid_t pid, CGroupMode outer_cgver, CGroupMode inner_cgver, uid_t uid_shift) {
         _cleanup_free_ char *cgroup = NULL;
         char mountpoint[] = "/tmp/containerXXXXXX", pid_string[DECIMAL_STR_MAX(pid) + 1];
         bool undo_mount = false;
@@ -157,7 +180,8 @@ finish:
         return r;
 }
 
-int create_subcgroup(pid_t pid, CGroupUnified unified_requested) {
+/* run this if the cgroup 2 hierarchy is writable in the container, but there are > 1 processes in it rn. */
+static int create_subcgroup(pid_t pid) {
         _cleanup_free_ char *cgroup = NULL;
         const char *child;
         int unified, r;
@@ -168,15 +192,6 @@ int create_subcgroup(pid_t pid, CGroupUnified unified_requested) {
          * unified hierarchy and the container does the same, and we
          * did not create a scope unit for the container move us and
          * the container into two separate subcgroups. */
-
-        if (unified_requested == CGROUP_UNIFIED_NONE)
-                return 0;
-
-        unified = cg_unified(SYSTEMD_CGROUP_CONTROLLER);
-        if (unified < 0)
-                return log_error_errno(r, "Failed to create host subcgroup: Failed to determine cgroup version: %m");
-        if (unified == 0)
-                return 0;
 
         r = cg_mask_supported(&supported);
         if (r < 0)
@@ -199,4 +214,49 @@ int create_subcgroup(pid_t pid, CGroupUnified unified_requested) {
         /* Try to enable as many controllers as possible for the new payload. */
         (void) cg_enable_everywhere(supported, supported, cgroup);
         return 0;
+}
+
+static int cgpath_count_procs(const char *cgpath) {
+        char line[LINE_MAX];
+        int n = 0;
+        _cleanup_fclose_ FILE *procs = NULL;
+
+        procs = fopen(prefix_roota(cgpath, "cgroup.procs"), "re");
+        if (!procs)
+                return -errno;
+
+        FOREACH_LINE(line, procs, return -errno)
+                n++;
+
+        return n;
+}
+
+int cgroup_setup(
+                pid_t pid,
+                CGroupMode outer_cgver, CGroupMode inner_cgver,
+                uid_t uid_shift, bool keep_unit
+) {
+        int r;
+        _cleanup_free_ const char *cg2group;
+        const char cg2path;
+
+        r = sync_cgroup(pid, inner_cgver, uid_shift);
+        if (r < 0)
+                return r;
+
+
+        r = cg_pid_get_path2(NULL, 0, &cg2group);
+        if (r < 0 && r != -ENODATA)
+                return r;
+        if (r == 0)
+                cg2path = prefix_roota(
+        if (outer_cgver)
+                r = create_subcgroup(pid, inner_cgver);
+                if (r < 0)
+                        return r;
+        }
+
+        r = chown_cgroup(pid, inner_cgver);
+        if (r < 0)
+                return r;
 }
