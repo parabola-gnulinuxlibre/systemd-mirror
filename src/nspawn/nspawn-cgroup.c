@@ -78,7 +78,7 @@ int chown_cgroup(pid_t pid, uid_t uid_shift) {
         return 0;
 }
 
-int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
+int sync_cgroup(pid_t pid, CGroupUnified inner_cgver, uid_t uid_shift) {
         _cleanup_free_ char *cgroup = NULL;
         char tree[] = "/tmp/unifiedXXXXXX", pid_string[DECIMAL_STR_MAX(pid) + 1];
         bool undo_mount = false;
@@ -89,7 +89,7 @@ int sync_cgroup(pid_t pid, CGroupUnified unified_requested, uid_t uid_shift) {
         if (unified < 0)
                 return log_error_errno(unified, "Failed to determine whether the unified hierarchy is used: %m");
 
-        if ((unified > 0) == (unified_requested >= CGROUP_UNIFIED_SYSTEMD))
+        if ((unified > 0) == (inner_cgver >= CGROUP_UNIFIED_SYSTEMD))
                 return 0;
 
         /* When the host uses the legacy cgroup setup, but the
@@ -144,7 +144,7 @@ finish:
         return r;
 }
 
-int create_subcgroup(pid_t pid, CGroupUnified unified_requested) {
+int create_subcgroup(pid_t pid, CGroupUnified inner_cgver) {
         _cleanup_free_ char *cgroup = NULL;
         const char *child;
         int unified, r;
@@ -156,7 +156,7 @@ int create_subcgroup(pid_t pid, CGroupUnified unified_requested) {
          * did not create a scope unit for the container move us and
          * the container into two separate subcgroups. */
 
-        if (unified_requested == CGROUP_UNIFIED_NONE)
+        if (inner_cgver == CGROUP_UNIFIED_NONE)
                 return 0;
 
         unified = cg_unified(SYSTEMD_CGROUP_CONTROLLER);
@@ -234,7 +234,7 @@ static int get_controllers(Set *subsystems) {
 }
 
 static int mount_legacy_cgroup_hierarchy(const char *dest, const char *controller, const char *hierarchy,
-                                         CGroupUnified unified_requested, bool read_only) {
+                                         CGroupUnified inner_cgver, bool read_only) {
         const char *to, *fstype, *opts;
         int r;
 
@@ -251,7 +251,7 @@ static int mount_legacy_cgroup_hierarchy(const char *dest, const char *controlle
         /* The superblock mount options of the mount point need to be
          * identical to the hosts', and hence writable... */
         if (streq(controller, SYSTEMD_CGROUP_CONTROLLER)) {
-                if (unified_requested >= CGROUP_UNIFIED_SYSTEMD) {
+                if (inner_cgver >= CGROUP_UNIFIED_SYSTEMD) {
                         fstype = "cgroup2";
                         opts = NULL;
                 } else {
@@ -280,7 +280,7 @@ static int mount_legacy_cgroup_hierarchy(const char *dest, const char *controlle
 
 /* Mount a legacy cgroup hierarchy when cgroup namespaces are supported. */
 static int mount_legacy_cgns_supported(
-                CGroupUnified unified_requested, bool userns, uid_t uid_shift,
+                CGroupUnified inner_cgver, bool userns, uid_t uid_shift,
                 uid_t uid_range, const char *selinux_apifs_context) {
         _cleanup_set_free_free_ Set *controllers = NULL;
         const char *cgroup_root = "/sys/fs/cgroup", *c;
@@ -330,7 +330,7 @@ static int mount_legacy_cgns_supported(
                 if (!controller)
                         break;
 
-                r = mount_legacy_cgroup_hierarchy("", controller, controller, unified_requested, !userns);
+                r = mount_legacy_cgroup_hierarchy("", controller, controller, inner_cgver, !userns);
                 if (r < 0)
                         return r;
 
@@ -364,7 +364,7 @@ static int mount_legacy_cgns_supported(
         }
 
 skip_controllers:
-        r = mount_legacy_cgroup_hierarchy("", SYSTEMD_CGROUP_CONTROLLER, "systemd", unified_requested, false);
+        r = mount_legacy_cgroup_hierarchy("", SYSTEMD_CGROUP_CONTROLLER, "systemd", inner_cgver, false);
         if (r < 0)
                 return r;
 
@@ -378,7 +378,7 @@ skip_controllers:
 /* Mount legacy cgroup hierarchy when cgroup namespaces are unsupported. */
 static int mount_legacy_cgns_unsupported(
                 const char *dest,
-                CGroupUnified unified_requested, bool userns, uid_t uid_shift, uid_t uid_range,
+                CGroupUnified inner_cgver, bool userns, uid_t uid_shift, uid_t uid_range,
                 const char *selinux_apifs_context) {
         _cleanup_set_free_free_ Set *controllers = NULL;
         const char *cgroup_root;
@@ -431,7 +431,7 @@ static int mount_legacy_cgns_unsupported(
                 if (r == -EINVAL) {
                         /* Not a symbolic link, but directly a single cgroup hierarchy */
 
-                        r = mount_legacy_cgroup_hierarchy(dest, controller, controller, unified_requested, true);
+                        r = mount_legacy_cgroup_hierarchy(dest, controller, controller, inner_cgver, true);
                         if (r < 0)
                                 return r;
 
@@ -451,7 +451,7 @@ static int mount_legacy_cgns_unsupported(
                                 continue;
                         }
 
-                        r = mount_legacy_cgroup_hierarchy(dest, combined, combined, unified_requested, true);
+                        r = mount_legacy_cgroup_hierarchy(dest, combined, combined, inner_cgver, true);
                         if (r < 0)
                                 return r;
 
@@ -464,7 +464,7 @@ static int mount_legacy_cgns_unsupported(
         }
 
 skip_controllers:
-        r = mount_legacy_cgroup_hierarchy(dest, SYSTEMD_CGROUP_CONTROLLER, "systemd", unified_requested, false);
+        r = mount_legacy_cgroup_hierarchy(dest, SYSTEMD_CGROUP_CONTROLLER, "systemd", inner_cgver, false);
         if (r < 0)
                 return r;
 
@@ -501,22 +501,22 @@ static int mount_unified_cgroups(const char *dest) {
 
 int mount_cgroups(
                 const char *dest,
-                CGroupUnified unified_requested,
+                CGroupUnified inner_cgver,
                 bool userns, uid_t uid_shift, uid_t uid_range,
                 const char *selinux_apifs_context,
                 bool use_cgns) {
 
-        if (unified_requested >= CGROUP_UNIFIED_ALL)
+        if (inner_cgver >= CGROUP_UNIFIED_ALL)
                 return mount_unified_cgroups(dest);
         else if (use_cgns)
-                return mount_legacy_cgns_supported(unified_requested, userns, uid_shift, uid_range, selinux_apifs_context);
+                return mount_legacy_cgns_supported(inner_cgver, userns, uid_shift, uid_range, selinux_apifs_context);
 
-        return mount_legacy_cgns_unsupported(dest, unified_requested, userns, uid_shift, uid_range, selinux_apifs_context);
+        return mount_legacy_cgns_unsupported(dest, inner_cgver, userns, uid_shift, uid_range, selinux_apifs_context);
 }
 
 int mount_systemd_cgroup_writable(
                 const char *dest,
-                CGroupUnified unified_requested) {
+                CGroupUnified inner_cgver) {
 
         _cleanup_free_ char *own_cgroup_path = NULL;
         const char *systemd_root, *systemd_own;
@@ -532,7 +532,7 @@ int mount_systemd_cgroup_writable(
         if (path_equal(own_cgroup_path, "/"))
                 return 0;
 
-        if (unified_requested >= CGROUP_UNIFIED_ALL) {
+        if (inner_cgver >= CGROUP_UNIFIED_ALL) {
                 systemd_own = strjoina(dest, "/sys/fs/cgroup", own_cgroup_path);
                 systemd_root = prefix_roota(dest, "/sys/fs/cgroup");
         } else {
