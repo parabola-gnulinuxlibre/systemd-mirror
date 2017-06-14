@@ -323,23 +323,22 @@ static int custom_mount_check_all(void) {
         return 0;
 }
 
-static int detect_inner_cgver_from_environment(void) {
+static void parse_inner_cgver_env(void) {
         const char *e;
         int r;
 
-        /* Allow the user to control whether the unified hierarchy is used */
         e = getenv("UNIFIED_CGROUP_HIERARCHY");
         if (e) {
                 r = parse_boolean(e);
-                if (r < 0)
-                        return log_error_errno(r, "Failed to parse $UNIFIED_CGROUP_HIERARCHY.");
-                if (r > 0)
+                if (r < 0) {
+                        log_warning_errno(r, "Failed to parse UNIFIED_CGROUP_HIERARCHY from environment, ignoring.");
+                        arg_inner_cgver = CGROUP_UNIFIED_UNKNOWN;
+                        return;
+                } else if (r > 0)
                         arg_inner_cgver = CGROUP_UNIFIED_ALL;
                 else
                         arg_inner_cgver = CGROUP_UNIFIED_NONE;
         }
-
-        return 0;
 }
 
 static int detect_inner_cgver_from_image(const char *directory) {
@@ -1267,6 +1266,8 @@ static int parse_argv(int argc, char *argv[]) {
                 log_error("--network-namespace-path cannot be combined with other network options.");
                 return -EINVAL;
         }
+
+        parse_inner_cgver_env();
 
         parse_share_ns_env("SYSTEMD_NSPAWN_SHARE_NS_IPC", CLONE_NEWIPC);
         parse_share_ns_env("SYSTEMD_NSPAWN_SHARE_NS_PID", CLONE_NEWPID);
@@ -4231,10 +4232,6 @@ int main(int argc, char *argv[]) {
                 goto finish;
 
         r = verify_arguments();
-        if (r < 0)
-                goto finish;
-
-        r = detect_inner_cgver_from_environment();
         if (r < 0)
                 goto finish;
 
