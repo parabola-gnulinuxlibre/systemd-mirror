@@ -314,24 +314,9 @@ static int custom_mount_check_all(void) {
         return 0;
 }
 
-static int detect_unified_cgroup_hierarchy(const char *directory) {
-        const char *e;
+static int pick_cgroup_version(const char *directory) {
         int r;
         CGroupUnified outer_cgver;
-
-        /* Allow the user to control whether the unified hierarchy is used */
-        e = getenv("UNIFIED_CGROUP_HIERARCHY");
-        if (e) {
-                r = parse_boolean(e);
-                if (r < 0)
-                        return log_error_errno(r, "Failed to parse $UNIFIED_CGROUP_HIERARCHY.");
-                if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
-                else
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-
-                return 0;
-        }
 
         /* By default, inherit from the host system, unless the container doesn't have a new enough systemd (detected
          * by checking libsystemd-shared). */
@@ -1187,6 +1172,17 @@ static int parse_argv(int argc, char *argv[]) {
                 arg_use_cgns = cg_ns_supported();
         else
                 arg_use_cgns = r && cg_ns_supported();
+
+        e = getenv("UNIFIED_CGROUP_HIERARCHY");
+        if (e) {
+                r = parse_boolean(e);
+                if (r < 0)
+                        return log_error_errno(r, "Failed to parse $UNIFIED_CGROUP_HIERARCHY.");
+                if (r > 0)
+                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
+                else
+                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+        }
 
         r = custom_mount_check_all();
         if (r < 0)
@@ -3820,9 +3816,11 @@ int main(int argc, char *argv[]) {
         if (r < 0)
                 goto finish;
 
-        r = detect_unified_cgroup_hierarchy(arg_directory);
-        if (r < 0)
-                goto finish;
+        if (arg_unified_cgroup_hierarchy == CGROUP_UNIFIED_UNKNOWN) {
+                r = pick_cgroup_version(arg_directory);
+                if (r < 0)
+                        goto finish;
+        }
 
         interactive =
                 isatty(STDIN_FILENO) > 0 &&
