@@ -3979,15 +3979,7 @@ static int run(int master,
         } else if (arg_slice || arg_property)
                 log_notice("Machine and scope registration turned off, --slice= and --property= settings will have no effect.");
 
-        r = sync_cgroup(*pid, outer_cgver, arg_inner_cgver, arg_uid_shift);
-        if (r < 0)
-                return r;
-
-        r = create_subcgroup(*pid, arg_keep_unit, outer_cgver, arg_inner_cgver);
-        if (r < 0)
-                return r;
-
-        r = chown_cgroup(*pid, arg_inner_cgver, arg_uid_shift);
+        r = cgroup_setup(*pid, outer_cgver, arg_inner_cgver, arg_uid_shift, arg_keep_unit);
         if (r < 0)
                 return r;
 
