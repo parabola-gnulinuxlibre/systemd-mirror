@@ -59,7 +59,7 @@ static int chown_cgroup_path(const char *path, uid_t uid_shift) {
         return 0;
 }
 
-int chown_cgroup(pid_t pid, uid_t uid_shift) {
+static int chown_cgroup(pid_t pid, uid_t uid_shift) {
         _cleanup_free_ char *path = NULL, *fs = NULL;
         int r;
 
@@ -78,7 +78,7 @@ int chown_cgroup(pid_t pid, uid_t uid_shift) {
         return 0;
 }
 
-int sync_cgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver, uid_t uid_shift) {
+static int sync_cgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver, uid_t uid_shift) {
         _cleanup_free_ char *cgroup = NULL;
         char tree[] = "/tmp/unifiedXXXXXX", pid_string[DECIMAL_STR_MAX(pid) + 1];
         bool undo_mount = false;
@@ -140,7 +140,7 @@ finish:
         return r;
 }
 
-int create_subcgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver) {
+static int create_subcgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver) {
         _cleanup_free_ char *cgroup = NULL;
         const char *child;
         int r;
@@ -178,6 +178,27 @@ int create_subcgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_c
 
         /* Try to enable as many controllers as possible for the new payload. */
         (void) cg_enable_everywhere(supported, supported, cgroup);
+        return 0;
+}
+
+int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver, uid_t uid_shift, bool keep_unit) {
+
+        int r;
+
+        r = sync_cgroup(pid, outer_cgver, inner_cgver, uid_shift);
+        if (r < 0)
+                return r;
+
+        if (keep_unit) {
+                r = create_subcgroup(pid, outer_cgver, inner_cgver);
+                if (r < 0)
+                        return r;
+        }
+
+        r = chown_cgroup(pid, uid_shift);
+        if (r < 0)
+                return r;
+
         return 0;
 }
 

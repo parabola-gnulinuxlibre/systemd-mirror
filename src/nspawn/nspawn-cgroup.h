@@ -24,9 +24,7 @@
 
 #include "cgroup-util.h"
 
-int chown_cgroup(pid_t pid, uid_t uid_shift);
-int sync_cgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver, uid_t uid_shift);
-int create_subcgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver);
+int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver, uid_t uid_shift, bool keep_unit);
 
 int mount_cgroups(const char *dest, CGroupUnified outer_cgver, CGroupUnified inner_cgver, bool userns, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context, bool use_cgns);
 int mount_systemd_cgroup_writable(const char *dest, CGroupUnified inner_cgver);
