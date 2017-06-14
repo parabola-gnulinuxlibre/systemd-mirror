@@ -3876,7 +3876,7 @@ static int run(int master,
                         return r;
         }
 
-        r = cgroup_setup(*main_pid, outer_cgver, arg_unified_cgroup_hierarchy, arg_uid_shift, arg_keep_unit);
+        r = cgroup_setup(*main_pid, outer_cgver, arg_unified_cgroup_hierarchy, arg_uid_shift);
         if (r < 0)
                 return r;
 
