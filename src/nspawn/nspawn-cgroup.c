@@ -78,18 +78,14 @@ int chown_cgroup(pid_t pid, uid_t uid_shift) {
         return 0;
 }
 
-int sync_cgroup(pid_t pid, CGroupUnified inner_cgver, uid_t uid_shift) {
+int sync_cgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver, uid_t uid_shift) {
         _cleanup_free_ char *cgroup = NULL;
         char tree[] = "/tmp/unifiedXXXXXX", pid_string[DECIMAL_STR_MAX(pid) + 1];
         bool undo_mount = false;
         const char *fn;
-        int unified, r;
+        int r;
 
-        unified = cg_unified(SYSTEMD_CGROUP_CONTROLLER);
-        if (unified < 0)
-                return log_error_errno(unified, "Failed to determine whether the unified hierarchy is used: %m");
-
-        if ((unified > 0) == (inner_cgver >= CGROUP_UNIFIED_SYSTEMD))
+        if ((outer_cgver >= CGROUP_UNIFIED_SYSTEMD) == (inner_cgver >= CGROUP_UNIFIED_SYSTEMD))
                 return 0;
 
         /* When the host uses the legacy cgroup setup, but the
@@ -105,7 +101,7 @@ int sync_cgroup(pid_t pid, CGroupUnified inner_cgver, uid_t uid_shift) {
         if (!mkdtemp(tree))
                 return log_error_errno(errno, "Failed to generate temporary mount point for unified hierarchy: %m");
 
-        if (unified)
+        if (outer_cgver >= CGROUP_UNIFIED_SYSTEMD)
                 r = mount_verbose(LOG_ERR, "cgroup", tree, "cgroup",
                                   MS_NOSUID|MS_NOEXEC|MS_NODEV, "none,name=systemd,xattr");
         else
@@ -144,10 +140,10 @@ finish:
         return r;
 }
 
-int create_subcgroup(pid_t pid, CGroupUnified inner_cgver) {
+int create_subcgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver) {
         _cleanup_free_ char *cgroup = NULL;
         const char *child;
-        int unified, r;
+        int r;
         CGroupMask supported;
 
         /* In the unified hierarchy inner nodes may only contain
@@ -156,13 +152,7 @@ int create_subcgroup(pid_t pid, CGroupUnified inner_cgver) {
          * did not create a scope unit for the container move us and
          * the container into two separate subcgroups. */
 
-        if (inner_cgver == CGROUP_UNIFIED_NONE)
-                return 0;
-
-        unified = cg_unified(SYSTEMD_CGROUP_CONTROLLER);
-        if (unified < 0)
-                return log_error_errno(unified, "Failed to determine whether the unified hierarchy is used: %m");
-        if (unified == 0)
+        if (inner_cgver == CGROUP_UNIFIED_NONE || outer_cgver == CGROUP_UNIFIED_NONE)
                 return 0;
 
         r = cg_mask_supported(&supported);
@@ -280,7 +270,7 @@ static int mount_legacy_cgroup_hierarchy(const char *dest, const char *controlle
 
 /* Mount a legacy cgroup hierarchy when cgroup namespaces are supported. */
 static int mount_legacy_cgns_supported(
-                CGroupUnified inner_cgver, bool userns, uid_t uid_shift,
+                CGroupUnified outer_cgver, CGroupUnified inner_cgver, bool userns, uid_t uid_shift,
                 uid_t uid_range, const char *selinux_apifs_context) {
         _cleanup_set_free_free_ Set *controllers = NULL;
         const char *cgroup_root = "/sys/fs/cgroup", *c;
@@ -312,7 +302,7 @@ static int mount_legacy_cgns_supported(
                         return r;
         }
 
-        if (cg_all_unified() > 0)
+        if (outer_cgver >= CGROUP_UNIFIED_ALL)
                 goto skip_controllers;
 
         controllers = set_new(&string_hash_ops);
@@ -378,7 +368,7 @@ skip_controllers:
 /* Mount legacy cgroup hierarchy when cgroup namespaces are unsupported. */
 static int mount_legacy_cgns_unsupported(
                 const char *dest,
-                CGroupUnified inner_cgver, bool userns, uid_t uid_shift, uid_t uid_range,
+                CGroupUnified outer_cgver, CGroupUnified inner_cgver, bool userns, uid_t uid_shift, uid_t uid_range,
                 const char *selinux_apifs_context) {
         _cleanup_set_free_free_ Set *controllers = NULL;
         const char *cgroup_root;
@@ -405,7 +395,7 @@ static int mount_legacy_cgns_unsupported(
                         return r;
         }
 
-        if (cg_all_unified() > 0)
+        if (outer_cgver >= CGROUP_UNIFIED_ALL)
                 goto skip_controllers;
 
         controllers = set_new(&string_hash_ops);
@@ -501,7 +491,7 @@ static int mount_unified_cgroups(const char *dest) {
 
 int mount_cgroups(
                 const char *dest,
-                CGroupUnified inner_cgver,
+                CGroupUnified outer_cgver, CGroupUnified inner_cgver,
                 bool userns, uid_t uid_shift, uid_t uid_range,
                 const char *selinux_apifs_context,
                 bool use_cgns) {
@@ -509,9 +499,9 @@ int mount_cgroups(
         if (inner_cgver >= CGROUP_UNIFIED_ALL)
                 return mount_unified_cgroups(dest);
         else if (use_cgns)
-                return mount_legacy_cgns_supported(inner_cgver, userns, uid_shift, uid_range, selinux_apifs_context);
+                return mount_legacy_cgns_supported(outer_cgver, inner_cgver, userns, uid_shift, uid_range, selinux_apifs_context);
 
-        return mount_legacy_cgns_unsupported(dest, inner_cgver, userns, uid_shift, uid_range, selinux_apifs_context);
+        return mount_legacy_cgns_unsupported(dest, outer_cgver, inner_cgver, userns, uid_shift, uid_range, selinux_apifs_context);
 }
 
 int mount_systemd_cgroup_writable(
