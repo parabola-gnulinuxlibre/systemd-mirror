@@ -3388,17 +3388,7 @@ static int run(int master,
                         return r;
         }
 
-        r = sync_cgroup(*pid, outer_cgver, arg_unified_cgroup_hierarchy, arg_uid_shift);
-        if (r < 0)
-                return r;
-
-        if (arg_keep_unit) {
-                r = create_subcgroup(*pid, outer_cgver, arg_unified_cgroup_hierarchy);
-                if (r < 0)
-                        return r;
-        }
-
-        r = chown_cgroup(*pid, arg_uid_shift);
+        r = cgroup_setup(*pid, outer_cgver, arg_unified_cgroup_hierarchy, arg_uid_shift, arg_keep_unit);
         if (r < 0)
                 return r;
 
