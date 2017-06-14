@@ -3131,7 +3131,8 @@ static int run(int master,
                FDSet *fds,
                char veth_name[IFNAMSIZ], bool *veth_created,
                union in_addr_union *exposed,
-               pid_t *pid, int *ret) {
+               pid_t *helper_pid, pid_t *main_pid,
+               int *ret) {
 
         static const struct sigaction sa = {
                 .sa_handler = nop_signal_handler,
@@ -3208,13 +3209,13 @@ static int run(int master,
         if (r < 0)
                 return log_error_errno(errno, "Failed to install SIGCHLD handler: %m");
 
-        *pid = raw_clone(SIGCHLD|CLONE_NEWNS);
-        if (*pid < 0)
+        *helper_pid = raw_clone(SIGCHLD|CLONE_NEWNS);
+        if (*helper_pid < 0)
                 return log_error_errno(errno, "clone() failed%s: %m",
                                        errno == EINVAL ?
                                        ", do you have namespace support enabled in your kernel? (You need UTS, IPC, PID and NET namespacing built in)" : "");
 
-        if (*pid == 0) {
+        if (*helper_pid == 0) {
                 /* The outer child only has a file system namespace. */
                 barrier_set_role(&barrier, BARRIER_CHILD);
 
@@ -3291,15 +3292,16 @@ static int run(int master,
         }
 
         /* Wait for the outer child. */
-        r = wait_for_terminate_and_warn("namespace helper", *pid, NULL);
+        r = wait_for_terminate_and_warn("namespace helper", *helper_pid, NULL);
+        *helper_pid = 0;
         if (r != 0)
                 return r < 0 ? r : -EIO;
 
         /* And now retrieve the PID of the inner child. */
-        l = recv(pid_socket_pair[0], pid, sizeof *pid, 0);
+        l = recv(pid_socket_pair[0], main_pid, sizeof *main_pid, 0);
         if (l < 0)
                 return log_error_errno(errno, "Failed to read inner child PID: %m");
-        if (l != sizeof *pid) {
+        if (l != sizeof *main_pid) {
                 log_error("Short read while reading inner child PID.");
                 return -EIO;
         }
@@ -3319,7 +3321,7 @@ static int run(int master,
                 return log_error_errno(notify_socket,
                                        "Failed to receive notification socket from the outer child: %m");
 
-        log_debug("Init process invoked as PID "PID_FMT, *pid);
+        log_debug("Init process invoked as PID "PID_FMT, *main_pid);
 
         if (arg_userns_mode != USER_NAMESPACE_NO) {
                 if (!barrier_place_and_sync(&barrier)) { /* #1 */
@@ -3327,7 +3329,7 @@ static int run(int master,
                         return -ESRCH;
                 }
 
-                r = setup_uid_map(*pid);
+                r = setup_uid_map(*main_pid);
                 if (r < 0)
                         return r;
 
@@ -3336,12 +3338,12 @@ static int run(int master,
 
         if (arg_private_network) {
 
-                r = move_network_interfaces(*pid, arg_network_interfaces);
+                r = move_network_interfaces(*main_pid, arg_network_interfaces);
                 if (r < 0)
                         return r;
 
                 if (arg_network_veth) {
-                        r = setup_veth(arg_machine, *pid, veth_name,
+                        r = setup_veth(arg_machine, *main_pid, veth_name,
                                        arg_network_bridge || arg_network_zone);
                         if (r < 0)
                                 return r;
@@ -3365,7 +3367,7 @@ static int run(int master,
                         }
                 }
 
-                r = setup_veth_extra(arg_machine, *pid, arg_network_veth_extra);
+                r = setup_veth_extra(arg_machine, *main_pid, arg_network_veth_extra);
                 if (r < 0)
                         return r;
 
@@ -3375,11 +3377,11 @@ static int run(int master,
                    remove them on its own, since they cannot be referenced by anything yet. */
                 *veth_created = true;
 
-                r = setup_macvlan(arg_machine, *pid, arg_network_macvlan);
+                r = setup_macvlan(arg_machine, *main_pid, arg_network_macvlan);
                 if (r < 0)
                         return r;
 
-                r = setup_ipvlan(arg_machine, *pid, arg_network_ipvlan);
+                r = setup_ipvlan(arg_machine, *main_pid, arg_network_ipvlan);
                 if (r < 0)
                         return r;
         }
@@ -3387,7 +3389,7 @@ static int run(int master,
         if (arg_register) {
                 r = register_machine(
                                 arg_machine,
-                                *pid,
+                                *main_pid,
                                 arg_directory,
                                 arg_uuid,
                                 ifi,
@@ -3402,7 +3404,7 @@ static int run(int master,
         } else if (!arg_keep_unit) {
                 r = allocate_scope(
                                 arg_machine,
-                                *pid,
+                                *main_pid,
                                 arg_slice,
                                 arg_custom_mounts, arg_n_custom_mounts,
                                 arg_kill_signal,
@@ -3413,7 +3415,7 @@ static int run(int master,
         } else if (arg_slice || arg_property)
                 log_notice("Machine and scope registration turned off, --slice= and --property= settings will have no effect.");
 
-        r = cgroup_setup(*pid, outer_cgver, arg_unified_cgroup_hierarchy, arg_uid_shift, arg_keep_unit);
+        r = cgroup_setup(*main_pid, outer_cgver, arg_unified_cgroup_hierarchy, arg_uid_shift, arg_keep_unit);
         if (r < 0)
                 return r;
 
@@ -3436,7 +3438,7 @@ static int run(int master,
         if (r < 0)
                 return log_error_errno(r, "Failed to get default event source: %m");
 
-        r = setup_sd_notify_parent(event, notify_socket, PID_TO_PTR(*pid), &notify_event_source);
+        r = setup_sd_notify_parent(event, notify_socket, PID_TO_PTR(*main_pid), &notify_event_source);
         if (r < 0)
                 return r;
 
@@ -3452,14 +3454,14 @@ static int run(int master,
 
         sd_notifyf(false,
                    "STATUS=Container running.\n"
-                   "X_NSPAWN_LEADER_PID=" PID_FMT, *pid);
+                   "X_NSPAWN_LEADER_PID=" PID_FMT, *main_pid);
         if (!arg_notify_ready)
                 sd_notify(false, "READY=1\n");
 
         if (arg_kill_signal > 0) {
                 /* Try to kill the init system on SIGINT or SIGTERM */
-                sd_event_add_signal(event, NULL, SIGINT, on_orderly_shutdown, PID_TO_PTR(*pid));
-                sd_event_add_signal(event, NULL, SIGTERM, on_orderly_shutdown, PID_TO_PTR(*pid));
+                sd_event_add_signal(event, NULL, SIGINT, on_orderly_shutdown, PID_TO_PTR(*main_pid));
+                sd_event_add_signal(event, NULL, SIGTERM, on_orderly_shutdown, PID_TO_PTR(*main_pid));
         } else {
                 /* Immediately exit */
                 sd_event_add_signal(event, NULL, SIGINT, NULL, NULL);
@@ -3467,7 +3469,7 @@ static int run(int master,
         }
 
         /* Exit when the child exits */
-        sd_event_add_signal(event, NULL, SIGCHLD, on_sigchld, PID_TO_PTR(*pid));
+        sd_event_add_signal(event, NULL, SIGCHLD, on_sigchld, PID_TO_PTR(*main_pid));
 
         if (arg_expose_ports) {
                 r = expose_port_watch_rtnl(event, rtnl_socket_pair[0], on_address_change, exposed, &rtnl);
@@ -3498,13 +3500,13 @@ static int run(int master,
 
         /* Kill if it is not dead yet anyway */
         if (arg_register && !arg_keep_unit)
-                terminate_machine(*pid);
+                terminate_machine(*main_pid);
 
         /* Normally redundant, but better safe than sorry */
-        (void) kill(*pid, SIGKILL);
+        (void) kill(*main_pid, SIGKILL);
 
-        r = wait_for_container(*pid, &container_status);
-        *pid = 0;
+        r = wait_for_container(*main_pid, &container_status);
+        *main_pid = 0;
 
         if (r < 0)
                 /* We failed to wait for the container, or the container exited abnormally. */
@@ -3549,7 +3551,7 @@ int main(int argc, char *argv[]) {
         int r, n_fd_passed, ret = EXIT_SUCCESS;
         char veth_name[IFNAMSIZ] = "";
         bool secondary = false, remove_directory = false, remove_image = false;
-        pid_t pid = 0;
+        pid_t helper_pid = 0, main_pid = 0;
         union in_addr_union exposed = {};
         _cleanup_release_lock_file_ LockFile tree_global_lock = LOCK_FILE_INIT, tree_local_lock = LOCK_FILE_INIT;
         bool interactive, veth_created = false, remove_tmprootdir = false;
@@ -3889,7 +3891,8 @@ int main(int argc, char *argv[]) {
                         fds,
                         veth_name, &veth_created,
                         &exposed,
-                        &pid, &ret);
+                        &helper_pid, &main_pid,
+                        &ret);
                 if (r <= 0)
                         break;
         }
@@ -3899,8 +3902,10 @@ finish:
                   r == 0 && ret == EXIT_FORCE_RESTART ? "STOPPING=1\nSTATUS=Restarting..." :
                                                         "STOPPING=1\nSTATUS=Terminating...");
 
-        if (pid > 0)
-                (void) kill(pid, SIGKILL);
+        if (helper_pid > 0)
+                (void) kill(helper_pid, SIGKILL);
+        if (main_pid > 0)
+                (void) kill(main_pid, SIGKILL);
 
         /* Try to flush whatever is still queued in the pty */
         if (master >= 0) {
@@ -3908,8 +3913,10 @@ finish:
                 master = safe_close(master);
         }
 
-        if (pid > 0)
-                (void) wait_for_terminate(pid, NULL);
+        if (helper_pid > 0)
+                (void) wait_for_terminate(helper_pid, NULL);
+        if (main_pid > 0)
+                (void) wait_for_terminate(main_pid, NULL);
 
         if (remove_directory && arg_directory) {
                 int k;
