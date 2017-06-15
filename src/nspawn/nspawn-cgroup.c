@@ -204,10 +204,8 @@ int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver
 
 /********************************************************************/
 
-/* Retrieve existing subsystems. This function is called in a new cgroup
- * namespace.
- */
-static int get_controllers(Set *subsystems) {
+/* Retrieve a list of cgroup v1 hierarchies. */
+static int get_v1_hierarchies(Set *subsystems) {
         _cleanup_fclose_ FILE *f = NULL;
         char line[LINE_MAX];
 
@@ -304,7 +302,7 @@ static int mount_legacy_cgns_supported(
                 uid_t uid_range,
                 const char *selinux_apifs_context) {
 
-        _cleanup_set_free_free_ Set *controllers = NULL;
+        _cleanup_set_free_free_ Set *hierarchies = NULL;
         const char *cgroup_root = "/sys/fs/cgroup", *c;
         int r;
 
@@ -337,22 +335,22 @@ static int mount_legacy_cgns_supported(
         if (outer_cgver >= CGROUP_UNIFIED_ALL)
                 goto skip_controllers;
 
-        controllers = set_new(&string_hash_ops);
-        if (!controllers)
+        hierarchies = set_new(&string_hash_ops);
+        if (!hierarchies)
                 return log_oom();
 
-        r = get_controllers(controllers);
+        r = get_v1_hierarchies(hierarchies);
         if (r < 0)
-                return log_error_errno(r, "Failed to determine cgroup controllers: %m");
+                return log_error_errno(r, "Failed to determine cgroup hierarchies: %m");
 
         for (;;) {
-                _cleanup_free_ const char *controller = NULL;
+                _cleanup_free_ const char *hierarchy = NULL;
 
-                controller = set_steal_first(controllers);
-                if (!controller)
+                hierarchy = set_steal_first(hierarchies);
+                if (!hierarchy)
                         break;
 
-                r = mount_legacy_cgroup_hierarchy("", controller, controller, !userns);
+                r = mount_legacy_cgroup_hierarchy("", hierarchy, hierarchy, !userns);
                 if (r < 0)
                         return r;
 
@@ -360,24 +358,24 @@ static int mount_legacy_cgns_supported(
                  * constituting individual hierarchies a symlink to the
                  * co-mount.
                  */
-                c = controller;
+                c = hierarchy;
                 for (;;) {
-                        _cleanup_free_ char *target = NULL, *tok = NULL;
+                        _cleanup_free_ char *target = NULL, *controller = NULL;
 
-                        r = extract_first_word(&c, &tok, ",", 0);
+                        r = extract_first_word(&c, &controller, ",", 0);
                         if (r < 0)
                                 return log_error_errno(r, "Failed to extract co-mounted cgroup controller: %m");
                         if (r == 0)
                                 break;
 
-                        target = prefix_root("/sys/fs/cgroup", tok);
+                        target = prefix_root("/sys/fs/cgroup", controller);
                         if (!target)
                                 return log_oom();
 
-                        if (streq(controller, tok))
+                        if (streq(hierarchy, controller))
                                 break;
 
-                        r = symlink_idempotent(controller, target);
+                        r = symlink_idempotent(hierarchy, target);
                         if (r == -EINVAL)
                                 return log_error_errno(r, "Invalid existing symlink for combined hierarchy: %m");
                         if (r < 0)
