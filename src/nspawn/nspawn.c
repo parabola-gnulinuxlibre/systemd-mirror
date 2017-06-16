@@ -3468,14 +3468,18 @@ static int run(int master,
         sd_event_add_signal(event, NULL, SIGCHLD, on_sigchld, PID_TO_PTR(*pid));
 
         if (arg_expose_ports) {
-                r = expose_port_watch_rtnl(event, rtnl_socket_pair[0], on_address_change, exposed, &rtnl);
+                int rtnl_fd;
+
+                rtnl_fd = receive_one_fd(rtnl_socket_pair[0], 0);
+                if (rtnl_fd < 0)
+                        return log_error_errno(rtnl_fd, "Failed to recv netlink fd: %m");
+
+                r = expose_port_watch_rtnl(event, rtnl_fd, on_address_change, exposed, &rtnl);
                 if (r < 0)
                         return r;
 
                 (void) expose_port_execute(rtnl, arg_expose_ports, exposed);
         }
-
-        rtnl_socket_pair[0] = safe_close(rtnl_socket_pair[0]);
 
         r = pty_forward_new(event, master,
                             PTY_FORWARD_IGNORE_VHANGUP | (interactive ? 0 : PTY_FORWARD_READ_ONLY),

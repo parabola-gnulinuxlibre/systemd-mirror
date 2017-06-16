@@ -205,7 +205,7 @@ int expose_port_send_rtnl(int send_fd) {
 
 int expose_port_watch_rtnl(
                 sd_event *event,
-                int recv_fd,
+                int fd,
                 sd_netlink_message_handler_t handler,
                 union in_addr_union *exposed,
                 sd_netlink **ret) {
@@ -213,12 +213,8 @@ int expose_port_watch_rtnl(
         int fd, r;
 
         assert(event);
-        assert(recv_fd >= 0);
+        assert(fd >= 0);
         assert(ret);
-
-        fd = receive_one_fd(recv_fd, 0);
-        if (fd < 0)
-                return log_error_errno(fd, "Failed to recv netlink fd: %m");
 
         r = sd_netlink_open_fd(&rtnl, fd);
         if (r < 0) {
