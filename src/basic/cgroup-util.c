@@ -921,11 +921,18 @@ int cg_get_xattr(const char *controller, const char *path, const char *name, voi
         return (int) n;
 }
 
+/**
+ * Returns the cgroup path of the process under the hierarchy specified by @controller:
+ *
+ *     controller         : whichever hierarchy has @controller bound to it (with the special case that
+ *                          SYSTEMD_CGROUP_CONTROLLER selects whichever hierarchy systemd is using, even if it is the
+ *                          v2 (unified) hierarchy and thus the SYSTEMD_CGROUP_CONTROLLER doesn't actually exist)
+ *
+ *     controller == NULL : equivalent to SYSTEMD_CGROUP_CONTROLLER
+ */
 int cg_pid_get_path(const char *controller, pid_t pid, char **path) {
         _cleanup_fclose_ FILE *f = NULL;
-        char line[LINE_MAX];
         const char *fs;
-        size_t cs = 0;
         int unified;
 
         assert(path);
@@ -940,20 +947,40 @@ int cg_pid_get_path(const char *controller, pid_t pid, char **path) {
         unified = cg_unified(controller);
         if (unified < 0)
                 return unified;
-        if (unified == 0)
-                cs = strlen(controller);
 
         fs = procfs_file_alloca(pid, "cgroup");
         f = fopen(fs, "re");
         if (!f)
                 return errno == ENOENT ? -ESRCH : -errno;
 
+        return cg_pid_get_path_internal(unified ? NULL : controller, f, path);
+}
+
+/**
+ * NB: The meaning of @controller is different here than for cg_pid_get_path():
+ *
+ *     controller         : the cgroup v1 hierarchy with this controller bound to it
+ *     controller == NULL : the cgroup v2 (unified) hierarchy
+ */
+int cg_pid_get_path_internal(const char *controller, FILE *f, char **path) {
+        char line[LINE_MAX];
+        size_t cs = 0;
+
+        assert(path);
+        assert(f);
+
+        if (controller && !cg_controller_is_valid(controller))
+                return -EINVAL;
+
+        if (controller)
+                cs = strlen(controller);
+
         FOREACH_LINE(line, f, return -errno) {
                 char *e, *p;
 
                 truncate_nl(line);
 
-                if (unified) {
+                if (!controller) {
                         e = startswith(line, "0:");
                         if (!e)
                                 continue;
