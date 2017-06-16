@@ -2695,9 +2695,9 @@ static int outer_child(
                 return -EIO;
         }
 
-        l = send_one_fd(notify_socket, fd, 0);
-        if (l < 0)
-                return log_error_errno(errno, "Failed to send notify fd: %m");
+        r = send_one_fd(notify_socket, fd, 0);
+        if (r < 0)
+                return log_error_errno(r, "Failed to send notify fd: %m");
 
         pid_socket = safe_close(pid_socket);
         uuid_socket = safe_close(uuid_socket);
