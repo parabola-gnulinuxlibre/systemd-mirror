@@ -170,6 +170,7 @@ int cg_get_path(const char *controller, const char *path, const char *suffix, ch
 int cg_get_path_and_check(const char *controller, const char *path, const char *suffix, char **fs);
 
 int cg_pid_get_path(const char *controller, pid_t pid, char **path);
+int cg_pid_get_path_internal(const char *controller, FILE *f, char **path);
 
 int cg_trim(const char *controller, const char *path, bool delete_root);
 

@@ -992,11 +992,17 @@ int cg_get_xattr(const char *controller, const char *path, const char *name, voi
         return (int) n;
 }
 
+/**
+ * Returns the cgroup path of the process under the hierarchy specified by @controller:
+ *
+ *     controller         : whichever hierarchy has @controller bound to it (with a special case for the
+ *                          SYSTEMD_CGROUP_CONTROLLER ("_systemd") pseudo-controller)
+ *
+ *     controller == NULL : equivalent to SYSTEMD_CGROUP_CONTROLLER
+ */
 int cg_pid_get_path(const char *controller, pid_t pid, char **path) {
         _cleanup_fclose_ FILE *f = NULL;
-        char line[LINE_MAX];
-        const char *fs, *controller_str;
-        size_t cs = 0;
+        const char *fs, *controller_str = NULL;
         int unified;
 
         assert(path);
@@ -1016,8 +1022,6 @@ int cg_pid_get_path(const char *controller, pid_t pid, char **path) {
                         controller_str = SYSTEMD_CGROUP_CONTROLLER_LEGACY;
                 else
                         controller_str = controller;
-
-                cs = strlen(controller_str);
         }
 
         fs = procfs_file_alloca(pid, "cgroup");
@@ -1025,12 +1029,34 @@ int cg_pid_get_path(const char *controller, pid_t pid, char **path) {
         if (!f)
                 return errno == ENOENT ? -ESRCH : -errno;
 
+        return cg_pid_get_path_internal(controller_str, f, path);
+}
+
+/**
+ * NB: The meaning of @controller is different here than for cg_pid_get_path():
+ *
+ *     controller         : the cgroup v1 hierarchy with @controller bound to it
+ *     controller == NULL : the cgroup v2 (unified) hierarchy
+ */
+int cg_pid_get_path_internal(const char *controller, FILE *f, char **path) {
+        char line[LINE_MAX];
+        size_t cs = 0;
+
+        assert(path);
+        assert(f);
+
+        if (controller && !cg_controller_is_valid(controller))
+                return -EINVAL;
+
+        if (controller)
+                cs = strlen(controller);
+
         FOREACH_LINE(line, f, return -errno) {
                 char *e, *p;
 
                 truncate_nl(line);
 
-                if (unified) {
+                if (!controller) {
                         e = startswith(line, "0:");
                         if (!e)
                                 continue;
@@ -1055,7 +1081,7 @@ int cg_pid_get_path(const char *controller, pid_t pid, char **path) {
 
                         *e = 0;
                         FOREACH_WORD_SEPARATOR(word, k, l, ",", state) {
-                                if (k == cs && memcmp(word, controller_str, cs) == 0) {
+                                if (k == cs && memcmp(word, controller, cs) == 0) {
                                         found = true;
                                         break;
                                 }
