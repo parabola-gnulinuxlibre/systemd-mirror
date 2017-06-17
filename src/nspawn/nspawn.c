@@ -325,8 +325,12 @@ static int pick_cgroup_version(const char *directory, CGroupUnified outer_cgver)
          * by checking libsystemd-shared). */
         switch (outer_cgver) {
         default:
+        case CGROUP_UNIFIED_INHERIT:
+                assert_not_reached("Invalid host cgroup version");
+                return -EINVAL;
         case CGROUP_UNIFIED_UNKNOWN:
-                assert_not_reached("unknown cgroup version");
+                arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_INHERIT;
+                break;
         case CGROUP_UNIFIED_ALL:
                 /* Unified cgroup hierarchy support was added in 230.  Unfortunately, libsystemd-shared (which we use
                  * to sniff the systemd version) was only added in 231, so we'll have a false negative here for 230. */
@@ -334,7 +338,7 @@ static int pick_cgroup_version(const char *directory, CGroupUnified outer_cgver)
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
+                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_INHERIT;
                 else
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
                 break;
@@ -344,7 +348,7 @@ static int pick_cgroup_version(const char *directory, CGroupUnified outer_cgver)
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD233;
+                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_INHERIT;
                 else
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
                 break;
@@ -354,12 +358,12 @@ static int pick_cgroup_version(const char *directory, CGroupUnified outer_cgver)
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD232;
+                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_INHERIT;
                 else
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
                 break;
         case CGROUP_UNIFIED_NONE:
-                arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_INHERIT;
                 break;
         }
 
@@ -3594,6 +3598,10 @@ int main(int argc, char *argv[]) {
 
         log_parse_environment();
         log_open();
+        cg_unified_flush();
+        r = cg_version(&outer_cgver);
+        if (r < 0)
+                outer_cgver = CGROUP_UNIFIED_UNKNOWN;
 
         /* Make sure rename_process() in the stub init process can work */
         saved_argv = argv;
@@ -3606,12 +3614,6 @@ int main(int argc, char *argv[]) {
         if (geteuid() != 0) {
                 log_error("Need to be root.");
                 r = -EPERM;
-                goto finish;
-        }
-
-        r = cg_version(&outer_cgver);
-        if (r < 0) {
-                log_error_errno(r, "Failed to determine whether the unified cgroup hierarchy is used: %m");
                 goto finish;
         }
 
@@ -3874,6 +3876,12 @@ int main(int argc, char *argv[]) {
                 r = pick_cgroup_version(arg_directory, outer_cgver);
                 if (r < 0)
                         goto finish;
+        }
+
+        if (outer_cgver == CGROUP_UNIFIED_UNKNOWN &&
+            arg_unified_cgroup_hierarchy != CGROUP_UNIFIED_INHERIT) {
+                r = log_error_errno(EINVAL, "Cannot set cgroup version of container unless running on a host with a recognized (systemd or unified) cgroup setup");
+                goto finish;
         }
 
         interactive =
