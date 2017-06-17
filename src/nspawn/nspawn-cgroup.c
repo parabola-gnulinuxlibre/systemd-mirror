@@ -500,6 +500,10 @@ int cgroup_decide_mounts(
         case CGROUP_UNIFIED_NONE:
         case CGROUP_UNIFIED_SYSTEMD232:
         case CGROUP_UNIFIED_SYSTEMD233:
+                /* Historically, if use_cgns, then this ran inside the container; if !use_cgns, then it ran outside.
+                 * The use_cgns one had to be added because running inside the container, it couldn't look at the host
+                 * '/sys'.  Now that they both run outside the container again, I'm afraid to unify them because I'm
+                 * worried that someone depends on the subtle differences in their behavior. */
                 if (use_cgns)
                         return cgroup_decide_mounts_sd_y_cgns(ret_mounts, outer_cgver, inner_cgver);
                 else
@@ -543,14 +547,13 @@ static int cgroup_mount_cg(
 }
 
 int cgroup_mount_mounts(
-                const char *dest,
                 CGMounts m,
                 bool use_cgns,
                 uid_t uid_shift,
                 const char *selinux_apifs_context) {
 
         const bool use_userns = uid_shift != UID_INVALID;
-        const char *cgroup_root = prefix_roota(dest, "/sys/fs/cgroup");
+        const char *cgroup_root = "/sys/fs/cgroup";
 
         bool used_tmpfs = false;
 
@@ -575,7 +578,7 @@ int cgroup_mount_mounts(
                         break;
                 case CGMOUNT_TMPFS:
                         used_tmpfs = true;
-                        r = path_is_mount_point(dst, dest, path_equal(cgroup_root, dst) ? AT_SYMLINK_FOLLOW : 0);
+                        r = path_is_mount_point(dst, NULL, path_equal(cgroup_root, dst) ? AT_SYMLINK_FOLLOW : 0);
                         if (r < 0)
                                 return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
                         if (r > 0)
@@ -590,7 +593,7 @@ int cgroup_mount_mounts(
                         break;
                 case CGMOUNT_CGROUP1:
                 case CGMOUNT_CGROUP2:
-                        r = path_is_mount_point(dst, dest, path_equal(cgroup_root, dst) ? AT_SYMLINK_FOLLOW : 0);
+                        r = path_is_mount_point(dst, NULL, path_equal(cgroup_root, dst) ? AT_SYMLINK_FOLLOW : 0);
                         if (r < 0 && r != -ENOENT)
                                 return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
                         if (r > 0) {
@@ -620,26 +623,6 @@ int cgroup_mount_mounts(
 }
 
 /* mount_cgroups, mount_systemd_cgroup_writable *********************/
-
-int mount_cgroups(
-                const char *dest,
-                CGroupUnified outer_cgver,
-                CGroupUnified inner_cgver,
-                bool use_userns,
-                uid_t uid_shift,
-                uid_t uid_range,
-                const char *selinux_apifs_context,
-                bool use_cgns) {
-
-        _cleanup_(cgroup_free_mounts) CGMounts mounts = {};
-        int r;
-
-        r = cgroup_decide_mounts(&mounts, outer_cgver, inner_cgver, use_cgns);
-        if (r < 0)
-                return r;
-
-        return cgroup_mount_mounts(dest, mounts, use_cgns, use_userns ? uid_shift : UID_INVALID, selinux_apifs_context);
-}
 
 static int mount_systemd_cgroup_writable_one(const char *root, const char *own) {
         int r;
