@@ -328,11 +328,14 @@ static int pick_cgroup_version(const char *directory, CGroupUnified outer) {
          * by checking libsystemd-shared). */
         switch (outer) {
         default:
+        case CGROUP_UNIFIED_INHERIT:
+                assert_not_reached("Invalid host cgroup version");
+                return -EINVAL;
         case CGROUP_UNIFIED_UNKNOWN:
-                assert_not_reached("Unknown host cgroup version");
+                arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_INHERIT;
                 break;
         case CGROUP_UNIFIED_NONE: /* cgroup v1-sd */
-                arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_INHERIT;
                 break;
         case CGROUP_UNIFIED_ALL: /* cgroup v2 */
                 /* Unified cgroup hierarchy support was added in 230. Unfortunately libsystemd-shared,
@@ -342,7 +345,7 @@ static int pick_cgroup_version(const char *directory, CGroupUnified outer) {
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
+                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_INHERIT;
                 else
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
                 break;
@@ -352,7 +355,7 @@ static int pick_cgroup_version(const char *directory, CGroupUnified outer) {
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD;
+                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_INHERIT;
                 else
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
                 break;
@@ -4076,6 +4079,9 @@ int main(int argc, char *argv[]) {
         log_parse_environment();
         log_open();
         cg_unified_flush();
+        r = cg_version(&outer_cgver);
+        if (r < 0)
+                outer_cgver = CGROUP_UNIFIED_UNKNOWN;
 
         /* Make sure rename_process() in the stub init process can work */
         saved_argv = argv;
@@ -4090,13 +4096,6 @@ int main(int argc, char *argv[]) {
                 r = -EPERM;
                 goto finish;
         }
-
-        r = cg_version(&outer_cgver);
-        if (r < 0) {
-                log_error_errno(r, "Failed to determine whether the unified cgroups hierarchy is used: %m");
-                goto finish;
-        }
-
         r = determine_names();
         if (r < 0)
                 goto finish;
@@ -4263,6 +4262,12 @@ int main(int argc, char *argv[]) {
                 r = pick_cgroup_version(arg_directory, outer_cgver);
                 if (r < 0)
                         goto finish;
+        }
+
+        if (outer_cgver == CGROUP_UNIFIED_UNKNOWN &&
+            arg_unified_cgroup_hierarchy != CGROUP_UNIFIED_INHERIT) {
+                r = log_error_errno(EINVAL, "Cannot set cgroup version of container unless running on a host with a recognized (systemd or unified) cgroup setup");
+                goto finish;
         }
 
         interactive =
