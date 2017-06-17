@@ -230,7 +230,7 @@ static int get_v1_hierarchies(Set *subsystems) {
 
                 *e = 0;
 
-                if (STR_IN_SET(l, "", "name=systemd"))
+                if (streq(l, ""))
                         continue;
 
                 p = strdup(l);
@@ -349,6 +349,9 @@ static int mount_legacy_cgns_supported(
                 hierarchy = set_steal_first(hierarchies);
                 if (!hierarchy)
                         break;
+
+                if (streq(hierarchy, "name=systemd"))
+                        continue;
 
                 r = mount_legacy_cgroup_hierarchy("", hierarchy, hierarchy, !userns);
                 if (r < 0)
