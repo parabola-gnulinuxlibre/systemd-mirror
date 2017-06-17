@@ -35,6 +35,66 @@
 #include "nspawn-cgroup.h"
 #include "nspawn-mount.h"
 
+/* Code for managing the list of CGMounts ***************************/
+
+typedef enum CGMountType {
+        CGMOUNT_SYMLINK,
+        CGMOUNT_TMPFS,
+        CGMOUNT_CGROUP1,
+        CGMOUNT_CGROUP2,
+        _CGMOUNT_MAX
+} CGMountType;
+
+struct CGMount {
+        CGMountType type;
+        char *src;
+        char *dst;
+};
+
+static CGMount *cgmount_add(CGMounts *mounts, CGMountType type, const char *src, const char *dst) {
+        char *hsrc = NULL, *hdst = NULL;
+        CGMount *c, *ret;
+
+        assert(mounts);
+        assert(type >= 0 && type < _CGMOUNT_MAX);
+        assert(src);
+        assert(dst);
+
+        hsrc = strdup(src);
+        hdst = strdup(dst);
+        if (!hsrc || !hdst) {
+                free(hsrc);
+                free(hdst);
+                return NULL;
+        }
+
+        c = realloc_multiply(mounts->mounts, sizeof(CGMount), mounts->n + 1);
+        if (!c)
+                return NULL;
+
+        mounts->mounts = c;
+        ret = &(mounts->mounts)[mounts->n];
+        (mounts->n)++;
+
+        *ret = (CGMount) {
+                .type = type,
+                .src = hsrc,
+                .dst = hdst,
+        };
+        return ret;
+}
+
+void cgroup_free_mounts(CGMounts *mounts) {
+        for (size_t i = 0; i < mounts->n; i++) {
+                free(mounts->mounts[i].src);
+                free(mounts->mounts[i].dst);
+        }
+        mounts->mounts = mfree(mounts->mounts);
+        mounts->n = 0;
+}
+
+/********************************************************************/
+
 static int chown_cgroup_path(const char *path, uid_t uid_shift) {
         _cleanup_close_ int fd = -1;
         const char *fn;
@@ -245,84 +305,18 @@ static int get_v1_hierarchies(Set *subsystems) {
         return 0;
 }
 
-static int mount_legacy_cgroup_hierarchy(const char *dest, const char *controller, const char *hierarchy,
-                                         CGroupUnified inner_cgver, bool read_only) {
-        const char *to, *fstype, *opts;
-        int r;
-
-        to = strjoina(strempty(dest), "/sys/fs/cgroup/", hierarchy);
-
-        r = path_is_mount_point(to, 0);
-        if (r < 0 && r != -ENOENT)
-                return log_error_errno(r, "Failed to determine if %s is mounted already: %m", to);
-        if (r > 0)
-                return 0;
-
-        mkdir_p(to, 0755);
-
-        /* The superblock mount options of the mount point need to be
-         * identical to the hosts', and hence writable... */
-        if (streq(controller, SYSTEMD_CGROUP_CONTROLLER)) {
-                if (inner_cgver >= CGROUP_UNIFIED_SYSTEMD) {
-                        fstype = "cgroup2";
-                        opts = NULL;
-                } else {
-                        fstype = "cgroup";
-                        opts = "none,name=systemd,xattr";
-                }
-        } else {
-                fstype = "cgroup";
-                opts = controller;
-        }
-
-        r = mount_verbose(LOG_ERR, "cgroup", to, fstype, MS_NOSUID|MS_NOEXEC|MS_NODEV, opts);
-        if (r < 0)
-                return r;
-
-        /* ... hence let's only make the bind mount read-only, not the superblock. */
-        if (read_only) {
-                r = mount_verbose(LOG_ERR, NULL, to, NULL,
-                                  MS_BIND|MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_RDONLY, NULL);
-                if (r < 0)
-                        return r;
-        }
-
-        return 1;
-}
-
-/* Mount a legacy cgroup hierarchy when cgroup namespaces are supported. */
-static int mount_legacy_cgns_supported(
-                CGroupUnified outer_cgver, CGroupUnified inner_cgver, bool userns, uid_t uid_shift,
-                uid_t uid_range, const char *selinux_apifs_context) {
+/* Decide the legacy cgroup mounts when cgroup namespaces are used. */
+static int cgroup_decide_mounts_sd_y_cgns(
+                CGMounts *ret_mounts,
+                CGroupUnified outer_cgver, CGroupUnified inner_cgver) {
+        _cleanup_(cgroup_free_mounts) CGMounts mounts = {};
         _cleanup_set_free_free_ Set *hierarchies = NULL;
-        const char *cgroup_root = "/sys/fs/cgroup", *c;
+        const char *c;
         int r;
-
-        (void) mkdir_p(cgroup_root, 0755);
 
         /* Mount a tmpfs to /sys/fs/cgroup if it's not mounted there yet. */
-        r = path_is_mount_point(cgroup_root, AT_SYMLINK_FOLLOW);
-        if (r < 0)
-                return log_error_errno(r, "Failed to determine if /sys/fs/cgroup is already mounted: %m");
-        if (r == 0) {
-                _cleanup_free_ char *options = NULL;
-
-                /* When cgroup namespaces are enabled and user namespaces are
-                 * used then the mount of the cgroupfs is done *inside* the new
-                 * user namespace. We're root in the new user namespace and the
-                 * kernel will happily translate our uid/gid to the correct
-                 * uid/gid as seen from e.g. /proc/1/mountinfo. So we simply
-                 * pass uid 0 and not uid_shift to tmpfs_patch_options().
-                 */
-                r = tmpfs_patch_options("mode=755", 0, selinux_apifs_context, &options);
-                if (r < 0)
-                        return log_oom();
-
-                r = mount_verbose(LOG_ERR, "tmpfs", cgroup_root, "tmpfs",
-                                  MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME, options);
-                if (r < 0)
-                        return r;
-        }
+        if (!cgmount_add(&mounts, CGMOUNT_TMPFS, "mode=755", ""))
+                return log_oom();
 
         if (outer_cgver >= CGROUP_UNIFIED_ALL)
                 goto skip_controllers;
@@ -345,9 +339,8 @@ static int mount_legacy_cgns_supported(
                 if (streq(hierarchy, "name=systemd"))
                         continue;
 
-                r = mount_legacy_cgroup_hierarchy("", hierarchy, hierarchy, inner_cgver, !userns);
-                if (r < 0)
-                        return r;
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, hierarchy, hierarchy))
+                        return log_oom();
 
                 /* When multiple hierarchies are co-mounted, make their
                  * constituting individual hierarchies a symlink to the
@@ -363,62 +356,43 @@ static int mount_legacy_cgns_supported(
                         if (r == 0)
                                 break;
 
-                        target = prefix_root("/sys/fs/cgroup", controller);
-                        if (!target)
+                        if (!cgmount_add(&mounts, CGMOUNT_SYMLINK, hierarchy, controller))
                                 return log_oom();
-
-                        if (streq(hierarchy, controller))
-                                break;
-
-                        r = symlink_idempotent(hierarchy, target);
-                        if (r == -EINVAL)
-                                return log_error_errno(r, "Invalid existing symlink for combined hierarchy: %m");
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to create symlink for combined hierarchy: %m");
                 }
         }
 
 skip_controllers:
-        r = mount_legacy_cgroup_hierarchy("", SYSTEMD_CGROUP_CONTROLLER, "systemd", inner_cgver, false);
-        if (r < 0)
-                return r;
+        switch (inner_cgver) {
+        case CGROUP_UNIFIED_NONE:
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, "name=systmed", "systemd"))
+                        return log_oom();
+                break;
+        case CGROUP_UNIFIED_ALL:
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "", "systemd"))
+                        return log_oom();
+                break;
+        default:
+                assert_not_reached("non-legacy cgroup version desired in legacy setup function");
+                return -EINVAL;
+        }
 
-        if (!userns)
-                return mount_verbose(LOG_ERR, NULL, cgroup_root, NULL,
-                                     MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME|MS_RDONLY, "mode=755");
+        *ret_mounts = mounts;
+        mounts = (CGMounts){};
 
         return 0;
 }
 
-/* Mount legacy cgroup hierarchy when cgroup namespaces are unsupported. */
-static int mount_legacy_cgns_unsupported(
-                const char *dest,
-                CGroupUnified outer_cgver, CGroupUnified inner_cgver, bool userns, uid_t uid_shift, uid_t uid_range,
-                const char *selinux_apifs_context) {
+/* Decide the legacy cgroup mounts when cgroup namespaces are not used. */
+static int cgroup_decide_mounts_sd_n_cgns(
+                CGMounts *ret_mounts,
+                CGroupUnified outer_cgver, CGroupUnified inner_cgver) {
+        _cleanup_(cgroup_free_mounts) CGMounts mounts = {};
         _cleanup_set_free_free_ Set *controllers = NULL;
-        const char *cgroup_root;
         int r;
 
-        cgroup_root = prefix_roota(dest, "/sys/fs/cgroup");
-
-        (void) mkdir_p(cgroup_root, 0755);
-
         /* Mount a tmpfs to /sys/fs/cgroup if it's not mounted there yet. */
-        r = path_is_mount_point(cgroup_root, AT_SYMLINK_FOLLOW);
-        if (r < 0)
-                return log_error_errno(r, "Failed to determine if /sys/fs/cgroup is already mounted: %m");
-        if (r == 0) {
-                _cleanup_free_ char *options = NULL;
-
-                r = tmpfs_patch_options("mode=755", uid_shift == 0 ? UID_INVALID : uid_shift, selinux_apifs_context, &options);
-                if (r < 0)
-                        return log_oom();
-
-                r = mount_verbose(LOG_ERR, "tmpfs", cgroup_root, "tmpfs",
-                                  MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME, options);
-                if (r < 0)
-                        return r;
-        }
+        if (!cgmount_add(&mounts, CGMOUNT_TMPFS, "mode=755", ""))
+                return log_oom();
 
         if (outer_cgver >= CGROUP_UNIFIED_ALL)
                 goto skip_controllers;
@@ -446,19 +420,12 @@ static int mount_legacy_cgns_unsupported(
                 if (r == -EINVAL) {
                         /* Not a symbolic link, but directly a single cgroup hierarchy */
 
-                        r = mount_legacy_cgroup_hierarchy(dest, controller, controller, inner_cgver, true);
-                        if (r < 0)
-                                return r;
+                        if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, controller, controller))
+                                return log_oom();
 
                 } else if (r < 0)
                         return log_error_errno(r, "Failed to read link %s: %m", origin);
                 else {
-                        _cleanup_free_ char *target = NULL;
-
-                        target = prefix_root(dest, origin);
-                        if (!target)
-                                return log_oom();
-
                         /* A symbolic link, a combination of controllers in one hierarchy */
 
                         if (!filename_is_valid(combined)) {
@@ -466,67 +433,165 @@ static int mount_legacy_cgns_unsupported(
                                 continue;
                         }
 
-                        r = mount_legacy_cgroup_hierarchy(dest, combined, combined, inner_cgver, true);
-                        if (r < 0)
-                                return r;
+                        if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, combined, combined))
+                                return log_oom();
 
-                        r = symlink_idempotent(combined, target);
-                        if (r == -EINVAL)
-                                return log_error_errno(r, "Invalid existing symlink for combined hierarchy: %m");
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to create symlink for combined hierarchy: %m");
+                        if (!cgmount_add(&mounts, CGMOUNT_SYMLINK, combined, controller))
+                                return log_oom();
                 }
         }
 
 skip_controllers:
-        r = mount_legacy_cgroup_hierarchy(dest, SYSTEMD_CGROUP_CONTROLLER, "systemd", inner_cgver, false);
-        if (r < 0)
-                return r;
-
-        return mount_verbose(LOG_ERR, NULL, cgroup_root, NULL,
-                             MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME|MS_RDONLY, "mode=755");
-}
-
-static int mount_unified_cgroups(const char *dest) {
-        const char *p;
-        int r;
-
-        assert(dest);
-
-        p = prefix_roota(dest, "/sys/fs/cgroup");
-
-        (void) mkdir_p(p, 0755);
-
-        r = path_is_mount_point(p, AT_SYMLINK_FOLLOW);
-        if (r < 0)
-                return log_error_errno(r, "Failed to determine if %s is mounted already: %m", p);
-        if (r > 0) {
-                p = prefix_roota(dest, "/sys/fs/cgroup/cgroup.procs");
-                if (access(p, F_OK) >= 0)
-                        return 0;
-                if (errno != ENOENT)
-                        return log_error_errno(errno, "Failed to determine if mount point %s contains the unified cgroup hierarchy: %m", p);
-
-                log_error("%s is already mounted but not a unified cgroup hierarchy. Refusing.", p);
+        switch (inner_cgver) {
+        case CGROUP_UNIFIED_NONE:
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, "name=systmed", "systemd"))
+                        return log_oom();
+                break;
+        case CGROUP_UNIFIED_ALL:
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "", "systemd"))
+                        return log_oom();
+                break;
+        default:
+                assert_not_reached("non-legacy cgroup version desired in legacy setup function");
                 return -EINVAL;
         }
 
-        return mount_verbose(LOG_ERR, "cgroup", p, "cgroup2", MS_NOSUID|MS_NOEXEC|MS_NODEV, NULL);
+        *ret_mounts = mounts;
+        mounts = (CGMounts){};
+
+        return 0;
 }
+
+/********************************************************************/
+
+static int cgroup_mount_cg(
+                const char *mountpoint, const char *opts, CGMountType fstype,
+                bool use_cgns, bool use_userns) {
+        /* If we are using userns and cgns, then we always let it be RW, because we can count on the shifted root user
+         * to not have access to the things that would make us want to mount it RO.  Otherwise, we only give the
+         * container RW access to its unified or name=systemd cgroup. */
+        const bool rw = (use_userns && use_cgns) || fstype == CGMOUNT_CGROUP2 || streq(mountpoint, "/sys/fs/cgroup/systemd");
+        int r;
+
+        /* The superblock mount options of the mount point need to be
+         * identical to the hosts', and hence writable... */
+        r = mount_verbose(LOG_ERR, "cgroup", mountpoint, fstype == CGMOUNT_CGROUP1 ? "cgroup" : "cgroup2",
+                          MS_NOSUID|MS_NOEXEC|MS_NODEV, opts);
+        if (r < 0)
+                return r;
+
+        /* ... hence let's only make the bind mount read-only, not the superblock. */
+        if (!rw) {
+                r = mount_verbose(LOG_ERR, NULL, mountpoint, NULL,
+                                  MS_BIND|MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_RDONLY, NULL);
+                if (r < 0)
+                        return r;
+        }
+
+        return 0;
+}
+
+int cgroup_mount_mounts(CGMounts m, bool use_cgns, uid_t uid_shift, const char *selinux_apifs_context) {
+        const bool use_userns = uid_shift != UID_INVALID;
+
+        bool used_tmpfs = false;
+
+        for (size_t i = 0; i < m.n; i++) {
+                _cleanup_free_ char *options = NULL;
+                const char *dst;
+                int r;
+
+                dst = prefix_roota("/sys/fs/cgroup", m.mounts[i].dst);
+
+                /* The checks here to see if things are already mounted are kind of primative.  Perhaps they should
+                 * actually check the statfs() f_type to verify that the thing mounted is what we want to be mounted
+                 * (similar to cgroup-util's detection logic)?  But I don't really understand the use-case for having
+                 * any of these already mounted, so I'm not sure if such increased strictness would be unwelcome. */
+
+                switch (m.mounts[i].type) {
+                case CGMOUNT_SYMLINK:
+                        (void) mkdir_parents(dst, 0755);
+                        r = symlink_idempotent(m.mounts[i].src, dst);
+                        if (r < 0)
+                                return r;
+                        break;
+                case CGMOUNT_TMPFS:
+                        used_tmpfs = true;
+                        r = path_is_mount_point(dst, AT_SYMLINK_FOLLOW);
+                        if (r < 0)
+                                return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
+                        if (r > 0)
+                                continue;
+                        r = tmpfs_patch_options(m.mounts[i].src, uid_shift, selinux_apifs_context, &options);
+                        if (r < 0)
+                                return log_oom();
+                        r = mount_verbose(LOG_ERR, /*name*/"tmpfs", dst, /*fstype*/"tmpfs",
+                                          MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME, options);
+                        if (r < 0)
+                                return r;
+                        break;
+                case CGMOUNT_CGROUP1:
+                case CGMOUNT_CGROUP2:
+                        r = path_is_mount_point(dst, 0);
+                        if (r < 0 && r != -ENOENT)
+                                return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
+                        if (r > 0) {
+                                if (access(prefix_roota(dst, "cgroup.procs"), F_OK) >= 0)
+                                        continue;
+                                if (errno != ENOENT)
+                                        return log_error_errno(errno, "Failed to determine if mount point %s is a cgroup hierarchy: %m", dst);
+                                return log_error_errno(EINVAL, "%s is already mounted but not a cgroup hierarchy. Refusing.", dst);
+                        }
+                        (void) mkdir_p(dst, 0755);
+                        r = cgroup_mount_cg(dst, m.mounts[i].src, m.mounts[i].type, use_cgns, use_userns);
+                        if (r < 0)
+                                return r;
+                        break;
+                default:
+                        assert_not_reached("Invalid CGMount type");
+                        return -EINVAL;
+                }
+        }
+
+        /* I'm going to be honest: I don't understand why we don't do this if we're using both userns and cgns. */
+        if (used_tmpfs && (!use_userns || !use_cgns))
+                return mount_verbose(LOG_ERR, NULL, "/sys/fs/cgroup", NULL,
+                                     MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME|MS_RDONLY, "mode=755");
+
+        return 0;
+}
+
+/********************************************************************/
 
 int mount_cgroups(
                 const char *dest,
                 CGroupUnified outer_cgver, CGroupUnified inner_cgver,
-                bool userns, uid_t uid_shift, uid_t uid_range,
+                bool use_userns, uid_t uid_shift, uid_t uid_range,
                 const char *selinux_apifs_context,
                 bool use_cgns) {
+        _cleanup_(cgroup_free_mounts) CGMounts mounts = {};
+        int r;
 
-        if (inner_cgver >= CGROUP_UNIFIED_ALL)
-                return mount_unified_cgroups(dest);
-        else if (use_cgns)
-                return mount_legacy_cgns_supported(outer_cgver, inner_cgver, userns, uid_shift, uid_range, selinux_apifs_context);
+        switch (inner_cgver) {
+        case CGROUP_UNIFIED_NONE:
+        case CGROUP_UNIFIED_SYSTEMD:
+                if (use_cgns)
+                        r = cgroup_decide_mounts_sd_y_cgns(&mounts, outer_cgver, inner_cgver);
+                else
+                        r = cgroup_decide_mounts_sd_n_cgns(&mounts, outer_cgver, inner_cgver);
+                if (r < 0)
+                        return r;
+                break;
+        case CGROUP_UNIFIED_ALL:
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "cgroup", ""))
+                        return log_oom();
+                break;
+        default:
+                assert_not_reached("Invalid cgroup ver requested");
+                return -EINVAL;
+        }
 
-        return mount_legacy_cgns_unsupported(dest, outer_cgver, inner_cgver, userns, uid_shift, uid_range, selinux_apifs_context);
+        return cgroup_mount_mounts(mounts, use_cgns, use_userns ? uid_shift : UID_INVALID, selinux_apifs_context);
 }
 
 int mount_systemd_cgroup_writable(
