@@ -546,8 +546,9 @@ int cgroup_decide_mounts(
 
 static int cgroup_mount_cg(
                 const char *mountpoint, const char *opts, CGMountType fstype,
-                bool use_cgns, bool use_userns) {
+                FILE *cgfile, bool use_userns) {
 
+        const bool use_cgns = cgfile == NULL;
         /* If we are using userns and cgns, then we always let it be RW, because we can count on the shifted root user
          * to not have access to the things that would make us want to mount it RO.  Otherwise, we only give the
          * container RW access to its unified or name=systemd cgroup. */
@@ -555,26 +556,56 @@ static int cgroup_mount_cg(
 
         int r;
 
-        /* The superblock mount options of the mount point need to be
-         * identical to the hosts', and hence writable... */
         r = mount_verbose(LOG_ERR, "cgroup", mountpoint, fstype == CGMOUNT_CGROUP1 ? "cgroup" : "cgroup2",
-                          MS_NOSUID|MS_NOEXEC|MS_NODEV, opts);
+                          MS_NOSUID|MS_NOEXEC|MS_NODEV| ((!rw||!use_cgns) ? MS_RDONLY : 0), opts);
         if (r < 0)
                 return r;
 
-        /* ... hence let's only make the bind mount read-only, not the superblock. */
-        if (!rw) {
-                r = mount_verbose(LOG_ERR, NULL, mountpoint, NULL,
-                                  MS_BIND|MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_RDONLY, NULL);
+        if (rw && !use_cgns) {
+                /* emulate cgns by mounting everything but our subcgroup RO */
+                const char *rwmountpoint = strjoina(mountpoint, ".");
+
+                char *cgroup = NULL;
+                if (fstype == CGMOUNT_CGROUP2) {
+                        rewind(cgfile);
+                        r = cg_pid_get_path_internal(NULL, cgfile, &cgroup);
+                        if (r < 0)
+                                return log_error_errno(r, "Failed to get child's cgroup v2 path");
+                } else {
+                        const char *scontroller, *state;
+                        size_t controller_len;
+                        FOREACH_WORD_SEPARATOR(scontroller, controller_len, opts, ",", state) {
+                                _cleanup_free_ const char *controller = strndup(scontroller, controller_len);
+                                rewind(cgfile);
+                                if (cg_pid_get_path_internal(controller, cgfile, &cgroup) == 0)
+                                        break;
+                        }
+                        if (!cgroup)
+                                return log_error_errno(EBADMSG, "Failed to associate mounted cgroup hierarchy %s with numbered cgroup hierarchy", mountpoint);
+                }
+
+                (void) mkdir(rwmountpoint, 0755);
+                r = mount_verbose(LOG_ERR, "cgroup", rwmountpoint, fstype == CGMOUNT_CGROUP1 ? "cgroup" : "cgroup2",
+                                  MS_NOSUID|MS_NOEXEC|MS_NODEV, opts);
                 if (r < 0)
                         return r;
+                r = mount_verbose(LOG_ERR, strjoina(rwmountpoint, cgroup), strjoina(mountpoint, cgroup), NULL, MS_BIND, NULL);
+                if (r < 0)
+                        return r;
+                r = umount_verbose(rwmountpoint);
+                if (r < 0)
+                        return r;
+                r = rmdir(rwmountpoint);
+                if (r < 0)
+                        return log_error_errno(r, "Failed to rmdir temporary mountpoint %s: %m", rwmountpoint);
         }
 
         return 0;
 }
 
-int cgroup_mount_mounts(CGMounts m, bool use_cgns, uid_t uid_shift, const char *selinux_apifs_context) {
+int cgroup_mount_mounts(CGMounts m, FILE *cgfile, uid_t uid_shift, const char *selinux_apifs_context) {
 
+        const bool use_cgns = cgfile == NULL;
         const bool use_userns = uid_shift != UID_INVALID;
 
         bool used_tmpfs = false;
@@ -626,7 +657,7 @@ int cgroup_mount_mounts(CGMounts m, bool use_cgns, uid_t uid_shift, const char *
                                 return log_error_errno(EINVAL, "%s is already mounted but not a cgroup hierarchy. Refusing.", dst);
                         }
                         (void) mkdir_p(dst, 0755);
-                        r = cgroup_mount_cg(dst, m.mounts[i].src, m.mounts[i].type, use_cgns, use_userns);
+                        r = cgroup_mount_cg(dst, m.mounts[i].src, m.mounts[i].type, cgfile, use_userns);
                         if (r < 0)
                                 return r;
                         break;
@@ -642,42 +673,4 @@ int cgroup_mount_mounts(CGMounts m, bool use_cgns, uid_t uid_shift, const char *
                                      MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME|MS_RDONLY, "mode=755");
 
         return 0;
-}
-
-/********************************************************************/
-
-int mount_systemd_cgroup_writable(
-                const char *dest,
-                CGroupUnified inner_cgver) {
-
-        _cleanup_free_ char *own_cgroup_path = NULL;
-        const char *systemd_root, *systemd_own;
-        int r;
-
-        assert(dest);
-
-        r = cg_pid_get_path(NULL, 0, &own_cgroup_path);
-        if (r < 0)
-                return log_error_errno(r, "Failed to determine our own cgroup path: %m");
-
-        /* If we are living in the top-level, then there's nothing to do... */
-        if (path_equal(own_cgroup_path, "/"))
-                return 0;
-
-        if (inner_cgver >= CGROUP_UNIFIED_ALL) {
-                systemd_own = strjoina(dest, "/sys/fs/cgroup", own_cgroup_path);
-                systemd_root = prefix_roota(dest, "/sys/fs/cgroup");
-        } else {
-                systemd_own = strjoina(dest, "/sys/fs/cgroup/systemd", own_cgroup_path);
-                systemd_root = prefix_roota(dest, "/sys/fs/cgroup/systemd");
-        }
-
-        /* Make our own cgroup a (writable) bind mount */
-        r = mount_verbose(LOG_ERR, systemd_own, systemd_own,  NULL, MS_BIND, NULL);
-        if (r < 0)
-                return r;
-
-        /* And then remount the systemd cgroup root read-only */
-        return mount_verbose(LOG_ERR, NULL, systemd_root, NULL,
-                             MS_BIND|MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_RDONLY, NULL);
 }
