@@ -2163,7 +2163,7 @@ static int inner_child(
                 int kmsg_socket,
                 int rtnl_socket,
                 FDSet *fds,
-                CGroupUnified outer_cgver) {
+                CGMounts cgmounts) {
 
         _cleanup_free_ char *home = NULL;
         char as_uuid[37];
@@ -2228,15 +2228,11 @@ static int inner_child(
                 r = unshare(CLONE_NEWCGROUP);
                 if (r < 0)
                         return log_error_errno(errno, "Failed to unshare cgroup namespace");
-                r = mount_cgroups(
-                                "",
-                                outer_cgver,
-                                arg_unified_cgroup_hierarchy,
-                                arg_userns_mode != USER_NAMESPACE_NO,
-                                arg_uid_shift,
-                                arg_uid_range,
-                                arg_selinux_apifs_context,
-                                true);
+                r = cgroup_mount_mounts(cgmounts,
+                                        arg_use_cgns,
+                                        arg_userns_mode == USER_NAMESPACE_NO ? UID_INVALID : 0,
+                                        arg_selinux_apifs_context);
+                cgroup_free_mounts(&cgmounts);
                 if (r < 0)
                         return r;
         } else {
@@ -2452,6 +2448,7 @@ static int outer_child(
         ssize_t l;
         int r;
         _cleanup_close_ int fd = -1;
+        _cleanup_(cgroup_free_mounts) CGMounts cgmounts = {};
 
         assert(barrier);
         assert(directory);
@@ -2644,16 +2641,17 @@ static int outer_child(
         if (r < 0)
                 return r;
 
+        r = cgroup_decide_mounts(&cgmounts,
+                                 outer_cgver, arg_unified_cgroup_hierarchy,
+                                 arg_use_cgns);
+        if (r < 0)
+                return r;
+
         if (!arg_use_cgns) {
-                r = mount_cgroups(
-                                directory,
-                                outer_cgver,
-                                arg_unified_cgroup_hierarchy,
-                                arg_userns_mode != USER_NAMESPACE_NO,
-                                arg_uid_shift,
-                                arg_uid_range,
-                                arg_selinux_apifs_context,
-                                false);
+                r = cgroup_mount_mounts(cgmounts,
+                                        arg_use_cgns,
+                                        arg_userns_mode == USER_NAMESPACE_NO ? UID_INVALID : arg_uid_shift,
+                                        arg_selinux_apifs_context);
                 if (r < 0)
                         return r;
         }
@@ -2682,7 +2680,7 @@ static int outer_child(
                  * requested, so that we all are owned by the user if
                  * user namespaces are turned on. */
 
-                r = inner_child(barrier, directory, secondary, kmsg_socket, rtnl_socket, fds, outer_cgver);
+                r = inner_child(barrier, directory, secondary, kmsg_socket, rtnl_socket, fds, cgmounts);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
