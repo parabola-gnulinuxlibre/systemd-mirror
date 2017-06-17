@@ -246,7 +246,7 @@ static int get_v1_hierarchies(Set **ret) {
 
                 *e = 0;
 
-                if (STR_IN_SET(l, "", "name=systemd"))
+                if (streq(l, ""))
                         continue;
 
                 r = set_put_strdup(controllers, l);
@@ -359,6 +359,9 @@ static int mount_legacy_cgns_supported(
                 hierarchy = set_steal_first(hierarchies);
                 if (!hierarchy)
                         break;
+
+                if (streq(hierarchy, "name=systemd"))
+                        continue;
 
                 r = mount_legacy_cgroup_hierarchy("", hierarchy, hierarchy, !userns);
                 if (r < 0)
