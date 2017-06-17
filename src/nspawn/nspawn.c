@@ -2194,15 +2194,15 @@ static int inner_child(
         assert(directory);
         assert(kmsg_socket >= 0);
 
-        if (arg_userns_mode != USER_NAMESPACE_NO) {
-                /* Tell the parent, that it now can write the UID map. */
-                (void) barrier_place(barrier); /* #1 */
+        /* Tell the parent that it can now configure our process; write
+         * the UID map (if use_userns), place us in the correct cgroup (if
+         * use_cgns), et c. */
+        (void) barrier_place(barrier); /* #1 */
 
-                /* Wait until the parent wrote the UID map */
-                if (!barrier_place_and_sync(barrier)) { /* #2 */
-                        log_error("Parent died too early");
-                        return -ESRCH;
-                }
+        /* Wait until the parent says that we are fully configured. */
+        if (!barrier_place_and_sync(barrier)) { /* #2 */
+                log_error("Parent died too early");
+                return -ESRCH;
         }
 
         r = reset_uid_gid();
@@ -2221,26 +2221,15 @@ static int inner_child(
         if (r < 0)
                 return r;
 
-        /* Wait until we are cgroup-ified, so that we
-         * can mount the right cgroup path writable */
-        if (!barrier_place_and_sync(barrier)) { /* #3 */
-                log_error("Parent died too early");
-                return -ESRCH;
-        }
-
         if (arg_use_cgns) {
                 r = unshare(CLONE_NEWCGROUP);
                 if (r < 0)
                         return log_error_errno(errno, "Failed to unshare cgroup namespace");
                 r = cgroup_mount_mounts(cgmounts,
-                                        arg_use_cgns,
+                                        NULL,
                                         arg_userns_mode == USER_NAMESPACE_NO ? UID_INVALID : 0,
                                         arg_selinux_apifs_context);
                 cgroup_free_mounts(&cgmounts);
-                if (r < 0)
-                        return r;
-        } else {
-                r = mount_systemd_cgroup_writable("", arg_unified_cgroup_hierarchy);
                 if (r < 0)
                         return r;
         }
@@ -2329,7 +2318,7 @@ static int inner_child(
         /* Let the parent know that we are ready and
          * wait until the parent is ready with the
          * setup, too... */
-        if (!barrier_place_and_sync(barrier)) { /* #4 */
+        if (!barrier_place_and_sync(barrier)) { /* #3 */
                 log_error("Parent died too early");
                 return -ESRCH;
         }
@@ -2445,6 +2434,7 @@ static int outer_child(
                 int kmsg_socket,
                 int rtnl_socket,
                 int uid_shift_socket,
+                int cgroup_socket,
                 FDSet *fds,
                 CGroupUnified outer_cgver) {
 
@@ -2461,6 +2451,7 @@ static int outer_child(
         assert(uuid_socket >= 0);
         assert(notify_socket >= 0);
         assert(kmsg_socket >= 0);
+        assert(cgroup_socket);
 
         if (prctl(PR_SET_PDEATHSIG, SIGKILL) < 0)
                 return log_error_errno(errno, "PR_SET_PDEATHSIG failed: %m");
@@ -2651,15 +2642,6 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        if (!arg_use_cgns) {
-                r = cgroup_mount_mounts(cgmounts,
-                                        arg_use_cgns,
-                                        arg_userns_mode == USER_NAMESPACE_NO ? UID_INVALID : arg_uid_shift,
-                                        arg_selinux_apifs_context);
-                if (r < 0)
-                        return r;
-        }
-
         r = mount_move_root(directory);
         if (r < 0)
                 return log_error_errno(r, "Failed to move root directory: %m");
@@ -2679,6 +2661,7 @@ static int outer_child(
                 uuid_socket = safe_close(uuid_socket);
                 notify_socket = safe_close(notify_socket);
                 uid_shift_socket = safe_close(uid_shift_socket);
+                cgroup_socket = safe_close(cgroup_socket);
 
                 /* The inner child has all namespaces that are
                  * requested, so that we all are owned by the user if
@@ -2711,11 +2694,49 @@ static int outer_child(
         if (l < 0)
                 return log_error_errno(errno, "Failed to send notify fd: %m");
 
+        /* If !use_cgns, then we need to do this here because without cgns cgroups can't be mounted inside of a
+         * less privileged mountns (and using userns causes the mountns to be less privileged). */
+        if (!arg_use_cgns) {
+                /* If !use_cgns, then cgroup_mount_mounts() needs to look at /proc/pid/cgroup; but because we've
+                 * already chroot()ed, we don't have access to /proc.  So the parent opens the file for us and then
+                 * sends it to us. */
+                int cgfd;
+                _cleanup_fclose_ FILE *cgfile = NULL;
+
+                cgfd = receive_one_fd(cgroup_socket, 0);
+                if (cgfd < 0)
+                        return log_error_errno(cgfd, "Failed to recv cgroup fd: %m");
+
+                cgfile = fdopen(cgfd, "re");
+                if (!cgfile) {
+                        r = -errno; /* in case safe_close() sets errno */
+                        cgfd = safe_close(cgfd);
+                        return log_error_errno(r, "Failed to create a stream object for cgroup fd: %m");
+                }
+
+                r = cgroup_mount_mounts(cgmounts,
+                                        cgfile,
+                                        arg_userns_mode == USER_NAMESPACE_NO ? UID_INVALID : arg_uid_shift,
+                                        arg_selinux_apifs_context);
+                if (r < 0)
+                        return r;
+        } else {
+                /* We're not doing anything else, but wait for a bit of data anyway; as a synchronization point, to
+                 * make sure that our SIGCHLD doesn't EINTR anything important. */
+                char c;
+                l = recv(cgroup_socket, &c, sizeof(c), 0);
+                if (l < 0)
+                        return log_error_errno(errno, "Failed to recv synchronization byte: %m");
+                if (l != sizeof(c))
+                        return log_error_errno(errno, "Short read while receiving synchronization byte: %m");
+        }
+
         pid_socket = safe_close(pid_socket);
         uuid_socket = safe_close(uuid_socket);
         notify_socket = safe_close(notify_socket);
         kmsg_socket = safe_close(kmsg_socket);
         rtnl_socket = safe_close(rtnl_socket);
+        cgroup_socket = safe_close(cgroup_socket);
 
         return 0;
 }
@@ -3149,7 +3170,8 @@ static int run(int master,
                 pid_socket_pair[2] = { -1, -1 },
                 uuid_socket_pair[2] = { -1, -1 },
                 notify_socket_pair[2] = { -1, -1 },
-                uid_shift_socket_pair[2] = { -1, -1 };
+                uid_shift_socket_pair[2] = { -1, -1 },
+                cgroup_socket_pair[2] = {-1, -1 };
         _cleanup_close_ int notify_socket= -1;
         _cleanup_(barrier_destroy) Barrier barrier = BARRIER_NULL;
         _cleanup_(sd_event_source_unrefp) sd_event_source *notify_event_source = NULL;
@@ -3201,6 +3223,9 @@ static int run(int master,
                 if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, uid_shift_socket_pair) < 0)
                         return log_error_errno(errno, "Failed to create uid shift socket pair: %m");
 
+        if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, cgroup_socket_pair) < 0)
+                return log_error_errno(errno, "Failed to create cgroup socket pair: %m");
+
         /* Child can be killed before execv(), so handle SIGCHLD in order to interrupt
          * parent's blocking calls and give it a chance to call wait() and terminate. */
         r = sigprocmask(SIG_UNBLOCK, &mask_chld, NULL);
@@ -3229,6 +3254,7 @@ static int run(int master,
                 uuid_socket_pair[0] = safe_close(uuid_socket_pair[0]);
                 notify_socket_pair[0] = safe_close(notify_socket_pair[0]);
                 uid_shift_socket_pair[0] = safe_close(uid_shift_socket_pair[0]);
+                cgroup_socket_pair[0] = safe_close(cgroup_socket_pair[0]);
 
                 (void) reset_all_signal_handlers();
                 (void) reset_signal_mask();
@@ -3245,6 +3271,7 @@ static int run(int master,
                                 kmsg_socket_pair[1],
                                 rtnl_socket_pair[1],
                                 uid_shift_socket_pair[1],
+                                cgroup_socket_pair[1],
                                 fds,
                                 outer_cgver);
                 if (r < 0)
@@ -3263,6 +3290,7 @@ static int run(int master,
         uuid_socket_pair[1] = safe_close(uuid_socket_pair[1]);
         notify_socket_pair[1] = safe_close(notify_socket_pair[1]);
         uid_shift_socket_pair[1] = safe_close(uid_shift_socket_pair[1]);
+        cgroup_socket_pair[1] = safe_close(cgroup_socket_pair[1]);
 
         if (arg_userns_mode != USER_NAMESPACE_NO) {
                 /* The child just let us know the UID shift it might have read from the image. */
@@ -3293,12 +3321,6 @@ static int run(int master,
                 }
         }
 
-        /* Wait for the outer child. */
-        r = wait_for_terminate_and_warn("namespace helper", *helper_pid, NULL);
-        *helper_pid = 0;
-        if (r != 0)
-                return r < 0 ? r : -EIO;
-
         /* And now retrieve the PID of the inner child. */
         l = recv(pid_socket_pair[0], main_pid, sizeof *main_pid, 0);
         if (l < 0)
@@ -3325,17 +3347,16 @@ static int run(int master,
 
         log_debug("Init process invoked as PID "PID_FMT, *main_pid);
 
-        if (arg_userns_mode != USER_NAMESPACE_NO) {
-                if (!barrier_place_and_sync(&barrier)) { /* #1 */
-                        log_error("Child died too early.");
-                        return -ESRCH;
-                }
+        /* Wait until the child gives us the OK to configure it. */
+        if (!barrier_place_and_sync(&barrier)) { /* #1 */
+                log_error("Child died too early.");
+                return -ESRCH;
+        }
 
+        if (arg_userns_mode != USER_NAMESPACE_NO) {
                 r = setup_uid_map(*main_pid);
                 if (r < 0)
                         return r;
-
-                (void) barrier_place(&barrier); /* #2 */
         }
 
         if (arg_private_network) {
@@ -3389,6 +3410,8 @@ static int run(int master,
         }
 
         if (arg_register) {
+                /* If the child is to be placed into a different cgroup,
+                 * this is what does it. */
                 r = register_machine(
                                 arg_machine,
                                 *main_pid,
@@ -3421,11 +3444,42 @@ static int run(int master,
         if (r < 0)
                 return r;
 
+        if (!arg_use_cgns) {
+                const char *fs;
+                _cleanup_close_ int fd;
+
+                fs = procfs_file_alloca(*main_pid, "cgroup");
+                fd = open(fs, O_RDONLY|O_CLOEXEC);
+                if (fd < 0)
+                        return log_error_errno(errno, "Failed to open cgroups of child: %m");
+
+                r = send_one_fd(cgroup_socket_pair[0], fd, 0);
+                if (r < 0)
+                        return log_error_errno(r, "Failed to send cgroup fd: %m");
+        } else {
+                /* we don't have any data to send, but sending something here is important because it acts as a
+                 * synchronization point.  Otherwise the outer child could exit earlier, and the resulting SIGCHLD
+                 * could interrupt something like register_machine() above.  We could use a barrier for this, but we
+                 * have a perfectly good socket here already. */
+                char c = '\0';
+                l = send(cgroup_socket_pair[0], &c, sizeof(c), MSG_NOSIGNAL);
+                if (l < 0)
+                        return log_error_errno(errno, "Failed to send synchronization byte: %m");
+                if (l != sizeof(c))
+                        return log_error_errno(errno, "Short write while sending synchronization byte: %m");
+        }
+
+        /* Wait for the outer child. */
+        r = wait_for_terminate_and_warn("namespace helper", *helper_pid, NULL);
+        *helper_pid = 0;
+        if (r != 0)
+                return r < 0 ? r : -EIO;
+
         /* Notify the child that the parent is ready with all
          * its setup (including cgroup-ification), and that
          * the child can now hand over control to the code to
          * run inside the container. */
-        (void) barrier_place(&barrier); /* #3 */
+        (void) barrier_place(&barrier); /* #2 */
 
         /* Block SIGCHLD here, before notifying child.
          * process_pty() will handle it with the other signals. */
@@ -3445,7 +3499,7 @@ static int run(int master,
                 return r;
 
         /* Let the child know that we are ready and wait that the child is completely ready now. */
-        if (!barrier_place_and_sync(&barrier)) { /* #4 */
+        if (!barrier_place_and_sync(&barrier)) { /* #3 */
                 log_error("Child died too early.");
                 return -ESRCH;
         }
