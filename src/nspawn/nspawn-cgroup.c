@@ -463,6 +463,32 @@ skip_controllers:
         return 0;
 }
 
+int cgroup_decide_mounts(
+                CGMounts *ret_mounts,
+                CGroupUnified outer_cgver, CGroupUnified inner_cgver,
+                bool use_cgns) {
+
+        switch (inner_cgver) {
+        case CGROUP_UNIFIED_NONE:
+        case CGROUP_UNIFIED_SYSTEMD:
+                /* Historically, if use_cgns, then this ran inside the container; if !use_cgns, then it ran outside.
+                 * The use_cgns one had to be added because running inside the container, it couldn't look at the host
+                 * '/sys'.  Now that they both run outside the container again, I'm afraid to unify them because I'm
+                 * worried that someone depends on the subtle differences in their behavior. */
+                if (use_cgns)
+                        return cgroup_decide_mounts_sd_y_cgns(ret_mounts, outer_cgver, inner_cgver);
+                else
+                        return cgroup_decide_mounts_sd_n_cgns(ret_mounts, outer_cgver, inner_cgver);
+        case CGROUP_UNIFIED_ALL:
+                if (!cgmount_add(ret_mounts, CGMOUNT_CGROUP2, "cgroup", ""))
+                        return log_oom();
+                return 0;
+        default:
+                assert_not_reached("Invalid cgroup ver requested");
+                return -EINVAL;
+        }
+}
+
 /********************************************************************/
 
 static int cgroup_mount_cg(
@@ -566,38 +592,6 @@ int cgroup_mount_mounts(CGMounts m, bool use_cgns, uid_t uid_shift, const char *
 }
 
 /********************************************************************/
-
-int mount_cgroups(
-                const char *dest,
-                CGroupUnified outer_cgver, CGroupUnified inner_cgver,
-                bool use_userns, uid_t uid_shift, uid_t uid_range,
-                const char *selinux_apifs_context,
-                bool use_cgns) {
-
-        _cleanup_(cgroup_free_mounts) CGMounts mounts = {};
-        int r;
-
-        switch (inner_cgver) {
-        case CGROUP_UNIFIED_NONE:
-        case CGROUP_UNIFIED_SYSTEMD:
-                if (use_cgns)
-                        r = cgroup_decide_mounts_sd_y_cgns(&mounts, outer_cgver, inner_cgver);
-                else
-                        r = cgroup_decide_mounts_sd_n_cgns(&mounts, outer_cgver, inner_cgver);
-                if (r < 0)
-                        return r;
-                break;
-        case CGROUP_UNIFIED_ALL:
-                if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "cgroup", ""))
-                        return log_oom();
-                break;
-        default:
-                assert_not_reached("Invalid cgroup ver requested");
-                return -EINVAL;
-        }
-
-        return cgroup_mount_mounts(mounts, use_cgns, use_userns ? uid_shift : UID_INVALID, selinux_apifs_context);
-}
 
 int mount_systemd_cgroup_writable(
                 const char *dest,
