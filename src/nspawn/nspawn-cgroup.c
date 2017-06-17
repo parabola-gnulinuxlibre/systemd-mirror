@@ -35,6 +35,68 @@
 #include "nspawn-cgroup.h"
 #include "nspawn-mount.h"
 
+/* Code for managing the list of CGMounts ***************************/
+
+typedef enum CGMountType {
+        CGMOUNT_SYMLINK,
+        CGMOUNT_TMPFS,
+        CGMOUNT_CGROUP1,
+        CGMOUNT_CGROUP2,
+        _CGMOUNT_MAX
+} CGMountType;
+
+struct CGMount {
+        CGMountType type;
+        char *src;
+        char *dst;
+};
+
+static CGMount *cgmount_add(CGMounts *mounts, CGMountType type, const char *src, const char *dst) {
+
+        char *hsrc = NULL, *hdst = NULL;
+        CGMount *c, *ret;
+
+        assert(mounts);
+        assert(type >= 0 && type < _CGMOUNT_MAX);
+        assert(src);
+        assert(dst);
+
+        hsrc = strdup(src);
+        hdst = strdup(dst);
+        if (!hsrc || !hdst) {
+                free(hsrc);
+                free(hdst);
+                return NULL;
+        }
+
+        c = realloc_multiply(mounts->mounts, sizeof(CGMount), mounts->n + 1);
+        if (!c)
+                return NULL;
+
+        mounts->mounts = c;
+        ret = &(mounts->mounts)[mounts->n];
+        (mounts->n)++;
+
+        *ret = (CGMount) {
+                .type = type,
+                .src = hsrc,
+                .dst = hdst,
+        };
+        return ret;
+}
+
+void cgroup_free_mounts(CGMounts *mounts) {
+
+        for (size_t i = 0; i < mounts->n; i++) {
+                free(mounts->mounts[i].src);
+                free(mounts->mounts[i].dst);
+        }
+        mounts->mounts = mfree(mounts->mounts);
+        mounts->n = 0;
+}
+
+/********************************************************************/
+
 static int chown_cgroup_path(const char *path, uid_t uid_shift) {
         _cleanup_close_ int fd = -1;
         const char *fn;
@@ -564,6 +626,116 @@ static int mount_unified_cgroups(const char *dest) {
 
         return mount_verbose(LOG_ERR, "cgroup", p, "cgroup2", MS_NOSUID|MS_NOEXEC|MS_NODEV, NULL);
 }
+
+/********************************************************************/
+
+static int cgroup_mount_cg(
+                const char *mountpoint, const char *opts, CGMountType fstype,
+                bool use_cgns, bool use_userns) {
+
+        /* If we are using userns and cgns, then we always let it be RW, because we can count on the shifted root user
+         * to not have access to the things that would make us want to mount it RO.  Otherwise, we only give the
+         * container RW access to its unified or name=systemd cgroup. */
+        const bool rw = (use_userns && use_cgns) || fstype == CGMOUNT_CGROUP2 || streq(mountpoint, "/sys/fs/cgroup/systemd");
+
+        int r;
+
+        /* The superblock mount options of the mount point need to be
+         * identical to the hosts', and hence writable... */
+        r = mount_verbose(LOG_ERR, "cgroup", mountpoint, fstype == CGMOUNT_CGROUP1 ? "cgroup" : "cgroup2",
+                          MS_NOSUID|MS_NOEXEC|MS_NODEV, opts);
+        if (r < 0)
+                return r;
+
+        /* ... hence let's only make the bind mount read-only, not the superblock. */
+        if (!rw) {
+                r = mount_verbose(LOG_ERR, NULL, mountpoint, NULL,
+                                  MS_BIND|MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_RDONLY, NULL);
+                if (r < 0)
+                        return r;
+        }
+
+        return 0;
+}
+
+int cgroup_mount_mounts(
+                const char *dest,
+                CGMounts m,
+                bool use_cgns,
+                uid_t uid_shift,
+                const char *selinux_apifs_context) {
+
+        const bool use_userns = uid_shift != UID_INVALID;
+        const char *cgroup_root = prefix_roota(dest, "/sys/fs/cgroup");
+
+        bool used_tmpfs = false;
+
+        for (size_t i = 0; i < m.n; i++) {
+                _cleanup_free_ char *options = NULL;
+                const char *dst;
+                int r;
+
+                dst = prefix_roota(cgroup_root, m.mounts[i].dst);
+
+                /* The checks here to see if things are already mounted are kind of primative.  Perhaps they should
+                 * actually check the statfs() f_type to verify that the thing mounted is what we want to be mounted
+                 * (similar to cgroup-util's detection logic)?  But I don't really understand the use-case for having
+                 * any of these already mounted, so I'm not sure if such increased strictness would be unwelcome. */
+
+                switch (m.mounts[i].type) {
+                case CGMOUNT_SYMLINK:
+                        (void) mkdir_parents(dst, 0755);
+                        r = symlink_idempotent(m.mounts[i].src, dst);
+                        if (r < 0)
+                                return r;
+                        break;
+                case CGMOUNT_TMPFS:
+                        used_tmpfs = true;
+                        r = path_is_mount_point(dst, dest, path_equal(cgroup_root, dst) ? AT_SYMLINK_FOLLOW : 0);
+                        if (r < 0)
+                                return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
+                        if (r > 0)
+                                continue;
+                        r = tmpfs_patch_options(m.mounts[i].src, uid_shift, selinux_apifs_context, &options);
+                        if (r < 0)
+                                return log_oom();
+                        r = mount_verbose(LOG_ERR, /*name*/"tmpfs", dst, /*fstype*/"tmpfs",
+                                          MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME, options);
+                        if (r < 0)
+                                return r;
+                        break;
+                case CGMOUNT_CGROUP1:
+                case CGMOUNT_CGROUP2:
+                        r = path_is_mount_point(dst, dest, path_equal(cgroup_root, dst) ? AT_SYMLINK_FOLLOW : 0);
+                        if (r < 0 && r != -ENOENT)
+                                return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
+                        if (r > 0) {
+                                if (access(prefix_roota(dst, "cgroup.procs"), F_OK) >= 0)
+                                        continue;
+                                if (errno != ENOENT)
+                                        return log_error_errno(errno, "Failed to determine if mount point %s is a cgroup hierarchy: %m", dst);
+                                return log_error_errno(EINVAL, "%s is already mounted but not a cgroup hierarchy. Refusing.", dst);
+                        }
+                        (void) mkdir_p(dst, 0755);
+                        r = cgroup_mount_cg(dst, m.mounts[i].src, m.mounts[i].type, use_cgns, use_userns);
+                        if (r < 0)
+                                return r;
+                        break;
+                default:
+                        assert_not_reached("Invalid CGMount type");
+                        return -EINVAL;
+                }
+        }
+
+        /* I'm going to be honest: I don't understand why we don't do this if we're using both userns and cgns. */
+        if (used_tmpfs && (!use_userns || !use_cgns))
+                return mount_verbose(LOG_ERR, NULL, "/sys/fs/cgroup", NULL,
+                                     MS_REMOUNT|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_STRICTATIME|MS_RDONLY, "mode=755");
+
+        return 0;
+}
+
+/********************************************************************/
 
 int mount_cgroups(
                 const char *dest,
