@@ -3277,6 +3277,7 @@ systemd_nspawn_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(ACL_CFLAGS) \
 	$(BLKID_CFLAGS) \
+	$(MOUNT_CFLAGS) \
 	$(SECCOMP_CFLAGS) \
 	$(SELINUX_CFLAGS)
 
@@ -3284,6 +3285,7 @@ systemd_nspawn_LDADD = \
 	libsystemd-shared.la \
 	$(ACL_LIBS) \
 	$(BLKID_LIBS) \
+	$(MOUNT_LIBS) \
 	$(SECCOMP_LIBS) \
 	$(SELINUX_LIBS)
 
