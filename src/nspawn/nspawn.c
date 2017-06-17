@@ -318,7 +318,8 @@ static int custom_mounts_prepare(void) {
 
 static int detect_unified_cgroup_hierarchy(const char *directory) {
         const char *e;
-        int r, all_unified, systemd_unified;
+        int r;
+        CGroupUnified outer;
 
         /* Allow the user to control whether the unified hierarchy is used */
         e = getenv("UNIFIED_CGROUP_HIERARCHY");
@@ -334,17 +335,25 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                 return 0;
         }
 
-        all_unified = cg_all_unified();
-        systemd_unified = cg_unified(SYSTEMD_CGROUP_CONTROLLER);
+        r = cg_version(&outer);
+        if (r < 0)
+                return log_error_errno(r, "Failed to determine whether the unified cgroups hierarchy is used: %m");
 
-        if (all_unified < 0 || systemd_unified < 0)
-                return log_error_errno(all_unified < 0 ? all_unified : systemd_unified,
-                                       "Failed to determine whether the unified cgroups hierarchy is used: %m");
-
-        /* Otherwise inherit the default from the host system */
-        if (all_unified > 0) {
-                /* Unified cgroup hierarchy support was added in 230. Unfortunately the detection
-                 * routine only detects 231, so we'll have a false negative here for 230. */
+        /* Otherwise inherit the default from the host system, unless
+         * the container doesn't have a new enough systemd (detected
+         * by checking libsystemd-shared). */
+        switch (outer) {
+        default:
+        case CGROUP_UNIFIED_UNKNOWN:
+                assert_not_reached("Unknown host cgroup version");
+                break;
+        case CGROUP_UNIFIED_NONE: /* cgroup v1-sd */
+                arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                break;
+        case CGROUP_UNIFIED_ALL: /* cgroup v2 */
+                /* Unified cgroup hierarchy support was added in 230. Unfortunately libsystemd-shared,
+                 * which we use to sniff the systemd version, was only added in 231, so we'll have a
+                 * false negative here for 230. */
                 r = systemd_installation_has_version(directory, 230);
                 if (r < 0)
                         return log_error_errno(r, "Failed to determine systemd version in container: %m");
@@ -352,7 +361,8 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
                 else
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-        } else if (systemd_unified > 0) {
+                break;
+        case CGROUP_UNIFIED_SYSTEMD: /* cgroup v1/v2 mixed-sd232 */
                 /* Mixed cgroup hierarchy support was added in 232 */
                 r = systemd_installation_has_version(directory, 232);
                 if (r < 0)
@@ -361,8 +371,8 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD;
                 else
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-        } else
-                arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                break;
+        }
 
         return 0;
 }
