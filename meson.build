@@ -544,7 +544,7 @@ conf.set_quoted('DEFAULT_HIERARCHY_NAME', default_hierarchy,
 if default_hierarchy == 'legacy'
         conf.set('DEFAULT_HIERARCHY', 'CGROUP_UNIFIED_NONE')
 elif default_hierarchy == 'hybrid'
-        conf.set('DEFAULT_HIERARCHY', 'CGROUP_UNIFIED_SYSTEMD')
+        conf.set('DEFAULT_HIERARCHY', 'CGROUP_UNIFIED_SYSTEMD233')
 else
         conf.set('DEFAULT_HIERARCHY', 'CGROUP_UNIFIED_ALL')
 endif

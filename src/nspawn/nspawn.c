@@ -352,7 +352,7 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                 if (r < 0)
                         return log_error_errno(r, "Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD;
+                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD233;
                 else
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
         } else
