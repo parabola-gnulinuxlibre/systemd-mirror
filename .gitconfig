@@ -16,6 +16,11 @@
 	remote = r-systemd
 	merge = refs/heads/master
 
+[remote "r-systemd-stable"]
+	url = https://github.com/systemd/systemd-stable.git
+	fetch = +refs/heads/*:refs/remotes/r-systemd-stable/*
+	tagopt = --no-tags
+
 [remote "r-elogind"]
 	url = https://github.com/wingo/elogind.git
 	fetch = +refs/heads/*:refs/remotes/r-elogind/*
