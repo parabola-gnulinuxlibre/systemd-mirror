@@ -17,6 +17,10 @@
 #include "user-util.h"
 #include "util.h"
 
+/* Code for managing the list of CGMounts ***************************/
+
+/* cgroup-util ******************************************************/
+
 static int chown_cgroup_path(const char *path, uid_t uid_shift) {
         _cleanup_close_ int fd = -1;
         const char *fn;
@@ -42,6 +46,8 @@ static int chown_cgroup_path(const char *path, uid_t uid_shift) {
 
         return 0;
 }
+
+/* cgroup_setup *****************************************************/
 
 static int chown_cgroup(pid_t pid, CGroupUnified inner_cgver, uid_t uid_shift) {
         _cleanup_free_ char *path = NULL, *fs = NULL;
@@ -208,6 +214,8 @@ int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver
 
         return 0;
 }
+
+/* cgroup_decide_mounts *********************************************/
 
 /* Retrieve a list of cgroup v1 hierarchies. */
 static int get_v1_hierarchies(Set **ret) {
@@ -570,6 +578,10 @@ static int mount_unified_cgroups(const char *dest) {
 
         return mount_verbose(LOG_ERR, "cgroup", p, "cgroup2", MS_NOSUID|MS_NOEXEC|MS_NODEV, NULL);
 }
+
+/* cgroup_mount_mounts **********************************************/
+
+/* mount_cgroups, mount_systemd_cgroup_writable *********************/
 
 int mount_cgroups(
                 const char *dest,
