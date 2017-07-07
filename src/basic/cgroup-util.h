@@ -120,8 +120,9 @@ static inline bool CGROUP_BLKIO_WEIGHT_IS_OK(uint64_t x) {
 typedef enum CGroupUnified {
         CGROUP_UNIFIED_UNKNOWN = -1,
         CGROUP_UNIFIED_NONE = 0,        /* Both systemd and controllers on legacy */
-        CGROUP_UNIFIED_SYSTEMD = 1,     /* Only systemd on unified */
-        CGROUP_UNIFIED_ALL = 2,         /* Both systemd and controllers on unified */
+        CGROUP_UNIFIED_SYSTEMD232 = 1,  /* Only systemd on unified, as done by SD232 */
+        CGROUP_UNIFIED_SYSTEMD233 = 2,  /* Only systemd on unified, as done by SD233+ */
+        CGROUP_UNIFIED_ALL = 3,         /* Both systemd and controllers on unified */
 } CGroupUnified;
 
 /*

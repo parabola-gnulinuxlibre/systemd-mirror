@@ -88,7 +88,7 @@ int sync_cgroup(pid_t pid, CGroupUnified inner_cgver, uid_t uid_shift) {
         unified_controller = cg_unified_controller(SYSTEMD_CGROUP_CONTROLLER);
         if (unified_controller < 0)
                 return log_error_errno(unified_controller, "Failed to determine whether the systemd hierarchy is unified: %m");
-        if ((unified_controller > 0) == (inner_cgver >= CGROUP_UNIFIED_SYSTEMD))
+        if ((unified_controller > 0) == (inner_cgver >= CGROUP_UNIFIED_SYSTEMD232))
                 return 0;
 
         /* When the host uses the legacy cgroup setup, but the
@@ -373,7 +373,7 @@ static int mount_legacy_cgns_supported(
         }
 
 skip_controllers:
-        if (inner_cgver >= CGROUP_UNIFIED_SYSTEMD) {
+        if (inner_cgver >= CGROUP_UNIFIED_SYSTEMD232) {
                 r = mount_legacy_cgroup_hierarchy("", SYSTEMD_CGROUP_CONTROLLER_HYBRID, "unified", false);
                 if (r < 0)
                         return r;
@@ -486,7 +486,7 @@ static int mount_legacy_cgns_unsupported(
         }
 
 skip_controllers:
-        if (inner_cgver >= CGROUP_UNIFIED_SYSTEMD) {
+        if (inner_cgver >= CGROUP_UNIFIED_SYSTEMD232) {
                 r = mount_legacy_cgroup_hierarchy(dest, SYSTEMD_CGROUP_CONTROLLER_HYBRID, "unified", false);
                 if (r < 0)
                         return r;
@@ -579,7 +579,7 @@ int mount_systemd_cgroup_writable(
                 return mount_systemd_cgroup_writable_one(strjoina(dest, "/sys/fs/cgroup", own_cgroup_path),
                                                          prefix_roota(dest, "/sys/fs/cgroup"));
 
-        if (inner_cgver >= CGROUP_UNIFIED_SYSTEMD) {
+        if (inner_cgver >= CGROUP_UNIFIED_SYSTEMD232) {
                 r = mount_systemd_cgroup_writable_one(strjoina(dest, "/sys/fs/cgroup/unified", own_cgroup_path),
                                                       prefix_roota(dest, "/sys/fs/cgroup/unified"));
                 if (r < 0)
