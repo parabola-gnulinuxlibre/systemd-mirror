@@ -467,7 +467,7 @@ int mount_sysfs(const char *dest, MountSettingsMask mount_settings) {
                              MS_BIND|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_REMOUNT|extra_flags, NULL);
 }
 
-static int mkdir_userns(const char *path, mode_t mode, MountSettingsMask mask, uid_t uid_shift) {
+static int mkdir_userns(const char *path, mode_t mode, uid_t uid_shift) {
         int r;
 
         assert(path);
@@ -476,10 +476,7 @@ static int mkdir_userns(const char *path, mode_t mode, MountSettingsMask mask, u
         if (r < 0 && errno != EEXIST)
                 return -errno;
 
-        if ((mask & MOUNT_USE_USERNS) == 0)
-                return 0;
-
-        if (mask & MOUNT_IN_USERNS)
+        if (uid_shift == UID_INVALID)
                 return 0;
 
         r = lchown(path, uid_shift, uid_shift);
@@ -489,7 +486,7 @@ static int mkdir_userns(const char *path, mode_t mode, MountSettingsMask mask, u
         return 0;
 }
 
-static int mkdir_userns_p(const char *prefix, const char *path, mode_t mode, MountSettingsMask mask, uid_t uid_shift) {
+static int mkdir_userns_p(const char *prefix, const char *path, mode_t mode, uid_t uid_shift) {
         const char *p, *e;
         int r;
 
@@ -516,12 +513,12 @@ static int mkdir_userns_p(const char *prefix, const char *path, mode_t mode, Mou
                 if (prefix && path_startswith(prefix, t))
                         continue;
 
-                r = mkdir_userns(t, mode, mask, uid_shift);
+                r = mkdir_userns(t, mode, uid_shift);
                 if (r < 0)
                         return r;
         }
 
-        return mkdir_userns(path, mode, mask, uid_shift);
+        return mkdir_userns(path, mode, uid_shift);
 }
 
 int mount_all(const char *dest,
@@ -595,7 +592,7 @@ int mount_all(const char *dest,
                 if (mount_table[k].what && r > 0)
                         continue;
 
-                r = mkdir_userns_p(dest, where, 0755, mount_settings, uid_shift);
+                r = mkdir_userns_p(dest, where, 0755, (use_userns && !in_userns) ? uid_shift : UID_INVALID);
                 if (r < 0 && r != -EEXIST) {
                         if (fatal)
                                 return log_error_errno(r, "Failed to create directory %s: %m", where);
