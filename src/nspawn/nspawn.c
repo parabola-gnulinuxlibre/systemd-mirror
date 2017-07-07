@@ -366,7 +366,7 @@ static int detect_inner_cgver_from_image(const char *directory) {
                 if (r < 0)
                         return log_error_errno(r, "Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_inner_cgver = CGROUP_UNIFIED_SYSTEMD;
+                        arg_inner_cgver = CGROUP_UNIFIED_SYSTEMD233;
                 else
                         arg_inner_cgver = CGROUP_UNIFIED_NONE;
         } else
@@ -374,7 +374,7 @@ static int detect_inner_cgver_from_image(const char *directory) {
 
         log_debug("Using %s hierarchy for container.",
                   arg_inner_cgver == CGROUP_UNIFIED_NONE ? "legacy" :
-                  arg_inner_cgver == CGROUP_UNIFIED_SYSTEMD ? "hybrid" : "unified");
+                  arg_inner_cgver == CGROUP_UNIFIED_SYSTEMD233 ? "hybrid" : "unified");
 
         return 0;
 }

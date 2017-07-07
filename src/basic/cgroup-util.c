@@ -2445,17 +2445,6 @@ int cg_kernel_controllers(Set **ret) {
 
 static thread_local CGroupUnified unified_cache = CGROUP_UNIFIED_UNKNOWN;
 
-/* The hybrid mode was initially implemented in v232 and simply mounted cgroup v2 on /sys/fs/cgroup/systemd.  This
- * unfortunately broke other tools (such as docker) which expected the v1 "name=systemd" hierarchy on
- * /sys/fs/cgroup/systemd.  From v233 and on, the hybrid mode mountnbs v2 on /sys/fs/cgroup/unified and maintains
- * "name=systemd" hierarchy on /sys/fs/cgroup/systemd for compatibility with other tools.
- *
- * To keep live upgrade working, we detect and support v232 layout.  When v232 layout is detected, to keep cgroup v2
- * process management but disable the compat dual layout, we return %true on
- * cg_unified_controller(SYSTEMD_CGROUP_CONTROLLER) and %false on cg_hybrid_unified().
- */
-static thread_local bool unified_systemd_v232;
-
 static int cg_unified_update(void) {
 
         struct statfs fs;
@@ -2478,16 +2467,14 @@ static int cg_unified_update(void) {
                 if (statfs("/sys/fs/cgroup/unified/", &fs) == 0 &&
                     F_TYPE_EQUAL(fs.f_type, CGROUP2_SUPER_MAGIC)) {
                         log_debug("Found cgroup2 on /sys/fs/cgroup/unified, unified hierarchy for systemd controller");
-                        unified_cache = CGROUP_UNIFIED_SYSTEMD;
-                        unified_systemd_v232 = false;
+                        unified_cache = CGROUP_UNIFIED_SYSTEMD233;
                 } else {
                         if (statfs("/sys/fs/cgroup/systemd/", &fs) < 0)
                                 return log_debug_errno(errno, "statfs(\"/sys/fs/cgroup/systemd\" failed: %m");
 
                         if (F_TYPE_EQUAL(fs.f_type, CGROUP2_SUPER_MAGIC)) {
                                 log_debug("Found cgroup2 on /sys/fs/cgroup/systemd, unified hierarchy for systemd controller (v232 variant)");
-                                unified_cache = CGROUP_UNIFIED_SYSTEMD;
-                                unified_systemd_v232 = true;
+                                unified_cache = CGROUP_UNIFIED_SYSTEMD232;
                         } else if (F_TYPE_EQUAL(fs.f_type, CGROUP_SUPER_MAGIC)) {
                                 log_debug("Found cgroup on /sys/fs/cgroup/systemd, legacy hierarchy");
                                 unified_cache = CGROUP_UNIFIED_NONE;
@@ -2539,7 +2526,7 @@ int cg_hybrid_unified(void) {
         if (r < 0)
                 return r;
 
-        return unified_cache == CGROUP_UNIFIED_SYSTEMD && !unified_systemd_v232;
+        return unified_cache == CGROUP_UNIFIED_SYSTEMD233;
 }
 
 int cg_unified_flush(void) {
@@ -2645,7 +2632,7 @@ bool cg_is_hybrid_wanted(void) {
         static thread_local int wanted = -1;
         int r;
         bool b;
-        const bool is_default = DEFAULT_HIERARCHY >= CGROUP_UNIFIED_SYSTEMD;
+        const bool is_default = DEFAULT_HIERARCHY >= CGROUP_UNIFIED_SYSTEMD232;
         /* We default to true if the default is "hybrid", obviously,
          * but also when the default is "unified", because if we get
          * called, it means that unified hierarchy was not mounted. */
