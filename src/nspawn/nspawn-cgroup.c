@@ -88,7 +88,7 @@ int sync_cgroup(pid_t pid, CGroupUnified inner_cgver, uid_t uid_shift) {
         unified_controller = cg_unified_controller(SYSTEMD_CGROUP_CONTROLLER);
         if (unified_controller < 0)
                 return log_error_errno(unified_controller, "Failed to determine whether the systemd hierarchy is unified: %m");
-        if ((unified_controller > 0) == (inner_cgver >= CGROUP_UNIFIED_SYSTEMD))
+        if ((unified_controller > 0) == (inner_cgver >= CGROUP_VER_MIXED_SD232))
                 return 0;
 
         /* When the host uses the legacy cgroup setup, but the
@@ -155,7 +155,7 @@ int create_subcgroup(pid_t pid, CGroupUnified inner_cgver) {
          * did not create a scope unit for the container move us and
          * the container into two separate subcgroups. */
 
-        if (inner_cgver == CGROUP_UNIFIED_NONE)
+        if (inner_cgver == CGROUP_VER_1_SD)
                 return 0;
 
         r = cg_unified_controller(SYSTEMD_CGROUP_CONTROLLER);
@@ -373,7 +373,7 @@ static int mount_legacy_cgns_supported(
         }
 
 skip_controllers:
-        if (inner_cgver >= CGROUP_UNIFIED_SYSTEMD) {
+        if (inner_cgver == CGROUP_VER_MIXED_SD233) {
                 r = mount_legacy_cgroup_hierarchy("", SYSTEMD_CGROUP_CONTROLLER_HYBRID, "unified", false);
                 if (r < 0)
                         return r;
@@ -486,7 +486,7 @@ static int mount_legacy_cgns_unsupported(
         }
 
 skip_controllers:
-        if (inner_cgver >= CGROUP_UNIFIED_SYSTEMD) {
+        if (inner_cgver == CGROUP_VER_MIXED_SD233) {
                 r = mount_legacy_cgroup_hierarchy(dest, SYSTEMD_CGROUP_CONTROLLER_HYBRID, "unified", false);
                 if (r < 0)
                         return r;
@@ -536,7 +536,7 @@ int mount_cgroups(
                 const char *selinux_apifs_context,
                 bool use_cgns) {
 
-        if (inner_cgver >= CGROUP_UNIFIED_ALL)
+        if (inner_cgver == CGROUP_VER_2)
                 return mount_unified_cgroups(dest);
         else if (use_cgns)
                 return mount_legacy_cgns_supported(dest, inner_cgver, userns, uid_shift, uid_range, selinux_apifs_context);
@@ -575,11 +575,11 @@ int mount_systemd_cgroup_writable(
         if (path_equal(own_cgroup_path, "/"))
                 return 0;
 
-        if (inner_cgver >= CGROUP_UNIFIED_ALL)
+        if (inner_cgver == CGROUP_VER_2)
                 return mount_systemd_cgroup_writable_one(strjoina(dest, "/sys/fs/cgroup", own_cgroup_path),
                                                          prefix_roota(dest, "/sys/fs/cgroup"));
 
-        if (inner_cgver >= CGROUP_UNIFIED_SYSTEMD) {
+        if (inner_cgver == CGROUP_VER_MIXED_SD233) {
                 r = mount_systemd_cgroup_writable_one(strjoina(dest, "/sys/fs/cgroup/unified", own_cgroup_path),
                                                       prefix_roota(dest, "/sys/fs/cgroup/unified"));
                 if (r < 0)

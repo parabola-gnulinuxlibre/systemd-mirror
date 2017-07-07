@@ -197,7 +197,7 @@ static UserNamespaceMode arg_userns_mode = USER_NAMESPACE_NO;
 static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
 static bool arg_userns_chown = false;
 static int arg_kill_signal = 0;
-static CGroupUnified arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_UNKNOWN;
+static CGroupUnified arg_unified_cgroup_hierarchy = CGROUP_VER_UNKNOWN;
 static SettingsMask arg_settings_mask = 0;
 static int arg_settings_trusted = -1;
 static char **arg_parameters = NULL;
@@ -325,9 +325,9 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                 if (r < 0)
                         return log_error_errno(r, "Failed to parse $UNIFIED_CGROUP_HIERARCHY.");
                 if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
+                        arg_unified_cgroup_hierarchy = CGROUP_VER_2;
                 else
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                        arg_unified_cgroup_hierarchy = CGROUP_VER_1_SD;
 
                 return 0;
         }
@@ -343,20 +343,20 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                 if (r < 0)
                         return log_error_errno(r, "Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
+                        arg_unified_cgroup_hierarchy = CGROUP_VER_2;
                 else
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                        arg_unified_cgroup_hierarchy = CGROUP_VER_1_SD;
         } else if (cg_unified_controller(SYSTEMD_CGROUP_CONTROLLER) > 0) {
                 /* Mixed cgroup hierarchy support was added in 233 */
                 r = systemd_installation_has_version(directory, 233);
                 if (r < 0)
                         return log_error_errno(r, "Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD;
+                        arg_unified_cgroup_hierarchy = CGROUP_VER_MIXED_SD233;
                 else
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                        arg_unified_cgroup_hierarchy = CGROUP_VER_1_SD;
         } else
-                arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                arg_unified_cgroup_hierarchy = CGROUP_VER_1_SD;
 
         return 0;
 }

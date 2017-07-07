@@ -118,10 +118,11 @@ static inline bool CGROUP_BLKIO_WEIGHT_IS_OK(uint64_t x) {
 #define DEFAULT_USER_TASKS_MAX_PERCENTAGE       33U /* 33% of PIDs, 10813 on default settings */
 
 typedef enum CGroupUnified {
-        CGROUP_UNIFIED_UNKNOWN = -1,
-        CGROUP_UNIFIED_NONE = 0,        /* Both systemd and controllers on legacy */
-        CGROUP_UNIFIED_SYSTEMD = 1,     /* Only systemd on unified */
-        CGROUP_UNIFIED_ALL = 2,         /* Both systemd and controllers on unified */
+        CGROUP_VER_UNKNOWN = -1,
+        CGROUP_VER_1_SD = 0,        /* Both systemd and controllers on legacy */
+        CGROUP_VER_MIXED_SD232 = 1, /* Only systemd on unified, as done by SD232 */
+        CGROUP_VER_MIXED_SD233 = 2, /* Only systemd on unified, as done by SD233+ */
+        CGROUP_VER_2 = 3,           /* Both systemd and controllers on unified */
 } CGroupUnified;
 
 /*

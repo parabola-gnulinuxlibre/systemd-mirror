@@ -622,9 +622,9 @@ AC_ARG_WITH(default-hierarchy,
         [DEFAULT_HIERARCHY="hybrid"])
 
 AS_CASE("$DEFAULT_HIERARCHY",
-        [legacy], [mode=CGROUP_UNIFIED_NONE],
-        [hybrid], [mode=CGROUP_UNIFIED_SYSTEMD],
-        [unified], [mode=CGROUP_UNIFIED_ALL],
+        [legacy], [mode=CGROUP_VER_1_SD],
+        [hybrid], [mode=CGROUP_VER_MIXED_SD233],
+        [unified], [mode=CGROUP_VER_2],
         AC_MSG_ERROR(Bad default hierarchy mode ${DEFAULT_HIERARCHY}))
 AC_DEFINE_UNQUOTED(DEFAULT_HIERARCHY, [$mode], [Default cgroup hierarchy])
 AC_DEFINE_UNQUOTED(DEFAULT_HIERARCHY_NAME, ["$DEFAULT_HIERARCHY"],
