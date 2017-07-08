@@ -333,7 +333,8 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                 return 0;
         }
 
-        /* Otherwise inherit the default from the host system */
+        /* By default, inherit from the host system, unless the container doesn't have a new enough systemd (detected
+         * by checking libsystemd-shared). */
         r = cg_version(&outer_cgver);
         if (r < 0)
                 return log_error_errno(r, "Failed to determine whether we are in all unified mode.");
@@ -342,8 +343,8 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
         case CGROUP_UNIFIED_UNKNOWN:
                 assert_not_reached("unknown cgroup version");
         case CGROUP_UNIFIED_ALL:
-                /* Unified cgroup hierarchy support was added in 230. Unfortunately the detection
-                 * routine only detects 231, so we'll have a false negative here for 230. */
+                /* Unified cgroup hierarchy support was added in 230.  Unfortunately, libsystemd-shared (which we use
+                 * to sniff the systemd version) was only added in 231, so we'll have a false negative here for 230. */
                 r = systemd_installation_has_version(directory, 230);
                 if (r < 0)
                         return log_error_errno(r, "Failed to determine systemd version in container: %m");
