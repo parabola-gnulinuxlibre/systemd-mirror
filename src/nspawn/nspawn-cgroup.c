@@ -246,7 +246,7 @@ static int get_v1_hierarchies(Set **ret) {
 
                 *e = 0;
 
-                if (STR_IN_SET(l, "", "name=systemd", "name=unified"))
+                if (STR_IN_SET(l, "", "name=systemd"))
                         continue;
 
                 r = set_put_strdup(controllers, l);
