@@ -230,7 +230,7 @@ static int get_v1_hierarchies(Set *subsystems) {
 
                 *e = 0;
 
-                if (STR_IN_SET(l, "", "name=systemd", "name=unified"))
+                if (STR_IN_SET(l, "", "name=systemd"))
                         continue;
 
                 p = strdup(l);
