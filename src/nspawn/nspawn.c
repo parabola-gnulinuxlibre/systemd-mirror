@@ -3537,10 +3537,6 @@ int main(int argc, char *argv[]) {
         log_parse_environment();
         log_open();
 
-        r = cg_version(&outer_cgver);
-        if (r < 0)
-                return log_error_errno(r, "Failed to determine whether the unified cgroups hierarchy is used: %m");
-
         /* Make sure rename_process() in the stub init process can work */
         saved_argv = argv;
         saved_argc = argc;
@@ -3554,6 +3550,13 @@ int main(int argc, char *argv[]) {
                 r = -EPERM;
                 goto finish;
         }
+
+        r = cg_version(&outer_cgver);
+        if (r < 0) {
+                log_error_errno(r, "Failed to determine whether the unified cgroup hierarchy is used: %m");
+                goto finish;
+        }
+
         r = determine_names();
         if (r < 0)
                 goto finish;
