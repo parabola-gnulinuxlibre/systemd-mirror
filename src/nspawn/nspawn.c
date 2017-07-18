@@ -314,15 +314,11 @@ static int custom_mount_check_all(void) {
         return 0;
 }
 
-static int pick_cgroup_version(const char *directory) {
+static int pick_cgroup_version(const char *directory, CGroupUnified outer_cgver) {
         int r;
-        CGroupUnified outer_cgver;
 
         /* By default, inherit from the host system, unless the container doesn't have a new enough systemd (detected
          * by checking libsystemd-shared). */
-        r = cg_version(&outer_cgver);
-        if (r < 0)
-                return log_error_errno(r, "Failed to determine whether we are in all unified mode.");
         switch (outer_cgver) {
         default:
         case CGROUP_UNIFIED_UNKNOWN:
@@ -1160,10 +1156,6 @@ static int parse_argv(int argc, char *argv[]) {
                 arg_settings_mask = _SETTINGS_MASK_ALL;
 
         arg_caps_retain = (arg_caps_retain | plus | (arg_private_network ? 1ULL << CAP_NET_ADMIN : 0)) & ~minus;
-
-        r = cg_unified_flush();
-        if (r < 0)
-                return log_error_errno(r, "Failed to determine whether the unified cgroups hierarchy is used: %m");
 
         e = getenv("SYSTEMD_NSPAWN_CONTAINER_SERVICE");
         if (e)
@@ -2170,7 +2162,8 @@ static int inner_child(
                 bool secondary,
                 int kmsg_socket,
                 int rtnl_socket,
-                FDSet *fds) {
+                FDSet *fds,
+                CGroupUnified outer_cgver) {
 
         _cleanup_free_ char *home = NULL;
         char as_uuid[37];
@@ -2237,6 +2230,7 @@ static int inner_child(
                         return log_error_errno(errno, "Failed to unshare cgroup namespace");
                 r = mount_cgroups(
                                 "",
+                                outer_cgver,
                                 arg_unified_cgroup_hierarchy,
                                 arg_userns_mode != USER_NAMESPACE_NO,
                                 arg_uid_shift,
@@ -2451,7 +2445,8 @@ static int outer_child(
                 int kmsg_socket,
                 int rtnl_socket,
                 int uid_shift_socket,
-                FDSet *fds) {
+                FDSet *fds,
+                CGroupUnified outer_cgver) {
 
         pid_t pid;
         ssize_t l;
@@ -2652,6 +2647,7 @@ static int outer_child(
         if (!arg_use_cgns) {
                 r = mount_cgroups(
                                 directory,
+                                outer_cgver,
                                 arg_unified_cgroup_hierarchy,
                                 arg_userns_mode != USER_NAMESPACE_NO,
                                 arg_uid_shift,
@@ -2686,7 +2682,7 @@ static int outer_child(
                  * requested, so that we all are owned by the user if
                  * user namespaces are turned on. */
 
-                r = inner_child(barrier, directory, secondary, kmsg_socket, rtnl_socket, fds);
+                r = inner_child(barrier, directory, secondary, kmsg_socket, rtnl_socket, fds, outer_cgver);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
@@ -3131,6 +3127,7 @@ static int run(int master,
                DissectedImage *dissected_image,
                bool interactive,
                bool secondary,
+               CGroupUnified outer_cgver,
                FDSet *fds,
                char veth_name[IFNAMSIZ], bool *veth_created,
                union in_addr_union *exposed,
@@ -3245,7 +3242,8 @@ static int run(int master,
                                 kmsg_socket_pair[1],
                                 rtnl_socket_pair[1],
                                 uid_shift_socket_pair[1],
-                                fds);
+                                fds,
+                                outer_cgver);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
@@ -3415,12 +3413,12 @@ static int run(int master,
         } else if (arg_slice || arg_property)
                 log_notice("Machine and scope registration turned off, --slice= and --property= settings will have no effect.");
 
-        r = sync_cgroup(*pid, arg_unified_cgroup_hierarchy, arg_uid_shift);
+        r = sync_cgroup(*pid, outer_cgver, arg_unified_cgroup_hierarchy, arg_uid_shift);
         if (r < 0)
                 return r;
 
         if (arg_keep_unit) {
-                r = create_subcgroup(*pid, arg_unified_cgroup_hierarchy);
+                r = create_subcgroup(*pid, outer_cgver, arg_unified_cgroup_hierarchy);
                 if (r < 0)
                         return r;
         }
@@ -3569,6 +3567,7 @@ int main(int argc, char *argv[]) {
         _cleanup_(loop_device_unrefp) LoopDevice *loop = NULL;
         _cleanup_(decrypted_image_unrefp) DecryptedImage *decrypted_image = NULL;
         _cleanup_(dissected_image_unrefp) DissectedImage *dissected_image = NULL;
+        CGroupUnified outer_cgver;
 
         log_parse_environment();
         log_open();
@@ -3580,6 +3579,12 @@ int main(int argc, char *argv[]) {
         r = parse_argv(argc, argv);
         if (r <= 0)
                 goto finish;
+
+        r = cg_version(&outer_cgver);
+        if (r < 0) {
+                log_error_errno(r, "Failed to determine whether the unified cgroups hierarchy is used: %m");
+                goto finish;
+        }
 
         if (geteuid() != 0) {
                 log_error("Need to be root.");
@@ -3842,7 +3847,7 @@ int main(int argc, char *argv[]) {
                 goto finish;
 
         if (arg_unified_cgroup_hierarchy == CGROUP_UNIFIED_UNKNOWN) {
-                r = pick_cgroup_version(arg_directory);
+                r = pick_cgroup_version(arg_directory, outer_cgver);
                 if (r < 0)
                         goto finish;
         }
@@ -3890,6 +3895,7 @@ int main(int argc, char *argv[]) {
                         console,
                         dissected_image,
                         interactive, secondary,
+                        outer_cgver,
                         fds,
                         veth_name, &veth_created,
                         &exposed,
