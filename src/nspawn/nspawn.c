@@ -344,13 +344,18 @@ static int detect_inner_cgver_from_environment(void) {
 
 static int detect_inner_cgver_from_image(const char *directory) {
         int r;
+        CGroupUnified outer_cgver;
 
         /* Let's inherit the mode to use from the host system, but let's take into consideration what systemd in the
          * image actually supports. */
-        r = cg_all_unified();
+        r = cg_version(&outer_cgver);
         if (r < 0)
                 return log_error_errno(r, "Failed to determine whether we are in all unified mode.");
-        if (r > 0) {
+        switch (outer_cgver) {
+        default:
+        case CGROUP_UNIFIED_UNKNOWN:
+                assert_not_reached("unknown cgroup version");
+        case CGROUP_UNIFIED_ALL:
                 /* Unified cgroup hierarchy support was added in 230. Unfortunately the detection
                  * routine only detects 231, so we'll have a false negative here for 230. */
                 r = systemd_installation_has_version(directory, 230);
@@ -360,7 +365,9 @@ static int detect_inner_cgver_from_image(const char *directory) {
                         arg_inner_cgver = CGROUP_UNIFIED_ALL;
                 else
                         arg_inner_cgver = CGROUP_UNIFIED_NONE;
-        } else if (cg_unified_controller(SYSTEMD_CGROUP_CONTROLLER) > 0) {
+                break;
+        case CGROUP_UNIFIED_SYSTEMD233:
+        case CGROUP_UNIFIED_SYSTEMD232:
                 /* Mixed cgroup hierarchy support was added in 233 */
                 r = systemd_installation_has_version(directory, 233);
                 if (r < 0)
@@ -369,8 +376,11 @@ static int detect_inner_cgver_from_image(const char *directory) {
                         arg_inner_cgver = CGROUP_UNIFIED_SYSTEMD233;
                 else
                         arg_inner_cgver = CGROUP_UNIFIED_NONE;
-        } else
+                break;
+        case CGROUP_UNIFIED_NONE:
                 arg_inner_cgver = CGROUP_UNIFIED_NONE;
+                break;
+        }
 
         log_debug("Using %s hierarchy for container.",
                   arg_inner_cgver == CGROUP_UNIFIED_NONE ? "legacy" :
