@@ -353,13 +353,22 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
                 break;
         case CGROUP_UNIFIED_SYSTEMD233:
-        case CGROUP_UNIFIED_SYSTEMD232:
-                /* Mixed cgroup hierarchy support was added in 233 */
+                /* systemd v233+ -style mixed cgroup hierarchy */
                 r = systemd_installation_has_version(directory, 233);
                 if (r < 0)
                         return log_error_errno(r, "Failed to determine systemd version in container: %m");
                 if (r > 0)
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD233;
+                else
+                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                break;
+        case CGROUP_UNIFIED_SYSTEMD232:
+                /* systemd v232 -style mixed cgroup hierarchy */
+                r = systemd_installation_has_version(directory, 232);
+                if (r < 0)
+                        return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
+                if (r > 0)
+                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD232;
                 else
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
                 break;
