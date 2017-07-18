@@ -2386,13 +2386,18 @@ int cg_unified_controller(const char *controller) {
         if (r < 0)
                 return r;
 
-        if (unified_cache == CGROUP_UNIFIED_NONE)
+        switch (unified_cache) {
+        default:
+        case CGROUP_UNIFIED_UNKNOWN:
+                assert_not_reached("unknown cgroup version");
+        case CGROUP_UNIFIED_NONE:
                 return false;
-
-        if (unified_cache >= CGROUP_UNIFIED_ALL)
+        case CGROUP_UNIFIED_SYSTEMD232:
+        case CGROUP_UNIFIED_SYSTEMD233:
+                return streq_ptr(controller, SYSTEMD_CGROUP_CONTROLLER);
+        case CGROUP_UNIFIED_ALL:
                 return true;
-
-        return streq_ptr(controller, SYSTEMD_CGROUP_CONTROLLER);
+        }
 }
 
 int cg_all_unified(void) {
