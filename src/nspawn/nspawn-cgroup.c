@@ -391,7 +391,10 @@ skip_controllers:
         case CGROUP_UNIFIED_ALL:
                 assert_not_reached("cgroup v2 requested in cgroup v1 function");
         case CGROUP_UNIFIED_SYSTEMD232:
-                assert_not_reached("systemd 232-style hybrid not supported");
+                r = mount_legacy_cgroup_hierarchy("", SYSTEMD_CGROUP_CONTROLLER_HYBRID, "systemd", false);
+                if (r < 0)
+                        return r;
+                break;
         case CGROUP_UNIFIED_SYSTEMD233:
                 r = mount_legacy_cgroup_hierarchy("", SYSTEMD_CGROUP_CONTROLLER_HYBRID, "unified", false);
                 if (r < 0)
@@ -511,7 +514,10 @@ skip_controllers:
         case CGROUP_UNIFIED_ALL:
                 assert_not_reached("cgroup v2 requested in cgroup v1 function");
         case CGROUP_UNIFIED_SYSTEMD232:
-                assert_not_reached("systemd 232-style hybrid not supported");
+                r = mount_legacy_cgroup_hierarchy(dest, SYSTEMD_CGROUP_CONTROLLER_HYBRID, "systemd", false);
+                if (r < 0)
+                        return r;
+                break;
         case CGROUP_UNIFIED_SYSTEMD233:
                 r = mount_legacy_cgroup_hierarchy(dest, SYSTEMD_CGROUP_CONTROLLER_HYBRID, "unified", false);
                 if (r < 0)
