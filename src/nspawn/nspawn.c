@@ -317,6 +317,7 @@ static int custom_mount_check_all(void) {
 static int detect_unified_cgroup_hierarchy(const char *directory) {
         const char *e;
         int r;
+        CGroupUnified outer_cgver;
 
         /* Allow the user to control whether the unified hierarchy is used */
         e = getenv("UNIFIED_CGROUP_HIERARCHY");
@@ -333,10 +334,14 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
         }
 
         /* Otherwise inherit the default from the host system */
-        r = cg_all_unified();
+        r = cg_version(&outer_cgver);
         if (r < 0)
                 return log_error_errno(r, "Failed to determine whether we are in all unified mode.");
-        if (r > 0) {
+        switch (outer_cgver) {
+        default:
+        case CGROUP_UNIFIED_UNKNOWN:
+                assert_not_reached("unknown cgroup version");
+        case CGROUP_UNIFIED_ALL:
                 /* Unified cgroup hierarchy support was added in 230. Unfortunately the detection
                  * routine only detects 231, so we'll have a false negative here for 230. */
                 r = systemd_installation_has_version(directory, 230);
@@ -346,7 +351,9 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
                 else
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-        } else if (cg_unified_controller(SYSTEMD_CGROUP_CONTROLLER) > 0) {
+                break;
+        case CGROUP_UNIFIED_SYSTEMD233:
+        case CGROUP_UNIFIED_SYSTEMD232:
                 /* Mixed cgroup hierarchy support was added in 233 */
                 r = systemd_installation_has_version(directory, 233);
                 if (r < 0)
@@ -355,8 +362,11 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD233;
                 else
                         arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-        } else
+                break;
+        case CGROUP_UNIFIED_NONE:
                 arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
+                break;
+        }
 
         return 0;
 }
