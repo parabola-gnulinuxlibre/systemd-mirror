@@ -478,6 +478,29 @@ skip_controllers:
         return 0;
 }
 
+int cgroup_decide_mounts(
+                CGMounts *ret_mounts,
+                CGroupUnified outer_cgver, CGroupUnified inner_cgver,
+                bool use_cgns) {
+
+        switch (inner_cgver) {
+        default:
+        case CGROUP_UNIFIED_UNKNOWN:
+                assert_not_reached("unknown inner_cgver");
+        case CGROUP_UNIFIED_NONE:
+        case CGROUP_UNIFIED_SYSTEMD232:
+        case CGROUP_UNIFIED_SYSTEMD233:
+                if (use_cgns)
+                        return cgroup_decide_mounts_sd_y_cgns(ret_mounts, outer_cgver, inner_cgver);
+                else
+                        return cgroup_decide_mounts_sd_n_cgns(ret_mounts, outer_cgver, inner_cgver);
+        case CGROUP_UNIFIED_ALL:
+                if (!cgmount_add(ret_mounts, CGMOUNT_CGROUP2, "cgroup", ""))
+                        return log_oom();
+                return 0;
+        }
+}
+
 /********************************************************************/
 
 static int cgroup_mount_cg(
@@ -601,25 +624,9 @@ int mount_cgroups(
         _cleanup_(cgroup_free_mounts) CGMounts mounts = {};
         int r;
 
-        switch (inner_cgver) {
-        default:
-        case CGROUP_UNIFIED_UNKNOWN:
-                assert_not_reached("unknown inner_cgver");
-        case CGROUP_UNIFIED_NONE:
-        case CGROUP_UNIFIED_SYSTEMD232:
-        case CGROUP_UNIFIED_SYSTEMD233:
-                if (use_cgns)
-                        r = cgroup_decide_mounts_sd_y_cgns(&mounts, outer_cgver, inner_cgver);
-                else
-                        r = cgroup_decide_mounts_sd_n_cgns(&mounts, outer_cgver, inner_cgver);
-                if (r < 0)
-                        return r;
-                break;
-        case CGROUP_UNIFIED_ALL:
-                if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "cgroup", ""))
-                        return log_oom();
-                break;
-        }
+        r = cgroup_decide_mounts(&mounts, outer_cgver, inner_cgver, use_cgns);
+        if (r < 0)
+                return r;
 
         return cgroup_mount_mounts(dest, mounts, use_cgns, use_userns ? uid_shift : UID_INVALID, selinux_apifs_context);
 }
