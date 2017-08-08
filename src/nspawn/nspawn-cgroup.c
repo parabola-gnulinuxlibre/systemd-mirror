@@ -25,7 +25,9 @@
 #include "fs-util.h"
 #include "mkdir.h"
 #include "mount-util.h"
+#include "parse-util.h"
 #include "path-util.h"
+#include "process-util.h"
 #include "rm-rf.h"
 #include "string-util.h"
 #include "strv.h"
@@ -121,25 +123,6 @@ static int chown_cgroup_path(const char *path, uid_t uid_shift) {
         return 0;
 }
 
-static int chown_cgroup(pid_t pid, uid_t uid_shift) {
-        _cleanup_free_ char *path = NULL, *fs = NULL;
-        int r;
-
-        r = cg_pid_get_path(NULL, pid, &path);
-        if (r < 0)
-                return log_error_errno(r, "Failed to get host cgroup of the container: %m");
-
-        r = cg_get_path(SYSTEMD_CGROUP_CONTROLLER, path, NULL, &fs);
-        if (r < 0)
-                return log_error_errno(r, "Failed to get host file system path for container cgroup: %m");
-
-        r = chown_cgroup_path(fs, uid_shift);
-        if (r < 0)
-                return log_error_errno(r, "Failed to chown() cgroup %s: %m", fs);
-
-        return 0;
-}
-
 static int sync_cgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver, uid_t uid_shift) {
         _cleanup_free_ char *cgroup = NULL;
         char mountpoint[] = "/tmp/containerXXXXXX", pid_string[DECIMAL_STR_MAX(pid) + 1];
@@ -148,9 +131,6 @@ static int sync_cgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner
         int r;
 
 #define LOG_PFIX "PID " PID_FMT ": sync host cgroup -> container cgroup"
-
-        if ((outer_cgver >= CGROUP_UNIFIED_SYSTEMD232) == (inner_cgver >= CGROUP_UNIFIED_SYSTEMD232))
-                return 0;
 
         /* When the host uses the legacy cgroup setup, but the
          * container shall use the unified hierarchy, let's make sure
@@ -226,12 +206,6 @@ static int create_subcgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified 
          * did not create a scope unit for the container move us and
          * the container into two separate subcgroups. */
 
-        if (inner_cgver == CGROUP_UNIFIED_NONE)
-                return 0;
-
-        if (outer_cgver < CGROUP_UNIFIED_SYSTEMD232)
-                return 0;
-
         r = cg_mask_supported(&supported);
         if (r < 0)
                 return log_error_errno(r, "Failed to create host subcgroup: Failed to determine supported controllers: %m");
@@ -255,23 +229,87 @@ static int create_subcgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified 
         return 0;
 }
 
-int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver, uid_t uid_shift, bool keep_unit) {
+static int cgpath_list_procs(const char *cgpath, Set **ret_pids) {
 
+        char line[LINE_MAX];
+        _cleanup_set_free_ Set *pid_set = NULL;
+        _cleanup_fclose_ FILE *procs = NULL;
+
+        pid_set = set_new(NULL);
+        if (!pid_set)
+                return -ENOMEM;
+
+        procs = fopen(prefix_roota(cgpath, "cgroup.procs"), "re");
+        if (!procs)
+                return -errno;
+
+        FOREACH_LINE(line, procs, return -errno) {
+                int r;
+                pid_t pid;
+
+                truncate_nl(line);
+                r = parse_pid(line, &pid);
+                if (r < 0)
+                        return r;
+                set_put(pid_set, PID_TO_PTR(pid));
+        }
+
+        if (ret_pids) {
+                *ret_pids = pid_set;
+                pid_set = NULL;
+        }
+        return 0;
+}
+
+int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver, uid_t uid_shift) {
+
+        _cleanup_free_ char *cgpath = NULL, *cgroup = NULL;
+        _cleanup_set_free_ Set *peers = NULL;
         int r;
 
-        r = sync_cgroup(pid, outer_cgver, inner_cgver, uid_shift);
-        if (r < 0)
-                return r;
-
-        if (keep_unit) {
-                r = create_subcgroup(pid, outer_cgver, inner_cgver);
+        if ((outer_cgver >= CGROUP_UNIFIED_SYSTEMD232) != (inner_cgver >= CGROUP_UNIFIED_SYSTEMD232)) {
+                /* sync the name=systemd hierarchy with the unified hierarchy */
+                r = sync_cgroup(pid, outer_cgver, inner_cgver, uid_shift);
                 if (r < 0)
                         return r;
         }
 
-        r = chown_cgroup(pid, uid_shift);
+        r = cg_pid_get_path(SYSTEMD_CGROUP_CONTROLLER, pid, &cgroup);
         if (r < 0)
-                return r;
+                return log_error_errno(r, "Failed to get host cgroup of the container: %m");
+
+        r = cg_get_path(SYSTEMD_CGROUP_CONTROLLER, cgroup, NULL, &cgpath);
+        if (r < 0)
+                return log_error_errno(r, "Failed to get host file system path for container cgroup: %m");
+
+        r = cgpath_list_procs(cgpath, &peers);
+        if (r < 0)
+                return log_error_errno(r, "Unable to count the processes in the container's cgroup: %m");
+
+        /* This applies only to the unified hierarchy */
+        if (outer_cgver >= CGROUP_UNIFIED_SYSTEMD232 && inner_cgver >= CGROUP_UNIFIED_SYSTEMD232) {
+                if (set_size(peers) == 2 && set_contains(peers, PID_TO_PTR(getpid()))) {
+                        char *tmp;
+
+                        r = create_subcgroup(pid, outer_cgver, inner_cgver);
+                        if (r < 0)
+                                return r;
+
+                        set_remove(peers, PID_TO_PTR(getpid()));
+                        tmp = strappend(cgpath, "/payload");
+                        if (!tmp)
+                                return log_oom();
+                        cgpath = tmp;
+                }
+        }
+
+        /* This applies only to the name=systemd/unified hierarchy, but IMO it should apply to all
+         * hierarchies. */
+        if (uid_shift != UID_INVALID && set_size(peers) == 1) {
+                r = chown_cgroup_path(cgpath, uid_shift);
+                if (r < 0)
+                        return log_error_errno(r, "Failed to chown() cgroup %s: %m", cgpath);
+        }
 
         return 0;
 }
