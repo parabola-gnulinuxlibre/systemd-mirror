@@ -1,2 +1,0 @@
-#!/bin/sh
-git tag|grep '^elogind/v[0-9]*$'|xargs -n1 git tag -d

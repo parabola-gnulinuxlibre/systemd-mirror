@@ -28,10 +28,14 @@
 	#  - XXX: legacy udev tags
 	#  - vXXX: upstream systemd tags
 	#  - vXXX.Y: elogind versions
+	#
 	# Unfortunately, git gives us no good way of filtering to only
-	# get tags containing a `.`
+	# get tags containing a `.` However, fortunately or
+	# unfortunately, elogind hasn't been touched for more than a
+	# year (as of 2017-09), so it seams reasonably safe that it
+	# will never be updated off of v219.Y.
 	tagopt = --no-tags
-	fetch = +refs/tags/v*:refs/tags/elogind/v*
+	fetch = +refs/tags/v219.*:refs/tags/elogind/v219.*
 [branch "elogind/master"]
 	remote = r-elogind
 	merge = refs/heads/master
