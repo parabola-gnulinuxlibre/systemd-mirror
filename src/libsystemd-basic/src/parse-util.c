@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <xlocale.h>
 
 #include "systemd-basic/alloc-util.h"
 #include "systemd-basic/extract-word.h"
