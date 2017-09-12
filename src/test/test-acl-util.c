@@ -22,11 +22,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "acl-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "string-util.h"
-#include "user-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-shared/acl-util.h"
 
 static void test_add_acls_for_user(void) {
         char fn[] = "/tmp/test-empty.XXXXXX";

@@ -20,8 +20,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "log.h"
-#include "namespace.h"
+#include "core/namespace.h"
+#include "systemd-basic/log.h"
 
 int main(int argc, char *argv[]) {
         const char * const writable[] = {

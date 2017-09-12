@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "hexdecoct.h"
-#include "macro.h"
-#include "string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/hexdecoct.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/string-util.h"
 
 static void test_hexchar(void) {
         assert_se(hexchar(0xa) == 'a');

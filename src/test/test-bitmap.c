@@ -17,7 +17,7 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "bitmap.h"
+#include "systemd-basic/bitmap.h"
 
 int main(int argc, const char *argv[]) {
         _cleanup_bitmap_free_ Bitmap *b = NULL, *b2 = NULL;

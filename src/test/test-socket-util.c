@@ -17,15 +17,15 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "async.h"
-#include "fd-util.h"
-#include "in-addr-util.h"
-#include "log.h"
-#include "macro.h"
-#include "socket-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/async.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/in-addr-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/socket-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 static void test_ifname_valid(void) {
         assert(ifname_valid("foo"));

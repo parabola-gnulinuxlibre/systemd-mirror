@@ -25,24 +25,25 @@
 #include <sys/capability.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "capability-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "hashmap.h"
-#include "hostname-util.h"
-#include "install-printf.h"
-#include "install.h"
-#include "load-fragment.h"
-#include "macro.h"
-#include "rm-rf.h"
-#include "specifier.h"
-#include "string-util.h"
-#include "strv.h"
+#include "core/load-fragment.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/capability-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/hostname-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/install-printf.h"
+#include "systemd-shared/install.h"
+#include "systemd-shared/specifier.h"
+#include "systemd-shared/tests.h"
+
 #include "test-helper.h"
-#include "tests.h"
-#include "user-util.h"
-#include "util.h"
 
 static int test_unit_file_get_set(void) {
         int r;

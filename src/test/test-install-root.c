@@ -17,12 +17,12 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "fileio.h"
-#include "install.h"
-#include "mkdir.h"
-#include "rm-rf.h"
-#include "string-util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/mkdir.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-shared/install.h"
 
 static void test_basic_mask_and_enable(const char *root) {
         const char *p;

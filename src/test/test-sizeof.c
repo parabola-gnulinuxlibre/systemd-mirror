@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "log.h"
-#include "time-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/time-util.h"
 
 /* Print information about various types. Useful when diagnosing
  * gcc diagnostics on an unfamiliar architecture. */

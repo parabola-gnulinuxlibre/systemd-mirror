@@ -17,8 +17,8 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "macro.h"
-#include "web-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/web-util.h"
 
 static void test_is_valid_documentation_url(void) {
         assert_se(documentation_url_is_valid("http://www.freedesktop.org/wiki/Software/systemd"));

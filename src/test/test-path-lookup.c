@@ -20,11 +20,11 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#include "log.h"
-#include "path-lookup.h"
-#include "rm-rf.h"
-#include "string-util.h"
-#include "strv.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-shared/path-lookup.h"
 
 static void test_paths(UnitFileScope scope) {
         char template[] = "/tmp/test-path-lookup.XXXXXXX";

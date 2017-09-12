@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "log.h"
-#include "loopback-setup.h"
+#include "core/loopback-setup.h"
+#include "systemd-basic/log.h"
 
 int main(int argc, char* argv[]) {
         int r;

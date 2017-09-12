@@ -19,9 +19,9 @@
 
 #include <stdio.h>
 
-#include "string-util.h"
-#include "terminal-util.h"
-#include "util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/util.h"
 
 int main(int argc, char *argv[]) {
         char *p;

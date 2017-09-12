@@ -19,13 +19,13 @@
 
 #include <fcntl.h>
 
-#include "btrfs-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "log.h"
-#include "parse-util.h"
-#include "string-util.h"
-#include "util.h"
+#include "systemd-basic/btrfs-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/parse-util.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 int main(int argc, char *argv[]) {
         BtrfsQuotaInfo quota;

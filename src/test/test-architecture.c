@@ -17,10 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "architecture.h"
-#include "log.h"
-#include "util.h"
-#include "virt.h"
+#include "systemd-basic/architecture.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/util.h"
+#include "systemd-basic/virt.h"
 
 int main(int argc, char *argv[]) {
         int a, v;

@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "sparse-endian.h"
-#include "unaligned.h"
-#include "util.h"
+#include "systemd-basic/sparse-endian.h"
+#include "systemd-basic/unaligned.h"
+#include "systemd-basic/util.h"
 
 static uint8_t data[] = {
         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,

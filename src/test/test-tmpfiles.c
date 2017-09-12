@@ -22,14 +22,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "fileio.h"
-#include "formats-util.h"
-#include "fs-util.h"
-#include "log.h"
-#include "string-util.h"
-#include "util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/formats-util.h"
+#include "systemd-basic/fs-util.h"
+#include "systemd-basic/log.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/util.h"
 
 int main(int argc, char** argv) {
         _cleanup_free_ char *cmd = NULL, *cmd2 = NULL, *ans = NULL, *ans2 = NULL, *d = NULL, *tmp = NULL, *line = NULL;

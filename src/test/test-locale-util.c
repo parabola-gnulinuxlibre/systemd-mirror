@@ -18,9 +18,9 @@
 ***/
 
 
-#include "locale-util.h"
-#include "macro.h"
-#include "strv.h"
+#include "systemd-basic/locale-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/strv.h"
 
 static void test_get_locales(void) {
         _cleanup_strv_free_ char **locales = NULL;

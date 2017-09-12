@@ -19,9 +19,9 @@
 
 #include <stdio.h>
 
-#include "job.h"
-#include "service.h"
-#include "unit.h"
+#include "core/job.h"
+#include "core/service.h"
+#include "core/unit.h"
 
 int main(int argc, char*argv[]) {
         JobType a, b, c, ab, bc, ab_c, bc_a, a_bc;

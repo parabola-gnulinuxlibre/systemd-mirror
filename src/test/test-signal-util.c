@@ -20,8 +20,8 @@
 #include <signal.h>
 #include <unistd.h>
 
-#include "macro.h"
-#include "signal-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/signal-util.h"
 
 static void test_block_signals(void) {
         sigset_t ss;

@@ -19,11 +19,11 @@
 
 #include <stdio.h>
 
-#include "alloc-util.h"
-#include "def.h"
-#include "string-util.h"
-#include "terminal-util.h"
-#include "util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/def.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/terminal-util.h"
+#include "systemd-basic/util.h"
 
 static void test_one(const char *p) {
         _cleanup_free_ char *t;

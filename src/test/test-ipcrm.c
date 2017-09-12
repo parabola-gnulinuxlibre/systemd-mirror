@@ -17,9 +17,9 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "clean-ipc.h"
-#include "user-util.h"
-#include "util.h"
+#include "systemd-basic/user-util.h"
+#include "systemd-basic/util.h"
+#include "systemd-shared/clean-ipc.h"
 
 int main(int argc, char *argv[]) {
         uid_t uid;

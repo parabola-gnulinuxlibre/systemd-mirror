@@ -19,10 +19,10 @@
 
 #include <unistd.h>
 
-#include "async.h"
-#include "fileio.h"
-#include "macro.h"
-#include "util.h"
+#include "systemd-basic/async.h"
+#include "systemd-basic/fileio.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/util.h"
 
 static bool test_async = false;
 

@@ -19,12 +19,13 @@
 
 #include <stdio.h>
 
-#include "macro.h"
-#include "manager.h"
-#include "rm-rf.h"
+#include "core/manager.h"
+#include "core/unit.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-shared/tests.h"
+
 #include "test-helper.h"
-#include "tests.h"
-#include "unit.h"
 
 static int test_cgroup_mask(void) {
         Manager *m = NULL;

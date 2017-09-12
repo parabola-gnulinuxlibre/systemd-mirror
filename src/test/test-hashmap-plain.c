@@ -17,11 +17,11 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include "alloc-util.h"
-#include "hashmap.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/hashmap.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
 
 void test_hashmap_funcs(void);
 

@@ -21,15 +21,15 @@
 #include <sys/mount.h>
 #include <unistd.h>
 
-#include "alloc-util.h"
-#include "fd-util.h"
-#include "macro.h"
-#include "mount-util.h"
-#include "path-util.h"
-#include "rm-rf.h"
-#include "string-util.h"
-#include "strv.h"
-#include "util.h"
+#include "systemd-basic/alloc-util.h"
+#include "systemd-basic/fd-util.h"
+#include "systemd-basic/macro.h"
+#include "systemd-basic/mount-util.h"
+#include "systemd-basic/path-util.h"
+#include "systemd-basic/rm-rf.h"
+#include "systemd-basic/string-util.h"
+#include "systemd-basic/strv.h"
+#include "systemd-basic/util.h"
 
 #define test_path_compare(a, b, result) {                 \
                 assert_se(path_compare(a, b) == result);  \
