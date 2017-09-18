@@ -298,14 +298,14 @@ int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver
 
         /* This applies only to the unified hierarchy */
         if (outer_cgver >= CGROUP_UNIFIED_SYSTEMD232 && inner_cgver >= CGROUP_UNIFIED_SYSTEMD232) {
-                if (set_size(peers) == 2 && set_contains(peers, PID_TO_PTR(getpid()))) {
+                if (set_size(peers) == 2 && set_contains(peers, PID_TO_PTR(getpid_cached()))) {
                         char *tmp;
 
                         r = create_subcgroup(pid, outer_cgver, inner_cgver);
                         if (r < 0)
                                 return r;
 
-                        set_remove(peers, PID_TO_PTR(getpid()));
+                        set_remove(peers, PID_TO_PTR(getpid_cached()));
                         tmp = strappend(cgpath, "/payload");
                         if (!tmp)
                                 return log_oom();
