@@ -143,7 +143,6 @@ static const char *arg_selinux_apifs_context = NULL;
 static const char *arg_slice = NULL;
 static bool arg_read_only = false;
 static StartMode arg_start_mode = START_PID1;
-static bool arg_ephemeral = false;
 static LinkJournal arg_link_journal = LINK_AUTO;
 static bool arg_link_journal_try = false;
 static uint64_t arg_caps_retain =
@@ -423,10 +422,6 @@ static int parse_argv(int argc, char *argv[]) {
                         r = parse_path_argument_and_warn(optarg, false, &arg_template);
                         if (r < 0)
                                 return r;
-                        break;
-
-                case 'x':
-                        arg_ephemeral = true;
                         break;
 
                 case 'u':
@@ -849,28 +844,8 @@ static int parse_argv(int argc, char *argv[]) {
         if (arg_userns_mode == USER_NAMESPACE_PICK)
                 arg_userns_chown = true;
 
-        if (arg_ephemeral && arg_template && !arg_directory) {
-                /* User asked for ephemeral execution but specified --template= instead of --directory=. Semantically
-                 * such an invocation makes some sense, see https://github.com/systemd/systemd/issues/3667. Let's
-                 * accept this here, and silently make "--ephemeral --template=" equivalent to "--ephemeral
-                 * --directory=". */
-
-                arg_directory = arg_template;
-                arg_template = NULL;
-        }
-
         if (arg_template && !(arg_directory || arg_machine)) {
                 log_error("--template= needs --directory= or --machine=.");
-                return -EINVAL;
-        }
-
-        if (arg_ephemeral && arg_template) {
-                log_error("--ephemeral and --template= may not be combined.");
-                return -EINVAL;
-        }
-
-        if (arg_ephemeral && !IN_SET(arg_link_journal, LINK_NO, LINK_AUTO)) {
-                log_error("--ephemeral and --link-journal= may not be combined.");
                 return -EINVAL;
         }
 
@@ -1384,10 +1359,6 @@ static int setup_journal(const char *directory) {
         char id[33];
         int r;
 
-        /* Don't link journals in ephemeral mode */
-        if (arg_ephemeral)
-                return 0;
-
         if (arg_link_journal == LINK_NO)
                 return 0;
 
@@ -1767,21 +1738,6 @@ static int determine_names(void) {
                 if (!machine_name_is_valid(arg_machine)) {
                         log_error("Failed to determine machine name automatically, please use -M.");
                         return -EINVAL;
-                }
-
-                if (arg_ephemeral) {
-                        char *b;
-
-                        /* Add a random suffix when this is an
-                         * ephemeral machine, so that we can run many
-                         * instances at once without manually having
-                         * to specify -M each time. */
-
-                        if (asprintf(&b, "%s-%016" PRIx64, arg_machine, random_u64()) < 0)
-                                return log_oom();
-
-                        free(arg_machine);
-                        arg_machine = b;
                 }
         }
 
@@ -2945,28 +2901,24 @@ int main(int argc, char *argv[]) {
                 goto finish;
 
         if (arg_directory) {
-                if (path_equal(arg_directory, "/") && !arg_ephemeral) {
+                if (path_equal(arg_directory, "/")) {
                         log_error("Spawning container on root directory is not supported. Consider using --ephemeral.");
                         r = -EINVAL;
                         goto finish;
                 }
 
-                if (arg_ephemeral) {
-                } else {
-                        r = chase_symlinks_and_update(&arg_directory, arg_template ? CHASE_NONEXISTENT : 0);
-                        if (r < 0)
-                                goto finish;
+                r = chase_symlinks_and_update(&arg_directory, arg_template ? CHASE_NONEXISTENT : 0);
+                if (r < 0)
+                        goto finish;
 
-                        r = image_path_lock(arg_directory, (arg_read_only ? LOCK_SH : LOCK_EX) | LOCK_NB, &tree_global_lock, &tree_local_lock);
-                        if (r == -EBUSY) {
-                                log_error_errno(r, "Directory tree %s is currently busy.", arg_directory);
-                                goto finish;
-                        }
-                        if (r < 0) {
-                                log_error_errno(r, "Failed to lock %s: %m", arg_directory);
-                                goto finish;
-                        }
-
+                r = image_path_lock(arg_directory, (arg_read_only ? LOCK_SH : LOCK_EX) | LOCK_NB, &tree_global_lock, &tree_local_lock);
+                if (r == -EBUSY) {
+                        log_error_errno(r, "Directory tree %s is currently busy.", arg_directory);
+                        goto finish;
+                }
+                if (r < 0) {
+                        log_error_errno(r, "Failed to lock %s: %m", arg_directory);
+                        goto finish;
                 }
 
                 if (arg_start_mode == START_BOOT) {
