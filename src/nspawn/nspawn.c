@@ -179,53 +179,6 @@ static unsigned long arg_clone_ns_flags = CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS
 static MountSettingsMask arg_mount_settings = MOUNT_APPLY_APIVFS_RO;
 static void *arg_root_hash = NULL;
 
-static int detect_unified_cgroup_hierarchy(const char *directory) {
-        const char *e;
-        int r;
-
-        /* Allow the user to control whether the unified hierarchy is used */
-        e = getenv("UNIFIED_CGROUP_HIERARCHY");
-        if (e) {
-                r = parse_boolean(e);
-                if (r < 0)
-                        return log_error_errno(r, "Failed to parse $UNIFIED_CGROUP_HIERARCHY.");
-                if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
-                else
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-
-                return 0;
-        }
-
-        /* Otherwise inherit the default from the host system */
-        r = cg_all_unified();
-        if (r < 0)
-                return log_error_errno(r, "Failed to determine whether we are in all unified mode.");
-        if (r > 0) {
-                /* Unified cgroup hierarchy support was added in 230. Unfortunately the detection
-                 * routine only detects 231, so we'll have a false negative here for 230. */
-                r = systemd_installation_has_version(directory, 230);
-                if (r < 0)
-                        return log_error_errno(r, "Failed to determine systemd version in container: %m");
-                if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_ALL;
-                else
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-        } else if (cg_unified_controller(SYSTEMD_CGROUP_CONTROLLER) > 0) {
-                /* Mixed cgroup hierarchy support was added in 233 */
-                r = systemd_installation_has_version(directory, 233);
-                if (r < 0)
-                        return log_error_errno(r, "Failed to determine systemd version in container: %m");
-                if (r > 0)
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_SYSTEMD;
-                else
-                        arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-        } else
-                arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_NONE;
-
-        return 0;
-}
-
 static int parse_argv(int argc, char *argv[]) {
 
         static const struct option options[] = {
@@ -793,12 +746,7 @@ static int determine_names(void) {
         assert(arg_directory);
 
         if (!arg_machine) {
-
-                if (arg_directory && path_equal(arg_directory, "/"))
-                        arg_machine = gethostname_malloc();
-                else {
-                        arg_machine = strdup(basename(arg_directory));
-                }
+                arg_machine = strdup(basename(arg_directory));
                 if (!arg_machine)
                         return log_oom();
 
@@ -808,25 +756,6 @@ static int determine_names(void) {
                         return -EINVAL;
                 }
         }
-
-        return 0;
-}
-
-static int chase_symlinks_and_update(char **p, unsigned flags) {
-        char *chased;
-        int r;
-
-        assert(p);
-
-        if (!*p)
-                return 0;
-
-        r = chase_symlinks(*p, NULL, flags, &chased);
-        if (r < 0)
-                return log_error_errno(r, "Failed to resolve path %s: %m", *p);
-
-        free(*p);
-        *p = chased;
 
         return 0;
 }
@@ -1658,49 +1587,11 @@ int main(int argc, char *argv[]) {
         if (r <= 0)
                 goto finish;
 
-        if (geteuid() != 0) {
-                log_error("Need to be root.");
-                r = -EPERM;
-                goto finish;
-        }
         r = determine_names();
         if (r < 0)
                 goto finish;
 
-        if (arg_directory) {
-                const char *p;
-
-                if (path_equal(arg_directory, "/")) {
-                        log_error("Spawning container on root directory is not supported. Consider using --ephemeral.");
-                        r = -EINVAL;
-                        goto finish;
-                }
-
-                r = chase_symlinks_and_update(&arg_directory, 0);
-                if (r < 0)
-                        goto finish;
-
-                r = image_path_lock(arg_directory, LOCK_EX | LOCK_NB, &tree_global_lock, &tree_local_lock);
-                if (r == -EBUSY) {
-                        log_error_errno(r, "Directory tree %s is currently busy.", arg_directory);
-                        goto finish;
-                }
-                if (r < 0) {
-                        log_error_errno(r, "Failed to lock %s: %m", arg_directory);
-                        goto finish;
-                }
-
-                p = strjoina(arg_directory, "/usr/");
-                if (laccess(p, F_OK) < 0) {
-                        log_error("Directory %s doesn't look like it has an OS tree. Refusing.", arg_directory);
-                        r = -EINVAL;
-                        goto finish;
-                }
-        }
-
-        r = detect_unified_cgroup_hierarchy(arg_directory);
-        if (r < 0)
-                goto finish;
+        assert(arg_directory);
 
         interactive =
                 isatty(STDIN_FILENO) > 0 &&
@@ -1730,13 +1621,13 @@ int main(int argc, char *argv[]) {
                 goto finish;
         }
 
-                r = run(master,
-                        console,
-                        dissected_image,
-                        interactive, secondary,
-                        fds,
-                        &exposed,
-                        &pid, &ret);
+        r = run(master,
+                console,
+                dissected_image,
+                interactive, secondary,
+                fds,
+                &exposed,
+                &pid, &ret);
 
 finish:
         if (pid > 0)
