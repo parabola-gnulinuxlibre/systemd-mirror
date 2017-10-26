@@ -2269,12 +2269,11 @@ int main(int argc, char *argv[]) {
         _cleanup_close_ int master = -1;
         _cleanup_fdset_free_ FDSet *fds = NULL;
         int r, ret = EXIT_SUCCESS;
-        bool secondary = false, remove_directory = false;
+        bool secondary = false;
         pid_t pid = 0;
         union in_addr_union exposed = {};
         _cleanup_release_lock_file_ LockFile tree_global_lock = LOCK_FILE_INIT, tree_local_lock = LOCK_FILE_INIT;
-        bool interactive, remove_tmprootdir = false;
-        char tmprootdir[] = "/tmp/nspawn-root-XXXXXX";
+        bool interactive;
         _cleanup_(loop_device_unrefp) LoopDevice *loop = NULL;
         _cleanup_(decrypted_image_unrefp) DecryptedImage *decrypted_image = NULL;
         _cleanup_(dissected_image_unrefp) DissectedImage *dissected_image = NULL;
@@ -2379,10 +2378,6 @@ int main(int argc, char *argv[]) {
                         &pid, &ret);
 
 finish:
-        sd_notify(false,
-                  r == 0 && ret == EXIT_FORCE_RESTART ? "STOPPING=1\nSTATUS=Restarting..." :
-                                                        "STOPPING=1\nSTATUS=Terminating...");
-
         if (pid > 0)
                 (void) kill(pid, SIGKILL);
 
@@ -2394,19 +2389,6 @@ finish:
 
         if (pid > 0)
                 (void) wait_for_terminate(pid, NULL);
-
-        if (remove_directory && arg_directory) {
-                int k;
-
-                k = rm_rf(arg_directory, REMOVE_ROOT|REMOVE_PHYSICAL|REMOVE_SUBVOLUME);
-                if (k < 0)
-                        log_warning_errno(k, "Cannot remove '%s', ignoring: %m", arg_directory);
-        }
-
-        if (remove_tmprootdir) {
-                if (rmdir(tmprootdir) < 0)
-                        log_debug_errno(errno, "Can't remove temporary root directory '%s', ignoring: %m", tmprootdir);
-        }
 
         free(arg_directory);
         free(arg_machine);
