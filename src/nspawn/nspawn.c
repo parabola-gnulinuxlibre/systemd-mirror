@@ -131,7 +131,6 @@ typedef enum LinkJournal {
 } LinkJournal;
 
 static char *arg_directory = NULL;
-static char *arg_template = NULL;
 static char *arg_chdir = NULL;
 static char *arg_pivot_root_new = NULL;
 static char *arg_pivot_root_old = NULL;
@@ -176,7 +175,6 @@ static CustomMount *arg_custom_mounts = NULL;
 static unsigned arg_n_custom_mounts = 0;
 static char **arg_setenv = NULL;
 static bool arg_quiet = false;
-static bool arg_keep_unit = false;
 static char **arg_network_interfaces = NULL;
 static char **arg_network_macvlan = NULL;
 static char **arg_network_ipvlan = NULL;
@@ -325,7 +323,6 @@ static int parse_argv(int argc, char *argv[]) {
                 ARG_OVERLAY,
                 ARG_OVERLAY_RO,
                 ARG_SHARE_SYSTEM,
-                ARG_KEEP_UNIT,
                 ARG_NETWORK_INTERFACE,
                 ARG_NETWORK_MACVLAN,
                 ARG_NETWORK_IPVLAN,
@@ -333,7 +330,6 @@ static int parse_argv(int argc, char *argv[]) {
                 ARG_NETWORK_ZONE,
                 ARG_PERSONALITY,
                 ARG_VOLATILE,
-                ARG_TEMPLATE,
                 ARG_PROPERTY,
                 ARG_PRIVATE_USERS,
                 ARG_KILL_SIGNAL,
@@ -349,8 +345,6 @@ static int parse_argv(int argc, char *argv[]) {
                 { "help",                  no_argument,       NULL, 'h'                     },
                 { "version",               no_argument,       NULL, ARG_VERSION             },
                 { "directory",             required_argument, NULL, 'D'                     },
-                { "template",              required_argument, NULL, ARG_TEMPLATE            },
-                { "ephemeral",             no_argument,       NULL, 'x'                     },
                 { "user",                  required_argument, NULL, 'u'                     },
                 { "as-pid2",               no_argument,       NULL, 'a'                     },
                 { "boot",                  no_argument,       NULL, 'b'                     },
@@ -371,7 +365,6 @@ static int parse_argv(int argc, char *argv[]) {
                 { "selinux-apifs-context", required_argument, NULL, 'L'                     },
                 { "quiet",                 no_argument,       NULL, 'q'                     },
                 { "share-system",          no_argument,       NULL, ARG_SHARE_SYSTEM        }, /* not documented */
-                { "keep-unit",             no_argument,       NULL, ARG_KEEP_UNIT           },
                 { "network-interface",     required_argument, NULL, ARG_NETWORK_INTERFACE   },
                 { "network-macvlan",       required_argument, NULL, ARG_NETWORK_MACVLAN     },
                 { "network-ipvlan",        required_argument, NULL, ARG_NETWORK_IPVLAN      },
@@ -414,12 +407,6 @@ static int parse_argv(int argc, char *argv[]) {
 
                 case 'D':
                         r = parse_path_argument_and_warn(optarg, false, &arg_directory);
-                        if (r < 0)
-                                return r;
-                        break;
-
-                case ARG_TEMPLATE:
-                        r = parse_path_argument_and_warn(optarg, false, &arg_template);
                         if (r < 0)
                                 return r;
                         break;
@@ -593,10 +580,6 @@ static int parse_argv(int argc, char *argv[]) {
                         /* We don't officially support this anymore, except for compat reasons. People should use the
                          * $SYSTEMD_NSPAWN_SHARE_* environment variables instead. */
                         arg_clone_ns_flags = 0;
-                        break;
-
-                case ARG_KEEP_UNIT:
-                        arg_keep_unit = true;
                         break;
 
                 case ARG_PERSONALITY:
@@ -843,11 +826,6 @@ static int parse_argv(int argc, char *argv[]) {
 
         if (arg_userns_mode == USER_NAMESPACE_PICK)
                 arg_userns_chown = true;
-
-        if (arg_template && !(arg_directory || arg_machine)) {
-                log_error("--template= needs --directory= or --machine=.");
-                return -EINVAL;
-        }
 
         if (arg_userns_mode != USER_NAMESPACE_NO && !userns_supported()) {
                 log_error("--private-users= is not supported, kernel compiled without user namespace support.");
@@ -1710,17 +1688,6 @@ static int on_sigchld(sd_event_source *s, const struct signalfd_siginfo *ssi, vo
 }
 
 static int determine_names(void) {
-
-        if (arg_template && !arg_directory && arg_machine) {
-
-                /* If --template= was specified then we should not
-                 * search for a machine, but instead create a new one
-                 * in /var/lib/machine. */
-
-                arg_directory = strjoin("/var/lib/machines/", arg_machine);
-                if (!arg_directory)
-                        return log_oom();
-        }
 
         assert(arg_directory);
 
@@ -2732,11 +2699,9 @@ static int run(int master,
         if (r < 0)
                 return r;
 
-        if (arg_keep_unit) {
-                r = create_subcgroup(*pid, arg_unified_cgroup_hierarchy);
-                if (r < 0)
-                        return r;
-        }
+        r = create_subcgroup(*pid, arg_unified_cgroup_hierarchy);
+        if (r < 0)
+                return r;
 
         r = chown_cgroup(*pid, arg_uid_shift);
         if (r < 0)
@@ -2844,16 +2809,14 @@ static int run(int master,
 
         /* CONTAINER_REBOOTED, loop again */
 
-        if (arg_keep_unit) {
-                /* Special handling if we are running as a service: instead of simply
-                 * restarting the machine we want to restart the entire service, so let's
-                 * inform systemd about this with the special exit code 133. The service
-                 * file uses RestartForceExitStatus=133 so that this results in a full
-                 * nspawn restart. This is necessary since we might have cgroup parameters
-                 * set we want to have flushed out. */
-                *ret = EXIT_FORCE_RESTART;
-                return 0; /* finito */
-        }
+        /* Special handling if we are running as a service: instead of simply
+         * restarting the machine we want to restart the entire service, so let's
+         * inform systemd about this with the special exit code 133. The service
+         * file uses RestartForceExitStatus=133 so that this results in a full
+         * nspawn restart. This is necessary since we might have cgroup parameters
+         * set we want to have flushed out. */
+        *ret = EXIT_FORCE_RESTART;
+        return 0; /* finito */
 
         expose_port_flush(arg_expose_ports, exposed);
 
@@ -2907,7 +2870,7 @@ int main(int argc, char *argv[]) {
                         goto finish;
                 }
 
-                r = chase_symlinks_and_update(&arg_directory, arg_template ? CHASE_NONEXISTENT : 0);
+                r = chase_symlinks_and_update(&arg_directory, 0);
                 if (r < 0)
                         goto finish;
 
@@ -3008,7 +2971,6 @@ finish:
         expose_port_flush(arg_expose_ports, &exposed);
 
         free(arg_directory);
-        free(arg_template);
         free(arg_machine);
         free(arg_user);
         free(arg_pivot_root_new);
