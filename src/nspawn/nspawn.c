@@ -111,11 +111,6 @@
 #define UID_SHIFT_PICK_MIN ((uid_t) UINT32_C(0x00080000))
 #define UID_SHIFT_PICK_MAX ((uid_t) UINT32_C(0x6FFF0000))
 
-/* nspawn is listening on the socket at the path in the constant nspawn_notify_socket_path
- * nspawn_notify_socket_path is relative to the container
- * the init process in the container pid can send messages to nspawn following the sd_notify(3) protocol */
-#define NSPAWN_NOTIFY_SOCKET_PATH "/run/systemd/nspawn/notify"
-
 #define EXIT_FORCE_RESTART 133
 
 typedef enum ContainerStatus {
@@ -173,7 +168,6 @@ static CGroupUnified arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_UNKNOWN;
 static SettingsMask arg_settings_mask = 0;
 static char **arg_parameters = NULL;
 static const char *arg_container_service_name = "systemd-nspawn";
-static bool arg_notify_ready = false;
 static bool arg_use_cgns = true;
 static unsigned long arg_clone_ns_flags = CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS;
 static MountSettingsMask arg_mount_settings = MOUNT_APPLY_APIVFS_RO;
@@ -781,7 +775,6 @@ static int inner_child(
                 NULL, /* container_uuid */
                 NULL, /* LISTEN_FDS */
                 NULL, /* LISTEN_PID */
-                NULL, /* NOTIFY_SOCKET */
                 NULL
         };
         const char *exec_target;
@@ -889,8 +882,6 @@ static int inner_child(
                     (asprintf((char **)(envp + n_env++), "LISTEN_PID=1") < 0))
                         return log_oom();
         }
-        if (asprintf((char **)(envp + n_env++), "NOTIFY_SOCKET=%s", NSPAWN_NOTIFY_SOCKET_PATH) < 0)
-                return log_oom();
 
         env_use = strv_env_merge(2, envp, arg_setenv);
         if (!env_use)
@@ -938,38 +929,6 @@ static int inner_child(
         return log_error_errno(r, "execv(%s) failed: %m", exec_target);
 }
 
-static int setup_sd_notify_child(void) {
-        static const int one = 1;
-        int fd = -1;
-        union sockaddr_union sa = {
-                .sa.sa_family = AF_UNIX,
-        };
-        int r;
-
-        fd = socket(AF_UNIX, SOCK_DGRAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0);
-        if (fd < 0)
-                return log_error_errno(errno, "Failed to allocate notification socket: %m");
-
-        (void) mkdir_parents(NSPAWN_NOTIFY_SOCKET_PATH, 0755);
-        (void) unlink(NSPAWN_NOTIFY_SOCKET_PATH);
-
-        strncpy(sa.un.sun_path, NSPAWN_NOTIFY_SOCKET_PATH, sizeof(sa.un.sun_path)-1);
-        r = bind(fd, &sa.sa, SOCKADDR_UN_LEN(sa.un));
-        if (r < 0) {
-                safe_close(fd);
-                return log_error_errno(errno, "bind(%s) failed: %m", sa.un.sun_path);
-        }
-
-
-        r = setsockopt(fd, SOL_SOCKET, SO_PASSCRED, &one, sizeof(one));
-        if (r < 0) {
-                safe_close(fd);
-                return log_error_errno(errno, "SO_PASSCRED failed: %m");
-        }
-
-        return fd;
-}
-
 static int outer_child(
                 Barrier *barrier,
                 const char *directory,
@@ -979,7 +938,6 @@ static int outer_child(
                 bool secondary,
                 int pid_socket,
                 int uuid_socket,
-                int notify_socket,
                 int kmsg_socket,
                 int rtnl_socket,
                 int uid_shift_socket,
@@ -995,7 +953,6 @@ static int outer_child(
         assert(console);
         assert(pid_socket >= 0);
         assert(uuid_socket >= 0);
-        assert(notify_socket >= 0);
         assert(kmsg_socket >= 0);
 
         if (prctl(PR_SET_PDEATHSIG, SIGKILL) < 0)
@@ -1153,10 +1110,6 @@ static int outer_child(
         if (r < 0)
                 return log_error_errno(r, "Failed to move root directory: %m");
 
-        fd = setup_sd_notify_child();
-        if (fd < 0)
-                return fd;
-
         pid = raw_clone(SIGCHLD|CLONE_NEWNS|
                         arg_clone_ns_flags);
         if (pid < 0)
@@ -1164,7 +1117,6 @@ static int outer_child(
         if (pid == 0) {
                 pid_socket = safe_close(pid_socket);
                 uuid_socket = safe_close(uuid_socket);
-                notify_socket = safe_close(notify_socket);
                 uid_shift_socket = safe_close(uid_shift_socket);
 
                 /* The inner child has all namespaces that are
@@ -1194,103 +1146,10 @@ static int outer_child(
                 return -EIO;
         }
 
-        l = send_one_fd(notify_socket, fd, 0);
-        if (l < 0)
-                return log_error_errno(errno, "Failed to send notify fd: %m");
-
         pid_socket = safe_close(pid_socket);
         uuid_socket = safe_close(uuid_socket);
-        notify_socket = safe_close(notify_socket);
         kmsg_socket = safe_close(kmsg_socket);
         rtnl_socket = safe_close(rtnl_socket);
-
-        return 0;
-}
-
-static int nspawn_dispatch_notify_fd(sd_event_source *source, int fd, uint32_t revents, void *userdata) {
-        char buf[NOTIFY_BUFFER_MAX+1];
-        char *p = NULL;
-        struct iovec iovec = {
-                .iov_base = buf,
-                .iov_len = sizeof(buf)-1,
-        };
-        union {
-                struct cmsghdr cmsghdr;
-                uint8_t buf[CMSG_SPACE(sizeof(struct ucred)) +
-                            CMSG_SPACE(sizeof(int) * NOTIFY_FD_MAX)];
-        } control = {};
-        struct msghdr msghdr = {
-                .msg_iov = &iovec,
-                .msg_iovlen = 1,
-                .msg_control = &control,
-                .msg_controllen = sizeof(control),
-        };
-        struct cmsghdr *cmsg;
-        struct ucred *ucred = NULL;
-        ssize_t n;
-        pid_t inner_child_pid;
-        _cleanup_strv_free_ char **tags = NULL;
-
-        assert(userdata);
-
-        inner_child_pid = PTR_TO_PID(userdata);
-
-        if (revents != EPOLLIN) {
-                log_warning("Got unexpected poll event for notify fd.");
-                return 0;
-        }
-
-        n = recvmsg(fd, &msghdr, MSG_DONTWAIT|MSG_CMSG_CLOEXEC);
-        if (n < 0) {
-                if (errno == EAGAIN || errno == EINTR)
-                        return 0;
-
-                return log_warning_errno(errno, "Couldn't read notification socket: %m");
-        }
-        cmsg_close_all(&msghdr);
-
-        CMSG_FOREACH(cmsg, &msghdr) {
-                if (cmsg->cmsg_level == SOL_SOCKET &&
-                           cmsg->cmsg_type == SCM_CREDENTIALS &&
-                           cmsg->cmsg_len == CMSG_LEN(sizeof(struct ucred))) {
-
-                        ucred = (struct ucred*) CMSG_DATA(cmsg);
-                }
-        }
-
-        if (!ucred || ucred->pid != inner_child_pid) {
-                log_warning("Received notify message without valid credentials. Ignoring.");
-                return 0;
-        }
-
-        if ((size_t) n >= sizeof(buf)) {
-                log_warning("Received notify message exceeded maximum size. Ignoring.");
-                return 0;
-        }
-
-        buf[n] = 0;
-        tags = strv_split(buf, "\n\r");
-        if (!tags)
-                return log_oom();
-
-        if (strv_find(tags, "READY=1"))
-                sd_notifyf(false, "READY=1\n");
-
-        p = strv_find_startswith(tags, "STATUS=");
-        if (p)
-                sd_notifyf(false, "STATUS=Container running: %s", p);
-
-        return 0;
-}
-
-static int setup_sd_notify_parent(sd_event *event, int fd, pid_t *inner_child_pid, sd_event_source **notify_event_source) {
-        int r;
-
-        r = sd_event_add_io(event, notify_event_source, fd, EPOLLIN, nspawn_dispatch_notify_fd, inner_child_pid);
-        if (r < 0)
-                return log_error_errno(r, "Failed to allocate notify event source: %m");
-
-        (void) sd_event_source_set_description(*notify_event_source, "nspawn-notify");
 
         return 0;
 }
@@ -1301,7 +1160,6 @@ static int run(int master,
                bool interactive,
                bool secondary,
                FDSet *fds,
-               union in_addr_union *exposed,
                pid_t *pid, int *ret) {
 
         static const struct sigaction sa = {
@@ -1316,11 +1174,8 @@ static int run(int master,
                 rtnl_socket_pair[2] = { -1, -1 },
                 pid_socket_pair[2] = { -1, -1 },
                 uuid_socket_pair[2] = { -1, -1 },
-                notify_socket_pair[2] = { -1, -1 },
                 uid_shift_socket_pair[2] = { -1, -1 };
-        _cleanup_close_ int notify_socket= -1;
         _cleanup_(barrier_destroy) Barrier barrier = BARRIER_NULL;
-        _cleanup_(sd_event_source_unrefp) sd_event_source *notify_event_source = NULL;
         _cleanup_(sd_event_unrefp) sd_event *event = NULL;
         _cleanup_(pty_forward_freep) PTYForward *forward = NULL;
         _cleanup_(sd_netlink_unrefp) sd_netlink *rtnl = NULL;
@@ -1349,9 +1204,6 @@ static int run(int master,
         if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, uuid_socket_pair) < 0)
                 return log_error_errno(errno, "Failed to create id socket pair: %m");
 
-        if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, notify_socket_pair) < 0)
-                return log_error_errno(errno, "Failed to create notify socket pair: %m");
-
         /* Child can be killed before execv(), so handle SIGCHLD in order to interrupt
          * parent's blocking calls and give it a chance to call wait() and terminate. */
         r = sigprocmask(SIG_UNBLOCK, &mask_chld, NULL);
@@ -1378,7 +1230,6 @@ static int run(int master,
                 rtnl_socket_pair[0] = safe_close(rtnl_socket_pair[0]);
                 pid_socket_pair[0] = safe_close(pid_socket_pair[0]);
                 uuid_socket_pair[0] = safe_close(uuid_socket_pair[0]);
-                notify_socket_pair[0] = safe_close(notify_socket_pair[0]);
                 uid_shift_socket_pair[0] = safe_close(uid_shift_socket_pair[0]);
 
                 (void) reset_all_signal_handlers();
@@ -1392,7 +1243,6 @@ static int run(int master,
                                 secondary,
                                 pid_socket_pair[1],
                                 uuid_socket_pair[1],
-                                notify_socket_pair[1],
                                 kmsg_socket_pair[1],
                                 rtnl_socket_pair[1],
                                 uid_shift_socket_pair[1],
@@ -1411,7 +1261,6 @@ static int run(int master,
         rtnl_socket_pair[1] = safe_close(rtnl_socket_pair[1]);
         pid_socket_pair[1] = safe_close(pid_socket_pair[1]);
         uuid_socket_pair[1] = safe_close(uuid_socket_pair[1]);
-        notify_socket_pair[1] = safe_close(notify_socket_pair[1]);
         uid_shift_socket_pair[1] = safe_close(uid_shift_socket_pair[1]);
 
         /* Wait for the outer child. */
@@ -1436,12 +1285,6 @@ static int run(int master,
                 log_error("Short read while reading container machined ID.");
                 return -EIO;
         }
-
-        /* We also retrieve the socket used for notifications generated by outer child */
-        notify_socket = receive_one_fd(notify_socket_pair[0], 0);
-        if (notify_socket < 0)
-                return log_error_errno(notify_socket,
-                                       "Failed to receive notification socket from the outer child: %m");
 
         log_debug("Init process invoked as PID "PID_FMT, *pid);
 
@@ -1476,10 +1319,6 @@ static int run(int master,
         if (r < 0)
                 return log_error_errno(r, "Failed to get default event source: %m");
 
-        r = setup_sd_notify_parent(event, notify_socket, PID_TO_PTR(*pid), &notify_event_source);
-        if (r < 0)
-                return r;
-
         /* Let the child know that we are ready and wait that the child is completely ready now. */
         if (!barrier_place_and_sync(&barrier)) { /* #4 */
                 log_error("Child died too early.");
@@ -1489,12 +1328,6 @@ static int run(int master,
         /* At this point we have made use of the UID we picked, and thus nss-mymachines
          * will make them appear in getpwuid(), thus we can release the /etc/passwd lock. */
         etc_passwd_lock = safe_close(etc_passwd_lock);
-
-        sd_notifyf(false,
-                   "STATUS=Container running.\n"
-                   "X_NSPAWN_LEADER_PID=" PID_FMT, *pid);
-        if (!arg_notify_ready)
-                sd_notify(false, "READY=1\n");
 
         if (arg_kill_signal > 0) {
                 /* Try to kill the init system on SIGINT or SIGTERM */
@@ -1569,7 +1402,6 @@ int main(int argc, char *argv[]) {
         int r, ret = EXIT_SUCCESS;
         bool secondary = false;
         pid_t pid = 0;
-        union in_addr_union exposed = {};
         _cleanup_release_lock_file_ LockFile tree_global_lock = LOCK_FILE_INIT, tree_local_lock = LOCK_FILE_INIT;
         bool interactive;
         _cleanup_(loop_device_unrefp) LoopDevice *loop = NULL;
@@ -1626,7 +1458,6 @@ int main(int argc, char *argv[]) {
                 dissected_image,
                 interactive, secondary,
                 fds,
-                &exposed,
                 &pid, &ret);
 
 finish:
