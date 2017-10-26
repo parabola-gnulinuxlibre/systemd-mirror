@@ -758,7 +758,6 @@ static int inner_child(
                 Barrier *barrier,
                 const char *directory,
                 bool secondary,
-                int kmsg_socket,
                 int rtnl_socket,
                 FDSet *fds) {
 
@@ -784,7 +783,6 @@ static int inner_child(
 
         assert(barrier);
         assert(directory);
-        assert(kmsg_socket >= 0);
 
         r = reset_uid_gid();
         if (r < 0)
@@ -938,7 +936,6 @@ static int outer_child(
                 bool secondary,
                 int pid_socket,
                 int uuid_socket,
-                int kmsg_socket,
                 int rtnl_socket,
                 int uid_shift_socket,
                 FDSet *fds) {
@@ -953,7 +950,6 @@ static int outer_child(
         assert(console);
         assert(pid_socket >= 0);
         assert(uuid_socket >= 0);
-        assert(kmsg_socket >= 0);
 
         if (prctl(PR_SET_PDEATHSIG, SIGKILL) < 0)
                 return log_error_errno(errno, "PR_SET_PDEATHSIG failed: %m");
@@ -1123,7 +1119,7 @@ static int outer_child(
                  * requested, so that we all are owned by the user if
                  * user namespaces are turned on. */
 
-                r = inner_child(barrier, directory, secondary, kmsg_socket, rtnl_socket, fds);
+                r = inner_child(barrier, directory, secondary, rtnl_socket, fds);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
@@ -1148,7 +1144,6 @@ static int outer_child(
 
         pid_socket = safe_close(pid_socket);
         uuid_socket = safe_close(uuid_socket);
-        kmsg_socket = safe_close(kmsg_socket);
         rtnl_socket = safe_close(rtnl_socket);
 
         return 0;
@@ -1170,7 +1165,6 @@ static int run(int master,
         _cleanup_release_lock_file_ LockFile uid_shift_lock = LOCK_FILE_INIT;
         _cleanup_close_ int etc_passwd_lock = -1;
         _cleanup_close_pair_ int
-                kmsg_socket_pair[2] = { -1, -1 },
                 rtnl_socket_pair[2] = { -1, -1 },
                 pid_socket_pair[2] = { -1, -1 },
                 uuid_socket_pair[2] = { -1, -1 },
@@ -1191,9 +1185,6 @@ static int run(int master,
         r = barrier_create(&barrier);
         if (r < 0)
                 return log_error_errno(r, "Cannot initialize IPC barrier: %m");
-
-        if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, kmsg_socket_pair) < 0)
-                return log_error_errno(errno, "Failed to create kmsg socket pair: %m");
 
         if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, rtnl_socket_pair) < 0)
                 return log_error_errno(errno, "Failed to create rtnl socket pair: %m");
@@ -1226,7 +1217,6 @@ static int run(int master,
 
                 master = safe_close(master);
 
-                kmsg_socket_pair[0] = safe_close(kmsg_socket_pair[0]);
                 rtnl_socket_pair[0] = safe_close(rtnl_socket_pair[0]);
                 pid_socket_pair[0] = safe_close(pid_socket_pair[0]);
                 uuid_socket_pair[0] = safe_close(uuid_socket_pair[0]);
@@ -1243,7 +1233,6 @@ static int run(int master,
                                 secondary,
                                 pid_socket_pair[1],
                                 uuid_socket_pair[1],
-                                kmsg_socket_pair[1],
                                 rtnl_socket_pair[1],
                                 uid_shift_socket_pair[1],
                                 fds);
@@ -1257,7 +1246,6 @@ static int run(int master,
 
         fds = fdset_free(fds);
 
-        kmsg_socket_pair[1] = safe_close(kmsg_socket_pair[1]);
         rtnl_socket_pair[1] = safe_close(rtnl_socket_pair[1]);
         pid_socket_pair[1] = safe_close(pid_socket_pair[1]);
         uuid_socket_pair[1] = safe_close(uuid_socket_pair[1]);
