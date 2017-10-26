@@ -912,34 +912,6 @@ static int setup_resolv_conf(const char *dest) {
         return 0;
 }
 
-static int setup_boot_id(const char *dest) {
-        sd_id128_t rnd = SD_ID128_NULL;
-        const char *from, *to;
-        int r;
-
-        /* Generate a new randomized boot ID, so that each boot-up of
-         * the container gets a new one */
-
-        from = prefix_roota(dest, "/run/proc-sys-kernel-random-boot-id");
-        to = prefix_roota(dest, "/proc/sys/kernel/random/boot_id");
-
-        r = sd_id128_randomize(&rnd);
-        if (r < 0)
-                return log_error_errno(r, "Failed to generate random boot id: %m");
-
-        r = id128_write(from, ID128_UUID, rnd, false);
-        if (r < 0)
-                return log_error_errno(r, "Failed to write boot id: %m");
-
-        r = mount_verbose(LOG_ERR, from, to, NULL, MS_BIND, NULL);
-        if (r >= 0)
-                r = mount_verbose(LOG_ERR, NULL, to, NULL,
-                                  MS_BIND|MS_REMOUNT|MS_RDONLY|MS_NOSUID|MS_NODEV, NULL);
-
-        (void) unlink(from);
-        return r;
-}
-
 static int copy_devnodes(const char *dest) {
 
         static const char devnodes[] =
@@ -1067,49 +1039,6 @@ static int setup_dev_console(const char *dest, const char *console) {
                 return log_error_errno(r, "touch() for /dev/console failed: %m");
 
         return mount_verbose(LOG_ERR, console, to, NULL, MS_BIND, NULL);
-}
-
-static int setup_kmsg(const char *dest, int kmsg_socket) {
-        const char *from, *to;
-        _cleanup_umask_ mode_t u;
-        int fd, r;
-
-        assert(kmsg_socket >= 0);
-
-        u = umask(0000);
-
-        /* We create the kmsg FIFO as /run/kmsg, but immediately
-         * delete it after bind mounting it to /proc/kmsg. While FIFOs
-         * on the reading side behave very similar to /proc/kmsg,
-         * their writing side behaves differently from /dev/kmsg in
-         * that writing blocks when nothing is reading. In order to
-         * avoid any problems with containers deadlocking due to this
-         * we simply make /dev/kmsg unavailable to the container. */
-        from = prefix_roota(dest, "/run/kmsg");
-        to = prefix_roota(dest, "/proc/kmsg");
-
-        if (mkfifo(from, 0600) < 0)
-                return log_error_errno(errno, "mkfifo() for /run/kmsg failed: %m");
-        r = mount_verbose(LOG_ERR, from, to, NULL, MS_BIND, NULL);
-        if (r < 0)
-                return r;
-
-        fd = open(from, O_RDWR|O_NDELAY|O_CLOEXEC);
-        if (fd < 0)
-                return log_error_errno(errno, "Failed to open fifo: %m");
-
-        /* Store away the fd in the socket, so that it stays open as
-         * long as we run the child */
-        r = send_one_fd(kmsg_socket, fd, 0);
-        safe_close(fd);
-
-        if (r < 0)
-                return log_error_errno(r, "Failed to send FIFO fd: %m");
-
-        /* And now make the FIFO unavailable as /run/kmsg... */
-        (void) unlink(from);
-
-        return 0;
 }
 
 static int on_address_change(sd_netlink *rtnl, sd_netlink_message *m, void *userdata) {
@@ -1588,15 +1517,6 @@ static int inner_child(
                 if (r < 0)
                         return r;
         }
-
-        r = setup_boot_id(NULL);
-        if (r < 0)
-                return r;
-
-        r = setup_kmsg(NULL, kmsg_socket);
-        if (r < 0)
-                return r;
-        kmsg_socket = safe_close(kmsg_socket);
 
         umask(0022);
 

@@ -102,15 +102,6 @@ static int custom_mount_compare(const void *a, const void *b) {
         return 0;
 }
 
-static bool source_path_is_valid(const char *p) {
-        assert(p);
-
-        if (*p == '+')
-                p++;
-
-        return path_is_absolute(p);
-}
-
 static char *resolve_source_path(const char *dest, const char *source) {
 
         if (!source)
