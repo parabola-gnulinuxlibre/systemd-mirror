@@ -98,7 +98,6 @@ typedef struct Settings {
         ExposePort *expose_ports;
 } Settings;
 
-int settings_load(FILE *f, const char *path, Settings **ret);
 Settings* settings_free(Settings *s);
 
 bool settings_network_veth(Settings *s);

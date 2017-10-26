@@ -205,52 +205,6 @@ int custom_mount_prepare_all(const char *dest, CustomMount *l, unsigned n) {
         return 0;
 }
 
-int bind_mount_parse(CustomMount **l, unsigned *n, const char *s, bool read_only) {
-        _cleanup_free_ char *source = NULL, *destination = NULL, *opts = NULL;
-        const char *p = s;
-        CustomMount *m;
-        int r;
-
-        assert(l);
-        assert(n);
-
-        r = extract_many_words(&p, ":", EXTRACT_DONT_COALESCE_SEPARATORS, &source, &destination, NULL);
-        if (r < 0)
-                return r;
-        if (r == 0)
-                return -EINVAL;
-        if (r == 1) {
-                destination = strdup(source[0] == '+' ? source+1 : source);
-                if (!destination)
-                        return -ENOMEM;
-        }
-        if (r == 2 && !isempty(p)) {
-                opts = strdup(p);
-                if (!opts)
-                        return -ENOMEM;
-        }
-
-        if (isempty(source))
-                source = NULL;
-        else if (!source_path_is_valid(source))
-                return -EINVAL;
-
-        if (!path_is_absolute(destination))
-                return -EINVAL;
-
-        m = custom_mount_add(l, n, CUSTOM_MOUNT_BIND);
-        if (!m)
-                return -ENOMEM;
-
-        m->source = source;
-        m->destination = destination;
-        m->read_only = read_only;
-        m->options = opts;
-
-        source = destination = opts = NULL;
-        return 0;
-}
-
 int tmpfs_mount_parse(CustomMount **l, unsigned *n, const char *s) {
         _cleanup_free_ char *path = NULL, *opts = NULL;
         const char *p = s;
@@ -285,71 +239,6 @@ int tmpfs_mount_parse(CustomMount **l, unsigned *n, const char *s) {
         m->options = opts;
 
         path = opts = NULL;
-        return 0;
-}
-
-int overlay_mount_parse(CustomMount **l, unsigned *n, const char *s, bool read_only) {
-        _cleanup_free_ char *upper = NULL, *destination = NULL;
-        _cleanup_strv_free_ char **lower = NULL;
-        CustomMount *m;
-        int k;
-
-        k = strv_split_extract(&lower, s, ":", EXTRACT_DONT_COALESCE_SEPARATORS);
-        if (k < 0)
-                return k;
-        if (k < 2)
-                return -EADDRNOTAVAIL;
-        if (k == 2) {
-                /* If two parameters are specified, the first one is the lower, the second one the upper directory. And
-                 * we'll also define the destination mount point the same as the upper. */
-
-                if (!source_path_is_valid(lower[0]) ||
-                    !source_path_is_valid(lower[1]))
-                        return -EINVAL;
-
-                upper = lower[1];
-                lower[1] = NULL;
-
-                destination = strdup(upper[0] == '+' ? upper+1 : upper); /* take the destination without "+" prefix */
-                if (!destination)
-                        return -ENOMEM;
-        } else {
-                char **i;
-
-                /* If more than two parameters are specified, the last one is the destination, the second to last one
-                 * the "upper", and all before that the "lower" directories. */
-
-                destination = lower[k - 1];
-                upper = lower[k - 2];
-                lower[k - 2] = NULL;
-
-                STRV_FOREACH(i, lower)
-                        if (!source_path_is_valid(*i))
-                                return -EINVAL;
-
-                /* If the upper directory is unspecified, then let's create it automatically as a throw-away directory
-                 * in /var/tmp */
-                if (isempty(upper))
-                        upper = NULL;
-                else if (!source_path_is_valid(upper))
-                        return -EINVAL;
-
-                if (!path_is_absolute(destination))
-                        return -EINVAL;
-        }
-
-        m = custom_mount_add(l, n, CUSTOM_MOUNT_OVERLAY);
-        if (!m)
-                return -ENOMEM;
-
-        m->destination = destination;
-        m->source = upper;
-        m->lower = lower;
-        m->read_only = read_only;
-
-        upper = destination = NULL;
-        lower = NULL;
-
         return 0;
 }
 

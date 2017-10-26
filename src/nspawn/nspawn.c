@@ -79,7 +79,6 @@
 #include "nspawn-cgroup.h"
 #include "nspawn-expose-ports.h"
 #include "nspawn-mount.h"
-#include "nspawn-network.h"
 #include "nspawn-patch-uid.h"
 #include "nspawn-register.h"
 #include "nspawn-seccomp.h"
@@ -142,7 +141,6 @@ static char *arg_machine = NULL;
 static const char *arg_selinux_context = NULL;
 static const char *arg_selinux_apifs_context = NULL;
 static const char *arg_slice = NULL;
-static bool arg_private_network = false;
 static bool arg_read_only = false;
 static StartMode arg_start_mode = START_PID1;
 static bool arg_ephemeral = false;
@@ -179,13 +177,10 @@ static CustomMount *arg_custom_mounts = NULL;
 static unsigned arg_n_custom_mounts = 0;
 static char **arg_setenv = NULL;
 static bool arg_quiet = false;
-static bool arg_register = true;
 static bool arg_keep_unit = false;
 static char **arg_network_interfaces = NULL;
 static char **arg_network_macvlan = NULL;
 static char **arg_network_ipvlan = NULL;
-static bool arg_network_veth = false;
-static char **arg_network_veth_extra = NULL;
 static char *arg_network_bridge = NULL;
 static char *arg_network_zone = NULL;
 static unsigned long arg_personality = PERSONALITY_INVALID;
@@ -212,84 +207,6 @@ static size_t arg_root_hash_size = 0;
 static void help(void) {
         printf("%s [OPTIONS...] [PATH] [ARGUMENTS...]\n\n"
                "Spawn a minimal namespace container for debugging, testing and building.\n\n"
-               "  -h --help                 Show this help\n"
-               "     --version              Print version string\n"
-               "  -q --quiet                Do not show status information\n"
-               "  -D --directory=PATH       Root directory for the container\n"
-               "     --template=PATH        Initialize root directory from template directory,\n"
-               "                            if missing\n"
-               "  -x --ephemeral            Run container with snapshot of root directory, and\n"
-               "                            remove it after exit\n"
-               "  -i --image=PATH           File system device or disk image for the container\n"
-               "     --root-hash=HASH       Specify verity root hash\n"
-               "  -a --as-pid2              Maintain a stub init as PID1, invoke binary as PID2\n"
-               "  -b --boot                 Boot up full system (i.e. invoke init)\n"
-               "     --chdir=PATH           Set working directory in the container\n"
-               "     --pivot-root=PATH[:PATH]\n"
-               "                            Pivot root to given directory in the container\n"
-               "  -u --user=USER            Run the command under specified user or uid\n"
-               "  -M --machine=NAME         Set the machine name for the container\n"
-               "     --uuid=UUID            Set a specific machine UUID for the container\n"
-               "  -S --slice=SLICE          Place the container in the specified slice\n"
-               "     --property=NAME=VALUE  Set scope unit property\n"
-               "  -U --private-users=pick   Run within user namespace, autoselect UID/GID range\n"
-               "     --private-users[=UIDBASE[:NUIDS]]\n"
-               "                            Similar, but with user configured UID/GID range\n"
-               "     --private-users-chown  Adjust OS tree ownership to private UID/GID range\n"
-               "     --private-network      Disable network in container\n"
-               "     --network-interface=INTERFACE\n"
-               "                            Assign an existing network interface to the\n"
-               "                            container\n"
-               "     --network-macvlan=INTERFACE\n"
-               "                            Create a macvlan network interface based on an\n"
-               "                            existing network interface to the container\n"
-               "     --network-ipvlan=INTERFACE\n"
-               "                            Create a ipvlan network interface based on an\n"
-               "                            existing network interface to the container\n"
-               "  -n --network-veth         Add a virtual Ethernet connection between host\n"
-               "                            and container\n"
-               "     --network-veth-extra=HOSTIF[:CONTAINERIF]\n"
-               "                            Add an additional virtual Ethernet link between\n"
-               "                            host and container\n"
-               "     --network-bridge=INTERFACE\n"
-               "                            Add a virtual Ethernet connection to the container\n"
-               "                            and attach it to an existing bridge on the host\n"
-               "     --network-zone=NAME    Similar, but attach the new interface to an\n"
-               "                            an automatically managed bridge interface\n"
-               "  -p --port=[PROTOCOL:]HOSTPORT[:CONTAINERPORT]\n"
-               "                            Expose a container IP port on the host\n"
-               "  -Z --selinux-context=SECLABEL\n"
-               "                            Set the SELinux security context to be used by\n"
-               "                            processes in the container\n"
-               "  -L --selinux-apifs-context=SECLABEL\n"
-               "                            Set the SELinux security context to be used by\n"
-               "                            API/tmpfs file systems in the container\n"
-               "     --capability=CAP       In addition to the default, retain specified\n"
-               "                            capability\n"
-               "     --drop-capability=CAP  Drop the specified capability from the default set\n"
-               "     --kill-signal=SIGNAL   Select signal to use for shutting down PID 1\n"
-               "     --link-journal=MODE    Link up guest journal, one of no, auto, guest, \n"
-               "                            host, try-guest, try-host\n"
-               "  -j                        Equivalent to --link-journal=try-guest\n"
-               "     --read-only            Mount the root directory read-only\n"
-               "     --bind=PATH[:PATH[:OPTIONS]]\n"
-               "                            Bind mount a file or directory from the host into\n"
-               "                            the container\n"
-               "     --bind-ro=PATH[:PATH[:OPTIONS]\n"
-               "                            Similar, but creates a read-only bind mount\n"
-               "     --tmpfs=PATH:[OPTIONS] Mount an empty tmpfs to the specified directory\n"
-               "     --overlay=PATH[:PATH...]:PATH\n"
-               "                            Create an overlay mount from the host to \n"
-               "                            the container\n"
-               "     --overlay-ro=PATH[:PATH...]:PATH\n"
-               "                            Similar, but creates a read-only overlay mount\n"
-               "  -E --setenv=NAME=VALUE    Pass an environment variable to PID 1\n"
-               "     --register=BOOLEAN     Register container as machine\n"
-               "     --keep-unit            Do not register a scope for the machine, reuse\n"
-               "                            the service unit nspawn is running in\n"
-               "     --volatile[=MODE]      Run the system in volatile mode\n"
-               "     --settings=BOOLEAN     Load additional settings from .nspawn file\n"
-               "     --notify-ready=BOOLEAN Receive notifications from the child init process\n"
                , program_invocation_short_name);
 }
 
@@ -399,7 +316,6 @@ static int parse_argv(int argc, char *argv[]) {
 
         enum {
                 ARG_VERSION = 0x100,
-                ARG_PRIVATE_NETWORK,
                 ARG_UUID,
                 ARG_READ_ONLY,
                 ARG_CAPABILITY,
@@ -411,14 +327,12 @@ static int parse_argv(int argc, char *argv[]) {
                 ARG_OVERLAY,
                 ARG_OVERLAY_RO,
                 ARG_SHARE_SYSTEM,
-                ARG_REGISTER,
                 ARG_KEEP_UNIT,
                 ARG_NETWORK_INTERFACE,
                 ARG_NETWORK_MACVLAN,
                 ARG_NETWORK_IPVLAN,
                 ARG_NETWORK_BRIDGE,
                 ARG_NETWORK_ZONE,
-                ARG_NETWORK_VETH_EXTRA,
                 ARG_PERSONALITY,
                 ARG_VOLATILE,
                 ARG_TEMPLATE,
@@ -440,7 +354,6 @@ static int parse_argv(int argc, char *argv[]) {
                 { "template",              required_argument, NULL, ARG_TEMPLATE            },
                 { "ephemeral",             no_argument,       NULL, 'x'                     },
                 { "user",                  required_argument, NULL, 'u'                     },
-                { "private-network",       no_argument,       NULL, ARG_PRIVATE_NETWORK     },
                 { "as-pid2",               no_argument,       NULL, 'a'                     },
                 { "boot",                  no_argument,       NULL, 'b'                     },
                 { "uuid",                  required_argument, NULL, ARG_UUID                },
@@ -460,13 +373,10 @@ static int parse_argv(int argc, char *argv[]) {
                 { "selinux-apifs-context", required_argument, NULL, 'L'                     },
                 { "quiet",                 no_argument,       NULL, 'q'                     },
                 { "share-system",          no_argument,       NULL, ARG_SHARE_SYSTEM        }, /* not documented */
-                { "register",              required_argument, NULL, ARG_REGISTER            },
                 { "keep-unit",             no_argument,       NULL, ARG_KEEP_UNIT           },
                 { "network-interface",     required_argument, NULL, ARG_NETWORK_INTERFACE   },
                 { "network-macvlan",       required_argument, NULL, ARG_NETWORK_MACVLAN     },
                 { "network-ipvlan",        required_argument, NULL, ARG_NETWORK_IPVLAN      },
-                { "network-veth",          no_argument,       NULL, 'n'                     },
-                { "network-veth-extra",    required_argument, NULL, ARG_NETWORK_VETH_EXTRA  },
                 { "network-bridge",        required_argument, NULL, ARG_NETWORK_BRIDGE      },
                 { "network-zone",          required_argument, NULL, ARG_NETWORK_ZONE        },
                 { "personality",           required_argument, NULL, ARG_PERSONALITY         },
@@ -532,101 +442,6 @@ static int parse_argv(int argc, char *argv[]) {
                                 return log_oom();
 
                         arg_settings_mask |= SETTING_USER;
-                        break;
-
-                case ARG_NETWORK_ZONE: {
-                        char *j;
-
-                        j = strappend("vz-", optarg);
-                        if (!j)
-                                return log_oom();
-
-                        if (!ifname_valid(j)) {
-                                log_error("Network zone name not valid: %s", j);
-                                free(j);
-                                return -EINVAL;
-                        }
-
-                        free(arg_network_zone);
-                        arg_network_zone = j;
-
-                        arg_network_veth = true;
-                        arg_private_network = true;
-                        arg_settings_mask |= SETTING_NETWORK;
-                        break;
-                }
-
-                case ARG_NETWORK_BRIDGE:
-
-                        if (!ifname_valid(optarg)) {
-                                log_error("Bridge interface name not valid: %s", optarg);
-                                return -EINVAL;
-                        }
-
-                        r = free_and_strdup(&arg_network_bridge, optarg);
-                        if (r < 0)
-                                return log_oom();
-
-                        /* fall through */
-
-                case 'n':
-                        arg_network_veth = true;
-                        arg_private_network = true;
-                        arg_settings_mask |= SETTING_NETWORK;
-                        break;
-
-                case ARG_NETWORK_VETH_EXTRA:
-                        r = veth_extra_parse(&arg_network_veth_extra, optarg);
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to parse --network-veth-extra= parameter: %s", optarg);
-
-                        arg_private_network = true;
-                        arg_settings_mask |= SETTING_NETWORK;
-                        break;
-
-                case ARG_NETWORK_INTERFACE:
-
-                        if (!ifname_valid(optarg)) {
-                                log_error("Network interface name not valid: %s", optarg);
-                                return -EINVAL;
-                        }
-
-                        if (strv_extend(&arg_network_interfaces, optarg) < 0)
-                                return log_oom();
-
-                        arg_private_network = true;
-                        arg_settings_mask |= SETTING_NETWORK;
-                        break;
-
-                case ARG_NETWORK_MACVLAN:
-
-                        if (!ifname_valid(optarg)) {
-                                log_error("MACVLAN network interface name not valid: %s", optarg);
-                                return -EINVAL;
-                        }
-
-                        if (strv_extend(&arg_network_macvlan, optarg) < 0)
-                                return log_oom();
-
-                        arg_private_network = true;
-                        arg_settings_mask |= SETTING_NETWORK;
-                        break;
-
-                case ARG_NETWORK_IPVLAN:
-
-                        if (!ifname_valid(optarg)) {
-                                log_error("IPVLAN network interface name not valid: %s", optarg);
-                                return -EINVAL;
-                        }
-
-                        if (strv_extend(&arg_network_ipvlan, optarg) < 0)
-                                return log_oom();
-
-                        /* fall through */
-
-                case ARG_PRIVATE_NETWORK:
-                        arg_private_network = true;
-                        arg_settings_mask |= SETTING_NETWORK;
                         break;
 
                 case 'b':
@@ -763,34 +578,6 @@ static int parse_argv(int argc, char *argv[]) {
 
                         break;
 
-                case ARG_BIND:
-                case ARG_BIND_RO:
-                        r = bind_mount_parse(&arg_custom_mounts, &arg_n_custom_mounts, optarg, c == ARG_BIND_RO);
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to parse --bind(-ro)= argument %s: %m", optarg);
-
-                        arg_settings_mask |= SETTING_CUSTOM_MOUNTS;
-                        break;
-
-                case ARG_TMPFS:
-                        r = tmpfs_mount_parse(&arg_custom_mounts, &arg_n_custom_mounts, optarg);
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to parse --tmpfs= argument %s: %m", optarg);
-
-                        arg_settings_mask |= SETTING_CUSTOM_MOUNTS;
-                        break;
-
-                case ARG_OVERLAY:
-                case ARG_OVERLAY_RO:
-                        r = overlay_mount_parse(&arg_custom_mounts, &arg_n_custom_mounts, optarg, c == ARG_OVERLAY_RO);
-                        if (r == -EADDRNOTAVAIL)
-                                return log_error_errno(r, "--overlay(-ro)= needs at least two colon-separated directories specified.");
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to parse --overlay(-ro)= argument %s: %m", optarg);
-
-                        arg_settings_mask |= SETTING_CUSTOM_MOUNTS;
-                        break;
-
                 case 'E': {
                         char **n;
 
@@ -818,16 +605,6 @@ static int parse_argv(int argc, char *argv[]) {
                         /* We don't officially support this anymore, except for compat reasons. People should use the
                          * $SYSTEMD_NSPAWN_SHARE_* environment variables instead. */
                         arg_clone_ns_flags = 0;
-                        break;
-
-                case ARG_REGISTER:
-                        r = parse_boolean(optarg);
-                        if (r < 0) {
-                                log_error("Failed to parse --register= argument: %s", optarg);
-                                return r;
-                        }
-
-                        arg_register = r;
                         break;
 
                 case ARG_KEEP_UNIT:
@@ -1066,14 +843,10 @@ static int parse_argv(int argc, char *argv[]) {
         if (arg_userns_mode != USER_NAMESPACE_NO)
                 arg_mount_settings |= MOUNT_USE_USERNS;
 
-        if (arg_private_network)
-                arg_mount_settings |= MOUNT_APPLY_APIVFS_NETNS;
-
         parse_mount_settings_env();
 
         if (!(arg_clone_ns_flags & CLONE_NEWPID) ||
             !(arg_clone_ns_flags & CLONE_NEWUTS)) {
-                arg_register = false;
                 if (arg_start_mode != START_PID1) {
                         log_error("--boot cannot be used without namespacing.");
                         return -EINVAL;
@@ -1082,11 +855,6 @@ static int parse_argv(int argc, char *argv[]) {
 
         if (arg_userns_mode == USER_NAMESPACE_PICK)
                 arg_userns_chown = true;
-
-        if (arg_keep_unit && arg_register && cg_pid_get_owner_uid(0, NULL) >= 0) {
-                log_error("--keep-unit --register=yes may not be used when invoked from a user session.");
-                return -EINVAL;
-        }
 
         if (arg_directory && arg_image) {
                 log_error("--directory= and --image= may not be combined.");
@@ -1154,7 +922,7 @@ static int parse_argv(int argc, char *argv[]) {
         if (mask_all_settings)
                 arg_settings_mask = _SETTINGS_MASK_ALL;
 
-        arg_caps_retain = (arg_caps_retain | plus | (arg_private_network ? 1ULL << CAP_NET_ADMIN : 0)) & ~minus;
+        arg_caps_retain = (arg_caps_retain | plus) & ~minus;
 
         r = cg_unified_flush();
         if (r < 0)
@@ -1178,11 +946,6 @@ static int parse_argv(int argc, char *argv[]) {
 }
 
 static int verify_arguments(void) {
-        if (arg_userns_mode != USER_NAMESPACE_NO && (arg_mount_settings & MOUNT_APPLY_APIVFS_NETNS) && !arg_private_network) {
-                log_error("Invalid namespacing settings. Mounting sysfs with --private-users requires --private-network.");
-                return -EINVAL;
-        }
-
         if (arg_userns_mode != USER_NAMESPACE_NO && !(arg_mount_settings & MOUNT_APPLY_APIVFS_RO)) {
                 log_error("Cannot combine --private-users with read-write mounts.");
                 return -EINVAL;
@@ -1192,18 +955,6 @@ static int verify_arguments(void) {
                 log_error("Cannot combine --read-only with --volatile. Note that --volatile already implies a read-only base hierarchy.");
                 return -EINVAL;
         }
-
-        if (arg_expose_ports && !arg_private_network) {
-                log_error("Cannot use --port= without private networking.");
-                return -EINVAL;
-        }
-
-#ifndef HAVE_LIBIPTC
-        if (arg_expose_ports) {
-                log_error("--port= is not supported, compiled without libiptc support.");
-                return -EOPNOTSUPP;
-        }
-#endif
 
         if (arg_start_mode == START_BOOT && arg_kill_signal <= 0)
                 arg_kill_signal = SIGRTMIN+3;
@@ -1357,9 +1108,6 @@ static int setup_resolv_conf(const char *dest) {
         int r, found;
 
         assert(dest);
-
-        if (arg_private_network)
-                return 0;
 
         r = chase_symlinks("/etc", dest, CHASE_PREFIX_ROOT, &etc);
         if (r < 0) {
@@ -2250,9 +1998,6 @@ static int inner_child(
         if (setsid() < 0)
                 return log_error_errno(errno, "setsid() failed: %m");
 
-        if (arg_private_network)
-                loopback_setup();
-
         if (arg_expose_ports) {
                 r = expose_port_send_rtnl(rtnl_socket);
                 if (r < 0)
@@ -2658,7 +2403,6 @@ static int outer_child(
 
         pid = raw_clone(SIGCHLD|CLONE_NEWNS|
                         arg_clone_ns_flags |
-                        (arg_private_network ? CLONE_NEWNET : 0) |
                         (arg_userns_mode != USER_NAMESPACE_NO ? CLONE_NEWUSER : 0));
         if (pid < 0)
                 return log_error_errno(errno, "Failed to fork inner child: %m");
@@ -2872,253 +2616,12 @@ static int setup_sd_notify_parent(sd_event *event, int fd, pid_t *inner_child_pi
         return 0;
 }
 
-static int load_settings(void) {
-        _cleanup_(settings_freep) Settings *settings = NULL;
-        _cleanup_fclose_ FILE *f = NULL;
-        _cleanup_free_ char *p = NULL;
-        const char *fn, *i;
-        int r;
-
-        /* If all settings are masked, there's no point in looking for
-         * the settings file */
-        if ((arg_settings_mask & _SETTINGS_MASK_ALL) == _SETTINGS_MASK_ALL)
-                return 0;
-
-        fn = strjoina(arg_machine, ".nspawn");
-
-        /* We first look in the admin's directories in /etc and /run */
-        FOREACH_STRING(i, "/etc/systemd/nspawn", "/run/systemd/nspawn") {
-                _cleanup_free_ char *j = NULL;
-
-                j = strjoin(i, "/", fn);
-                if (!j)
-                        return log_oom();
-
-                f = fopen(j, "re");
-                if (f) {
-                        p = j;
-                        j = NULL;
-
-                        /* By default, we trust configuration from /etc and /run */
-                        if (arg_settings_trusted < 0)
-                                arg_settings_trusted = true;
-
-                        break;
-                }
-
-                if (errno != ENOENT)
-                        return log_error_errno(errno, "Failed to open %s: %m", j);
-        }
-
-        if (!f) {
-                /* After that, let's look for a file next to the
-                 * actual image we shall boot. */
-
-                if (arg_image) {
-                        p = file_in_same_dir(arg_image, fn);
-                        if (!p)
-                                return log_oom();
-                } else if (arg_directory) {
-                        p = file_in_same_dir(arg_directory, fn);
-                        if (!p)
-                                return log_oom();
-                }
-
-                if (p) {
-                        f = fopen(p, "re");
-                        if (!f && errno != ENOENT)
-                                return log_error_errno(errno, "Failed to open %s: %m", p);
-
-                        /* By default, we do not trust configuration from /var/lib/machines */
-                        if (arg_settings_trusted < 0)
-                                arg_settings_trusted = false;
-                }
-        }
-
-        if (!f)
-                return 0;
-
-        log_debug("Settings are trusted: %s", yes_no(arg_settings_trusted));
-
-        r = settings_load(f, p, &settings);
-        if (r < 0)
-                return r;
-
-        /* Copy over bits from the settings, unless they have been
-         * explicitly masked by command line switches. */
-
-        if ((arg_settings_mask & SETTING_START_MODE) == 0 &&
-            settings->start_mode >= 0) {
-                arg_start_mode = settings->start_mode;
-
-                strv_free(arg_parameters);
-                arg_parameters = settings->parameters;
-                settings->parameters = NULL;
-        }
-
-        if ((arg_settings_mask & SETTING_PIVOT_ROOT) == 0 &&
-            settings->pivot_root_new) {
-                free_and_replace(arg_pivot_root_new, settings->pivot_root_new);
-                free_and_replace(arg_pivot_root_old, settings->pivot_root_old);
-        }
-
-        if ((arg_settings_mask & SETTING_WORKING_DIRECTORY) == 0 &&
-            settings->working_directory) {
-                free(arg_chdir);
-                arg_chdir = settings->working_directory;
-                settings->working_directory = NULL;
-        }
-
-        if ((arg_settings_mask & SETTING_ENVIRONMENT) == 0 &&
-            settings->environment) {
-                strv_free(arg_setenv);
-                arg_setenv = settings->environment;
-                settings->environment = NULL;
-        }
-
-        if ((arg_settings_mask & SETTING_USER) == 0 &&
-            settings->user) {
-                free(arg_user);
-                arg_user = settings->user;
-                settings->user = NULL;
-        }
-
-        if ((arg_settings_mask & SETTING_CAPABILITY) == 0) {
-                uint64_t plus;
-
-                plus = settings->capability;
-                if (settings_private_network(settings))
-                        plus |= (1ULL << CAP_NET_ADMIN);
-
-                if (!arg_settings_trusted && plus != 0) {
-                        if (settings->capability != 0)
-                                log_warning("Ignoring Capability= setting, file %s is not trusted.", p);
-                } else
-                        arg_caps_retain |= plus;
-
-                arg_caps_retain &= ~settings->drop_capability;
-        }
-
-        if ((arg_settings_mask & SETTING_KILL_SIGNAL) == 0 &&
-            settings->kill_signal > 0)
-                arg_kill_signal = settings->kill_signal;
-
-        if ((arg_settings_mask & SETTING_PERSONALITY) == 0 &&
-            settings->personality != PERSONALITY_INVALID)
-                arg_personality = settings->personality;
-
-        if ((arg_settings_mask & SETTING_MACHINE_ID) == 0 &&
-            !sd_id128_is_null(settings->machine_id)) {
-
-                if (!arg_settings_trusted)
-                        log_warning("Ignoring MachineID= setting, file %s is not trusted.", p);
-                else
-                        arg_uuid = settings->machine_id;
-        }
-
-        if ((arg_settings_mask & SETTING_READ_ONLY) == 0 &&
-            settings->read_only >= 0)
-                arg_read_only = settings->read_only;
-
-        if ((arg_settings_mask & SETTING_VOLATILE_MODE) == 0 &&
-            settings->volatile_mode != _VOLATILE_MODE_INVALID)
-                arg_volatile_mode = settings->volatile_mode;
-
-        if ((arg_settings_mask & SETTING_CUSTOM_MOUNTS) == 0 &&
-            settings->n_custom_mounts > 0) {
-
-                if (!arg_settings_trusted)
-                        log_warning("Ignoring TemporaryFileSystem=, Bind= and BindReadOnly= settings, file %s is not trusted.", p);
-                else {
-                        custom_mount_free_all(arg_custom_mounts, arg_n_custom_mounts);
-                        arg_custom_mounts = settings->custom_mounts;
-                        arg_n_custom_mounts = settings->n_custom_mounts;
-
-                        settings->custom_mounts = NULL;
-                        settings->n_custom_mounts = 0;
-                }
-        }
-
-        if ((arg_settings_mask & SETTING_NETWORK) == 0 &&
-            (settings->private_network >= 0 ||
-             settings->network_veth >= 0 ||
-             settings->network_bridge ||
-             settings->network_zone ||
-             settings->network_interfaces ||
-             settings->network_macvlan ||
-             settings->network_ipvlan ||
-             settings->network_veth_extra)) {
-
-                if (!arg_settings_trusted)
-                        log_warning("Ignoring network settings, file %s is not trusted.", p);
-                else {
-                        arg_network_veth = settings_network_veth(settings);
-                        arg_private_network = settings_private_network(settings);
-
-                        strv_free(arg_network_interfaces);
-                        arg_network_interfaces = settings->network_interfaces;
-                        settings->network_interfaces = NULL;
-
-                        strv_free(arg_network_macvlan);
-                        arg_network_macvlan = settings->network_macvlan;
-                        settings->network_macvlan = NULL;
-
-                        strv_free(arg_network_ipvlan);
-                        arg_network_ipvlan = settings->network_ipvlan;
-                        settings->network_ipvlan = NULL;
-
-                        strv_free(arg_network_veth_extra);
-                        arg_network_veth_extra = settings->network_veth_extra;
-                        settings->network_veth_extra = NULL;
-
-                        free(arg_network_bridge);
-                        arg_network_bridge = settings->network_bridge;
-                        settings->network_bridge = NULL;
-
-                        free(arg_network_zone);
-                        arg_network_zone = settings->network_zone;
-                        settings->network_zone = NULL;
-                }
-        }
-
-        if ((arg_settings_mask & SETTING_EXPOSE_PORTS) == 0 &&
-            settings->expose_ports) {
-
-                if (!arg_settings_trusted)
-                        log_warning("Ignoring Port= setting, file %s is not trusted.", p);
-                else {
-                        expose_port_free_all(arg_expose_ports);
-                        arg_expose_ports = settings->expose_ports;
-                        settings->expose_ports = NULL;
-                }
-        }
-
-        if ((arg_settings_mask & SETTING_USERNS) == 0 &&
-            settings->userns_mode != _USER_NAMESPACE_MODE_INVALID) {
-
-                if (!arg_settings_trusted)
-                        log_warning("Ignoring PrivateUsers= and PrivateUsersChown= settings, file %s is not trusted.", p);
-                else {
-                        arg_userns_mode = settings->userns_mode;
-                        arg_uid_shift = settings->uid_shift;
-                        arg_uid_range = settings->uid_range;
-                        arg_userns_chown = settings->userns_chown;
-                }
-        }
-
-        if ((arg_settings_mask & SETTING_NOTIFY_READY) == 0)
-                arg_notify_ready = settings->notify_ready;
-
-        return 0;
-}
-
 static int run(int master,
                const char* console,
                DissectedImage *dissected_image,
                bool interactive,
                bool secondary,
                FDSet *fds,
-               char veth_name[IFNAMSIZ], bool *veth_created,
                union in_addr_union *exposed,
                pid_t *pid, int *ret) {
 
@@ -3144,7 +2647,7 @@ static int run(int master,
         _cleanup_(sd_netlink_unrefp) sd_netlink *rtnl = NULL;
         ContainerStatus container_status = 0;
         char last_char = 0;
-        int ifi = 0, r;
+        int r;
         ssize_t l;
         sigset_t mask_chld;
 
@@ -3322,83 +2825,7 @@ static int run(int master,
                 (void) barrier_place(&barrier); /* #2 */
         }
 
-        if (arg_private_network) {
-
-                r = move_network_interfaces(*pid, arg_network_interfaces);
-                if (r < 0)
-                        return r;
-
-                if (arg_network_veth) {
-                        r = setup_veth(arg_machine, *pid, veth_name,
-                                       arg_network_bridge || arg_network_zone);
-                        if (r < 0)
-                                return r;
-                        else if (r > 0)
-                                ifi = r;
-
-                        if (arg_network_bridge) {
-                                /* Add the interface to a bridge */
-                                r = setup_bridge(veth_name, arg_network_bridge, false);
-                                if (r < 0)
-                                        return r;
-                                if (r > 0)
-                                        ifi = r;
-                        } else if (arg_network_zone) {
-                                /* Add the interface to a bridge, possibly creating it */
-                                r = setup_bridge(veth_name, arg_network_zone, true);
-                                if (r < 0)
-                                        return r;
-                                if (r > 0)
-                                        ifi = r;
-                        }
-                }
-
-                r = setup_veth_extra(arg_machine, *pid, arg_network_veth_extra);
-                if (r < 0)
-                        return r;
-
-                /* We created the primary and extra veth links now; let's remember this, so that we know to
-                   remove them later on. Note that we don't bother with removing veth links that were created
-                   here when their setup failed half-way, because in that case the kernel should be able to
-                   remove them on its own, since they cannot be referenced by anything yet. */
-                *veth_created = true;
-
-                r = setup_macvlan(arg_machine, *pid, arg_network_macvlan);
-                if (r < 0)
-                        return r;
-
-                r = setup_ipvlan(arg_machine, *pid, arg_network_ipvlan);
-                if (r < 0)
-                        return r;
-        }
-
-        if (arg_register) {
-                r = register_machine(
-                                arg_machine,
-                                *pid,
-                                arg_directory,
-                                arg_uuid,
-                                ifi,
-                                arg_slice,
-                                arg_custom_mounts, arg_n_custom_mounts,
-                                arg_kill_signal,
-                                arg_property,
-                                arg_keep_unit,
-                                arg_container_service_name);
-                if (r < 0)
-                        return r;
-        } else if (!arg_keep_unit) {
-                r = allocate_scope(
-                                arg_machine,
-                                *pid,
-                                arg_slice,
-                                arg_custom_mounts, arg_n_custom_mounts,
-                                arg_kill_signal,
-                                arg_property);
-                if (r < 0)
-                        return r;
-
-        } else if (arg_slice || arg_property)
+        if (arg_slice || arg_property)
                 log_notice("Machine and scope registration turned off, --slice= and --property= settings will have no effect.");
 
         r = sync_cgroup(*pid, arg_unified_cgroup_hierarchy, arg_uid_shift);
@@ -3494,10 +2921,6 @@ static int run(int master,
         if (!arg_quiet && last_char != '\n')
                 putc('\n', stdout);
 
-        /* Kill if it is not dead yet anyway */
-        if (arg_register && !arg_keep_unit)
-                terminate_machine(*pid);
-
         /* Normally redundant, but better safe than sorry */
         (void) kill(*pid, SIGKILL);
 
@@ -3534,8 +2957,6 @@ static int run(int master,
 
         expose_port_flush(arg_expose_ports, exposed);
 
-        (void) remove_veth_links(veth_name, arg_network_veth_extra);
-        *veth_created = false;
         return 1; /* loop again */
 }
 
@@ -3544,13 +2965,12 @@ int main(int argc, char *argv[]) {
         _cleanup_free_ char *console = NULL;
         _cleanup_close_ int master = -1;
         _cleanup_fdset_free_ FDSet *fds = NULL;
-        int r, n_fd_passed, ret = EXIT_SUCCESS;
-        char veth_name[IFNAMSIZ] = "";
+        int r, ret = EXIT_SUCCESS;
         bool secondary = false, remove_directory = false, remove_image = false;
         pid_t pid = 0;
         union in_addr_union exposed = {};
         _cleanup_release_lock_file_ LockFile tree_global_lock = LOCK_FILE_INIT, tree_local_lock = LOCK_FILE_INIT;
-        bool interactive, veth_created = false, remove_tmprootdir = false;
+        bool interactive, remove_tmprootdir = false;
         char tmprootdir[] = "/tmp/nspawn-root-XXXXXX";
         _cleanup_(loop_device_unrefp) LoopDevice *loop = NULL;
         _cleanup_(decrypted_image_unrefp) DecryptedImage *decrypted_image = NULL;
@@ -3576,22 +2996,9 @@ int main(int argc, char *argv[]) {
         if (r < 0)
                 goto finish;
 
-        r = load_settings();
-        if (r < 0)
-                goto finish;
-
         r = verify_arguments();
         if (r < 0)
                 goto finish;
-
-        n_fd_passed = sd_listen_fds(false);
-        if (n_fd_passed > 0) {
-                r = fdset_new_listen_fds(&fds, false);
-                if (r < 0) {
-                        log_error_errno(r, "Failed to collect file descriptors: %m");
-                        goto finish;
-                }
-        }
 
         if (arg_directory) {
                 assert(!arg_image);
@@ -3603,55 +3010,6 @@ int main(int argc, char *argv[]) {
                 }
 
                 if (arg_ephemeral) {
-                        _cleanup_free_ char *np = NULL;
-
-                        r = chase_symlinks_and_update(&arg_directory, 0);
-                        if (r < 0)
-                                goto finish;
-
-                        /* If the specified path is a mount point we
-                         * generate the new snapshot immediately
-                         * inside it under a random name. However if
-                         * the specified is not a mount point we
-                         * create the new snapshot in the parent
-                         * directory, just next to it. */
-                        r = path_is_mount_point(arg_directory, NULL, 0);
-                        if (r < 0) {
-                                log_error_errno(r, "Failed to determine whether directory %s is mount point: %m", arg_directory);
-                                goto finish;
-                        }
-                        if (r > 0)
-                                r = tempfn_random_child(arg_directory, "machine.", &np);
-                        else
-                                r = tempfn_random(arg_directory, "machine.", &np);
-                        if (r < 0) {
-                                log_error_errno(r, "Failed to generate name for directory snapshot: %m");
-                                goto finish;
-                        }
-
-                        r = image_path_lock(np, (arg_read_only ? LOCK_SH : LOCK_EX) | LOCK_NB, &tree_global_lock, &tree_local_lock);
-                        if (r < 0) {
-                                log_error_errno(r, "Failed to lock %s: %m", np);
-                                goto finish;
-                        }
-
-                        r = btrfs_subvol_snapshot(arg_directory, np,
-                                                  (arg_read_only ? BTRFS_SNAPSHOT_READ_ONLY : 0) |
-                                                  BTRFS_SNAPSHOT_FALLBACK_COPY |
-                                                  BTRFS_SNAPSHOT_FALLBACK_DIRECTORY |
-                                                  BTRFS_SNAPSHOT_RECURSIVE |
-                                                  BTRFS_SNAPSHOT_QUOTA);
-                        if (r < 0) {
-                                log_error_errno(r, "Failed to create snapshot %s from %s: %m", np, arg_directory);
-                                goto finish;
-                        }
-
-                        free(arg_directory);
-                        arg_directory = np;
-                        np = NULL;
-
-                        remove_directory = true;
-
                 } else {
                         r = chase_symlinks_and_update(&arg_directory, arg_template ? CHASE_NONEXISTENT : 0);
                         if (r < 0)
@@ -3667,37 +3025,9 @@ int main(int argc, char *argv[]) {
                                 goto finish;
                         }
 
-                        if (arg_template) {
-                                r = chase_symlinks_and_update(&arg_template, 0);
-                                if (r < 0)
-                                        goto finish;
-
-                                r = btrfs_subvol_snapshot(arg_template, arg_directory,
-                                                          (arg_read_only ? BTRFS_SNAPSHOT_READ_ONLY : 0) |
-                                                          BTRFS_SNAPSHOT_FALLBACK_COPY |
-                                                          BTRFS_SNAPSHOT_FALLBACK_DIRECTORY |
-                                                          BTRFS_SNAPSHOT_FALLBACK_IMMUTABLE |
-                                                          BTRFS_SNAPSHOT_RECURSIVE |
-                                                          BTRFS_SNAPSHOT_QUOTA);
-                                if (r == -EEXIST) {
-                                        if (!arg_quiet)
-                                                log_info("Directory %s already exists, not populating from template %s.", arg_directory, arg_template);
-                                } else if (r < 0) {
-                                        log_error_errno(r, "Couldn't create snapshot %s from %s: %m", arg_directory, arg_template);
-                                        goto finish;
-                                } else {
-                                        if (!arg_quiet)
-                                                log_info("Populated %s from template %s.", arg_directory, arg_template);
-                                }
-                        }
                 }
 
                 if (arg_start_mode == START_BOOT) {
-                        if (path_is_os_tree(arg_directory) <= 0) {
-                                log_error("Directory %s doesn't look like an OS root directory (os-release file is missing). Refusing.", arg_directory);
-                                r = -EINVAL;
-                                goto finish;
-                        }
                 } else {
                         const char *p;
 
@@ -3709,123 +3039,7 @@ int main(int argc, char *argv[]) {
                         }
                 }
 
-        } else {
-                assert(arg_image);
-                assert(!arg_template);
-
-                r = chase_symlinks_and_update(&arg_image, 0);
-                if (r < 0)
-                        goto finish;
-
-                if (arg_ephemeral)  {
-                        _cleanup_free_ char *np = NULL;
-
-                        r = tempfn_random(arg_image, "machine.", &np);
-                        if (r < 0) {
-                                log_error_errno(r, "Failed to generate name for image snapshot: %m");
-                                goto finish;
-                        }
-
-                        r = image_path_lock(np, (arg_read_only ? LOCK_SH : LOCK_EX) | LOCK_NB, &tree_global_lock, &tree_local_lock);
-                        if (r < 0) {
-                                r = log_error_errno(r, "Failed to create image lock: %m");
-                                goto finish;
-                        }
-
-                        r = copy_file(arg_image, np, O_EXCL, arg_read_only ? 0400 : 0600, FS_NOCOW_FL, COPY_REFLINK);
-                        if (r < 0) {
-                                r = log_error_errno(r, "Failed to copy image file: %m");
-                                goto finish;
-                        }
-
-                        free(arg_image);
-                        arg_image = np;
-                        np = NULL;
-
-                        remove_image = true;
-                } else {
-                        r = image_path_lock(arg_image, (arg_read_only ? LOCK_SH : LOCK_EX) | LOCK_NB, &tree_global_lock, &tree_local_lock);
-                        if (r == -EBUSY) {
-                                r = log_error_errno(r, "Disk image %s is currently busy.", arg_image);
-                                goto finish;
-                        }
-                        if (r < 0) {
-                                r = log_error_errno(r, "Failed to create image lock: %m");
-                                goto finish;
-                        }
-
-                        if (!arg_root_hash) {
-                                r = root_hash_load(arg_image, &arg_root_hash, &arg_root_hash_size);
-                                if (r < 0) {
-                                        log_error_errno(r, "Failed to load root hash file for %s: %m", arg_image);
-                                        goto finish;
-                                }
-                        }
-                }
-
-                if (!mkdtemp(tmprootdir)) {
-                        r = log_error_errno(errno, "Failed to create temporary directory: %m");
-                        goto finish;
-                }
-
-                remove_tmprootdir = true;
-
-                arg_directory = strdup(tmprootdir);
-                if (!arg_directory) {
-                        r = log_oom();
-                        goto finish;
-                }
-
-                r = loop_device_make_by_path(arg_image, arg_read_only ? O_RDONLY : O_RDWR, &loop);
-                if (r < 0) {
-                        log_error_errno(r, "Failed to set up loopback block device: %m");
-                        goto finish;
-                }
-
-                r = dissect_image(
-                                loop->fd,
-                                arg_root_hash, arg_root_hash_size,
-                                DISSECT_IMAGE_REQUIRE_ROOT,
-                                &dissected_image);
-                if (r == -ENOPKG) {
-                        log_error_errno(r, "Could not find a suitable file system or partition table in image: %s", arg_image);
-
-                        log_notice("Note that the disk image needs to\n"
-                                   "    a) either contain only a single MBR partition of type 0x83 that is marked bootable\n"
-                                   "    b) or contain a single GPT partition of type 0FC63DAF-8483-4772-8E79-3D69D8477DE4\n"
-                                   "    c) or follow http://www.freedesktop.org/wiki/Specifications/DiscoverablePartitionsSpec/\n"
-                                   "    d) or contain a file system without a partition table\n"
-                                   "in order to be bootable with systemd-nspawn.");
-                        goto finish;
-                }
-                if (r == -EADDRNOTAVAIL) {
-                        log_error_errno(r, "No root partition for specified root hash found.");
-                        goto finish;
-                }
-                if (r == -EOPNOTSUPP) {
-                        log_error_errno(r, "--image= is not supported, compiled without blkid support.");
-                        goto finish;
-                }
-                if (r < 0) {
-                        log_error_errno(r, "Failed to dissect image: %m");
-                        goto finish;
-                }
-
-                if (!arg_root_hash && dissected_image->can_verity)
-                        log_notice("Note: image %s contains verity information, but no root hash specified! Proceeding without integrity checking.", arg_image);
-
-                r = dissected_image_decrypt_interactively(dissected_image, NULL, arg_root_hash, arg_root_hash_size, 0, &decrypted_image);
-                if (r < 0)
-                        goto finish;
-
-                /* Now that we mounted the image, let's try to remove it again, if it is ephemeral */
-                if (remove_image && unlink(arg_image) >= 0)
-                        remove_image = false;
         }
-
-        r = custom_mount_prepare_all(arg_directory, arg_custom_mounts, arg_n_custom_mounts);
-        if (r < 0)
-                goto finish;
 
         r = detect_unified_cgroup_hierarchy(arg_directory);
         if (r < 0)
@@ -3847,20 +3061,10 @@ int main(int argc, char *argv[]) {
                 goto finish;
         }
 
-        if (arg_selinux_apifs_context) {
-                r = mac_selinux_apply(console, arg_selinux_apifs_context);
-                if (r < 0)
-                        goto finish;
-        }
-
         if (unlockpt(master) < 0) {
                 r = log_error_errno(errno, "Failed to unlock tty: %m");
                 goto finish;
         }
-
-        if (!arg_quiet)
-                log_info("Spawning container %s on %s.\nPress ^] three times within 1s to kill container.",
-                         arg_machine, arg_image ?: arg_directory);
 
         assert_se(sigprocmask_many(SIG_BLOCK, NULL, SIGCHLD, SIGWINCH, SIGTERM, SIGINT, -1) >= 0);
 
@@ -3869,18 +3073,13 @@ int main(int argc, char *argv[]) {
                 goto finish;
         }
 
-        for (;;) {
                 r = run(master,
                         console,
                         dissected_image,
                         interactive, secondary,
                         fds,
-                        veth_name, &veth_created,
                         &exposed,
                         &pid, &ret);
-                if (r <= 0)
-                        break;
-        }
 
 finish:
         sd_notify(false,
@@ -3917,18 +3116,7 @@ finish:
                         log_debug_errno(errno, "Can't remove temporary root directory '%s', ignoring: %m", tmprootdir);
         }
 
-        if (arg_machine) {
-                const char *p;
-
-                p = strjoina("/run/systemd/nspawn/propagate/", arg_machine);
-                (void) rm_rf(p, REMOVE_ROOT);
-        }
-
         expose_port_flush(arg_expose_ports, &exposed);
-
-        if (veth_created)
-                (void) remove_veth_links(veth_name, arg_network_veth_extra);
-        (void) remove_bridge(arg_network_zone);
 
         free(arg_directory);
         free(arg_template);
@@ -3943,7 +3131,6 @@ finish:
         strv_free(arg_network_interfaces);
         strv_free(arg_network_macvlan);
         strv_free(arg_network_ipvlan);
-        strv_free(arg_network_veth_extra);
         strv_free(arg_parameters);
         custom_mount_free_all(arg_custom_mounts, arg_n_custom_mounts);
         expose_port_free_all(arg_expose_ports);

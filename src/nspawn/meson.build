@@ -4,8 +4,6 @@ systemd_nspawn_sources = files('''
         nspawn-settings.h
         nspawn-mount.c
         nspawn-mount.h
-        nspawn-network.c
-        nspawn-network.h
         nspawn-expose-ports.c
         nspawn-expose-ports.h
         nspawn-cgroup.c
@@ -21,14 +19,6 @@ systemd_nspawn_sources = files('''
         nspawn-patch-uid.c
         nspawn-patch-uid.h
 '''.split())
-
-nspawn_gperf_c = custom_target(
-        'nspawn-gperf.c',
-        input : 'nspawn-gperf.gperf',
-        output : 'nspawn-gperf.c',
-        command : [gperf, '@INPUT@', '--output-file', '@OUTPUT@'])
-
-systemd_nspawn_sources += [nspawn_gperf_c]
 
 tests += [
         [['src/nspawn/test-patch-uid.c',

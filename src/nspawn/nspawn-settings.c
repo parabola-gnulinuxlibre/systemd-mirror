@@ -20,7 +20,6 @@
 #include "alloc-util.h"
 #include "cap-list.h"
 #include "conf-parser.h"
-#include "nspawn-network.h"
 #include "nspawn-settings.h"
 #include "parse-util.h"
 #include "process-util.h"
@@ -29,58 +28,6 @@
 #include "strv.h"
 #include "user-util.h"
 #include "util.h"
-
-int settings_load(FILE *f, const char *path, Settings **ret) {
-        _cleanup_(settings_freep) Settings *s = NULL;
-        int r;
-
-        assert(path);
-        assert(ret);
-
-        s = new0(Settings, 1);
-        if (!s)
-                return -ENOMEM;
-
-        s->start_mode = _START_MODE_INVALID;
-        s->personality = PERSONALITY_INVALID;
-        s->userns_mode = _USER_NAMESPACE_MODE_INVALID;
-        s->uid_shift = UID_INVALID;
-        s->uid_range = UID_INVALID;
-
-        s->read_only = -1;
-        s->volatile_mode = _VOLATILE_MODE_INVALID;
-        s->userns_chown = -1;
-
-        s->private_network = -1;
-        s->network_veth = -1;
-
-        r = config_parse(NULL, path, f,
-                         "Exec\0"
-                         "Network\0"
-                         "Files\0",
-                         config_item_perf_lookup, nspawn_gperf_lookup,
-                         false,
-                         false,
-                         true,
-                         s);
-        if (r < 0)
-                return r;
-
-        /* Make sure that if userns_mode is set, userns_chown is set to something appropriate, and vice versa. Either
-         * both fields shall be initialized or neither. */
-        if (s->userns_mode == USER_NAMESPACE_PICK)
-                s->userns_chown = true;
-        else if (s->userns_mode != _USER_NAMESPACE_MODE_INVALID && s->userns_chown < 0)
-                s->userns_chown = false;
-
-        if (s->userns_chown >= 0 && s->userns_mode == _USER_NAMESPACE_MODE_INVALID)
-                s->userns_mode = USER_NAMESPACE_NO;
-
-        *ret = s;
-        s = NULL;
-
-        return 0;
-}
 
 Settings* settings_free(Settings *s) {
 
@@ -261,116 +208,6 @@ int config_parse_pivot_root(
         r = pivot_root_parse(&settings->pivot_root_new, &settings->pivot_root_old, rvalue);
         if (r < 0) {
                 log_syntax(unit, LOG_ERR, filename, line, r, "Invalid pivot root mount specification %s: %m", rvalue);
-                return 0;
-        }
-
-        return 0;
-}
-
-int config_parse_bind(
-                const char *unit,
-                const char *filename,
-                unsigned line,
-                const char *section,
-                unsigned section_line,
-                const char *lvalue,
-                int ltype,
-                const char *rvalue,
-                void *data,
-                void *userdata) {
-
-        Settings *settings = data;
-        int r;
-
-        assert(filename);
-        assert(lvalue);
-        assert(rvalue);
-
-        r = bind_mount_parse(&settings->custom_mounts, &settings->n_custom_mounts, rvalue, ltype);
-        if (r < 0) {
-                log_syntax(unit, LOG_ERR, filename, line, r, "Invalid bind mount specification %s: %m", rvalue);
-                return 0;
-        }
-
-        return 0;
-}
-
-int config_parse_tmpfs(
-                const char *unit,
-                const char *filename,
-                unsigned line,
-                const char *section,
-                unsigned section_line,
-                const char *lvalue,
-                int ltype,
-                const char *rvalue,
-                void *data,
-                void *userdata) {
-
-        Settings *settings = data;
-        int r;
-
-        assert(filename);
-        assert(lvalue);
-        assert(rvalue);
-
-        r = tmpfs_mount_parse(&settings->custom_mounts, &settings->n_custom_mounts, rvalue);
-        if (r < 0) {
-                log_syntax(unit, LOG_ERR, filename, line, r, "Invalid temporary file system specification %s: %m", rvalue);
-                return 0;
-        }
-
-        return 0;
-}
-
-int config_parse_overlay(
-                const char *unit,
-                const char *filename,
-                unsigned line,
-                const char *section,
-                unsigned section_line,
-                const char *lvalue,
-                int ltype,
-                const char *rvalue,
-                void *data,
-                void *userdata) {
-
-        Settings *settings = data;
-        int r;
-
-        assert(filename);
-        assert(lvalue);
-        assert(rvalue);
-
-        r = overlay_mount_parse(&settings->custom_mounts, &settings->n_custom_mounts, rvalue, ltype);
-        if (r < 0)
-                log_syntax(unit, LOG_ERR, filename, line, r, "Invalid overlay file system specification %s, ignoring: %m", rvalue);
-
-        return 0;
-}
-
-int config_parse_veth_extra(
-                const char *unit,
-                const char *filename,
-                unsigned line,
-                const char *section,
-                unsigned section_line,
-                const char *lvalue,
-                int ltype,
-                const char *rvalue,
-                void *data,
-                void *userdata) {
-
-        Settings *settings = data;
-        int r;
-
-        assert(filename);
-        assert(lvalue);
-        assert(rvalue);
-
-        r = veth_extra_parse(&settings->network_veth_extra, rvalue);
-        if (r < 0) {
-                log_syntax(unit, LOG_ERR, filename, line, r, "Invalid extra virtual Ethernet link specification %s: %m", rvalue);
                 return 0;
         }
 
