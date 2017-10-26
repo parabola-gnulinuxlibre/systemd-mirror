@@ -132,9 +132,6 @@ typedef enum LinkJournal {
 
 static char *arg_directory = NULL;
 static char *arg_chdir = NULL;
-static char *arg_pivot_root_new = NULL;
-static char *arg_pivot_root_old = NULL;
-static char *arg_user = NULL;
 static sd_id128_t arg_uuid = {};
 static char *arg_machine = NULL;
 static const char *arg_selinux_context = NULL;
@@ -184,9 +181,7 @@ static unsigned long arg_personality = PERSONALITY_INVALID;
 static VolatileMode arg_volatile_mode = VOLATILE_NO;
 static ExposePort *arg_expose_ports = NULL;
 static char **arg_property = NULL;
-static UserNamespaceMode arg_userns_mode = USER_NAMESPACE_NO;
 static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
-static bool arg_userns_chown = false;
 static int arg_kill_signal = 0;
 static CGroupUnified arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_UNKNOWN;
 static SettingsMask arg_settings_mask = 0;
@@ -204,27 +199,6 @@ static void help(void) {
         printf("%s [OPTIONS...] [PATH] [ARGUMENTS...]\n\n"
                "Spawn a minimal namespace container for debugging, testing and building.\n\n"
                , program_invocation_short_name);
-}
-
-static int custom_mount_check_all(void) {
-        unsigned i;
-
-        for (i = 0; i < arg_n_custom_mounts; i++) {
-                CustomMount *m = &arg_custom_mounts[i];
-
-                if (path_equal(m->destination, "/") && arg_userns_mode != USER_NAMESPACE_NO) {
-
-                        if (arg_userns_chown) {
-                                log_error("--private-users-chown may not be combined with custom root mounts.");
-                                return -EINVAL;
-                        } else if (arg_uid_shift == UID_INVALID) {
-                                log_error("--private-users with automatic UID shift may not be combined with custom root mounts.");
-                                return -EINVAL;
-                        }
-                }
-        }
-
-        return 0;
 }
 
 static int detect_unified_cgroup_hierarchy(const char *directory) {
@@ -335,7 +309,6 @@ static int parse_argv(int argc, char *argv[]) {
                 ARG_KILL_SIGNAL,
                 ARG_SETTINGS,
                 ARG_CHDIR,
-                ARG_PIVOT_ROOT,
                 ARG_PRIVATE_USERS_CHOWN,
                 ARG_NOTIFY_READY,
                 ARG_ROOT_HASH,
@@ -380,7 +353,6 @@ static int parse_argv(int argc, char *argv[]) {
                 { "kill-signal",           required_argument, NULL, ARG_KILL_SIGNAL         },
                 { "settings",              required_argument, NULL, ARG_SETTINGS            },
                 { "chdir",                 required_argument, NULL, ARG_CHDIR               },
-                { "pivot-root",            required_argument, NULL, ARG_PIVOT_ROOT          },
                 { "notify-ready",          required_argument, NULL, ARG_NOTIFY_READY        },
                 { "root-hash",             required_argument, NULL, ARG_ROOT_HASH           },
                 {}
@@ -409,14 +381,6 @@ static int parse_argv(int argc, char *argv[]) {
                         r = parse_path_argument_and_warn(optarg, false, &arg_directory);
                         if (r < 0)
                                 return r;
-                        break;
-
-                case 'u':
-                        r = free_and_strdup(&arg_user, optarg);
-                        if (r < 0)
-                                return log_oom();
-
-                        arg_settings_mask |= SETTING_USER;
                         break;
 
                 case 'b':
@@ -627,83 +591,6 @@ static int parse_argv(int argc, char *argv[]) {
 
                         break;
 
-                case ARG_PRIVATE_USERS: {
-                        int boolean = -1;
-
-                        if (!optarg)
-                                boolean = true;
-                        else if (!in_charset(optarg, DIGITS))
-                                /* do *not* parse numbers as booleans */
-                                boolean = parse_boolean(optarg);
-
-                        if (boolean == false) {
-                                /* no: User namespacing off */
-                                arg_userns_mode = USER_NAMESPACE_NO;
-                                arg_uid_shift = UID_INVALID;
-                                arg_uid_range = UINT32_C(0x10000);
-                        } else if (boolean == true) {
-                                /* yes: User namespacing on, UID range is read from root dir */
-                                arg_userns_mode = USER_NAMESPACE_FIXED;
-                                arg_uid_shift = UID_INVALID;
-                                arg_uid_range = UINT32_C(0x10000);
-                        } else if (streq(optarg, "pick")) {
-                                /* pick: User namespacing on, UID range is picked randomly */
-                                arg_userns_mode = USER_NAMESPACE_PICK;
-                                arg_uid_shift = UID_INVALID;
-                                arg_uid_range = UINT32_C(0x10000);
-                        } else {
-                                _cleanup_free_ char *buffer = NULL;
-                                const char *range, *shift;
-
-                                /* anything else: User namespacing on, UID range is explicitly configured */
-
-                                range = strchr(optarg, ':');
-                                if (range) {
-                                        buffer = strndup(optarg, range - optarg);
-                                        if (!buffer)
-                                                return log_oom();
-                                        shift = buffer;
-
-                                        range++;
-                                        r = safe_atou32(range, &arg_uid_range);
-                                        if (r < 0)
-                                                return log_error_errno(r, "Failed to parse UID range \"%s\": %m", range);
-                                } else
-                                        shift = optarg;
-
-                                r = parse_uid(shift, &arg_uid_shift);
-                                if (r < 0)
-                                        return log_error_errno(r, "Failed to parse UID \"%s\": %m", optarg);
-
-                                arg_userns_mode = USER_NAMESPACE_FIXED;
-                        }
-
-                        if (arg_uid_range <= 0) {
-                                log_error("UID range cannot be 0.");
-                                return -EINVAL;
-                        }
-
-                        arg_settings_mask |= SETTING_USERNS;
-                        break;
-                }
-
-                case 'U':
-                        if (userns_supported()) {
-                                arg_userns_mode = USER_NAMESPACE_PICK;
-                                arg_uid_shift = UID_INVALID;
-                                arg_uid_range = UINT32_C(0x10000);
-
-                                arg_settings_mask |= SETTING_USERNS;
-                        }
-
-                        break;
-
-                case ARG_PRIVATE_USERS_CHOWN:
-                        arg_userns_chown = true;
-
-                        arg_settings_mask |= SETTING_USERNS;
-                        break;
-
                 case ARG_KILL_SIGNAL:
                         arg_kill_signal = signal_from_string_try_harder(optarg);
                         if (arg_kill_signal < 0) {
@@ -762,14 +649,6 @@ static int parse_argv(int argc, char *argv[]) {
                         arg_settings_mask |= SETTING_WORKING_DIRECTORY;
                         break;
 
-                case ARG_PIVOT_ROOT:
-                        r = pivot_root_parse(&arg_pivot_root_new, &arg_pivot_root_old, optarg);
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to parse --pivot-root= argument %s: %m", optarg);
-
-                        arg_settings_mask |= SETTING_PIVOT_ROOT;
-                        break;
-
                 case ARG_NOTIFY_READY:
                         r = parse_boolean(optarg);
                         if (r < 0) {
@@ -811,9 +690,6 @@ static int parse_argv(int argc, char *argv[]) {
         parse_share_ns_env("SYSTEMD_NSPAWN_SHARE_NS_UTS", CLONE_NEWUTS);
         parse_share_ns_env("SYSTEMD_NSPAWN_SHARE_SYSTEM", CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS);
 
-        if (arg_userns_mode != USER_NAMESPACE_NO)
-                arg_mount_settings |= MOUNT_USE_USERNS;
-
         parse_mount_settings_env();
 
         if (!(arg_clone_ns_flags & CLONE_NEWPID) ||
@@ -822,19 +698,6 @@ static int parse_argv(int argc, char *argv[]) {
                         log_error("--boot cannot be used without namespacing.");
                         return -EINVAL;
                 }
-        }
-
-        if (arg_userns_mode == USER_NAMESPACE_PICK)
-                arg_userns_chown = true;
-
-        if (arg_userns_mode != USER_NAMESPACE_NO && !userns_supported()) {
-                log_error("--private-users= is not supported, kernel compiled without user namespace support.");
-                return -EOPNOTSUPP;
-        }
-
-        if (arg_userns_chown && arg_read_only) {
-                log_error("--read-only and --private-users-chown may not be combined.");
-                return -EINVAL;
         }
 
         if (arg_network_bridge && arg_network_zone) {
@@ -874,19 +737,10 @@ static int parse_argv(int argc, char *argv[]) {
         else
                 arg_use_cgns = r;
 
-        r = custom_mount_check_all();
-        if (r < 0)
-                return r;
-
         return 1;
 }
 
 static int verify_arguments(void) {
-        if (arg_userns_mode != USER_NAMESPACE_NO && !(arg_mount_settings & MOUNT_APPLY_APIVFS_RO)) {
-                log_error("Cannot combine --private-users with read-write mounts.");
-                return -EINVAL;
-        }
-
         if (arg_volatile_mode != VOLATILE_NO && arg_read_only) {
                 log_error("Cannot combine --read-only with --volatile. Note that --volatile already implies a read-only base hierarchy.");
                 return -EINVAL;
@@ -894,35 +748,6 @@ static int verify_arguments(void) {
 
         if (arg_start_mode == START_BOOT && arg_kill_signal <= 0)
                 arg_kill_signal = SIGRTMIN+3;
-
-        return 0;
-}
-
-static int userns_lchown(const char *p, uid_t uid, gid_t gid) {
-        assert(p);
-
-        if (arg_userns_mode == USER_NAMESPACE_NO)
-                return 0;
-
-        if (uid == UID_INVALID && gid == GID_INVALID)
-                return 0;
-
-        if (uid != UID_INVALID) {
-                uid += arg_uid_shift;
-
-                if (uid < arg_uid_shift || uid >= arg_uid_shift + arg_uid_range)
-                        return -EOVERFLOW;
-        }
-
-        if (gid != GID_INVALID) {
-                gid += (gid_t) arg_uid_shift;
-
-                if (gid < (gid_t) arg_uid_shift || gid >= (gid_t) (arg_uid_shift + arg_uid_range))
-                        return -EOVERFLOW;
-        }
-
-        if (lchown(p, uid, gid) < 0)
-                return -errno;
 
         return 0;
 }
@@ -937,7 +762,7 @@ static int userns_mkdir(const char *root, const char *path, mode_t mode, uid_t u
                 return -errno;
         }
 
-        return userns_lchown(q, uid, gid);
+        return 0;
 }
 
 static int setup_timezone(const char *dest) {
@@ -1002,10 +827,6 @@ static int setup_timezone(const char *dest) {
                                "Failed to correct timezone of container, ignoring: %m");
                 return 0;
         }
-
-        r = userns_lchown(where, 0, 0);
-        if (r < 0)
-                return log_warning_errno(r, "Failed to chown /etc/localtime: %m");
 
         return 0;
 }
@@ -1087,10 +908,6 @@ static int setup_resolv_conf(const char *dest) {
                                "Failed to copy /etc/resolv.conf to %s, ignoring: %m", where);
                 return 0;
         }
-
-        r = userns_lchown(where, 0, 0);
-        if (r < 0)
-                log_warning_errno(r, "Failed to chown /etc/resolv.conf, ignoring: %m");
 
         return 0;
 }
@@ -1181,9 +998,6 @@ static int copy_devnodes(const char *dest) {
                                         return log_error_errno(r, "Both mknod and bind mount (%s) failed: %m", to);
                         }
 
-                        r = userns_lchown(to, 0, 0);
-                        if (r < 0)
-                                return log_error_errno(r, "chown() of device node %s failed: %m", to);
                 }
         }
 
@@ -1217,23 +1031,14 @@ static int setup_pts(const char *dest) {
         r = mount_verbose(LOG_ERR, "devpts", p, "devpts", MS_NOSUID|MS_NOEXEC, options);
         if (r < 0)
                 return r;
-        r = userns_lchown(p, 0, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to chown /dev/pts: %m");
 
         /* Create /dev/ptmx symlink */
         p = prefix_roota(dest, "/dev/ptmx");
         if (symlink("pts/ptmx", p) < 0)
                 return log_error_errno(errno, "Failed to create /dev/ptmx symlink: %m");
-        r = userns_lchown(p, 0, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to chown /dev/ptmx: %m");
 
         /* And fix /dev/pts/ptmx ownership */
         p = prefix_roota(dest, "/dev/pts/ptmx");
-        r = userns_lchown(p, 0, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to chown /dev/pts/ptmx: %m");
 
         return 0;
 }
@@ -1568,29 +1373,6 @@ static int setup_machine_id(const char *directory) {
         return 0;
 }
 
-static int recursive_chown(const char *directory, uid_t shift, uid_t range) {
-        int r;
-
-        assert(directory);
-
-        if (arg_userns_mode == USER_NAMESPACE_NO || !arg_userns_chown)
-                return 0;
-
-        r = path_patch_uid(directory, arg_uid_shift, arg_uid_range);
-        if (r == -EOPNOTSUPP)
-                return log_error_errno(r, "Automatic UID/GID adjusting is only supported for UID/GID ranges starting at multiples of 2^16 with a range of 2^16.");
-        if (r == -EBADE)
-                return log_error_errno(r, "Upper 16 bits of root directory UID and GID do not match.");
-        if (r < 0)
-                return log_error_errno(r, "Failed to adjust UID/GID shift of OS tree: %m");
-        if (r == 0)
-                log_debug("Root directory of image is already owned by the right UID/GID range, skipping recursive chown operation.");
-        else
-                log_debug("Patched directory tree to match UID/GID range.");
-
-        return r;
-}
-
 /*
  * Return values:
  * < 0 : wait_for_terminate() failed to get the state of the
@@ -1730,39 +1512,6 @@ static int chase_symlinks_and_update(char **p, unsigned flags) {
         return 0;
 }
 
-static int determine_uid_shift(const char *directory) {
-        int r;
-
-        if (arg_userns_mode == USER_NAMESPACE_NO) {
-                arg_uid_shift = 0;
-                return 0;
-        }
-
-        if (arg_uid_shift == UID_INVALID) {
-                struct stat st;
-
-                r = stat(directory, &st);
-                if (r < 0)
-                        return log_error_errno(errno, "Failed to determine UID base of %s: %m", directory);
-
-                arg_uid_shift = st.st_uid & UINT32_C(0xffff0000);
-
-                if (arg_uid_shift != (st.st_gid & UINT32_C(0xffff0000))) {
-                        log_error("UID and GID base of %s don't match.", directory);
-                        return -EINVAL;
-                }
-
-                arg_uid_range = UINT32_C(0x10000);
-        }
-
-        if (arg_uid_shift > (uid_t) -1 - arg_uid_range) {
-                log_error("UID base too high for UID range.");
-                return -EINVAL;
-        }
-
-        return 0;
-}
-
 static int inner_child(
                 Barrier *barrier,
                 const char *directory,
@@ -1796,17 +1545,6 @@ static int inner_child(
         assert(directory);
         assert(kmsg_socket >= 0);
 
-        if (arg_userns_mode != USER_NAMESPACE_NO) {
-                /* Tell the parent, that it now can write the UID map. */
-                (void) barrier_place(barrier); /* #1 */
-
-                /* Wait until the parent wrote the UID map */
-                if (!barrier_place_and_sync(barrier)) { /* #2 */
-                        log_error("Parent died too early");
-                        return -ESRCH;
-                }
-        }
-
         r = reset_uid_gid();
         if (r < 0)
                 return log_error_errno(r, "Couldn't become new root: %m");
@@ -1838,7 +1576,7 @@ static int inner_child(
                 r = mount_cgroups(
                                 "",
                                 arg_unified_cgroup_hierarchy,
-                                arg_userns_mode != USER_NAMESPACE_NO,
+                                false,
                                 arg_uid_shift,
                                 arg_uid_range,
                                 arg_selinux_apifs_context,
@@ -1892,7 +1630,7 @@ static int inner_child(
                         return log_error_errno(errno, "setexeccon(\"%s\") failed: %m", arg_selinux_context);
 #endif
 
-        r = change_uid_gid(arg_user, &home);
+        r = change_uid_gid(NULL, &home);
         if (r < 0)
                 return r;
 
@@ -1904,8 +1642,8 @@ static int inner_child(
                 n_env++;
 
         if ((asprintf((char**)(envp + n_env++), "HOME=%s", home ? home: "/root") < 0) ||
-            (asprintf((char**)(envp + n_env++), "USER=%s", arg_user ? arg_user : "root") < 0) ||
-            (asprintf((char**)(envp + n_env++), "LOGNAME=%s", arg_user ? arg_user : "root") < 0))
+            (asprintf((char**)(envp + n_env++), "USER=%s", "root") < 0) ||
+            (asprintf((char**)(envp + n_env++), "LOGNAME=%s", "root") < 0))
                 return log_oom();
 
         assert(!sd_id128_is_null(arg_uuid));
@@ -2020,11 +1758,6 @@ static int setup_sd_notify_child(void) {
                 return log_error_errno(errno, "bind(%s) failed: %m", sa.un.sun_path);
         }
 
-        r = userns_lchown(NSPAWN_NOTIFY_SOCKET_PATH, 0, 0);
-        if (r < 0) {
-                safe_close(fd);
-                return log_error_errno(r, "Failed to chown " NSPAWN_NOTIFY_SOCKET_PATH ": %m");
-        }
 
         r = setsockopt(fd, SOL_SOCKET, SO_PASSCRED, &one, sizeof(one));
         if (r < 0) {
@@ -2103,53 +1836,21 @@ static int outer_child(
                         return r;
         }
 
-        r = determine_uid_shift(directory);
-        if (r < 0)
-                return r;
-
-        if (arg_userns_mode != USER_NAMESPACE_NO) {
-                /* Let the parent know which UID shift we read from the image */
-                l = send(uid_shift_socket, &arg_uid_shift, sizeof(arg_uid_shift), MSG_NOSIGNAL);
-                if (l < 0)
-                        return log_error_errno(errno, "Failed to send UID shift: %m");
-                if (l != sizeof(arg_uid_shift)) {
-                        log_error("Short write while sending UID shift.");
-                        return -EIO;
-                }
-
-                if (arg_userns_mode == USER_NAMESPACE_PICK) {
-                        /* When we are supposed to pick the UID shift, the parent will check now whether the UID shift
-                         * we just read from the image is available. If yes, it will send the UID shift back to us, if
-                         * not it will pick a different one, and send it back to us. */
-
-                        l = recv(uid_shift_socket, &arg_uid_shift, sizeof(arg_uid_shift), 0);
-                        if (l < 0)
-                                return log_error_errno(errno, "Failed to recv UID shift: %m");
-                        if (l != sizeof(arg_uid_shift)) {
-                                log_error("Short read while receiving UID shift.");
-                                return -EIO;
-                        }
-                }
-
-                log_info("Selected user namespace base " UID_FMT " and range " UID_FMT ".", arg_uid_shift, arg_uid_range);
-        }
+        arg_uid_shift = 0;
 
         /* Turn directory into bind mount */
         r = mount_verbose(LOG_ERR, directory, directory, NULL, MS_BIND|MS_REC, NULL);
         if (r < 0)
                 return r;
 
-        r = setup_pivot_root(
-                        directory,
-                        arg_pivot_root_new,
-                        arg_pivot_root_old);
+        r = setup_pivot_root(directory, NULL, NULL);
         if (r < 0)
                 return r;
 
         r = setup_volatile(
                         directory,
                         arg_volatile_mode,
-                        arg_userns_mode != USER_NAMESPACE_NO,
+                        false,
                         arg_uid_shift,
                         arg_uid_range,
                         arg_selinux_context);
@@ -2159,7 +1860,7 @@ static int outer_child(
         r = setup_volatile_state(
                         directory,
                         arg_volatile_mode,
-                        arg_userns_mode != USER_NAMESPACE_NO,
+                        false,
                         arg_uid_shift,
                         arg_uid_range,
                         arg_selinux_context);
@@ -2173,10 +1874,6 @@ static int outer_child(
          * Further submounts (such as /dev) done after this will inherit the
          * shared propagation mode. */
         r = mount_verbose(LOG_ERR, NULL, directory, NULL, MS_SHARED|MS_REC, NULL);
-        if (r < 0)
-                return r;
-
-        r = recursive_chown(directory, arg_uid_shift, arg_uid_range);
         if (r < 0)
                 return r;
 
@@ -2240,7 +1937,7 @@ static int outer_child(
                         directory,
                         arg_custom_mounts,
                         arg_n_custom_mounts,
-                        arg_userns_mode != USER_NAMESPACE_NO,
+                        false,
                         arg_uid_shift,
                         arg_uid_range,
                         arg_selinux_apifs_context);
@@ -2251,7 +1948,7 @@ static int outer_child(
                 r = mount_cgroups(
                                 directory,
                                 arg_unified_cgroup_hierarchy,
-                                arg_userns_mode != USER_NAMESPACE_NO,
+                                false,
                                 arg_uid_shift,
                                 arg_uid_range,
                                 arg_selinux_apifs_context,
@@ -2269,8 +1966,7 @@ static int outer_child(
                 return fd;
 
         pid = raw_clone(SIGCHLD|CLONE_NEWNS|
-                        arg_clone_ns_flags |
-                        (arg_userns_mode != USER_NAMESPACE_NO ? CLONE_NEWUSER : 0));
+                        arg_clone_ns_flags);
         if (pid < 0)
                 return log_error_errno(errno, "Failed to fork inner child: %m");
         if (pid == 0) {
@@ -2315,82 +2011,6 @@ static int outer_child(
         notify_socket = safe_close(notify_socket);
         kmsg_socket = safe_close(kmsg_socket);
         rtnl_socket = safe_close(rtnl_socket);
-
-        return 0;
-}
-
-static int uid_shift_pick(uid_t *shift, LockFile *ret_lock_file) {
-        unsigned n_tries = 100;
-        uid_t candidate;
-        int r;
-
-        assert(shift);
-        assert(ret_lock_file);
-        assert(arg_userns_mode == USER_NAMESPACE_PICK);
-        assert(arg_uid_range == 0x10000U);
-
-        candidate = *shift;
-
-        (void) mkdir("/run/systemd/nspawn-uid", 0755);
-
-        for (;;) {
-                char lock_path[strlen("/run/systemd/nspawn-uid/") + DECIMAL_STR_MAX(uid_t) + 1];
-                _cleanup_release_lock_file_ LockFile lf = LOCK_FILE_INIT;
-
-                if (--n_tries <= 0)
-                        return -EBUSY;
-
-                if (candidate < UID_SHIFT_PICK_MIN || candidate > UID_SHIFT_PICK_MAX)
-                        goto next;
-                if ((candidate & UINT32_C(0xFFFF)) != 0)
-                        goto next;
-
-                xsprintf(lock_path, "/run/systemd/nspawn-uid/" UID_FMT, candidate);
-                r = make_lock_file(lock_path, LOCK_EX|LOCK_NB, &lf);
-                if (r == -EBUSY) /* Range already taken by another nspawn instance */
-                        goto next;
-                if (r < 0)
-                        return r;
-
-                /* Make some superficial checks whether the range is currently known in the user database */
-                if (getpwuid(candidate))
-                        goto next;
-                if (getpwuid(candidate + UINT32_C(0xFFFE)))
-                        goto next;
-                if (getgrgid(candidate))
-                        goto next;
-                if (getgrgid(candidate + UINT32_C(0xFFFE)))
-                        goto next;
-
-                *ret_lock_file = lf;
-                lf = (struct LockFile) LOCK_FILE_INIT;
-                *shift = candidate;
-                return 0;
-
-        next:
-                random_bytes(&candidate, sizeof(candidate));
-                candidate = (candidate % (UID_SHIFT_PICK_MAX - UID_SHIFT_PICK_MIN)) + UID_SHIFT_PICK_MIN;
-                candidate &= (uid_t) UINT32_C(0xFFFF0000);
-        }
-}
-
-static int setup_uid_map(pid_t pid) {
-        char uid_map[strlen("/proc//uid_map") + DECIMAL_STR_MAX(uid_t) + 1], line[DECIMAL_STR_MAX(uid_t)*3+3+1];
-        int r;
-
-        assert(pid > 1);
-
-        xsprintf(uid_map, "/proc/" PID_FMT "/uid_map", pid);
-        xsprintf(line, UID_FMT " " UID_FMT " " UID_FMT "\n", 0, arg_uid_shift, arg_uid_range);
-        r = write_string_file(uid_map, line, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to write UID map: %m");
-
-        /* We always assign the same UID and GID ranges */
-        xsprintf(uid_map, "/proc/" PID_FMT "/gid_map", pid);
-        r = write_string_file(uid_map, line, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to write GID map: %m");
 
         return 0;
 }
@@ -2521,19 +2141,6 @@ static int run(int master,
         assert_se(sigemptyset(&mask_chld) == 0);
         assert_se(sigaddset(&mask_chld, SIGCHLD) == 0);
 
-        if (arg_userns_mode == USER_NAMESPACE_PICK) {
-                /* When we shall pick the UID/GID range, let's first lock /etc/passwd, so that we can safely
-                 * check with getpwuid() if the specific user already exists. Note that /etc might be
-                 * read-only, in which case this will fail with EROFS. But that's really OK, as in that case we
-                 * can be reasonably sure that no users are going to be added. Note that getpwuid() checks are
-                 * really just an extra safety net. We kinda assume that the UID range we allocate from is
-                 * really ours. */
-
-                etc_passwd_lock = take_etc_passwd_lock(NULL);
-                if (etc_passwd_lock < 0 && etc_passwd_lock != -EROFS)
-                        return log_error_errno(etc_passwd_lock, "Failed to take /etc/passwd lock: %m");
-        }
-
         r = barrier_create(&barrier);
         if (r < 0)
                 return log_error_errno(r, "Cannot initialize IPC barrier: %m");
@@ -2552,10 +2159,6 @@ static int run(int master,
 
         if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, notify_socket_pair) < 0)
                 return log_error_errno(errno, "Failed to create notify socket pair: %m");
-
-        if (arg_userns_mode != USER_NAMESPACE_NO)
-                if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, uid_shift_socket_pair) < 0)
-                        return log_error_errno(errno, "Failed to create uid shift socket pair: %m");
 
         /* Child can be killed before execv(), so handle SIGCHLD in order to interrupt
          * parent's blocking calls and give it a chance to call wait() and terminate. */
@@ -2619,35 +2222,6 @@ static int run(int master,
         notify_socket_pair[1] = safe_close(notify_socket_pair[1]);
         uid_shift_socket_pair[1] = safe_close(uid_shift_socket_pair[1]);
 
-        if (arg_userns_mode != USER_NAMESPACE_NO) {
-                /* The child just let us know the UID shift it might have read from the image. */
-                l = recv(uid_shift_socket_pair[0], &arg_uid_shift, sizeof arg_uid_shift, 0);
-                if (l < 0)
-                        return log_error_errno(errno, "Failed to read UID shift: %m");
-                if (l != sizeof arg_uid_shift) {
-                        log_error("Short read while reading UID shift.");
-                        return -EIO;
-                }
-
-                if (arg_userns_mode == USER_NAMESPACE_PICK) {
-                        /* If we are supposed to pick the UID shift, let's try to use the shift read from the
-                         * image, but if that's already in use, pick a new one, and report back to the child,
-                         * which one we now picked. */
-
-                        r = uid_shift_pick(&arg_uid_shift, &uid_shift_lock);
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to pick suitable UID/GID range: %m");
-
-                        l = send(uid_shift_socket_pair[0], &arg_uid_shift, sizeof arg_uid_shift, MSG_NOSIGNAL);
-                        if (l < 0)
-                                return log_error_errno(errno, "Failed to send UID shift: %m");
-                        if (l != sizeof arg_uid_shift) {
-                                log_error("Short write while writing UID shift.");
-                                return -EIO;
-                        }
-                }
-        }
-
         /* Wait for the outer child. */
         r = wait_for_terminate_and_warn("namespace helper", *pid, NULL);
         if (r != 0)
@@ -2678,19 +2252,6 @@ static int run(int master,
                                        "Failed to receive notification socket from the outer child: %m");
 
         log_debug("Init process invoked as PID "PID_FMT, *pid);
-
-        if (arg_userns_mode != USER_NAMESPACE_NO) {
-                if (!barrier_place_and_sync(&barrier)) { /* #1 */
-                        log_error("Child died too early.");
-                        return -ESRCH;
-                }
-
-                r = setup_uid_map(*pid);
-                if (r < 0)
-                        return r;
-
-                (void) barrier_place(&barrier); /* #2 */
-        }
 
         if (arg_slice || arg_property)
                 log_notice("Machine and scope registration turned off, --slice= and --property= settings will have no effect.");
@@ -2972,9 +2533,6 @@ finish:
 
         free(arg_directory);
         free(arg_machine);
-        free(arg_user);
-        free(arg_pivot_root_new);
-        free(arg_pivot_root_old);
         free(arg_chdir);
         strv_free(arg_setenv);
         free(arg_network_bridge);
