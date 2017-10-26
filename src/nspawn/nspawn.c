@@ -184,7 +184,6 @@ static char **arg_network_ipvlan = NULL;
 static char *arg_network_bridge = NULL;
 static char *arg_network_zone = NULL;
 static unsigned long arg_personality = PERSONALITY_INVALID;
-static char *arg_image = NULL;
 static VolatileMode arg_volatile_mode = VOLATILE_NO;
 static ExposePort *arg_expose_ports = NULL;
 static char **arg_property = NULL;
@@ -422,12 +421,6 @@ static int parse_argv(int argc, char *argv[]) {
 
                 case ARG_TEMPLATE:
                         r = parse_path_argument_and_warn(optarg, false, &arg_template);
-                        if (r < 0)
-                                return r;
-                        break;
-
-                case 'i':
-                        r = parse_path_argument_and_warn(optarg, false, &arg_image);
                         if (r < 0)
                                 return r;
                         break;
@@ -855,16 +848,6 @@ static int parse_argv(int argc, char *argv[]) {
 
         if (arg_userns_mode == USER_NAMESPACE_PICK)
                 arg_userns_chown = true;
-
-        if (arg_directory && arg_image) {
-                log_error("--directory= and --image= may not be combined.");
-                return -EINVAL;
-        }
-
-        if (arg_template && arg_image) {
-                log_error("--template= and --image= may not be combined.");
-                return -EINVAL;
-        }
 
         if (arg_ephemeral && arg_template && !arg_directory) {
                 /* User asked for ephemeral execution but specified --template= instead of --directory=. Semantically
@@ -1756,7 +1739,6 @@ static int on_sigchld(sd_event_source *s, const struct signalfd_siginfo *ssi, vo
 }
 
 static int determine_names(void) {
-        int r;
 
         if (arg_template && !arg_directory && arg_machine) {
 
@@ -1769,52 +1751,14 @@ static int determine_names(void) {
                         return log_oom();
         }
 
-        if (!arg_image && !arg_directory) {
-                if (arg_machine) {
-                        _cleanup_(image_unrefp) Image *i = NULL;
-
-                        r = image_find(arg_machine, &i);
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to find image for machine '%s': %m", arg_machine);
-                        if (r == 0) {
-                                log_error("No image for machine '%s'.", arg_machine);
-                                return -ENOENT;
-                        }
-
-                        if (i->type == IMAGE_RAW)
-                                r = free_and_strdup(&arg_image, i->path);
-                        else
-                                r = free_and_strdup(&arg_directory, i->path);
-                        if (r < 0)
-                                return log_oom();
-
-                        if (!arg_ephemeral)
-                                arg_read_only = arg_read_only || i->read_only;
-                } else
-                        arg_directory = get_current_dir_name();
-
-                if (!arg_directory && !arg_image) {
-                        log_error("Failed to determine path, please use -D or -i.");
-                        return -EINVAL;
-                }
-        }
+        assert(arg_directory);
 
         if (!arg_machine) {
 
                 if (arg_directory && path_equal(arg_directory, "/"))
                         arg_machine = gethostname_malloc();
                 else {
-                        if (arg_image) {
-                                char *e;
-
-                                arg_machine = strdup(basename(arg_image));
-
-                                /* Truncate suffix if there is one */
-                                e = endswith(arg_machine, ".raw");
-                                if (e)
-                                        *e = 0;
-                        } else
-                                arg_machine = strdup(basename(arg_directory));
+                        arg_machine = strdup(basename(arg_directory));
                 }
                 if (!arg_machine)
                         return log_oom();
@@ -2966,7 +2910,7 @@ int main(int argc, char *argv[]) {
         _cleanup_close_ int master = -1;
         _cleanup_fdset_free_ FDSet *fds = NULL;
         int r, ret = EXIT_SUCCESS;
-        bool secondary = false, remove_directory = false, remove_image = false;
+        bool secondary = false, remove_directory = false;
         pid_t pid = 0;
         union in_addr_union exposed = {};
         _cleanup_release_lock_file_ LockFile tree_global_lock = LOCK_FILE_INIT, tree_local_lock = LOCK_FILE_INIT;
@@ -3001,8 +2945,6 @@ int main(int argc, char *argv[]) {
                 goto finish;
 
         if (arg_directory) {
-                assert(!arg_image);
-
                 if (path_equal(arg_directory, "/") && !arg_ephemeral) {
                         log_error("Spawning container on root directory is not supported. Consider using --ephemeral.");
                         r = -EINVAL;
@@ -3106,11 +3048,6 @@ finish:
                         log_warning_errno(k, "Cannot remove '%s', ignoring: %m", arg_directory);
         }
 
-        if (remove_image && arg_image) {
-                if (unlink(arg_image) < 0)
-                        log_warning_errno(errno, "Can't remove image file '%s', ignoring: %m", arg_image);
-        }
-
         if (remove_tmprootdir) {
                 if (rmdir(tmprootdir) < 0)
                         log_debug_errno(errno, "Can't remove temporary root directory '%s', ignoring: %m", tmprootdir);
@@ -3120,7 +3057,6 @@ finish:
 
         free(arg_directory);
         free(arg_template);
-        free(arg_image);
         free(arg_machine);
         free(arg_user);
         free(arg_pivot_root_new);
