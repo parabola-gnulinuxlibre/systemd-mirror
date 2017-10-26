@@ -179,7 +179,6 @@ static char *arg_network_bridge = NULL;
 static char *arg_network_zone = NULL;
 static unsigned long arg_personality = PERSONALITY_INVALID;
 static VolatileMode arg_volatile_mode = VOLATILE_NO;
-static ExposePort *arg_expose_ports = NULL;
 static char **arg_property = NULL;
 static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
 static int arg_kill_signal = 0;
@@ -573,16 +572,6 @@ static int parse_argv(int argc, char *argv[]) {
                         }
 
                         arg_settings_mask |= SETTING_VOLATILE_MODE;
-                        break;
-
-                case 'p':
-                        r = expose_port_parse(&arg_expose_ports, optarg);
-                        if (r == -EEXIST)
-                                return log_error_errno(r, "Duplicate port specification: %s", optarg);
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to parse host port %s: %m", optarg);
-
-                        arg_settings_mask |= SETTING_EXPOSE_PORTS;
                         break;
 
                 case ARG_PROPERTY:
@@ -1039,17 +1028,6 @@ static int setup_dev_console(const char *dest, const char *console) {
                 return log_error_errno(r, "touch() for /dev/console failed: %m");
 
         return mount_verbose(LOG_ERR, console, to, NULL, MS_BIND, NULL);
-}
-
-static int on_address_change(sd_netlink *rtnl, sd_netlink_message *m, void *userdata) {
-        union in_addr_union *exposed = userdata;
-
-        assert(rtnl);
-        assert(m);
-        assert(exposed);
-
-        expose_port_execute(rtnl, arg_expose_ports, exposed);
-        return 0;
 }
 
 static int setup_hostname(void) {
@@ -1522,13 +1500,6 @@ static int inner_child(
 
         if (setsid() < 0)
                 return log_error_errno(errno, "setsid() failed: %m");
-
-        if (arg_expose_ports) {
-                r = expose_port_send_rtnl(rtnl_socket);
-                if (r < 0)
-                        return r;
-                rtnl_socket = safe_close(rtnl_socket);
-        }
 
         r = drop_capabilities();
         if (r < 0)
@@ -2240,14 +2211,6 @@ static int run(int master,
         /* Exit when the child exits */
         sd_event_add_signal(event, NULL, SIGCHLD, on_sigchld, PID_TO_PTR(*pid));
 
-        if (arg_expose_ports) {
-                r = expose_port_watch_rtnl(event, rtnl_socket_pair[0], on_address_change, exposed, &rtnl);
-                if (r < 0)
-                        return r;
-
-                (void) expose_port_execute(rtnl, arg_expose_ports, exposed);
-        }
-
         rtnl_socket_pair[0] = safe_close(rtnl_socket_pair[0]);
 
         r = pty_forward_new(event, master,
@@ -2298,10 +2261,6 @@ static int run(int master,
          * set we want to have flushed out. */
         *ret = EXIT_FORCE_RESTART;
         return 0; /* finito */
-
-        expose_port_flush(arg_expose_ports, exposed);
-
-        return 1; /* loop again */
 }
 
 int main(int argc, char *argv[]) {
@@ -2449,8 +2408,6 @@ finish:
                         log_debug_errno(errno, "Can't remove temporary root directory '%s', ignoring: %m", tmprootdir);
         }
 
-        expose_port_flush(arg_expose_ports, &exposed);
-
         free(arg_directory);
         free(arg_machine);
         free(arg_chdir);
@@ -2461,7 +2418,6 @@ finish:
         strv_free(arg_network_ipvlan);
         strv_free(arg_parameters);
         custom_mount_free_all(arg_custom_mounts, arg_n_custom_mounts);
-        expose_port_free_all(arg_expose_ports);
         free(arg_root_hash);
 
         return r < 0 ? EXIT_FAILURE : ret;
