@@ -127,7 +127,6 @@ typedef enum LinkJournal {
 
 static char *arg_directory = NULL;
 static char *arg_chdir = NULL;
-static sd_id128_t arg_uuid = {};
 static char *arg_machine = NULL;
 static const char *arg_selinux_context = NULL;
 static const char *arg_selinux_apifs_context = NULL;
@@ -603,42 +602,6 @@ static int setup_propagate(const char *root) {
         return mount_verbose(LOG_ERR, NULL, q, NULL, MS_SLAVE, NULL);
 }
 
-static int setup_machine_id(const char *directory) {
-        const char *etc_machine_id;
-        sd_id128_t id;
-        int r;
-
-        /* If the UUID in the container is already set, then that's what counts, and we use. If it isn't set, and the
-         * caller passed --uuid=, then we'll pass it in the $container_uuid env var to PID 1 of the container. The
-         * assumption is that PID 1 will then write it to /etc/machine-id to make it persistent. If --uuid= is not
-         * passed we generate a random UUID, and pass it via $container_uuid. In effect this means that /etc/machine-id
-         * in the container and our idea of the container UUID will always be in sync (at least if PID 1 in the
-         * container behaves nicely). */
-
-        etc_machine_id = prefix_roota(directory, "/etc/machine-id");
-
-        r = id128_read(etc_machine_id, ID128_PLAIN, &id);
-        if (r < 0) {
-                if (!IN_SET(r, -ENOENT, -ENOMEDIUM)) /* If the file is missing or empty, we don't mind */
-                        return log_error_errno(r, "Failed to read machine ID from container image: %m");
-
-                if (sd_id128_is_null(arg_uuid)) {
-                        r = sd_id128_randomize(&arg_uuid);
-                        if (r < 0)
-                                return log_error_errno(r, "Failed to acquire randomized machine UUID: %m");
-                }
-        } else {
-                if (sd_id128_is_null(id)) {
-                        log_error("Machine ID in container image is zero, refusing.");
-                        return -EINVAL;
-                }
-
-                arg_uuid = id;
-        }
-
-        return 0;
-}
-
 /*
  * Return values:
  * < 0 : wait_for_terminate() failed to get the state of the
@@ -758,11 +721,9 @@ static int inner_child(
                 Barrier *barrier,
                 const char *directory,
                 bool secondary,
-                int rtnl_socket,
                 FDSet *fds) {
 
         _cleanup_free_ char *home = NULL;
-        char as_uuid[37];
         unsigned n_env = 1;
         const char *envp[] = {
                 "PATH=" DEFAULT_PATH_SPLIT_USR,
@@ -771,7 +732,6 @@ static int inner_child(
                 NULL, /* HOME */
                 NULL, /* USER */
                 NULL, /* LOGNAME */
-                NULL, /* container_uuid */
                 NULL, /* LISTEN_FDS */
                 NULL, /* LISTEN_PID */
                 NULL
@@ -866,11 +826,6 @@ static int inner_child(
             (asprintf((char**)(envp + n_env++), "LOGNAME=%s", "root") < 0))
                 return log_oom();
 
-        assert(!sd_id128_is_null(arg_uuid));
-
-        if (asprintf((char**)(envp + n_env++), "container_uuid=%s", id128_to_uuid_string(arg_uuid, as_uuid)) < 0)
-                return log_oom();
-
         if (fdset_size(fds) > 0) {
                 r = fdset_cloexec(fds, false);
                 if (r < 0)
@@ -935,8 +890,6 @@ static int outer_child(
                 bool interactive,
                 bool secondary,
                 int pid_socket,
-                int uuid_socket,
-                int rtnl_socket,
                 int uid_shift_socket,
                 FDSet *fds) {
 
@@ -949,7 +902,6 @@ static int outer_child(
         assert(directory);
         assert(console);
         assert(pid_socket >= 0);
-        assert(uuid_socket >= 0);
 
         if (prctl(PR_SET_PDEATHSIG, SIGKILL) < 0)
                 return log_error_errno(errno, "PR_SET_PDEATHSIG failed: %m");
@@ -1074,10 +1026,6 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = setup_machine_id(directory);
-        if (r < 0)
-                return r;
-
         r = mount_custom(
                         directory,
                         arg_custom_mounts,
@@ -1112,14 +1060,13 @@ static int outer_child(
                 return log_error_errno(errno, "Failed to fork inner child: %m");
         if (pid == 0) {
                 pid_socket = safe_close(pid_socket);
-                uuid_socket = safe_close(uuid_socket);
                 uid_shift_socket = safe_close(uid_shift_socket);
 
                 /* The inner child has all namespaces that are
                  * requested, so that we all are owned by the user if
                  * user namespaces are turned on. */
 
-                r = inner_child(barrier, directory, secondary, rtnl_socket, fds);
+                r = inner_child(barrier, directory, secondary, fds);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
@@ -1134,17 +1081,7 @@ static int outer_child(
                 return -EIO;
         }
 
-        l = send(uuid_socket, &arg_uuid, sizeof(arg_uuid), MSG_NOSIGNAL);
-        if (l < 0)
-                return log_error_errno(errno, "Failed to send machine ID: %m");
-        if (l != sizeof(arg_uuid)) {
-                log_error("Short write while sending machine ID.");
-                return -EIO;
-        }
-
         pid_socket = safe_close(pid_socket);
-        uuid_socket = safe_close(uuid_socket);
-        rtnl_socket = safe_close(rtnl_socket);
 
         return 0;
 }
@@ -1165,14 +1102,11 @@ static int run(int master,
         _cleanup_release_lock_file_ LockFile uid_shift_lock = LOCK_FILE_INIT;
         _cleanup_close_ int etc_passwd_lock = -1;
         _cleanup_close_pair_ int
-                rtnl_socket_pair[2] = { -1, -1 },
                 pid_socket_pair[2] = { -1, -1 },
-                uuid_socket_pair[2] = { -1, -1 },
                 uid_shift_socket_pair[2] = { -1, -1 };
         _cleanup_(barrier_destroy) Barrier barrier = BARRIER_NULL;
         _cleanup_(sd_event_unrefp) sd_event *event = NULL;
         _cleanup_(pty_forward_freep) PTYForward *forward = NULL;
-        _cleanup_(sd_netlink_unrefp) sd_netlink *rtnl = NULL;
         ContainerStatus container_status = 0;
         char last_char = 0;
         int r;
@@ -1186,14 +1120,8 @@ static int run(int master,
         if (r < 0)
                 return log_error_errno(r, "Cannot initialize IPC barrier: %m");
 
-        if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, rtnl_socket_pair) < 0)
-                return log_error_errno(errno, "Failed to create rtnl socket pair: %m");
-
         if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, pid_socket_pair) < 0)
                 return log_error_errno(errno, "Failed to create pid socket pair: %m");
-
-        if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, uuid_socket_pair) < 0)
-                return log_error_errno(errno, "Failed to create id socket pair: %m");
 
         /* Child can be killed before execv(), so handle SIGCHLD in order to interrupt
          * parent's blocking calls and give it a chance to call wait() and terminate. */
@@ -1217,9 +1145,7 @@ static int run(int master,
 
                 master = safe_close(master);
 
-                rtnl_socket_pair[0] = safe_close(rtnl_socket_pair[0]);
                 pid_socket_pair[0] = safe_close(pid_socket_pair[0]);
-                uuid_socket_pair[0] = safe_close(uuid_socket_pair[0]);
                 uid_shift_socket_pair[0] = safe_close(uid_shift_socket_pair[0]);
 
                 (void) reset_all_signal_handlers();
@@ -1232,8 +1158,6 @@ static int run(int master,
                                 interactive,
                                 secondary,
                                 pid_socket_pair[1],
-                                uuid_socket_pair[1],
-                                rtnl_socket_pair[1],
                                 uid_shift_socket_pair[1],
                                 fds);
                 if (r < 0)
@@ -1246,9 +1170,7 @@ static int run(int master,
 
         fds = fdset_free(fds);
 
-        rtnl_socket_pair[1] = safe_close(rtnl_socket_pair[1]);
         pid_socket_pair[1] = safe_close(pid_socket_pair[1]);
-        uuid_socket_pair[1] = safe_close(uuid_socket_pair[1]);
         uid_shift_socket_pair[1] = safe_close(uid_shift_socket_pair[1]);
 
         /* Wait for the outer child. */
@@ -1262,15 +1184,6 @@ static int run(int master,
                 return log_error_errno(errno, "Failed to read inner child PID: %m");
         if (l != sizeof *pid) {
                 log_error("Short read while reading inner child PID.");
-                return -EIO;
-        }
-
-        /* We also retrieve container UUID in case it was generated by outer child */
-        l = recv(uuid_socket_pair[0], &arg_uuid, sizeof arg_uuid, 0);
-        if (l < 0)
-                return log_error_errno(errno, "Failed to read container machine ID: %m");
-        if (l != sizeof(arg_uuid)) {
-                log_error("Short read while reading container machined ID.");
                 return -EIO;
         }
 
@@ -1329,8 +1242,6 @@ static int run(int master,
 
         /* Exit when the child exits */
         sd_event_add_signal(event, NULL, SIGCHLD, on_sigchld, PID_TO_PTR(*pid));
-
-        rtnl_socket_pair[0] = safe_close(rtnl_socket_pair[0]);
 
         r = pty_forward_new(event, master,
                             PTY_FORWARD_IGNORE_VHANGUP | (interactive ? 0 : PTY_FORWARD_READ_ONLY),
