@@ -75,14 +75,9 @@
 #include "mkdir.h"
 #include "mount-util.h"
 #include "netlink-util.h"
-#include "nspawn-expose-ports.h"
 #include "nspawn-mount.h"
-#include "nspawn-patch-uid.h"
-#include "nspawn-register.h"
-#include "nspawn-seccomp.h"
 #include "nspawn-settings.h"
 #include "nspawn-setuid.h"
-#include "nspawn-stub-pid1.h"
 #include "parse-util.h"
 #include "path-util.h"
 #include "process-util.h"
@@ -155,8 +150,6 @@ static uint64_t arg_caps_retain =
         (1ULL << CAP_SYS_PTRACE) |
         (1ULL << CAP_SYS_RESOURCE) |
         (1ULL << CAP_SYS_TTY_CONFIG);
-static CustomMount *arg_custom_mounts = NULL;
-static unsigned arg_n_custom_mounts = 0;
 static char **arg_setenv = NULL;
 static bool arg_quiet = false;
 static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
@@ -865,14 +858,10 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = setup_seccomp(arg_caps_retain);
-        if (r < 0)
-                return r;
-
         r = mount_custom(
                         directory,
-                        arg_custom_mounts,
-                        arg_n_custom_mounts,
+                        NULL,
+                        0,
                         false,
                         arg_uid_shift,
                         arg_uid_range,
@@ -1208,7 +1197,6 @@ finish:
         free(arg_chdir);
         strv_free(arg_setenv);
         strv_free(arg_parameters);
-        custom_mount_free_all(arg_custom_mounts, arg_n_custom_mounts);
         free(arg_root_hash);
 
         return r < 0 ? EXIT_FAILURE : ret;

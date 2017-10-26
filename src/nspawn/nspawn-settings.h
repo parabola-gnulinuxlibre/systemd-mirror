@@ -22,7 +22,6 @@
 #include <stdio.h>
 
 #include "macro.h"
-#include "nspawn-expose-ports.h"
 #include "nspawn-mount.h"
 
 typedef enum StartMode {
@@ -50,7 +49,6 @@ typedef enum SettingsMask {
         SETTING_PERSONALITY       = 1 << 5,
         SETTING_MACHINE_ID        = 1 << 6,
         SETTING_NETWORK           = 1 << 7,
-        SETTING_EXPOSE_PORTS      = 1 << 8,
         SETTING_READ_ONLY         = 1 << 9,
         SETTING_VOLATILE_MODE     = 1 << 10,
         SETTING_CUSTOM_MOUNTS     = 1 << 11,
@@ -95,7 +93,6 @@ typedef struct Settings {
         char **network_macvlan;
         char **network_ipvlan;
         char **network_veth_extra;
-        ExposePort *expose_ports;
 } Settings;
 
 Settings* settings_free(Settings *s);
@@ -109,7 +106,6 @@ const struct ConfigPerfItem* nspawn_gperf_lookup(const char *key, GPERF_LEN_TYPE
 
 int config_parse_capability(const char *unit, const char *filename, unsigned line, const char *section, unsigned section_line, const char *lvalue, int ltype, const char *rvalue, void *data, void *userdata);
 int config_parse_id128(const char *unit, const char *filename, unsigned line, const char *section, unsigned section_line, const char *lvalue, int ltype, const char *rvalue, void *data, void *userdata);
-int config_parse_expose_port(const char *unit, const char *filename, unsigned line, const char *section, unsigned section_line, const char *lvalue, int ltype, const char *rvalue, void *data, void *userdata);
 int config_parse_volatile_mode(const char *unit, const char *filename, unsigned line, const char *section, unsigned section_line, const char *lvalue, int ltype, const char *rvalue, void *data, void *userdata);
 int config_parse_pivot_root(const char *unit, const char *filename, unsigned line, const char *section, unsigned section_line, const char *lvalue, int ltype, const char *rvalue, void *data, void *userdata);
 int config_parse_bind(const char *unit, const char *filename, unsigned line, const char *section, unsigned section_line, const char *lvalue, int ltype, const char *rvalue, void *data, void *userdata);

@@ -47,7 +47,6 @@ Settings* settings_free(Settings *s) {
         strv_free(s->network_veth_extra);
         free(s->network_bridge);
         free(s->network_zone);
-        expose_port_free_all(s->expose_ports);
 
         custom_mount_free_all(s->custom_mounts, s->n_custom_mounts);
         return mfree(s);
@@ -77,38 +76,6 @@ bool settings_network_veth(Settings *s) {
 }
 
 DEFINE_CONFIG_PARSE_ENUM(config_parse_volatile_mode, volatile_mode, VolatileMode, "Failed to parse volatile mode");
-
-int config_parse_expose_port(
-                const char *unit,
-                const char *filename,
-                unsigned line,
-                const char *section,
-                unsigned section_line,
-                const char *lvalue,
-                int ltype,
-                const char *rvalue,
-                void *data,
-                void *userdata) {
-
-        Settings *s = data;
-        int r;
-
-        assert(filename);
-        assert(lvalue);
-        assert(rvalue);
-
-        r = expose_port_parse(&s->expose_ports, rvalue);
-        if (r == -EEXIST) {
-                log_syntax(unit, LOG_ERR, filename, line, r, "Duplicate port specification, ignoring: %s", rvalue);
-                return 0;
-        }
-        if (r < 0) {
-                log_syntax(unit, LOG_ERR, filename, line, r, "Failed to parse host port %s: %m", rvalue);
-                return 0;
-        }
-
-        return 0;
-}
 
 int config_parse_capability(
                 const char *unit,
