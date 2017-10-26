@@ -53,7 +53,6 @@
 #include "bus-util.h"
 #include "cap-list.h"
 #include "capability-util.h"
-#include "cgroup-util.h"
 #include "copy.h"
 #include "dev-setup.h"
 #include "dissect-image.h"
@@ -76,7 +75,6 @@
 #include "mkdir.h"
 #include "mount-util.h"
 #include "netlink-util.h"
-#include "nspawn-cgroup.h"
 #include "nspawn-expose-ports.h"
 #include "nspawn-mount.h"
 #include "nspawn-patch-uid.h"
@@ -1033,18 +1031,6 @@ static int run(int master,
         }
 
         log_debug("Init process invoked as PID "PID_FMT, *pid);
-
-        r = sync_cgroup(*pid, arg_unified_cgroup_hierarchy, arg_uid_shift);
-        if (r < 0)
-                return r;
-
-        r = create_subcgroup(*pid, arg_unified_cgroup_hierarchy);
-        if (r < 0)
-                return r;
-
-        r = chown_cgroup(*pid, arg_uid_shift);
-        if (r < 0)
-                return r;
 
         /* Notify the child that the parent is ready with all
          * its setup (including cgroup-ification), and that

@@ -6,8 +6,6 @@ systemd_nspawn_sources = files('''
         nspawn-mount.h
         nspawn-expose-ports.c
         nspawn-expose-ports.h
-        nspawn-cgroup.c
-        nspawn-cgroup.h
         nspawn-seccomp.c
         nspawn-seccomp.h
         nspawn-register.c
