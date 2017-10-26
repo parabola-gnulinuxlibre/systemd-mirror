@@ -136,11 +136,6 @@ static sd_id128_t arg_uuid = {};
 static char *arg_machine = NULL;
 static const char *arg_selinux_context = NULL;
 static const char *arg_selinux_apifs_context = NULL;
-static const char *arg_slice = NULL;
-static bool arg_read_only = false;
-static StartMode arg_start_mode = START_PID1;
-static LinkJournal arg_link_journal = LINK_AUTO;
-static bool arg_link_journal_try = false;
 static uint64_t arg_caps_retain =
         (1ULL << CAP_AUDIT_CONTROL) |
         (1ULL << CAP_AUDIT_WRITE) |
@@ -172,14 +167,6 @@ static CustomMount *arg_custom_mounts = NULL;
 static unsigned arg_n_custom_mounts = 0;
 static char **arg_setenv = NULL;
 static bool arg_quiet = false;
-static char **arg_network_interfaces = NULL;
-static char **arg_network_macvlan = NULL;
-static char **arg_network_ipvlan = NULL;
-static char *arg_network_bridge = NULL;
-static char *arg_network_zone = NULL;
-static unsigned long arg_personality = PERSONALITY_INVALID;
-static VolatileMode arg_volatile_mode = VOLATILE_NO;
-static char **arg_property = NULL;
 static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
 static int arg_kill_signal = 0;
 static CGroupUnified arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_UNKNOWN;
@@ -239,40 +226,6 @@ static int detect_unified_cgroup_hierarchy(const char *directory) {
         return 0;
 }
 
-static void parse_share_ns_env(const char *name, unsigned long ns_flag) {
-        int r;
-
-        r = getenv_bool(name);
-        if (r == -ENXIO)
-                return;
-        if (r < 0)
-                log_warning_errno(r, "Failed to parse %s from environment, defaulting to false.", name);
-        arg_clone_ns_flags = (arg_clone_ns_flags & ~ns_flag) | (r > 0 ? 0 : ns_flag);
-}
-
-static void parse_mount_settings_env(void) {
-        int r;
-        const char *e;
-
-        e = getenv("SYSTEMD_NSPAWN_API_VFS_WRITABLE");
-        if (!e)
-                return;
-
-        if (streq(e, "network")) {
-                arg_mount_settings |= MOUNT_APPLY_APIVFS_RO|MOUNT_APPLY_APIVFS_NETNS;
-                return;
-        }
-
-        r = parse_boolean(e);
-        if (r < 0) {
-                log_warning_errno(r, "Failed to parse SYSTEMD_NSPAWN_API_VFS_WRITABLE from environment, ignoring.");
-                return;
-        }
-
-        SET_FLAG(arg_mount_settings, MOUNT_APPLY_APIVFS_RO, r == 0);
-        SET_FLAG(arg_mount_settings, MOUNT_APPLY_APIVFS_NETNS, false);
-}
-
 static int parse_argv(int argc, char *argv[]) {
 
         static const struct option options[] = {
@@ -281,7 +234,6 @@ static int parse_argv(int argc, char *argv[]) {
         };
 
         int c, r;
-        const char *e;
         uint64_t plus = 0, minus = 0;
         bool mask_all_settings = false, mask_no_settings = false;
 
@@ -305,26 +257,6 @@ static int parse_argv(int argc, char *argv[]) {
                         assert_not_reached("Unhandled option");
                 }
 
-        parse_share_ns_env("SYSTEMD_NSPAWN_SHARE_NS_IPC", CLONE_NEWIPC);
-        parse_share_ns_env("SYSTEMD_NSPAWN_SHARE_NS_PID", CLONE_NEWPID);
-        parse_share_ns_env("SYSTEMD_NSPAWN_SHARE_NS_UTS", CLONE_NEWUTS);
-        parse_share_ns_env("SYSTEMD_NSPAWN_SHARE_SYSTEM", CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS);
-
-        parse_mount_settings_env();
-
-        if (!(arg_clone_ns_flags & CLONE_NEWPID) ||
-            !(arg_clone_ns_flags & CLONE_NEWUTS)) {
-                if (arg_start_mode != START_PID1) {
-                        log_error("--boot cannot be used without namespacing.");
-                        return -EINVAL;
-                }
-        }
-
-        if (arg_network_bridge && arg_network_zone) {
-                log_error("--network-bridge= and --network-zone= may not be combined.");
-                return -EINVAL;
-        }
-
         if (argc > optind) {
                 arg_parameters = strv_copy(argv + optind);
                 if (!arg_parameters)
@@ -347,29 +279,9 @@ static int parse_argv(int argc, char *argv[]) {
         if (r < 0)
                 return log_error_errno(r, "Failed to determine whether the unified cgroups hierarchy is used: %m");
 
-        e = getenv("SYSTEMD_NSPAWN_CONTAINER_SERVICE");
-        if (e)
-                arg_container_service_name = e;
-
-        r = getenv_bool("SYSTEMD_NSPAWN_USE_CGNS");
-        if (r < 0)
-                arg_use_cgns = cg_ns_supported();
-        else
-                arg_use_cgns = r;
+        arg_use_cgns = cg_ns_supported();
 
         return 1;
-}
-
-static int verify_arguments(void) {
-        if (arg_volatile_mode != VOLATILE_NO && arg_read_only) {
-                log_error("Cannot combine --read-only with --volatile. Note that --volatile already implies a read-only base hierarchy.");
-                return -EINVAL;
-        }
-
-        if (arg_start_mode == START_BOOT && arg_kill_signal <= 0)
-                arg_kill_signal = SIGRTMIN+3;
-
-        return 0;
 }
 
 static int userns_mkdir(const char *root, const char *path, mode_t mode, uid_t uid, gid_t gid) {
@@ -668,137 +580,6 @@ static int setup_hostname(void) {
 
         if (sethostname_idempotent(arg_machine) < 0)
                 return -errno;
-
-        return 0;
-}
-
-static int setup_journal(const char *directory) {
-        sd_id128_t this_id;
-        _cleanup_free_ char *d = NULL;
-        const char *p, *q;
-        bool try;
-        char id[33];
-        int r;
-
-        if (arg_link_journal == LINK_NO)
-                return 0;
-
-        try = arg_link_journal_try || arg_link_journal == LINK_AUTO;
-
-        r = sd_id128_get_machine(&this_id);
-        if (r < 0)
-                return log_error_errno(r, "Failed to retrieve machine ID: %m");
-
-        if (sd_id128_equal(arg_uuid, this_id)) {
-                log_full(try ? LOG_WARNING : LOG_ERR,
-                         "Host and machine ids are equal (%s): refusing to link journals", sd_id128_to_string(arg_uuid, id));
-                if (try)
-                        return 0;
-                return -EEXIST;
-        }
-
-        r = userns_mkdir(directory, "/var", 0755, 0, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to create /var: %m");
-
-        r = userns_mkdir(directory, "/var/log", 0755, 0, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to create /var/log: %m");
-
-        r = userns_mkdir(directory, "/var/log/journal", 0755, 0, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to create /var/log/journal: %m");
-
-        (void) sd_id128_to_string(arg_uuid, id);
-
-        p = strjoina("/var/log/journal/", id);
-        q = prefix_roota(directory, p);
-
-        if (path_is_mount_point(p, NULL, 0) > 0) {
-                if (try)
-                        return 0;
-
-                log_error("%s: already a mount point, refusing to use for journal", p);
-                return -EEXIST;
-        }
-
-        if (path_is_mount_point(q, NULL, 0) > 0) {
-                if (try)
-                        return 0;
-
-                log_error("%s: already a mount point, refusing to use for journal", q);
-                return -EEXIST;
-        }
-
-        r = readlink_and_make_absolute(p, &d);
-        if (r >= 0) {
-                if ((arg_link_journal == LINK_GUEST ||
-                     arg_link_journal == LINK_AUTO) &&
-                    path_equal(d, q)) {
-
-                        r = userns_mkdir(directory, p, 0755, 0, 0);
-                        if (r < 0)
-                                log_warning_errno(r, "Failed to create directory %s: %m", q);
-                        return 0;
-                }
-
-                if (unlink(p) < 0)
-                        return log_error_errno(errno, "Failed to remove symlink %s: %m", p);
-        } else if (r == -EINVAL) {
-
-                if (arg_link_journal == LINK_GUEST &&
-                    rmdir(p) < 0) {
-
-                        if (errno == ENOTDIR) {
-                                log_error("%s already exists and is neither a symlink nor a directory", p);
-                                return r;
-                        } else
-                                return log_error_errno(errno, "Failed to remove %s: %m", p);
-                }
-        } else if (r != -ENOENT)
-                return log_error_errno(r, "readlink(%s) failed: %m", p);
-
-        if (arg_link_journal == LINK_GUEST) {
-
-                if (symlink(q, p) < 0) {
-                        if (try) {
-                                log_debug_errno(errno, "Failed to symlink %s to %s, skipping journal setup: %m", q, p);
-                                return 0;
-                        } else
-                                return log_error_errno(errno, "Failed to symlink %s to %s: %m", q, p);
-                }
-
-                r = userns_mkdir(directory, p, 0755, 0, 0);
-                if (r < 0)
-                        log_warning_errno(r, "Failed to create directory %s: %m", q);
-                return 0;
-        }
-
-        if (arg_link_journal == LINK_HOST) {
-                /* don't create parents here — if the host doesn't have
-                 * permanent journal set up, don't force it here */
-
-                if (mkdir(p, 0755) < 0 && errno != EEXIST) {
-                        if (try) {
-                                log_debug_errno(errno, "Failed to create %s, skipping journal setup: %m", p);
-                                return 0;
-                        } else
-                                return log_error_errno(errno, "Failed to create %s: %m", p);
-                }
-
-        } else if (access(p, F_OK) < 0)
-                return 0;
-
-        if (dir_is_empty(q) == 0)
-                log_warning("%s is not empty, proceeding anyway.", q);
-
-        r = userns_mkdir(directory, p, 0755, 0, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to create %s: %m", q);
-
-        r = mount_verbose(LOG_DEBUG, p, q, NULL, MS_BIND, NULL);
-        if (r < 0)
-                return log_error_errno(errno, "Failed to bind mount journal from host into guest: %m");
 
         return 0;
 }
@@ -1138,10 +919,7 @@ static int inner_child(
 
         setup_hostname();
 
-        if (arg_personality != PERSONALITY_INVALID) {
-                if (personality(arg_personality) < 0)
-                        return log_error_errno(errno, "personality() failed: %m");
-        } else if (secondary) {
+        if (secondary) {
                 if (personality(PER_LINUX32) < 0)
                         return log_error_errno(errno, "personality() failed: %m");
         }
@@ -1201,12 +979,6 @@ static int inner_child(
                 if (chdir(arg_chdir) < 0)
                         return log_error_errno(errno, "Failed to change to specified working directory %s: %m", arg_chdir);
 
-        if (arg_start_mode == START_PID2) {
-                r = stub_pid1(arg_uuid);
-                if (r < 0)
-                        return r;
-        }
-
         /* Now, explicitly close the log, so that we
          * then can close all remaining fds. Closing
          * the log explicitly first has the benefit
@@ -1218,28 +990,7 @@ static int inner_child(
         log_close();
         (void) fdset_close_others(fds);
 
-        if (arg_start_mode == START_BOOT) {
-                char **a;
-                size_t m;
-
-                /* Automatically search for the init system */
-
-                m = strv_length(arg_parameters);
-                a = newa(char*, m + 2);
-                memcpy_safe(a + 1, arg_parameters, m * sizeof(char*));
-                a[1 + m] = NULL;
-
-                a[0] = (char*) "/usr/lib/systemd/systemd";
-                execve(a[0], a, env_use);
-
-                a[0] = (char*) "/lib/systemd/systemd";
-                execve(a[0], a, env_use);
-
-                a[0] = (char*) "/sbin/init";
-                execve(a[0], a, env_use);
-
-                exec_target = "/usr/lib/systemd/systemd, /lib/systemd/systemd, /sbin/init";
-        } else if (!strv_isempty(arg_parameters)) {
+        if (!strv_isempty(arg_parameters)) {
                 exec_target = arg_parameters[0];
                 execvpe(arg_parameters[0], arg_parameters, env_use);
         } else {
@@ -1353,7 +1104,7 @@ static int outer_child(
                 return r;
 
         if (dissected_image) {
-                r = dissected_image_mount(dissected_image, directory, DISSECT_IMAGE_DISCARD_ON_LOOP|(arg_read_only ? DISSECT_IMAGE_READ_ONLY : 0));
+                r = dissected_image_mount(dissected_image, directory, DISSECT_IMAGE_DISCARD_ON_LOOP);
                 if (r < 0)
                         return r;
         }
@@ -1371,7 +1122,7 @@ static int outer_child(
 
         r = setup_volatile(
                         directory,
-                        arg_volatile_mode,
+                        false,
                         false,
                         arg_uid_shift,
                         arg_uid_range,
@@ -1381,7 +1132,7 @@ static int outer_child(
 
         r = setup_volatile_state(
                         directory,
-                        arg_volatile_mode,
+                        false,
                         false,
                         arg_uid_shift,
                         arg_uid_range,
@@ -1402,12 +1153,6 @@ static int outer_child(
         r = base_filesystem_create(directory, arg_uid_shift, (gid_t) arg_uid_shift);
         if (r < 0)
                 return r;
-
-        if (arg_read_only) {
-                r = bind_remount_recursive(directory, true, NULL);
-                if (r < 0)
-                        return log_error_errno(r, "Failed to make tree read-only: %m");
-        }
 
         r = mount_all(directory,
                       arg_mount_settings,
@@ -1448,10 +1193,6 @@ static int outer_child(
                 return r;
 
         r = setup_machine_id(directory);
-        if (r < 0)
-                return r;
-
-        r = setup_journal(directory);
         if (r < 0)
                 return r;
 
@@ -1775,9 +1516,6 @@ static int run(int master,
 
         log_debug("Init process invoked as PID "PID_FMT, *pid);
 
-        if (arg_slice || arg_property)
-                log_notice("Machine and scope registration turned off, --slice= and --property= settings will have no effect.");
-
         r = sync_cgroup(*pid, arg_unified_cgroup_hierarchy, arg_uid_shift);
         if (r < 0)
                 return r;
@@ -1929,11 +1667,9 @@ int main(int argc, char *argv[]) {
         if (r < 0)
                 goto finish;
 
-        r = verify_arguments();
-        if (r < 0)
-                goto finish;
-
         if (arg_directory) {
+                const char *p;
+
                 if (path_equal(arg_directory, "/")) {
                         log_error("Spawning container on root directory is not supported. Consider using --ephemeral.");
                         r = -EINVAL;
@@ -1944,7 +1680,7 @@ int main(int argc, char *argv[]) {
                 if (r < 0)
                         goto finish;
 
-                r = image_path_lock(arg_directory, (arg_read_only ? LOCK_SH : LOCK_EX) | LOCK_NB, &tree_global_lock, &tree_local_lock);
+                r = image_path_lock(arg_directory, LOCK_EX | LOCK_NB, &tree_global_lock, &tree_local_lock);
                 if (r == -EBUSY) {
                         log_error_errno(r, "Directory tree %s is currently busy.", arg_directory);
                         goto finish;
@@ -1954,18 +1690,12 @@ int main(int argc, char *argv[]) {
                         goto finish;
                 }
 
-                if (arg_start_mode == START_BOOT) {
-                } else {
-                        const char *p;
-
-                        p = strjoina(arg_directory, "/usr/");
-                        if (laccess(p, F_OK) < 0) {
-                                log_error("Directory %s doesn't look like it has an OS tree. Refusing.", arg_directory);
-                                r = -EINVAL;
-                                goto finish;
-                        }
+                p = strjoina(arg_directory, "/usr/");
+                if (laccess(p, F_OK) < 0) {
+                        log_error("Directory %s doesn't look like it has an OS tree. Refusing.", arg_directory);
+                        r = -EINVAL;
+                        goto finish;
                 }
-
         }
 
         r = detect_unified_cgroup_hierarchy(arg_directory);
@@ -2025,10 +1755,6 @@ finish:
         free(arg_machine);
         free(arg_chdir);
         strv_free(arg_setenv);
-        free(arg_network_bridge);
-        strv_free(arg_network_interfaces);
-        strv_free(arg_network_macvlan);
-        strv_free(arg_network_ipvlan);
         strv_free(arg_parameters);
         custom_mount_free_all(arg_custom_mounts, arg_n_custom_mounts);
         free(arg_root_hash);
