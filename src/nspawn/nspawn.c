@@ -76,7 +76,6 @@
 #include "mount-util.h"
 #include "netlink-util.h"
 #include "nspawn-mount.h"
-#include "nspawn-settings.h"
 #include "parse-util.h"
 #include "path-util.h"
 #include "process-util.h"
@@ -154,7 +153,6 @@ static bool arg_quiet = false;
 static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
 static int arg_kill_signal = 0;
 static CGroupUnified arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_UNKNOWN;
-static SettingsMask arg_settings_mask = 0;
 static char **arg_parameters = NULL;
 static const char *arg_container_service_name = "systemd-nspawn";
 static bool arg_use_cgns = true;
@@ -171,7 +169,6 @@ static int parse_argv(int argc, char *argv[]) {
 
         int c, r;
         uint64_t plus = 0, minus = 0;
-        bool mask_all_settings = false, mask_no_settings = false;
 
         assert(argc >= 0);
         assert(argv);
@@ -197,17 +194,7 @@ static int parse_argv(int argc, char *argv[]) {
                 arg_parameters = strv_copy(argv + optind);
                 if (!arg_parameters)
                         return log_oom();
-
-                arg_settings_mask |= SETTING_START_MODE;
         }
-
-        /* Load all settings from .nspawn files */
-        if (mask_no_settings)
-                arg_settings_mask = 0;
-
-        /* Don't load any settings from .nspawn files */
-        if (mask_all_settings)
-                arg_settings_mask = _SETTINGS_MASK_ALL;
 
         arg_caps_retain = (arg_caps_retain | plus) & ~minus;
 
