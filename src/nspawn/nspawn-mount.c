@@ -1255,40 +1255,6 @@ fail:
         return r;
 }
 
-/* Expects *pivot_root_new and *pivot_root_old to be initialised to allocated memory or NULL. */
-int pivot_root_parse(char **pivot_root_new, char **pivot_root_old, const char *s) {
-        _cleanup_free_ char *root_new = NULL, *root_old = NULL;
-        const char *p = s;
-        int r;
-
-        assert(pivot_root_new);
-        assert(pivot_root_old);
-
-        r = extract_first_word(&p, &root_new, ":", EXTRACT_DONT_COALESCE_SEPARATORS);
-        if (r < 0)
-                return r;
-        if (r == 0)
-                return -EINVAL;
-
-        if (isempty(p))
-                root_old = NULL;
-        else {
-                root_old = strdup(p);
-                if (!root_old)
-                        return -ENOMEM;
-        }
-
-        if (!path_is_absolute(root_new))
-                return -EINVAL;
-        if (root_old && !path_is_absolute(root_old))
-                return -EINVAL;
-
-        free_and_replace(*pivot_root_new, root_new);
-        free_and_replace(*pivot_root_old, root_old);
-
-        return 0;
-}
-
 int setup_pivot_root(const char *directory, const char *pivot_root_new, const char *pivot_root_old) {
         _cleanup_free_ char *directory_pivot_root_new = NULL;
         _cleanup_free_ char *pivot_tmp_pivot_root_old = NULL;

@@ -207,83 +207,6 @@ static int parse_argv(int argc, char *argv[]) {
         return 1;
 }
 
-static int userns_mkdir(const char *root, const char *path, mode_t mode, uid_t uid, gid_t gid) {
-        const char *q;
-
-        q = prefix_roota(root, path);
-        if (mkdir(q, mode) < 0) {
-                if (errno == EEXIST)
-                        return 0;
-                return -errno;
-        }
-
-        return 0;
-}
-
-static int copy_devnodes(const char *dest) {
-
-        static const char devnodes[] =
-                "null\0"
-                "zero\0"
-                "full\0"
-                "random\0"
-                "urandom\0"
-                "tty\0"
-                "net/tun\0";
-
-        const char *d;
-        int r = 0;
-        _cleanup_umask_ mode_t u;
-
-        assert(dest);
-
-        u = umask(0000);
-
-        /* Create /dev/net, so that we can create /dev/net/tun in it */
-        if (userns_mkdir(dest, "/dev/net", 0755, 0, 0) < 0)
-                return log_error_errno(r, "Failed to create /dev/net directory: %m");
-
-        NULSTR_FOREACH(d, devnodes) {
-                _cleanup_free_ char *from = NULL, *to = NULL;
-                struct stat st;
-
-                from = strappend("/dev/", d);
-                to = prefix_root(dest, from);
-
-                if (stat(from, &st) < 0) {
-
-                        if (errno != ENOENT)
-                                return log_error_errno(errno, "Failed to stat %s: %m", from);
-
-                } else if (!S_ISCHR(st.st_mode) && !S_ISBLK(st.st_mode)) {
-
-                        log_error("%s is not a char or block device, cannot copy.", from);
-                        return -EIO;
-
-                } else {
-                        if (mknod(to, st.st_mode, st.st_rdev) < 0) {
-                                /* Explicitly warn the user when /dev is already populated. */
-                                if (errno == EEXIST)
-                                        log_notice("%s/dev is pre-mounted and pre-populated. If a pre-mounted /dev is provided it needs to be an unpopulated file system.", dest);
-                                if (errno != EPERM)
-                                        return log_error_errno(errno, "mknod(%s) failed: %m", to);
-
-                                /* Some systems abusively restrict mknod but
-                                 * allow bind mounts. */
-                                r = touch(to);
-                                if (r < 0)
-                                        return log_error_errno(r, "touch (%s) failed: %m", to);
-                                r = mount_verbose(LOG_DEBUG, from, to, NULL, MS_BIND, NULL);
-                                if (r < 0)
-                                        return log_error_errno(r, "Both mknod and bind mount (%s) failed: %m", to);
-                        }
-
-                }
-        }
-
-        return r;
-}
-
 static int setup_pts(const char *dest) {
         _cleanup_free_ char *options = NULL;
         const char *p;
@@ -362,74 +285,6 @@ static int setup_hostname(void) {
 
 static int drop_capabilities(void) {
         return capability_bounding_set_drop(arg_caps_retain, false);
-}
-
-static int reset_audit_loginuid(void) {
-        _cleanup_free_ char *p = NULL;
-        int r;
-
-        if ((arg_clone_ns_flags & CLONE_NEWPID) == 0)
-                return 0;
-
-        r = read_one_line_file("/proc/self/loginuid", &p);
-        if (r == -ENOENT)
-                return 0;
-        if (r < 0)
-                return log_error_errno(r, "Failed to read /proc/self/loginuid: %m");
-
-        /* Already reset? */
-        if (streq(p, "4294967295"))
-                return 0;
-
-        r = write_string_file("/proc/self/loginuid", "4294967295", 0);
-        if (r < 0) {
-                log_error_errno(r,
-                                "Failed to reset audit login UID. This probably means that your kernel is too\n"
-                                "old and you have audit enabled. Note that the auditing subsystem is known to\n"
-                                "be incompatible with containers on old kernels. Please make sure to upgrade\n"
-                                "your kernel or to off auditing with 'audit=0' on the kernel command line before\n"
-                                "using systemd-nspawn. Sleeping for 5s... (%m)");
-
-                sleep(5);
-        }
-
-        return 0;
-}
-
-
-static int setup_propagate(const char *root) {
-        const char *p, *q;
-        int r;
-
-        (void) mkdir_p("/run/systemd/nspawn/", 0755);
-        (void) mkdir_p("/run/systemd/nspawn/propagate", 0600);
-        p = strjoina("/run/systemd/nspawn/propagate/", arg_machine);
-        (void) mkdir_p(p, 0600);
-
-        r = userns_mkdir(root, "/run/systemd", 0755, 0, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to create /run/systemd: %m");
-
-        r = userns_mkdir(root, "/run/systemd/nspawn", 0755, 0, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to create /run/systemd/nspawn: %m");
-
-        r = userns_mkdir(root, "/run/systemd/nspawn/incoming", 0600, 0, 0);
-        if (r < 0)
-                return log_error_errno(r, "Failed to create /run/systemd/nspawn/incoming: %m");
-
-        q = prefix_roota(root, "/run/systemd/nspawn/incoming");
-        r = mount_verbose(LOG_ERR, p, q, NULL, MS_BIND, NULL);
-        if (r < 0)
-                return r;
-
-        r = mount_verbose(LOG_ERR, NULL, q, NULL, MS_BIND|MS_REMOUNT|MS_RDONLY, NULL);
-        if (r < 0)
-                return r;
-
-        /* machined will MS_MOVE into that directory, and that's only
-         * supported for non-shared mounts. */
-        return mount_verbose(LOG_ERR, NULL, q, NULL, MS_SLAVE, NULL);
 }
 
 /*
@@ -712,7 +567,6 @@ static int outer_child(
                 Barrier *barrier,
                 const char *directory,
                 const char *console,
-                DissectedImage *dissected_image,
                 bool interactive,
                 bool secondary,
                 int pid_socket,
@@ -752,22 +606,12 @@ static int outer_child(
                         return log_error_errno(errno, "Failed to duplicate console: %m");
         }
 
-        r = reset_audit_loginuid();
-        if (r < 0)
-                return r;
-
         /* Mark everything as slave, so that we still
          * receive mounts from the real root, but don't
          * propagate mounts to the real root. */
         r = mount_verbose(LOG_ERR, NULL, "/", NULL, MS_SLAVE|MS_REC, NULL);
         if (r < 0)
                 return r;
-
-        if (dissected_image) {
-                r = dissected_image_mount(dissected_image, directory, DISSECT_IMAGE_DISCARD_ON_LOOP);
-                if (r < 0)
-                        return r;
-        }
 
         arg_uid_shift = 0;
 
@@ -822,32 +666,13 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = copy_devnodes(directory);
-        if (r < 0)
-                return r;
-
         dev_setup(directory, arg_uid_shift, arg_uid_shift);
 
         r = setup_pts(directory);
         if (r < 0)
                 return r;
 
-        r = setup_propagate(directory);
-        if (r < 0)
-                return r;
-
         r = setup_dev_console(directory, console);
-        if (r < 0)
-                return r;
-
-        r = mount_custom(
-                        directory,
-                        NULL,
-                        0,
-                        false,
-                        arg_uid_shift,
-                        arg_uid_range,
-                        arg_selinux_apifs_context);
         if (r < 0)
                 return r;
 
@@ -902,7 +727,6 @@ static int outer_child(
 
 static int run(int master,
                const char* console,
-               DissectedImage *dissected_image,
                bool interactive,
                bool secondary,
                FDSet *fds,
@@ -968,7 +792,6 @@ static int run(int master,
                 r = outer_child(&barrier,
                                 arg_directory,
                                 console,
-                                dissected_image,
                                 interactive,
                                 secondary,
                                 pid_socket_pair[1],
@@ -1107,7 +930,6 @@ int main(int argc, char *argv[]) {
         bool interactive;
         _cleanup_(loop_device_unrefp) LoopDevice *loop = NULL;
         _cleanup_(decrypted_image_unrefp) DecryptedImage *decrypted_image = NULL;
-        _cleanup_(dissected_image_unrefp) DissectedImage *dissected_image = NULL;
 
         log_parse_environment();
         log_open();
@@ -1156,7 +978,6 @@ int main(int argc, char *argv[]) {
 
         r = run(master,
                 console,
-                dissected_image,
                 interactive, secondary,
                 fds,
                 &pid, &ret);
