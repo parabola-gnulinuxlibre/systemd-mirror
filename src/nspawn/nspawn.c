@@ -272,21 +272,6 @@ static int setup_dev_console(const char *dest, const char *console) {
         return mount_verbose(LOG_ERR, console, to, NULL, MS_BIND, NULL);
 }
 
-static int setup_hostname(void) {
-
-        if ((arg_clone_ns_flags & CLONE_NEWUTS) == 0)
-                return 0;
-
-        if (sethostname_idempotent(arg_machine) < 0)
-                return -errno;
-
-        return 0;
-}
-
-static int drop_capabilities(void) {
-        return capability_bounding_set_drop(arg_caps_retain, false);
-}
-
 /*
  * Return values:
  * < 0 : wait_for_terminate() failed to get the state of the
@@ -405,7 +390,6 @@ static int determine_names(void) {
 static int inner_child(
                 Barrier *barrier,
                 const char *directory,
-                bool secondary,
                 FDSet *fds) {
 
         _cleanup_free_ char *home = NULL;
@@ -477,17 +461,6 @@ static int inner_child(
 
         if (setsid() < 0)
                 return log_error_errno(errno, "setsid() failed: %m");
-
-        r = drop_capabilities();
-        if (r < 0)
-                return log_error_errno(r, "drop_capabilities() failed: %m");
-
-        setup_hostname();
-
-        if (secondary) {
-                if (personality(PER_LINUX32) < 0)
-                        return log_error_errno(errno, "personality() failed: %m");
-        }
 
 #ifdef HAVE_SELINUX
         if (arg_selinux_context)
@@ -568,7 +541,6 @@ static int outer_child(
                 const char *directory,
                 const char *console,
                 bool interactive,
-                bool secondary,
                 int pid_socket,
                 int uid_shift_socket,
                 FDSet *fds) {
@@ -705,7 +677,7 @@ static int outer_child(
                  * requested, so that we all are owned by the user if
                  * user namespaces are turned on. */
 
-                r = inner_child(barrier, directory, secondary, fds);
+                r = inner_child(barrier, directory, fds);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
@@ -728,7 +700,6 @@ static int outer_child(
 static int run(int master,
                const char* console,
                bool interactive,
-               bool secondary,
                FDSet *fds,
                pid_t *pid, int *ret) {
 
@@ -793,7 +764,6 @@ static int run(int master,
                                 arg_directory,
                                 console,
                                 interactive,
-                                secondary,
                                 pid_socket_pair[1],
                                 uid_shift_socket_pair[1],
                                 fds);
@@ -924,7 +894,6 @@ int main(int argc, char *argv[]) {
         _cleanup_close_ int master = -1;
         _cleanup_fdset_free_ FDSet *fds = NULL;
         int r, ret = EXIT_SUCCESS;
-        bool secondary = false;
         pid_t pid = 0;
         _cleanup_release_lock_file_ LockFile tree_global_lock = LOCK_FILE_INIT, tree_local_lock = LOCK_FILE_INIT;
         bool interactive;
@@ -978,7 +947,7 @@ int main(int argc, char *argv[]) {
 
         r = run(master,
                 console,
-                interactive, secondary,
+                interactive,
                 fds,
                 &pid, &ret);
 
