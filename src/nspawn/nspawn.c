@@ -77,7 +77,6 @@
 #include "netlink-util.h"
 #include "nspawn-mount.h"
 #include "nspawn-settings.h"
-#include "nspawn-setuid.h"
 #include "parse-util.h"
 #include "path-util.h"
 #include "process-util.h"
@@ -653,10 +652,6 @@ static int inner_child(
                 if (setexeccon(arg_selinux_context) < 0)
                         return log_error_errno(errno, "setexeccon(\"%s\") failed: %m", arg_selinux_context);
 #endif
-
-        r = change_uid_gid(NULL, &home);
-        if (r < 0)
-                return r;
 
         /* LXC sets container=lxc, so follow the scheme here */
         envp[n_env++] = strjoina("container=", arg_container_service_name);
