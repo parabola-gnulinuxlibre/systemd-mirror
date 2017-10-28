@@ -58,7 +58,6 @@
 #include "dissect-image.h"
 #include "env-util.h"
 #include "fd-util.h"
-#include "fdset.h"
 #include "fileio.h"
 #include "format-util.h"
 #include "fs-util.h"
@@ -96,12 +95,6 @@
 #include "user-util.h"
 #include "util.h"
 
-/* Note that devpts's gid= parameter parses GIDs as signed values, hence we stay away from the upper half of the 32bit
- * UID range here. We leave a bit of room at the lower end and a lot of room at the upper end, so that other subsystems
- * may have their own allocation ranges too. */
-#define UID_SHIFT_PICK_MIN ((uid_t) UINT32_C(0x00080000))
-#define UID_SHIFT_PICK_MAX ((uid_t) UINT32_C(0x6FFF0000))
-
 #define EXIT_FORCE_RESTART 133
 
 typedef enum ContainerStatus {
@@ -109,56 +102,16 @@ typedef enum ContainerStatus {
         CONTAINER_REBOOTED
 } ContainerStatus;
 
-typedef enum LinkJournal {
-        LINK_NO,
-        LINK_AUTO,
-        LINK_HOST,
-        LINK_GUEST
-} LinkJournal;
-
 static char *arg_directory = NULL;
 static char *arg_chdir = NULL;
 static char *arg_machine = NULL;
-static const char *arg_selinux_context = NULL;
-static const char *arg_selinux_apifs_context = NULL;
-static uint64_t arg_caps_retain =
-        (1ULL << CAP_AUDIT_CONTROL) |
-        (1ULL << CAP_AUDIT_WRITE) |
-        (1ULL << CAP_CHOWN) |
-        (1ULL << CAP_DAC_OVERRIDE) |
-        (1ULL << CAP_DAC_READ_SEARCH) |
-        (1ULL << CAP_FOWNER) |
-        (1ULL << CAP_FSETID) |
-        (1ULL << CAP_IPC_OWNER) |
-        (1ULL << CAP_KILL) |
-        (1ULL << CAP_LEASE) |
-        (1ULL << CAP_LINUX_IMMUTABLE) |
-        (1ULL << CAP_MKNOD) |
-        (1ULL << CAP_NET_BIND_SERVICE) |
-        (1ULL << CAP_NET_BROADCAST) |
-        (1ULL << CAP_NET_RAW) |
-        (1ULL << CAP_SETFCAP) |
-        (1ULL << CAP_SETGID) |
-        (1ULL << CAP_SETPCAP) |
-        (1ULL << CAP_SETUID) |
-        (1ULL << CAP_SYS_ADMIN) |
-        (1ULL << CAP_SYS_BOOT) |
-        (1ULL << CAP_SYS_CHROOT) |
-        (1ULL << CAP_SYS_NICE) |
-        (1ULL << CAP_SYS_PTRACE) |
-        (1ULL << CAP_SYS_RESOURCE) |
-        (1ULL << CAP_SYS_TTY_CONFIG);
 static char **arg_setenv = NULL;
 static bool arg_quiet = false;
 static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
 static int arg_kill_signal = 0;
-static CGroupUnified arg_unified_cgroup_hierarchy = CGROUP_UNIFIED_UNKNOWN;
 static char **arg_parameters = NULL;
-static const char *arg_container_service_name = "systemd-nspawn";
-static bool arg_use_cgns = true;
 static unsigned long arg_clone_ns_flags = CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS;
 static MountSettingsMask arg_mount_settings = MOUNT_APPLY_APIVFS_RO;
-static void *arg_root_hash = NULL;
 
 static int parse_argv(int argc, char *argv[]) {
 
@@ -168,7 +121,6 @@ static int parse_argv(int argc, char *argv[]) {
         };
 
         int c, r;
-        uint64_t plus = 0, minus = 0;
 
         assert(argc >= 0);
         assert(argv);
@@ -196,14 +148,6 @@ static int parse_argv(int argc, char *argv[]) {
                         return log_oom();
         }
 
-        arg_caps_retain = (arg_caps_retain | plus) & ~minus;
-
-        r = cg_unified_flush();
-        if (r < 0)
-                return log_error_errno(r, "Failed to determine whether the unified cgroups hierarchy is used: %m");
-
-        arg_use_cgns = cg_ns_supported();
-
         return 1;
 }
 
@@ -212,18 +156,9 @@ static int setup_pts(const char *dest) {
         const char *p;
         int r;
 
-#ifdef HAVE_SELINUX
-        if (arg_selinux_apifs_context)
-                (void) asprintf(&options,
-                                "newinstance,ptmxmode=0666,mode=620,gid=" GID_FMT ",context=\"%s\"",
-                                arg_uid_shift + TTY_GID,
-                                arg_selinux_apifs_context);
-        else
-#endif
-                (void) asprintf(&options,
-                                "newinstance,ptmxmode=0666,mode=620,gid=" GID_FMT,
-                                arg_uid_shift + TTY_GID);
-
+        (void) asprintf(&options,
+                        "newinstance,ptmxmode=0666,mode=620,gid=" GID_FMT,
+                        arg_uid_shift + TTY_GID);
         if (!options)
                 return log_oom();
 
@@ -389,8 +324,7 @@ static int determine_names(void) {
 
 static int inner_child(
                 Barrier *barrier,
-                const char *directory,
-                FDSet *fds) {
+                const char *directory) {
 
         _cleanup_free_ char *home = NULL;
         unsigned n_env = 1;
@@ -421,7 +355,7 @@ static int inner_child(
                       arg_mount_settings | MOUNT_IN_USERNS,
                       arg_uid_shift,
                       arg_uid_range,
-                      arg_selinux_apifs_context);
+                      NULL);
 
         if (r < 0)
                 return r;
@@ -437,39 +371,10 @@ static int inner_child(
                 return -ESRCH;
         }
 
-        if (arg_use_cgns && cg_ns_supported()) {
-                r = unshare(CLONE_NEWCGROUP);
-                if (r < 0)
-                        return log_error_errno(errno, "Failed to unshare cgroup namespace");
-                r = mount_cgroups(
-                                "",
-                                arg_unified_cgroup_hierarchy,
-                                false,
-                                arg_uid_shift,
-                                arg_uid_range,
-                                arg_selinux_apifs_context,
-                                true);
-                if (r < 0)
-                        return r;
-        } else {
-                r = mount_systemd_cgroup_writable("", arg_unified_cgroup_hierarchy);
-                if (r < 0)
-                        return r;
-        }
-
         umask(0022);
 
         if (setsid() < 0)
                 return log_error_errno(errno, "setsid() failed: %m");
-
-#ifdef HAVE_SELINUX
-        if (arg_selinux_context)
-                if (setexeccon(arg_selinux_context) < 0)
-                        return log_error_errno(errno, "setexeccon(\"%s\") failed: %m", arg_selinux_context);
-#endif
-
-        /* LXC sets container=lxc, so follow the scheme here */
-        envp[n_env++] = strjoina("container=", arg_container_service_name);
 
         envp[n_env] = strv_find_prefix(environ, "TERM=");
         if (envp[n_env])
@@ -479,16 +384,6 @@ static int inner_child(
             (asprintf((char**)(envp + n_env++), "USER=%s", "root") < 0) ||
             (asprintf((char**)(envp + n_env++), "LOGNAME=%s", "root") < 0))
                 return log_oom();
-
-        if (fdset_size(fds) > 0) {
-                r = fdset_cloexec(fds, false);
-                if (r < 0)
-                        return log_error_errno(r, "Failed to unset O_CLOEXEC for file descriptors.");
-
-                if ((asprintf((char **)(envp + n_env++), "LISTEN_FDS=%u", fdset_size(fds)) < 0) ||
-                    (asprintf((char **)(envp + n_env++), "LISTEN_PID=1") < 0))
-                        return log_oom();
-        }
 
         env_use = strv_env_merge(2, envp, arg_setenv);
         if (!env_use)
@@ -505,17 +400,6 @@ static int inner_child(
         if (arg_chdir)
                 if (chdir(arg_chdir) < 0)
                         return log_error_errno(errno, "Failed to change to specified working directory %s: %m", arg_chdir);
-
-        /* Now, explicitly close the log, so that we
-         * then can close all remaining fds. Closing
-         * the log explicitly first has the benefit
-         * that the logging subsystem knows about it,
-         * and is thus ready to be reopened should we
-         * need it again. Note that the other fds
-         * closed here are at least the locking and
-         * barrier fds. */
-        log_close();
-        (void) fdset_close_others(fds);
 
         if (!strv_isempty(arg_parameters)) {
                 exec_target = arg_parameters[0];
@@ -542,8 +426,7 @@ static int outer_child(
                 const char *console,
                 bool interactive,
                 int pid_socket,
-                int uid_shift_socket,
-                FDSet *fds) {
+                int uid_shift_socket) {
 
         pid_t pid;
         ssize_t l;
@@ -602,7 +485,7 @@ static int outer_child(
                         false,
                         arg_uid_shift,
                         arg_uid_range,
-                        arg_selinux_context);
+                        NULL);
         if (r < 0)
                 return r;
 
@@ -612,7 +495,7 @@ static int outer_child(
                         false,
                         arg_uid_shift,
                         arg_uid_range,
-                        arg_selinux_context);
+                        NULL);
         if (r < 0)
                 return r;
 
@@ -634,7 +517,7 @@ static int outer_child(
                       arg_mount_settings,
                       arg_uid_shift,
                       arg_uid_range,
-                      arg_selinux_apifs_context);
+                      NULL);
         if (r < 0)
                 return r;
 
@@ -647,19 +530,6 @@ static int outer_child(
         r = setup_dev_console(directory, console);
         if (r < 0)
                 return r;
-
-        if (!arg_use_cgns || !cg_ns_supported()) {
-                r = mount_cgroups(
-                                directory,
-                                arg_unified_cgroup_hierarchy,
-                                false,
-                                arg_uid_shift,
-                                arg_uid_range,
-                                arg_selinux_apifs_context,
-                                false);
-                if (r < 0)
-                        return r;
-        }
 
         r = mount_move_root(directory);
         if (r < 0)
@@ -677,7 +547,7 @@ static int outer_child(
                  * requested, so that we all are owned by the user if
                  * user namespaces are turned on. */
 
-                r = inner_child(barrier, directory, fds);
+                r = inner_child(barrier, directory);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
@@ -700,7 +570,6 @@ static int outer_child(
 static int run(int master,
                const char* console,
                bool interactive,
-               FDSet *fds,
                pid_t *pid, int *ret) {
 
         static const struct sigaction sa = {
@@ -765,8 +634,7 @@ static int run(int master,
                                 console,
                                 interactive,
                                 pid_socket_pair[1],
-                                uid_shift_socket_pair[1],
-                                fds);
+                                uid_shift_socket_pair[1]);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
@@ -774,8 +642,6 @@ static int run(int master,
         }
 
         barrier_set_role(&barrier, BARRIER_PARENT);
-
-        fds = fdset_free(fds);
 
         pid_socket_pair[1] = safe_close(pid_socket_pair[1]);
         uid_shift_socket_pair[1] = safe_close(uid_shift_socket_pair[1]);
@@ -892,13 +758,9 @@ int main(int argc, char *argv[]) {
 
         _cleanup_free_ char *console = NULL;
         _cleanup_close_ int master = -1;
-        _cleanup_fdset_free_ FDSet *fds = NULL;
         int r, ret = EXIT_SUCCESS;
         pid_t pid = 0;
-        _cleanup_release_lock_file_ LockFile tree_global_lock = LOCK_FILE_INIT, tree_local_lock = LOCK_FILE_INIT;
         bool interactive;
-        _cleanup_(loop_device_unrefp) LoopDevice *loop = NULL;
-        _cleanup_(decrypted_image_unrefp) DecryptedImage *decrypted_image = NULL;
 
         log_parse_environment();
         log_open();
@@ -948,7 +810,6 @@ int main(int argc, char *argv[]) {
         r = run(master,
                 console,
                 interactive,
-                fds,
                 &pid, &ret);
 
 finish:
@@ -969,7 +830,6 @@ finish:
         free(arg_chdir);
         strv_free(arg_setenv);
         strv_free(arg_parameters);
-        free(arg_root_hash);
 
         return r < 0 ? EXIT_FAILURE : ret;
 }
