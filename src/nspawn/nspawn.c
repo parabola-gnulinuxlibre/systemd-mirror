@@ -58,7 +58,6 @@ static char *arg_directory = NULL;
 static char **arg_setenv = NULL;
 static bool arg_quiet = false;
 static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
-static int arg_kill_signal = 0;
 static char **arg_parameters = NULL;
 static unsigned long arg_clone_ns_flags = CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS;
 static MountSettingsMask arg_mount_settings = MOUNT_APPLY_APIVFS_RO;
@@ -177,22 +176,6 @@ static int wait_for_container(pid_t pid, ContainerStatus *container) {
                 log_error("Container failed due to unknown reason.");
                 return -EIO;
         }
-}
-
-static int on_orderly_shutdown(sd_event_source *s, const struct signalfd_siginfo *si, void *userdata) {
-        pid_t pid;
-
-        pid = PTR_TO_PID(userdata);
-        if (pid > 0) {
-                if (kill(pid, arg_kill_signal) >= 0) {
-                        log_info("Trying to halt container. Send SIGTERM again to trigger immediate termination.");
-                        sd_event_source_set_userdata(s, NULL);
-                        return 0;
-                }
-        }
-
-        sd_event_exit(sd_event_source_get_event(s), 0);
-        return 0;
 }
 
 static int on_sigchld(sd_event_source *s, const struct signalfd_siginfo *ssi, void *userdata) {
@@ -427,7 +410,6 @@ static int run(int master,
                 .sa_flags = SA_NOCLDSTOP|SA_RESTART,
         };
 
-        _cleanup_close_ int etc_passwd_lock = -1;
         _cleanup_close_pair_ int
                 pid_socket_pair[2] = { -1, -1 },
                 uid_shift_socket_pair[2] = { -1, -1 };
@@ -536,19 +518,9 @@ static int run(int master,
                 return -ESRCH;
         }
 
-        /* At this point we have made use of the UID we picked, and thus nss-mymachines
-         * will make them appear in getpwuid(), thus we can release the /etc/passwd lock. */
-        etc_passwd_lock = safe_close(etc_passwd_lock);
-
-        if (arg_kill_signal > 0) {
-                /* Try to kill the init system on SIGINT or SIGTERM */
-                sd_event_add_signal(event, NULL, SIGINT, on_orderly_shutdown, PID_TO_PTR(*pid));
-                sd_event_add_signal(event, NULL, SIGTERM, on_orderly_shutdown, PID_TO_PTR(*pid));
-        } else {
-                /* Immediately exit */
-                sd_event_add_signal(event, NULL, SIGINT, NULL, NULL);
-                sd_event_add_signal(event, NULL, SIGTERM, NULL, NULL);
-        }
+        /* Immediately exit */
+        sd_event_add_signal(event, NULL, SIGINT, NULL, NULL);
+        sd_event_add_signal(event, NULL, SIGTERM, NULL, NULL);
 
         /* Exit when the child exits */
         sd_event_add_signal(event, NULL, SIGCHLD, on_sigchld, PID_TO_PTR(*pid));
