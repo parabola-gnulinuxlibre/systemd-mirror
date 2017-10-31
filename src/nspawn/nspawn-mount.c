@@ -18,27 +18,14 @@
 ***/
 
 #include <sys/mount.h>
-#include <linux/magic.h>
 
-#include "alloc-util.h"
-#include "escape.h"
-#include "fd-util.h"
-#include "fileio.h"
 #include "fs-util.h"
-#include "label.h"
-#include "mkdir.h"
 #include "mount-util.h"
-#include "nspawn-mount.h"
-#include "parse-util.h"
 #include "path-util.h"
-#include "rm-rf.h"
-#include "set.h"
-#include "stat-util.h"
-#include "string-util.h"
 #include "strv.h"
 #include "user-util.h"
-#include "util.h"
 
+#include "nspawn-mount.h"
 
 static int tmpfs_patch_options(
                 const char *options,
@@ -243,118 +230,6 @@ int mount_all(const char *dest,
         }
 
         return 0;
-}
-
-int setup_volatile_state(
-                const char *directory,
-                VolatileMode mode,
-                bool userns, uid_t uid_shift, uid_t uid_range,
-                const char *selinux_apifs_context) {
-
-        _cleanup_free_ char *buf = NULL;
-        const char *p, *options;
-        int r;
-
-        assert(directory);
-
-        if (mode != VOLATILE_STATE)
-                return 0;
-
-        /* --volatile=state means we simply overmount /var
-           with a tmpfs, and the rest read-only. */
-
-        r = bind_remount_recursive(directory, true, NULL);
-        if (r < 0)
-                return log_error_errno(r, "Failed to remount %s read-only: %m", directory);
-
-        p = prefix_roota(directory, "/var");
-        r = mkdir(p, 0755);
-        if (r < 0 && errno != EEXIST)
-                return log_error_errno(errno, "Failed to create %s: %m", directory);
-
-        options = "mode=755";
-        r = tmpfs_patch_options(options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
-        if (r < 0)
-                return log_oom();
-        if (r > 0)
-                options = buf;
-
-        return mount_verbose(LOG_ERR, "tmpfs", p, "tmpfs", MS_STRICTATIME, options);
-}
-
-int setup_volatile(
-                const char *directory,
-                VolatileMode mode,
-                bool userns, uid_t uid_shift, uid_t uid_range,
-                const char *selinux_apifs_context) {
-
-        bool tmpfs_mounted = false, bind_mounted = false;
-        char template[] = "/tmp/nspawn-volatile-XXXXXX";
-        _cleanup_free_ char *buf = NULL;
-        const char *f, *t, *options;
-        int r;
-
-        assert(directory);
-
-        if (mode != VOLATILE_YES)
-                return 0;
-
-        /* --volatile=yes means we mount a tmpfs to the root dir, and
-           the original /usr to use inside it, and that read-only. */
-
-        if (!mkdtemp(template))
-                return log_error_errno(errno, "Failed to create temporary directory: %m");
-
-        options = "mode=755";
-        r = tmpfs_patch_options(options, userns, uid_shift, uid_range, false, selinux_apifs_context, &buf);
-        if (r < 0)
-                return log_oom();
-        if (r > 0)
-                options = buf;
-
-        r = mount_verbose(LOG_ERR, "tmpfs", template, "tmpfs", MS_STRICTATIME, options);
-        if (r < 0)
-                goto fail;
-
-        tmpfs_mounted = true;
-
-        f = prefix_roota(directory, "/usr");
-        t = prefix_roota(template, "/usr");
-
-        r = mkdir(t, 0755);
-        if (r < 0 && errno != EEXIST) {
-                r = log_error_errno(errno, "Failed to create %s: %m", t);
-                goto fail;
-        }
-
-        r = mount_verbose(LOG_ERR, f, t, NULL, MS_BIND|MS_REC, NULL);
-        if (r < 0)
-                goto fail;
-
-        bind_mounted = true;
-
-        r = bind_remount_recursive(t, true, NULL);
-        if (r < 0) {
-                log_error_errno(r, "Failed to remount %s read-only: %m", t);
-                goto fail;
-        }
-
-        r = mount_verbose(LOG_ERR, template, directory, NULL, MS_MOVE, NULL);
-        if (r < 0)
-                goto fail;
-
-        (void) rmdir(template);
-
-        return 0;
-
-fail:
-        if (bind_mounted)
-                (void) umount_verbose(t);
-
-        if (tmpfs_mounted)
-                (void) umount_verbose(template);
-        (void) rmdir(template);
-        return r;
 }
 
 int setup_pivot_root(const char *directory, const char *pivot_root_new, const char *pivot_root_old) {

@@ -427,26 +427,6 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = setup_volatile(
-                        directory,
-                        false,
-                        false,
-                        arg_uid_shift,
-                        arg_uid_range,
-                        NULL);
-        if (r < 0)
-                return r;
-
-        r = setup_volatile_state(
-                        directory,
-                        false,
-                        false,
-                        arg_uid_shift,
-                        arg_uid_range,
-                        NULL);
-        if (r < 0)
-                return r;
-
         /* Mark everything as shared so our mounts get propagated down. This is
          * required to make new bind mounts available in systemd services
          * inside the containter that create a new mount namespace.
