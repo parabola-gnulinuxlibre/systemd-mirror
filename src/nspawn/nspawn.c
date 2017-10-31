@@ -34,7 +34,6 @@
 
 static char *arg_directory = NULL;
 static char **arg_parameters = NULL;
-static unsigned long arg_clone_ns_flags = CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS;
 
 static int inner_child(
                 Barrier *barrier,
@@ -110,8 +109,7 @@ static int outer_child(
         if (chroot(".") < 0)
                 return log_error_errno(errno, "Failed to chroot: %m");
 
-        pid = raw_clone(SIGCHLD|CLONE_NEWNS|
-                        arg_clone_ns_flags);
+        pid = raw_clone(SIGCHLD|CLONE_NEWNS|CLONE_NEWPID);
         if (pid < 0)
                 return log_error_errno(errno, "Failed to fork inner child: %m");
         if (pid == 0) {
