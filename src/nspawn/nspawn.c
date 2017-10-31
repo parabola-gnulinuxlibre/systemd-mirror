@@ -79,9 +79,6 @@ static int outer_child(
         assert(console);
         assert(pid_socket >= 0);
 
-        if (prctl(PR_SET_PDEATHSIG, SIGKILL) < 0)
-                return log_error_errno(errno, "PR_SET_PDEATHSIG failed: %m");
-
         r = open(console, O_RDWR, 0);
         if (r < 0)
                 return log_error_errno(r, "Failed to open console: %m");
@@ -148,19 +145,10 @@ static int run(int master,
                const char* console,
                pid_t *pid, int *ret) {
 
-        static const struct sigaction sa = {
-                .sa_handler = nop_signal_handler,
-                .sa_flags = SA_NOCLDSTOP|SA_RESTART,
-        };
-
         _cleanup_close_pair_ int pid_socket_pair[2] = { -1, -1 };
         _cleanup_(barrier_destroy) Barrier barrier = BARRIER_NULL;
         int r;
         ssize_t l;
-        sigset_t mask_chld;
-
-        assert_se(sigemptyset(&mask_chld) == 0);
-        assert_se(sigaddset(&mask_chld, SIGCHLD) == 0);
 
         r = barrier_create(&barrier);
         if (r < 0)
@@ -168,16 +156,6 @@ static int run(int master,
 
         if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, pid_socket_pair) < 0)
                 return log_error_errno(errno, "Failed to create pid socket pair: %m");
-
-        /* Child can be killed before execv(), so handle SIGCHLD in order to interrupt
-         * parent's blocking calls and give it a chance to call wait() and terminate. */
-        r = sigprocmask(SIG_UNBLOCK, &mask_chld, NULL);
-        if (r < 0)
-                return log_error_errno(errno, "Failed to change the signal mask: %m");
-
-        r = sigaction(SIGCHLD, &sa, NULL);
-        if (r < 0)
-                return log_error_errno(errno, "Failed to install SIGCHLD handler: %m");
 
         *pid = raw_clone(SIGCHLD|CLONE_NEWNS);
         if (*pid < 0)
@@ -192,9 +170,6 @@ static int run(int master,
                 master = safe_close(master);
 
                 pid_socket_pair[0] = safe_close(pid_socket_pair[0]);
-
-                (void) reset_all_signal_handlers();
-                (void) reset_signal_mask();
 
                 r = outer_child(&barrier,
                                 arg_directory,
@@ -225,15 +200,6 @@ static int run(int master,
         }
 
         log_debug("Init process invoked as PID "PID_FMT, *pid);
-
-        /* Block SIGCHLD here, before notifying child.
-         * process_pty() will handle it with the other signals. */
-        assert_se(sigprocmask(SIG_BLOCK, &mask_chld, NULL) >= 0);
-
-        /* Reset signal to default */
-        r = default_signals(SIGCHLD, -1);
-        if (r < 0)
-                return log_error_errno(r, "Failed to reset SIGCHLD: %m");
 
         /* Let the child know that we are ready and wait that the child is completely ready now. */
         if (!barrier_place_and_sync(&barrier)) { /* #4 */
@@ -289,13 +255,6 @@ int main(int argc, char *argv[]) {
 
         if (unlockpt(master) < 0) {
                 r = log_error_errno(errno, "Failed to unlock tty: %m");
-                goto finish;
-        }
-
-        assert_se(sigprocmask_many(SIG_BLOCK, NULL, SIGCHLD, SIGWINCH, SIGTERM, SIGINT, -1) >= 0);
-
-        if (prctl(PR_SET_CHILD_SUBREAPER, 1) < 0) {
-                r = log_error_errno(errno, "Failed to become subreaper: %m");
                 goto finish;
         }
 
