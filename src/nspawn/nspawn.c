@@ -31,21 +31,6 @@
 static char *arg_directory = NULL;
 static char **arg_parameters = NULL;
 
-static int inner_child(void) {
-
-        int r;
-
-        r = mount_verbose(LOG_ERR, "proc", "/proc", "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, NULL);
-        if (r < 0)
-                return r;
-
-        execvp(arg_parameters[0], arg_parameters);
-
-        r = -errno;
-        (void) log_open();
-        return log_error_errno(r, "execv(%s) failed: %m", arg_parameters[0]);
-}
-
 static int outer_child(
                 const char *directory,
                 const char *console,
@@ -64,9 +49,7 @@ static int outer_child(
         if (r < 0)
                 return log_error_errno(r, "Failed to open console: %m");
 
-        /* Mark everything as slave, so that we still
-         * receive mounts from the real root, but don't
-         * propagate mounts to the real root. */
+        /* Mark everything as slave */
         r = mount_verbose(LOG_ERR, NULL, "/", NULL, MS_SLAVE|MS_REC, NULL);
         if (r < 0)
                 return r;
@@ -76,12 +59,7 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        /* Mark everything as shared so our mounts get propagated down. This is
-         * required to make new bind mounts available in systemd services
-         * inside the containter that create a new mount namespace.
-         * See https://github.com/systemd/systemd/issues/3860
-         * Further submounts (such as /dev) done after this will inherit the
-         * shared propagation mode. */
+        /* Mark everything as shared so our mounts get propagated down. */
         r = mount_verbose(LOG_ERR, NULL, directory, NULL, MS_SHARED|MS_REC, NULL);
         if (r < 0)
                 return r;
@@ -101,11 +79,16 @@ static int outer_child(
                  * requested, so that we all are owned by the user if
                  * user namespaces are turned on. */
 
-                r = inner_child();
+                r = mount_verbose(LOG_ERR, "proc", "/proc", "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, NULL);
                 if (r < 0)
-                        _exit(EXIT_FAILURE);
+                        return r;
 
-                _exit(EXIT_SUCCESS);
+                execvp(arg_parameters[0], arg_parameters);
+
+                r = -errno;
+                (void) log_open();
+                log_error_errno(r, "execv(%s) failed: %m", arg_parameters[0]);
+                _exit(EXIT_FAILURE);
         }
 
         l = send(pid_socket, &pid, sizeof(pid), MSG_NOSIGNAL);
