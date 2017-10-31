@@ -32,75 +32,9 @@
 #include "terminal-util.h"
 #include "user-util.h"
 
-typedef enum ContainerStatus {
-        CONTAINER_TERMINATED,
-        CONTAINER_REBOOTED
-} ContainerStatus;
-
 static char *arg_directory = NULL;
-static bool arg_quiet = false;
 static char **arg_parameters = NULL;
 static unsigned long arg_clone_ns_flags = CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS;
-
-/*
- * Return values:
- * < 0 : wait_for_terminate() failed to get the state of the
- *       container, the container was terminated by a signal, or
- *       failed for an unknown reason.  No change is made to the
- *       container argument.
- * > 0 : The program executed in the container terminated with an
- *       error.  The exit code of the program executed in the
- *       container is returned.  The container argument has been set
- *       to CONTAINER_TERMINATED.
- *   0 : The container is being rebooted, has been shut down or exited
- *       successfully.  The container argument has been set to either
- *       CONTAINER_TERMINATED or CONTAINER_REBOOTED.
- *
- * That is, success is indicated by a return value of zero, and an
- * error is indicated by a non-zero value.
- */
-static int wait_for_container(pid_t pid, ContainerStatus *container) {
-        siginfo_t status;
-        int r;
-
-        r = wait_for_terminate(pid, &status);
-        if (r < 0)
-                return log_warning_errno(r, "Failed to wait for container: %m");
-
-        switch (status.si_code) {
-
-        case CLD_EXITED:
-                if (status.si_status == 0)
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container exited successfully.");
-                else
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container failed with error code %i.", status.si_status);
-
-                *container = CONTAINER_TERMINATED;
-                return status.si_status;
-
-        case CLD_KILLED:
-                if (status.si_status == SIGINT) {
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container has been shut down.");
-                        *container = CONTAINER_TERMINATED;
-                        return 0;
-
-                } else if (status.si_status == SIGHUP) {
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container is being rebooted.");
-                        *container = CONTAINER_REBOOTED;
-                        return 0;
-                }
-
-                /* fall through */
-
-        case CLD_DUMPED:
-                log_error("Container terminated by signal %s.", signal_to_string(status.si_status));
-                return -EIO;
-
-        default:
-                log_error("Container failed due to unknown reason.");
-                return -EIO;
-        }
-}
 
 static int inner_child(
                 Barrier *barrier,
@@ -221,7 +155,6 @@ static int run(int master,
 
         _cleanup_close_pair_ int pid_socket_pair[2] = { -1, -1 };
         _cleanup_(barrier_destroy) Barrier barrier = BARRIER_NULL;
-        ContainerStatus container_status = 0;
         int r;
         ssize_t l;
         sigset_t mask_chld;
@@ -308,7 +241,7 @@ static int run(int master,
                 return -ESRCH;
         }
 
-        r = wait_for_container(*pid, &container_status);
+        r = wait_for_terminate(*pid, NULL);
         *pid = 0;
 
         if (r < 0) {
