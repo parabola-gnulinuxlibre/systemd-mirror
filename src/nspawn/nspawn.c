@@ -17,32 +17,21 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <getopt.h>
 #include <sys/mount.h>
 #include <sys/prctl.h>
 #include <sys/wait.h>
 
-#include "sd-bus.h"
-#include "sd-daemon.h"
-#include "sd-id128.h"
+#include "sd-event.h"
 
 #include "alloc-util.h"
 #include "barrier.h"
-#include "base-filesystem.h"
 #include "copy.h"
-#include "dev-setup.h"
-#include "env-util.h"
 #include "fd-util.h"
-#include "fs-util.h"
-#include "hostname-util.h"
 #include "mount-util.h"
-#include "path-util.h"
-#include "ptyfwd.h"
 #include "raw-clone.h"
 #include "signal-util.h"
+#include "strv.h"
 #include "terminal-util.h"
-#include "udev-util.h"
-#include "umask-util.h"
 #include "user-util.h"
 
 #include "nspawn-mount.h"
@@ -55,68 +44,11 @@ typedef enum ContainerStatus {
 } ContainerStatus;
 
 static char *arg_directory = NULL;
-static char **arg_setenv = NULL;
 static bool arg_quiet = false;
 static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
 static char **arg_parameters = NULL;
 static unsigned long arg_clone_ns_flags = CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS;
 static MountSettingsMask arg_mount_settings = MOUNT_APPLY_APIVFS_RO;
-
-static int setup_pts(const char *dest) {
-        _cleanup_free_ char *options = NULL;
-        const char *p;
-        int r;
-
-        (void) asprintf(&options,
-                        "newinstance,ptmxmode=0666,mode=620,gid=" GID_FMT,
-                        arg_uid_shift + TTY_GID);
-        if (!options)
-                return log_oom();
-
-        /* Mount /dev/pts itself */
-        p = prefix_roota(dest, "/dev/pts");
-        if (mkdir(p, 0755) < 0)
-                return log_error_errno(errno, "Failed to create /dev/pts: %m");
-        r = mount_verbose(LOG_ERR, "devpts", p, "devpts", MS_NOSUID|MS_NOEXEC, options);
-        if (r < 0)
-                return r;
-
-        /* Create /dev/ptmx symlink */
-        p = prefix_roota(dest, "/dev/ptmx");
-        if (symlink("pts/ptmx", p) < 0)
-                return log_error_errno(errno, "Failed to create /dev/ptmx symlink: %m");
-
-        /* And fix /dev/pts/ptmx ownership */
-        p = prefix_roota(dest, "/dev/pts/ptmx");
-
-        return 0;
-}
-
-static int setup_dev_console(const char *dest, const char *console) {
-        _cleanup_umask_ mode_t u;
-        const char *to;
-        int r;
-
-        assert(dest);
-        assert(console);
-
-        u = umask(0000);
-
-        r = chmod_and_chown(console, 0600, arg_uid_shift, arg_uid_shift);
-        if (r < 0)
-                return log_error_errno(r, "Failed to correct access mode for TTY: %m");
-
-        /* We need to bind mount the right tty to /dev/console since
-         * ptys can only exist on pts file systems. To have something
-         * to bind mount things on we create a empty regular file. */
-
-        to = prefix_roota(dest, "/dev/console");
-        r = touch(to);
-        if (r < 0)
-                return log_error_errno(r, "touch() for /dev/console failed: %m");
-
-        return mount_verbose(LOG_ERR, console, to, NULL, MS_BIND, NULL);
-}
 
 /*
  * Return values:
@@ -202,30 +134,10 @@ static int inner_child(
                 Barrier *barrier,
                 const char *directory) {
 
-        _cleanup_free_ char *home = NULL;
-        unsigned n_env = 1;
-        const char *envp[] = {
-                "PATH=" DEFAULT_PATH_SPLIT_USR,
-                NULL, /* container */
-                NULL, /* TERM */
-                NULL, /* HOME */
-                NULL, /* USER */
-                NULL, /* LOGNAME */
-                NULL, /* LISTEN_FDS */
-                NULL, /* LISTEN_PID */
-                NULL
-        };
-        const char *exec_target;
-
-        _cleanup_strv_free_ char **env_use = NULL;
         int r;
 
         assert(barrier);
         assert(directory);
-
-        r = reset_uid_gid();
-        if (r < 0)
-                return log_error_errno(r, "Couldn't become new root: %m");
 
         r = mount_all(NULL,
                       arg_mount_settings | MOUNT_IN_USERNS,
@@ -243,24 +155,6 @@ static int inner_child(
                 return -ESRCH;
         }
 
-        umask(0022);
-
-        if (setsid() < 0)
-                return log_error_errno(errno, "setsid() failed: %m");
-
-        envp[n_env] = strv_find_prefix(environ, "TERM=");
-        if (envp[n_env])
-                n_env++;
-
-        if ((asprintf((char**)(envp + n_env++), "HOME=%s", home ? home: "/root") < 0) ||
-            (asprintf((char**)(envp + n_env++), "USER=%s", "root") < 0) ||
-            (asprintf((char**)(envp + n_env++), "LOGNAME=%s", "root") < 0))
-                return log_oom();
-
-        env_use = strv_env_merge(2, envp, arg_setenv);
-        if (!env_use)
-                return log_oom();
-
         /* Let the parent know that we are ready and
          * wait until the parent is ready with the
          * setup, too... */
@@ -269,19 +163,17 @@ static int inner_child(
                 return -ESRCH;
         }
 
-        exec_target = arg_parameters[0];
-        execvpe(arg_parameters[0], arg_parameters, env_use);
+        execvp(arg_parameters[0], arg_parameters);
 
         r = -errno;
         (void) log_open();
-        return log_error_errno(r, "execv(%s) failed: %m", exec_target);
+        return log_error_errno(r, "execv(%s) failed: %m", arg_parameters[0]);
 }
 
 static int outer_child(
                 Barrier *barrier,
                 const char *directory,
                 const char *console,
-                bool interactive,
                 int pid_socket,
                 int uid_shift_socket) {
 
@@ -298,25 +190,9 @@ static int outer_child(
         if (prctl(PR_SET_PDEATHSIG, SIGKILL) < 0)
                 return log_error_errno(errno, "PR_SET_PDEATHSIG failed: %m");
 
-        if (interactive) {
-                close_nointr(STDIN_FILENO);
-                close_nointr(STDOUT_FILENO);
-                close_nointr(STDERR_FILENO);
-
-                r = open_terminal(console, O_RDWR);
-                if (r != STDIN_FILENO) {
-                        if (r >= 0) {
-                                safe_close(r);
-                                r = -EINVAL;
-                        }
-
-                        return log_error_errno(r, "Failed to open console: %m");
-                }
-
-                if (dup2(STDIN_FILENO, STDOUT_FILENO) != STDOUT_FILENO ||
-                    dup2(STDIN_FILENO, STDERR_FILENO) != STDERR_FILENO)
-                        return log_error_errno(errno, "Failed to duplicate console: %m");
-        }
+        r = open(console, O_RDWR, 0);
+        if (r < 0)
+                return log_error_errno(r, "Failed to open console: %m");
 
         /* Mark everything as slave, so that we still
          * receive mounts from the real root, but don't
@@ -342,10 +218,6 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        r = base_filesystem_create(directory, arg_uid_shift, (gid_t) arg_uid_shift);
-        if (r < 0)
-                return r;
-
         r = mount_all(directory,
                       arg_mount_settings,
                       arg_uid_shift,
@@ -354,19 +226,10 @@ static int outer_child(
         if (r < 0)
                 return r;
 
-        dev_setup(directory, arg_uid_shift, arg_uid_shift);
-
-        r = setup_pts(directory);
-        if (r < 0)
-                return r;
-
-        r = setup_dev_console(directory, console);
-        if (r < 0)
-                return r;
-
-        r = mount_move_root(directory);
-        if (r < 0)
-                return log_error_errno(r, "Failed to move root directory: %m");
+        if (chdir(directory) < 0)
+                return log_error_errno(errno, "Failed to chdir: %m");
+        if (chroot(".") < 0)
+                return log_error_errno(errno, "Failed to chroot: %m");
 
         pid = raw_clone(SIGCHLD|CLONE_NEWNS|
                         arg_clone_ns_flags);
@@ -402,7 +265,6 @@ static int outer_child(
 
 static int run(int master,
                const char* console,
-               bool interactive,
                pid_t *pid, int *ret) {
 
         static const struct sigaction sa = {
@@ -415,9 +277,7 @@ static int run(int master,
                 uid_shift_socket_pair[2] = { -1, -1 };
         _cleanup_(barrier_destroy) Barrier barrier = BARRIER_NULL;
         _cleanup_(sd_event_unrefp) sd_event *event = NULL;
-        _cleanup_(pty_forward_freep) PTYForward *forward = NULL;
         ContainerStatus container_status = 0;
-        char last_char = 0;
         int r;
         ssize_t l;
         sigset_t mask_chld;
@@ -463,7 +323,6 @@ static int run(int master,
                 r = outer_child(&barrier,
                                 arg_directory,
                                 console,
-                                interactive,
                                 pid_socket_pair[1],
                                 uid_shift_socket_pair[1]);
                 if (r < 0)
@@ -525,22 +384,9 @@ static int run(int master,
         /* Exit when the child exits */
         sd_event_add_signal(event, NULL, SIGCHLD, on_sigchld, PID_TO_PTR(*pid));
 
-        r = pty_forward_new(event, master,
-                            PTY_FORWARD_IGNORE_VHANGUP | (interactive ? 0 : PTY_FORWARD_READ_ONLY),
-                            &forward);
-        if (r < 0)
-                return log_error_errno(r, "Failed to create PTY forwarder: %m");
-
         r = sd_event_loop(event);
         if (r < 0)
                 return log_error_errno(r, "Failed to run event loop: %m");
-
-        pty_forward_get_last_char(forward, &last_char);
-
-        forward = pty_forward_free(forward);
-
-        if (!arg_quiet && last_char != '\n')
-                putc('\n', stdout);
 
         /* Normally redundant, but better safe than sorry */
         (void) kill(*pid, SIGKILL);
@@ -581,7 +427,6 @@ int main(int argc, char *argv[]) {
         _cleanup_close_ int master = -1;
         int r, ret = EXIT_SUCCESS;
         pid_t pid = 0;
-        bool interactive;
 
         log_parse_environment();
         log_open();
@@ -597,10 +442,6 @@ int main(int argc, char *argv[]) {
 
         assert(arg_directory);
         assert(!strv_isempty(arg_parameters));
-
-        interactive =
-                isatty(STDIN_FILENO) > 0 &&
-                isatty(STDOUT_FILENO) > 0;
 
         master = posix_openpt(O_RDWR|O_NOCTTY|O_CLOEXEC|O_NDELAY);
         if (master < 0) {
@@ -628,7 +469,6 @@ int main(int argc, char *argv[]) {
 
         r = run(master,
                 console,
-                interactive,
                 &pid, &ret);
 
 finish:
@@ -645,7 +485,6 @@ finish:
                 (void) wait_for_terminate(pid, NULL);
 
         free(arg_directory);
-        strv_free(arg_setenv);
         strv_free(arg_parameters);
 
         return r < 0 ? EXIT_FAILURE : ret;
