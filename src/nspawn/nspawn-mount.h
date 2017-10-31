@@ -33,4 +33,3 @@ typedef enum MountSettingsMask {
 } MountSettingsMask;
 
 int mount_all(const char *dest, MountSettingsMask mount_settings, uid_t uid_shift, uid_t uid_range, const char *selinux_apifs_context);
-int setup_pivot_root(const char *directory, const char *pivot_root_new, const char *pivot_root_old);

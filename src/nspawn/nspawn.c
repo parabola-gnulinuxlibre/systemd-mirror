@@ -55,8 +55,6 @@ typedef enum ContainerStatus {
 } ContainerStatus;
 
 static char *arg_directory = NULL;
-static char *arg_chdir = NULL;
-static char *arg_machine = NULL;
 static char **arg_setenv = NULL;
 static bool arg_quiet = false;
 static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
@@ -64,44 +62,6 @@ static int arg_kill_signal = 0;
 static char **arg_parameters = NULL;
 static unsigned long arg_clone_ns_flags = CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS;
 static MountSettingsMask arg_mount_settings = MOUNT_APPLY_APIVFS_RO;
-
-static int parse_argv(int argc, char *argv[]) {
-
-        static const struct option options[] = {
-                { "directory",             required_argument, NULL, 'D'                     },
-                {}
-        };
-
-        int c, r;
-
-        assert(argc >= 0);
-        assert(argv);
-
-        while ((c = getopt_long(argc, argv, "+hD:u:abL:M:jS:Z:qi:xp:nUE:", options, NULL)) >= 0)
-
-                switch (c) {
-
-                case 'D':
-                        r = parse_path_argument_and_warn(optarg, false, &arg_directory);
-                        if (r < 0)
-                                return r;
-                        break;
-
-                case '?':
-                        return -EINVAL;
-
-                default:
-                        assert_not_reached("Unhandled option");
-                }
-
-        if (argc > optind) {
-                arg_parameters = strv_copy(argv + optind);
-                if (!arg_parameters)
-                        return log_oom();
-        }
-
-        return 1;
-}
 
 static int setup_pts(const char *dest) {
         _cleanup_free_ char *options = NULL;
@@ -188,21 +148,21 @@ static int wait_for_container(pid_t pid, ContainerStatus *container) {
 
         case CLD_EXITED:
                 if (status.si_status == 0)
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s exited successfully.", arg_machine);
+                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container exited successfully.");
                 else
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s failed with error code %i.", arg_machine, status.si_status);
+                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container failed with error code %i.", status.si_status);
 
                 *container = CONTAINER_TERMINATED;
                 return status.si_status;
 
         case CLD_KILLED:
                 if (status.si_status == SIGINT) {
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s has been shut down.", arg_machine);
+                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container has been shut down.");
                         *container = CONTAINER_TERMINATED;
                         return 0;
 
                 } else if (status.si_status == SIGHUP) {
-                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container %s is being rebooted.", arg_machine);
+                        log_full(arg_quiet ? LOG_DEBUG : LOG_INFO, "Container is being rebooted.");
                         *container = CONTAINER_REBOOTED;
                         return 0;
                 }
@@ -210,11 +170,11 @@ static int wait_for_container(pid_t pid, ContainerStatus *container) {
                 /* fall through */
 
         case CLD_DUMPED:
-                log_error("Container %s terminated by signal %s.", arg_machine, signal_to_string(status.si_status));
+                log_error("Container terminated by signal %s.", signal_to_string(status.si_status));
                 return -EIO;
 
         default:
-                log_error("Container %s failed due to unknown reason.", arg_machine);
+                log_error("Container failed due to unknown reason.");
                 return -EIO;
         }
 }
@@ -250,25 +210,6 @@ static int on_sigchld(sd_event_source *s, const struct signalfd_siginfo *ssi, vo
                 }
                 /* Reap all other children. */
                 (void) waitid(P_PID, si.si_pid, &si, WNOHANG|WEXITED);
-        }
-
-        return 0;
-}
-
-static int determine_names(void) {
-
-        assert(arg_directory);
-
-        if (!arg_machine) {
-                arg_machine = strdup(basename(arg_directory));
-                if (!arg_machine)
-                        return log_oom();
-
-                hostname_cleanup(arg_machine);
-                if (!machine_name_is_valid(arg_machine)) {
-                        log_error("Failed to determine machine name automatically, please use -M.");
-                        return -EINVAL;
-                }
         }
 
         return 0;
@@ -345,23 +286,8 @@ static int inner_child(
                 return -ESRCH;
         }
 
-        if (arg_chdir)
-                if (chdir(arg_chdir) < 0)
-                        return log_error_errno(errno, "Failed to change to specified working directory %s: %m", arg_chdir);
-
-        if (!strv_isempty(arg_parameters)) {
-                exec_target = arg_parameters[0];
-                execvpe(arg_parameters[0], arg_parameters, env_use);
-        } else {
-                if (!arg_chdir)
-                        /* If we cannot change the directory, we'll end up in /, that is expected. */
-                        (void) chdir(home ?: "/root");
-
-                execle("/bin/bash", "-bash", NULL, env_use);
-                execle("/bin/sh", "-sh", NULL, env_use);
-
-                exec_target = "/bin/bash, /bin/sh";
-        }
+        exec_target = arg_parameters[0];
+        execvpe(arg_parameters[0], arg_parameters, env_use);
 
         r = -errno;
         (void) log_open();
@@ -420,10 +346,6 @@ static int outer_child(
 
         /* Turn directory into bind mount */
         r = mount_verbose(LOG_ERR, directory, directory, NULL, MS_BIND|MS_REC, NULL);
-        if (r < 0)
-                return r;
-
-        r = setup_pivot_root(directory, NULL, NULL);
         if (r < 0)
                 return r;
 
@@ -696,15 +618,13 @@ int main(int argc, char *argv[]) {
         saved_argv = argv;
         saved_argc = argc;
 
-        r = parse_argv(argc, argv);
-        if (r <= 0)
-                goto finish;
-
-        r = determine_names();
-        if (r < 0)
-                goto finish;
+        if (argc < 3)
+                return 2;
+        arg_directory = strdup(argv[1]);
+        arg_parameters = strv_copy(argv + 2);
 
         assert(arg_directory);
+        assert(!strv_isempty(arg_parameters));
 
         interactive =
                 isatty(STDIN_FILENO) > 0 &&
@@ -753,8 +673,6 @@ finish:
                 (void) wait_for_terminate(pid, NULL);
 
         free(arg_directory);
-        free(arg_machine);
-        free(arg_chdir);
         strv_free(arg_setenv);
         strv_free(arg_parameters);
 
