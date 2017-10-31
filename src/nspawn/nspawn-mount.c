@@ -85,71 +85,6 @@ static int tmpfs_patch_options(
         return !!buf;
 }
 
-int mount_sysfs(const char *dest, MountSettingsMask mount_settings) {
-        const char *full, *top, *x;
-        int r;
-        unsigned long extra_flags = 0;
-
-        top = prefix_roota(dest, "/sys");
-        r = path_check_fstype(top, SYSFS_MAGIC);
-        if (r < 0)
-                return log_error_errno(r, "Failed to determine filesystem type of %s: %m", top);
-        /* /sys might already be mounted as sysfs by the outer child in the
-         * !netns case. In this case, it's all good. Don't touch it because we
-         * don't have the right to do so, see https://github.com/systemd/systemd/issues/1555.
-         */
-        if (r > 0)
-                return 0;
-
-        full = prefix_roota(top, "/full");
-
-        (void) mkdir(full, 0755);
-
-        if (mount_settings & MOUNT_APPLY_APIVFS_RO)
-                extra_flags |= MS_RDONLY;
-
-        r = mount_verbose(LOG_ERR, "sysfs", full, "sysfs",
-                          MS_NOSUID|MS_NOEXEC|MS_NODEV|extra_flags, NULL);
-        if (r < 0)
-                return r;
-
-        FOREACH_STRING(x, "block", "bus", "class", "dev", "devices", "kernel") {
-                _cleanup_free_ char *from = NULL, *to = NULL;
-
-                from = prefix_root(full, x);
-                if (!from)
-                        return log_oom();
-
-                to = prefix_root(top, x);
-                if (!to)
-                        return log_oom();
-
-                (void) mkdir(to, 0755);
-
-                r = mount_verbose(LOG_ERR, from, to, NULL, MS_BIND, NULL);
-                if (r < 0)
-                        return r;
-
-                r = mount_verbose(LOG_ERR, NULL, to, NULL,
-                                  MS_BIND|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_REMOUNT|extra_flags, NULL);
-                if (r < 0)
-                        return r;
-        }
-
-        r = umount_verbose(full);
-        if (r < 0)
-                return r;
-
-        if (rmdir(full) < 0)
-                return log_error_errno(errno, "Failed to remove %s: %m", full);
-
-        x = prefix_roota(top, "/fs/kdbus");
-        (void) mkdir_p(x, 0755);
-
-        return mount_verbose(LOG_ERR, NULL, top, NULL,
-                             MS_BIND|MS_NOSUID|MS_NOEXEC|MS_NODEV|MS_REMOUNT|extra_flags, NULL);
-}
-
 static int mkdir_userns(const char *path, mode_t mode, MountSettingsMask mask, uid_t uid_shift) {
         int r;
 
@@ -233,8 +168,6 @@ int mount_all(const char *dest,
                 /* outer child mounts */
                 { "tmpfs",               "/tmp",                "tmpfs", "mode=1777", MS_NOSUID|MS_NODEV|MS_STRICTATIME,                                            MOUNT_FATAL },
                 { "tmpfs",               "/sys",                "tmpfs", "mode=755",  MS_NOSUID|MS_NOEXEC|MS_NODEV,                              MOUNT_FATAL|MOUNT_APPLY_APIVFS_NETNS },
-                { "sysfs",               "/sys",                "sysfs", NULL,        MS_RDONLY|MS_NOSUID|MS_NOEXEC|MS_NODEV,                    MOUNT_FATAL|MOUNT_APPLY_APIVFS_RO },    /* skipped if above was mounted */
-                { "sysfs",               "/sys",                "sysfs", NULL,                  MS_NOSUID|MS_NOEXEC|MS_NODEV,                    MOUNT_FATAL },                          /* skipped if above was mounted */
 
                 { "tmpfs",               "/dev",                "tmpfs", "mode=755",  MS_NOSUID|MS_STRICTATIME,                                  MOUNT_FATAL },
                 { "tmpfs",               "/dev/shm",            "tmpfs", "mode=1777", MS_NOSUID|MS_NODEV|MS_STRICTATIME,                         MOUNT_FATAL },

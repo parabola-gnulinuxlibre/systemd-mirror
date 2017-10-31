@@ -17,29 +17,10 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#ifdef HAVE_BLKID
-#include <blkid.h>
-#endif
-#include <errno.h>
 #include <getopt.h>
-#include <grp.h>
-#include <linux/loop.h>
-#include <pwd.h>
-#include <sched.h>
-#ifdef HAVE_SELINUX
-#include <selinux/selinux.h>
-#endif
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/file.h>
 #include <sys/mount.h>
-#include <sys/personality.h>
 #include <sys/prctl.h>
-#include <sys/types.h>
 #include <sys/wait.h>
-#include <unistd.h>
 
 #include "sd-bus.h"
 #include "sd-daemon.h"
@@ -48,52 +29,23 @@
 #include "alloc-util.h"
 #include "barrier.h"
 #include "base-filesystem.h"
-#include "blkid-util.h"
-#include "btrfs-util.h"
-#include "bus-util.h"
-#include "cap-list.h"
-#include "capability-util.h"
 #include "copy.h"
 #include "dev-setup.h"
-#include "dissect-image.h"
 #include "env-util.h"
 #include "fd-util.h"
-#include "fileio.h"
-#include "format-util.h"
 #include "fs-util.h"
-#include "gpt.h"
-#include "hexdecoct.h"
 #include "hostname-util.h"
-#include "id128-util.h"
-#include "log.h"
-#include "loop-util.h"
-#include "loopback-setup.h"
-#include "machine-image.h"
-#include "macro.h"
-#include "missing.h"
-#include "mkdir.h"
 #include "mount-util.h"
-#include "netlink-util.h"
-#include "nspawn-mount.h"
-#include "parse-util.h"
 #include "path-util.h"
-#include "process-util.h"
 #include "ptyfwd.h"
-#include "random-util.h"
 #include "raw-clone.h"
-#include "rm-rf.h"
-#include "selinux-util.h"
 #include "signal-util.h"
-#include "socket-util.h"
-#include "stat-util.h"
-#include "stdio-util.h"
-#include "string-util.h"
-#include "strv.h"
 #include "terminal-util.h"
 #include "udev-util.h"
 #include "umask-util.h"
 #include "user-util.h"
-#include "util.h"
+
+#include "nspawn-mount.h"
 
 #define EXIT_FORCE_RESTART 133
 
@@ -360,10 +312,6 @@ static int inner_child(
         if (r < 0)
                 return r;
 
-        r = mount_sysfs(NULL, arg_mount_settings);
-        if (r < 0)
-                return r;
-
         /* Wait until we are cgroup-ified, so that we
          * can mount the right cgroup path writable */
         if (!barrier_place_and_sync(barrier)) { /* #3 */
@@ -577,7 +525,6 @@ static int run(int master,
                 .sa_flags = SA_NOCLDSTOP|SA_RESTART,
         };
 
-        _cleanup_release_lock_file_ LockFile uid_shift_lock = LOCK_FILE_INIT;
         _cleanup_close_ int etc_passwd_lock = -1;
         _cleanup_close_pair_ int
                 pid_socket_pair[2] = { -1, -1 },
