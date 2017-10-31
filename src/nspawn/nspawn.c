@@ -21,8 +21,6 @@
 #include <sys/prctl.h>
 #include <sys/wait.h>
 
-#include "sd-event.h"
-
 #include "alloc-util.h"
 #include "barrier.h"
 #include "copy.h"
@@ -103,26 +101,6 @@ static int wait_for_container(pid_t pid, ContainerStatus *container) {
                 log_error("Container failed due to unknown reason.");
                 return -EIO;
         }
-}
-
-static int on_sigchld(sd_event_source *s, const struct signalfd_siginfo *ssi, void *userdata) {
-        for (;;) {
-                siginfo_t si = {};
-                if (waitid(P_ALL, 0, &si, WNOHANG|WNOWAIT|WEXITED) < 0)
-                        return log_error_errno(errno, "Failed to waitid(): %m");
-                if (si.si_pid == 0) /* No pending children. */
-                        break;
-                if (si.si_pid == PTR_TO_PID(userdata)) {
-                        /* The main process we care for has exited. Return from
-                         * signal handler but leave the zombie. */
-                        sd_event_exit(sd_event_source_get_event(s), 0);
-                        break;
-                }
-                /* Reap all other children. */
-                (void) waitid(P_PID, si.si_pid, &si, WNOHANG|WEXITED);
-        }
-
-        return 0;
 }
 
 static int inner_child(
@@ -250,7 +228,6 @@ static int run(int master,
                 pid_socket_pair[2] = { -1, -1 },
                 uid_shift_socket_pair[2] = { -1, -1 };
         _cleanup_(barrier_destroy) Barrier barrier = BARRIER_NULL;
-        _cleanup_(sd_event_unrefp) sd_event *event = NULL;
         ContainerStatus container_status = 0;
         int r;
         ssize_t l;
@@ -335,29 +312,11 @@ static int run(int master,
         if (r < 0)
                 return log_error_errno(r, "Failed to reset SIGCHLD: %m");
 
-        r = sd_event_new(&event);
-        if (r < 0)
-                return log_error_errno(r, "Failed to get default event source: %m");
-
         /* Let the child know that we are ready and wait that the child is completely ready now. */
         if (!barrier_place_and_sync(&barrier)) { /* #4 */
                 log_error("Child died too early.");
                 return -ESRCH;
         }
-
-        /* Immediately exit */
-        sd_event_add_signal(event, NULL, SIGINT, NULL, NULL);
-        sd_event_add_signal(event, NULL, SIGTERM, NULL, NULL);
-
-        /* Exit when the child exits */
-        sd_event_add_signal(event, NULL, SIGCHLD, on_sigchld, PID_TO_PTR(*pid));
-
-        r = sd_event_loop(event);
-        if (r < 0)
-                return log_error_errno(r, "Failed to run event loop: %m");
-
-        /* Normally redundant, but better safe than sorry */
-        (void) kill(*pid, SIGKILL);
 
         r = wait_for_container(*pid, &container_status);
         *pid = 0;
