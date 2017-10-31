@@ -39,7 +39,6 @@ typedef enum ContainerStatus {
 
 static char *arg_directory = NULL;
 static bool arg_quiet = false;
-static uid_t arg_uid_shift = UID_INVALID;
 static char **arg_parameters = NULL;
 static unsigned long arg_clone_ns_flags = CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS;
 
@@ -134,8 +133,7 @@ static int outer_child(
                 Barrier *barrier,
                 const char *directory,
                 const char *console,
-                int pid_socket,
-                int uid_shift_socket) {
+                int pid_socket) {
 
         pid_t pid;
         ssize_t l;
@@ -160,8 +158,6 @@ static int outer_child(
         r = mount_verbose(LOG_ERR, NULL, "/", NULL, MS_SLAVE|MS_REC, NULL);
         if (r < 0)
                 return r;
-
-        arg_uid_shift = 0;
 
         /* Turn directory into bind mount */
         r = mount_verbose(LOG_ERR, directory, directory, NULL, MS_BIND|MS_REC, NULL);
@@ -189,7 +185,6 @@ static int outer_child(
                 return log_error_errno(errno, "Failed to fork inner child: %m");
         if (pid == 0) {
                 pid_socket = safe_close(pid_socket);
-                uid_shift_socket = safe_close(uid_shift_socket);
 
                 /* The inner child has all namespaces that are
                  * requested, so that we all are owned by the user if
@@ -224,9 +219,7 @@ static int run(int master,
                 .sa_flags = SA_NOCLDSTOP|SA_RESTART,
         };
 
-        _cleanup_close_pair_ int
-                pid_socket_pair[2] = { -1, -1 },
-                uid_shift_socket_pair[2] = { -1, -1 };
+        _cleanup_close_pair_ int pid_socket_pair[2] = { -1, -1 };
         _cleanup_(barrier_destroy) Barrier barrier = BARRIER_NULL;
         ContainerStatus container_status = 0;
         int r;
@@ -266,7 +259,6 @@ static int run(int master,
                 master = safe_close(master);
 
                 pid_socket_pair[0] = safe_close(pid_socket_pair[0]);
-                uid_shift_socket_pair[0] = safe_close(uid_shift_socket_pair[0]);
 
                 (void) reset_all_signal_handlers();
                 (void) reset_signal_mask();
@@ -274,8 +266,7 @@ static int run(int master,
                 r = outer_child(&barrier,
                                 arg_directory,
                                 console,
-                                pid_socket_pair[1],
-                                uid_shift_socket_pair[1]);
+                                pid_socket_pair[1]);
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
@@ -285,7 +276,6 @@ static int run(int master,
         barrier_set_role(&barrier, BARRIER_PARENT);
 
         pid_socket_pair[1] = safe_close(pid_socket_pair[1]);
-        uid_shift_socket_pair[1] = safe_close(uid_shift_socket_pair[1]);
 
         /* Wait for the outer child. */
         r = wait_for_terminate_and_warn("namespace helper", *pid, NULL);
