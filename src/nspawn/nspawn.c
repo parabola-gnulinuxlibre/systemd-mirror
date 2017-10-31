@@ -22,38 +22,22 @@
 #include <sys/wait.h>
 
 #include "alloc-util.h"
-#include "barrier.h"
-#include "copy.h"
-#include "fd-util.h"
-#include "mount-util.h"
+#include "fd-util.h" /* _cleanup_close_ */
+#include "mount-util.h" /* mount_verbose */
 #include "raw-clone.h"
-#include "signal-util.h"
 #include "strv.h"
 #include "terminal-util.h"
-#include "user-util.h"
 
 static char *arg_directory = NULL;
 static char **arg_parameters = NULL;
 
-static int inner_child(
-                Barrier *barrier,
-                const char *directory) {
+static int inner_child(void) {
 
         int r;
-
-        assert(barrier);
-        assert(directory);
 
         r = mount_verbose(LOG_ERR, "proc", "/proc", "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, NULL);
         if (r < 0)
                 return r;
-
-        /* Wait until we are cgroup-ified, so that we
-         * can mount the right cgroup path writable */
-        if (!barrier_place_and_sync(barrier)) { /* #3 */
-                log_error("Parent died too early");
-                return -ESRCH;
-        }
 
         execvp(arg_parameters[0], arg_parameters);
 
@@ -63,7 +47,6 @@ static int inner_child(
 }
 
 static int outer_child(
-                Barrier *barrier,
                 const char *directory,
                 const char *console,
                 int pid_socket) {
@@ -73,7 +56,6 @@ static int outer_child(
         int r;
         _cleanup_close_ int fd = -1;
 
-        assert(barrier);
         assert(directory);
         assert(console);
         assert(pid_socket >= 0);
@@ -119,7 +101,7 @@ static int outer_child(
                  * requested, so that we all are owned by the user if
                  * user namespaces are turned on. */
 
-                r = inner_child(barrier, directory);
+                r = inner_child();
                 if (r < 0)
                         _exit(EXIT_FAILURE);
 
@@ -144,13 +126,8 @@ static int run(int master,
                pid_t *pid, int *ret) {
 
         _cleanup_close_pair_ int pid_socket_pair[2] = { -1, -1 };
-        _cleanup_(barrier_destroy) Barrier barrier = BARRIER_NULL;
         int r;
         ssize_t l;
-
-        r = barrier_create(&barrier);
-        if (r < 0)
-                return log_error_errno(r, "Cannot initialize IPC barrier: %m");
 
         if (socketpair(AF_UNIX, SOCK_SEQPACKET|SOCK_CLOEXEC, 0, pid_socket_pair) < 0)
                 return log_error_errno(errno, "Failed to create pid socket pair: %m");
@@ -163,14 +140,12 @@ static int run(int master,
 
         if (*pid == 0) {
                 /* The outer child only has a file system namespace. */
-                barrier_set_role(&barrier, BARRIER_CHILD);
 
                 master = safe_close(master);
 
                 pid_socket_pair[0] = safe_close(pid_socket_pair[0]);
 
-                r = outer_child(&barrier,
-                                arg_directory,
+                r = outer_child(arg_directory,
                                 console,
                                 pid_socket_pair[1]);
                 if (r < 0)
@@ -178,8 +153,6 @@ static int run(int master,
 
                 _exit(EXIT_SUCCESS);
         }
-
-        barrier_set_role(&barrier, BARRIER_PARENT);
 
         pid_socket_pair[1] = safe_close(pid_socket_pair[1]);
 
@@ -195,12 +168,6 @@ static int run(int master,
         if (l != sizeof *pid) {
                 log_error("Short read while reading inner child PID.");
                 return -EIO;
-        }
-
-        /* Let the child know that we are ready and wait that the child is completely ready now. */
-        if (!barrier_place_and_sync(&barrier)) { /* #4 */
-                log_error("Child died too early.");
-                return -ESRCH;
         }
 
         r = wait_for_terminate(*pid, NULL);
@@ -267,12 +234,6 @@ int main(int argc, char *argv[]) {
 finish:
         if (pid > 0)
                 (void) kill(pid, SIGKILL);
-
-        /* Try to flush whatever is still queued in the pty */
-        if (master >= 0) {
-                (void) copy_bytes(master, STDOUT_FILENO, (uint64_t) -1, 0);
-                master = safe_close(master);
-        }
 
         if (pid > 0)
                 (void) wait_for_terminate(pid, NULL);
