@@ -34,10 +34,6 @@
 #include "terminal-util.h"
 #include "user-util.h"
 
-#include "nspawn-mount.h"
-
-#define EXIT_FORCE_RESTART 133
-
 typedef enum ContainerStatus {
         CONTAINER_TERMINATED,
         CONTAINER_REBOOTED
@@ -45,10 +41,9 @@ typedef enum ContainerStatus {
 
 static char *arg_directory = NULL;
 static bool arg_quiet = false;
-static uid_t arg_uid_shift = UID_INVALID, arg_uid_range = 0x10000U;
+static uid_t arg_uid_shift = UID_INVALID;
 static char **arg_parameters = NULL;
 static unsigned long arg_clone_ns_flags = CLONE_NEWIPC|CLONE_NEWPID|CLONE_NEWUTS;
-static MountSettingsMask arg_mount_settings = MOUNT_APPLY_APIVFS_RO;
 
 /*
  * Return values:
@@ -139,26 +134,13 @@ static int inner_child(
         assert(barrier);
         assert(directory);
 
-        r = mount_all(NULL,
-                      arg_mount_settings | MOUNT_IN_USERNS,
-                      arg_uid_shift,
-                      arg_uid_range,
-                      NULL);
-
+        r = mount_verbose(LOG_ERR, "proc", "/proc", "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, NULL);
         if (r < 0)
                 return r;
 
         /* Wait until we are cgroup-ified, so that we
          * can mount the right cgroup path writable */
         if (!barrier_place_and_sync(barrier)) { /* #3 */
-                log_error("Parent died too early");
-                return -ESRCH;
-        }
-
-        /* Let the parent know that we are ready and
-         * wait until the parent is ready with the
-         * setup, too... */
-        if (!barrier_place_and_sync(barrier)) { /* #4 */
                 log_error("Parent died too early");
                 return -ESRCH;
         }
@@ -215,14 +197,6 @@ static int outer_child(
          * Further submounts (such as /dev) done after this will inherit the
          * shared propagation mode. */
         r = mount_verbose(LOG_ERR, NULL, directory, NULL, MS_SHARED|MS_REC, NULL);
-        if (r < 0)
-                return r;
-
-        r = mount_all(directory,
-                      arg_mount_settings,
-                      arg_uid_shift,
-                      arg_uid_range,
-                      NULL);
         if (r < 0)
                 return r;
 
@@ -352,12 +326,6 @@ static int run(int master,
 
         log_debug("Init process invoked as PID "PID_FMT, *pid);
 
-        /* Notify the child that the parent is ready with all
-         * its setup (including cgroup-ification), and that
-         * the child can now hand over control to the code to
-         * run inside the container. */
-        (void) barrier_place(&barrier); /* #3 */
-
         /* Block SIGCHLD here, before notifying child.
          * process_pty() will handle it with the other signals. */
         assert_se(sigprocmask(SIG_BLOCK, &mask_chld, NULL) >= 0);
@@ -394,31 +362,13 @@ static int run(int master,
         r = wait_for_container(*pid, &container_status);
         *pid = 0;
 
-        if (r < 0)
+        if (r < 0) {
                 /* We failed to wait for the container, or the container exited abnormally. */
                 return r;
-        if (r > 0 || container_status == CONTAINER_TERMINATED) {
-                /* r > 0 → The container exited with a non-zero status.
-                 *         As a special case, we need to replace 133 with a different value,
-                 *         because 133 is special-cased in the service file to reboot the container.
-                 * otherwise → The container exited with zero status and a reboot was not requested.
-                 */
-                if (r == EXIT_FORCE_RESTART)
-                        r = EXIT_FAILURE; /* replace 133 with the general failure code */
+        } else {
                 *ret = r;
-                return 0; /* finito */
+                return 0;
         }
-
-        /* CONTAINER_REBOOTED, loop again */
-
-        /* Special handling if we are running as a service: instead of simply
-         * restarting the machine we want to restart the entire service, so let's
-         * inform systemd about this with the special exit code 133. The service
-         * file uses RestartForceExitStatus=133 so that this results in a full
-         * nspawn restart. This is necessary since we might have cgroup parameters
-         * set we want to have flushed out. */
-        *ret = EXIT_FORCE_RESTART;
-        return 0; /* finito */
 }
 
 int main(int argc, char *argv[]) {
