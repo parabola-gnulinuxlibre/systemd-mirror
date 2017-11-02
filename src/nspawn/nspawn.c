@@ -103,6 +103,8 @@ static int run(int master,
         case 0:
                 if (unshare(CLONE_NEWNS|CLONE_NEWUSER) < 0)
                         return log_error_errno(errno, "unshare: %m");
+                if (unshare(CLONE_NEWNS) < 0)
+                        return log_error_errno(errno, "unshare: %m");
 
                 master = safe_close(master);
 
