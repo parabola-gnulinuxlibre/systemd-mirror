@@ -17,15 +17,15 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
+#include <fcntl.h>
 #include <sched.h>
 #include <sys/mount.h>
 #include <sys/prctl.h>
 #include <sys/wait.h>
 
 #include "fd-util.h" /* _cleanup_close_ */
-#include "mount-util.h" /* mount_verbose */
+#include "path-util.h" /* prefix_roota */
 
-static char *arg_directory = NULL;
 static char **arg_parameters = NULL;
 
 static int outer_child(
@@ -36,6 +36,7 @@ static int outer_child(
         pid_t pid;
         ssize_t l;
         int r;
+        const char *to;
 
         assert(directory);
         assert(console);
@@ -44,6 +45,11 @@ static int outer_child(
         r = open(console, O_RDWR, 0);
         if (r < 0)
                 return log_error_errno(r, "Failed to open console: %m");
+
+
+        to = prefix_roota(directory, "/dev/console");
+        if (mount(console, to, NULL, MS_BIND, NULL) < 0)
+                return log_error_errno(errno, "mount /dev/console: %m");
 
         if (chdir(directory) < 0)
                 return log_error_errno(errno, "Failed to chdir: %m");
@@ -60,9 +66,8 @@ static int outer_child(
                 pid_socket = safe_close(pid_socket);
 
                 printf("a\n");
-                r = mount_verbose(LOG_ERR, "proc", "/proc", "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, NULL);
-                if (r < 0)
-                        return r;
+                if (mount("proc", "/proc", "proc", MS_NOSUID|MS_NOEXEC|MS_NODEV, NULL) < 0)
+                        return log_error_errno(errno, "mount /proc: %m");
 
                 printf("b\n");
                 execvp(arg_parameters[0], arg_parameters);
@@ -82,8 +87,9 @@ static int outer_child(
         }
 }
 
-static int run(int master,
-               const char* console,
+static int run(const char *directory,
+               int master,
+               const char *console,
                int *ret) {
         pid_t pid;
 
@@ -110,7 +116,7 @@ static int run(int master,
 
                 pid_socket_pair[0] = safe_close(pid_socket_pair[0]);
 
-                r = outer_child(arg_directory,
+                r = outer_child(directory,
                                 console,
                                 pid_socket_pair[1]);
                 if (r < 0)
@@ -151,6 +157,7 @@ int main(int argc, char *argv[]) {
         char *console = NULL;
         _cleanup_close_ int master = -1;
         int r, ret = EXIT_SUCCESS;
+        char *arg_directory = NULL;
 
         log_parse_environment();
         log_open();
@@ -183,7 +190,8 @@ int main(int argc, char *argv[]) {
                 goto finish;
         }
 
-        r = run(master,
+        r = run(arg_directory,
+                master,
                 console,
                 &ret);
 
