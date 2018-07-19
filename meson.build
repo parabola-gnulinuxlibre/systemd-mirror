@@ -24,6 +24,9 @@ substs.set('PACKAGE_VERSION',      meson.project_version())
 
 m4_defines = []
 
+deps = configuration_data()
+features = configuration_data()
+
 #####################################################################
 
 rootprefixdir = get_option('rootprefix')
@@ -37,6 +40,7 @@ endif
 sysvinit_path = get_option('sysvinit-path')
 sysvrcnd_path = get_option('sysvrcnd-path')
 if sysvinit_path != '' or sysvrcnd_path != ''
+        conf.set('feature:sysv-compat', true)
         conf.set('HAVE_SYSV_COMPAT', true,
                  description : 'SysV init scripts and rcN.d links are supported')
         m4_defines += ['-DHAVE_SYSV_COMPAT']
@@ -642,9 +646,8 @@ if not libcap.found()
         libcap = cc.find_library('cap')
 endif
 
-libmount = dependency('mount',
-                      version : '>= 2.27')
-
+deps.set('mount', dependency('mount', version : '>= 2.27'))
+deps.set('libseccomp', get_option('dep:libseccomp') == 'false' ? dependency(' '), dependency('libseccomp', version : '>= 2.3.1', required : get_option('dep:libseccomp') == 'true'))
 want_seccomp = get_option('seccomp')
 if want_seccomp != 'false'
         libseccomp = dependency('libseccomp',
@@ -1203,6 +1206,7 @@ endforeach
 
 ############################################################
 
+#@auto/systemd/meson.build
 executable('systemd',
            systemd_sources,
            include_directories : includes,
@@ -1218,6 +1222,7 @@ executable('systemd',
            install : true,
            install_dir : rootlibexecdir)
 
+#@auto/systemd-analyze
 exe = executable('systemd-analyze',
                  systemd_analyze_sources,
                  include_directories : includes,
@@ -1233,6 +1238,7 @@ exe = executable('systemd-analyze',
                  install : true)
 public_programs += [exe]
 
+#@auto/systemd-journald
 executable('systemd-journald',
            systemd_journald_sources,
            include_directories : includes,
@@ -1246,6 +1252,7 @@ executable('systemd-journald',
            install : true,
            install_dir : rootlibexecdir)
 
+#@auto/systemd-cat
 exe = executable('systemd-cat',
                  systemd_cat_sources,
                  include_directories : includes,
@@ -1256,6 +1263,7 @@ exe = executable('systemd-cat',
                  install : true)
 public_programs += [exe]
 
+#@auto/journalctl
 exe = executable('journalctl',
                  journalctl_sources,
                  include_directories : includes,
@@ -1269,6 +1277,7 @@ exe = executable('journalctl',
                  install_dir : rootbindir)
 public_programs += [exe]
 
+#@auto/systemd-getty-generator
 executable('systemd-getty-generator',
            'src/getty-generator/getty-generator.c',
            include_directories : includes,
@@ -1277,6 +1286,7 @@ executable('systemd-getty-generator',
            install : true,
            install_dir : systemgeneratordir)
 
+#@auto/systemd-debug-generator
 executable('systemd-debug-generator',
            'src/debug-generator/debug-generator.c',
            include_directories : includes,
@@ -1285,6 +1295,7 @@ executable('systemd-debug-generator',
            install : true,
            install_dir : systemgeneratordir)
 
+#@auto/systemd-fstab-generator
 executable('systemd-fstab-generator',
            'src/fstab-generator/fstab-generator.c',
            'src/core/mount-setup.c',
@@ -1294,7 +1305,8 @@ executable('systemd-fstab-generator',
            install : true,
            install_dir : systemgeneratordir)
 
-if conf.get('ENABLE_ENVIRONMENT_D', false)
+#@auto/30-systemd-environment-d-generator
+if conf.get('feature:environment.d', false)
         executable('30-systemd-environment-d-generator',
                    'src/environment-d-generator/environment-d-generator.c',
                    include_directories : includes,
@@ -1308,7 +1320,8 @@ if conf.get('ENABLE_ENVIRONMENT_D', false)
                                  join_paths(environmentdir, '99-environment.conf'))
 endif
 
-if conf.get('ENABLE_HIBERNATE', false)
+#@auto/systemd-hibernate
+if conf.get('feature:hibernate', false)
         executable('systemd-hibernate-resume-generator',
                    'src/hibernate-resume/hibernate-resume-generator.c',
                    include_directories : includes,
@@ -1326,7 +1339,8 @@ if conf.get('ENABLE_HIBERNATE', false)
                    install_dir : rootlibexecdir)
 endif
 
-if conf.get('HAVE_BLKID', false)
+#!feature:gpt-auto-generator dep:blkid
+if conf.get('feature:gpt-auto-generator', false)
         executable('systemd-gpt-auto-generator',
                    'src/gpt-auto-generator/gpt-auto-generator.c',
                    'src/basic/blkid-util.h',
@@ -1336,7 +1350,9 @@ if conf.get('HAVE_BLKID', false)
                    install_rpath : rootlibexecdir,
                    install : true,
                    install_dir : systemgeneratordir)
-
+endif
+#!feature:dissect dep:blkid
+if conf.get('feature:dissect', false)
         exe = executable('systemd-dissect',
                          'src/dissect/dissect.c',
                          include_directories : includes,
@@ -1347,7 +1363,7 @@ if conf.get('HAVE_BLKID', false)
         public_programs += [exe]
 endif
 
-if conf.get('ENABLE_RESOLVED', false)
+if conf.get('feature:resolved', false)
         executable('systemd-resolved',
                    systemd_resolved_sources,
                    gcrypt_util_sources,
@@ -1377,7 +1393,7 @@ if conf.get('ENABLE_RESOLVED', false)
         public_programs += [exe]
 endif
 
-if conf.get('ENABLE_LOGIND', false)
+if conf.get('feature:logind', false)
         executable('systemd-logind',
                    systemd_logind_sources,
                    include_directories : includes,
@@ -1409,8 +1425,8 @@ if conf.get('ENABLE_LOGIND', false)
                          install : true,
                          install_dir : rootbindir)
         public_programs += [exe]
-
-        if conf.get('HAVE_PAM', false)
+        #!feature:logind:pam dep:pam
+        if conf.get('feature:logind:pam', false)
                 version_script_arg = join_paths(meson.current_source_dir(), pam_systemd_sym)
                 pam_systemd = shared_library(
                         'pam_systemd',
@@ -1433,8 +1449,8 @@ if conf.get('ENABLE_LOGIND', false)
                      args : [pam_systemd.full_path()]) # path to dlopen must include a slash
         endif
 endif
-
-if conf.get('HAVE_PAM', false)
+#!feature:user-sessions dep:pam
+if conf.get('feature:user-sessions', false)
         executable('systemd-user-sessions',
                    'src/user-sessions/user-sessions.c',
                    include_directories : includes,
@@ -1444,7 +1460,8 @@ if conf.get('HAVE_PAM', false)
                    install_dir : rootlibexecdir)
 endif
 
-if conf.get('ENABLE_EFI', false) and conf.get('HAVE_BLKID', false)
+#!feature:efi:bootctl dep:blkid
+if conf.get('feature:efi:bootctl', false)
         exe = executable('bootctl',
                          'src/boot/bootctl.c',
                          include_directories : includes,
@@ -1476,7 +1493,7 @@ exe = executable('systemctl', 'src/systemctl/systemctl.c',
                  install_dir : rootbindir)
 public_programs += [exe]
 
-if conf.get('ENABLE_BACKLIGHT', false)
+if conf.get('feature:backlight', false)
         executable('systemd-backlight',
                    'src/backlight/backlight.c',
                    include_directories : includes,
@@ -1486,7 +1503,7 @@ if conf.get('ENABLE_BACKLIGHT', false)
                    install_dir : rootlibexecdir)
 endif
 
-if conf.get('ENABLE_RFKILL', false)
+if conf.get('feature:rfkill', false)
         executable('systemd-rfkill',
                    'src/rfkill/rfkill.c',
                    include_directories : includes,
@@ -1504,7 +1521,8 @@ executable('systemd-system-update-generator',
            install : true,
            install_dir : systemgeneratordir)
 
-if conf.get('HAVE_LIBCRYPTSETUP', false)
+#!feature:cryptsetup dep:libcryptsetup
+if conf.get('feature:cryptsetup', false)
         executable('systemd-cryptsetup',
                    'src/cryptsetup/cryptsetup.c',
                    include_directories : includes,
@@ -1522,7 +1540,9 @@ if conf.get('HAVE_LIBCRYPTSETUP', false)
                    install_rpath : rootlibexecdir,
                    install : true,
                    install_dir : systemgeneratordir)
-
+endif
+#!feature:cryptsetup dep:libcryptsetup
+if conf.get('feature:veritysetup', false)
         executable('systemd-veritysetup',
                    'src/veritysetup/veritysetup.c',
                    include_directories : includes,
@@ -1542,7 +1562,8 @@ if conf.get('HAVE_LIBCRYPTSETUP', false)
                    install_dir : systemgeneratordir)
 endif
 
-if conf.get('HAVE_SYSV_COMPAT', false)
+#!feature:sysv-compat
+if conf.get('feature:sysv-compat', false)
         executable('systemd-sysv-generator',
                    'src/sysv-generator/sysv-generator.c',
                    include_directories : includes,
@@ -1560,7 +1581,7 @@ if conf.get('HAVE_SYSV_COMPAT', false)
                    install_dir : systemgeneratordir)
 endif
 
-if conf.get('ENABLE_HOSTNAMED', false)
+if conf.get('feature:hostnamed', false)
         executable('systemd-hostnamed',
                    'src/hostname/hostnamed.c',
                    include_directories : includes,
@@ -1578,8 +1599,9 @@ if conf.get('ENABLE_HOSTNAMED', false)
         public_programs += [exe]
 endif
 
-if conf.get('ENABLE_LOCALED', false)
-        if conf.get('HAVE_XKBCOMMON', false)
+if conf.get('feature:localed', false)
+        #!feature:localed:xkb dep:xkbcommon # Ability to control the default X11 key mapping
+        if conf.get('feature:localed:xkb', false)
                 # logind will load libxkbcommon.so dynamically on its own
                 deps = [libdl]
         else
@@ -1604,7 +1626,7 @@ if conf.get('ENABLE_LOCALED', false)
         public_programs += [exe]
 endif
 
-if conf.get('ENABLE_TIMEDATED', false)
+if conf.get('feature:timedated', false)
         executable('systemd-timedated',
                    'src/timedate/timedated.c',
                    include_directories : includes,
@@ -1622,7 +1644,7 @@ if conf.get('ENABLE_TIMEDATED', false)
         public_programs += [exe]
 endif
 
-if conf.get('ENABLE_TIMESYNCD', false)
+if conf.get('feature:timesyncd', false)
         executable('systemd-timesyncd',
                    systemd_timesyncd_sources,
                    include_directories : includes,
@@ -1634,7 +1656,7 @@ if conf.get('ENABLE_TIMESYNCD', false)
                    install_dir : rootlibexecdir)
 endif
 
-if conf.get('ENABLE_MACHINED', false)
+if conf.get('feature:machined', false)
         executable('systemd-machined',
                    systemd_machined_sources,
                    include_directories : includes,
@@ -1657,7 +1679,7 @@ if conf.get('ENABLE_MACHINED', false)
         public_programs += [exe]
 endif
 
-if conf.get('ENABLE_IMPORTD', false)
+if conf.get('feature:importd', false)
         executable('systemd-importd',
                    systemd_importd_sources,
                    include_directories : includes,
@@ -1706,7 +1728,8 @@ if conf.get('ENABLE_IMPORTD', false)
         public_programs += [systemd_pull, systemd_import, systemd_export]
 endif
 
-if conf.get('ENABLE_REMOTE', false) and conf.get('HAVE_LIBCURL', false)
+#!feature:journal-remote:upload dep:libcurl
+if conf.get('feature:journal-remote:upload', false)
         exe = executable('systemd-journal-upload',
                          systemd_journal_upload_sources,
                          include_directories : includes,
@@ -1722,7 +1745,8 @@ if conf.get('ENABLE_REMOTE', false) and conf.get('HAVE_LIBCURL', false)
         public_programs += [exe]
 endif
 
-if conf.get('ENABLE_REMOTE', false) and conf.get('HAVE_MICROHTTPD', false)
+#!feature:journal-remote:receive dep:libmicrohttpd
+if conf.get('feature:journal-remote:receive', false)
         s_j_remote = executable('systemd-journal-remote',
                                 systemd_journal_remote_sources,
                                 include_directories : includes,
@@ -1735,7 +1759,10 @@ if conf.get('ENABLE_REMOTE', false) and conf.get('HAVE_MICROHTTPD', false)
                                 install_rpath : rootlibexecdir,
                                 install : true,
                                 install_dir : rootlibexecdir)
-
+        public_programs += [s_j_remote]
+endif
+#!feature:journal-remote:gatewayd dep:libmicrohttpd
+if conf.get('feature:journal-remote:gatewayd', false)
         s_j_gatewayd = executable('systemd-journal-gatewayd',
                                   systemd_journal_gatewayd_sources,
                                   include_directories : includes,
@@ -1748,10 +1775,10 @@ if conf.get('ENABLE_REMOTE', false) and conf.get('HAVE_MICROHTTPD', false)
                                   install_rpath : rootlibexecdir,
                                   install : true,
                                   install_dir : rootlibexecdir)
-        public_programs += [s_j_remote, s_j_gatewayd]
+        public_programs += [s_j_gatewayd]
 endif
 
-if conf.get('ENABLE_COREDUMP', false)
+if conf.get('feature:coredump', false)
         executable('systemd-coredump',
                    systemd_coredump_sources,
                    include_directories : includes,
@@ -1777,7 +1804,7 @@ if conf.get('ENABLE_COREDUMP', false)
         public_programs += [exe]
 endif
 
-if conf.get('ENABLE_BINFMT', false)
+if conf.get('feature:binfmt', false)
         exe = executable('systemd-binfmt',
                          'src/binfmt/binfmt.c',
                          include_directories : includes,
@@ -1793,7 +1820,7 @@ if conf.get('ENABLE_BINFMT', false)
                                  mkdir_p.format(join_paths(sysconfdir, 'binfmt.d')))
 endif
 
-if conf.get('ENABLE_VCONSOLE', false)
+if conf.get('feature:vconsole', false)
         executable('systemd-vconsole-setup',
                    'src/vconsole/vconsole-setup.c',
                    include_directories : includes,
@@ -1803,7 +1830,7 @@ if conf.get('ENABLE_VCONSOLE', false)
                    install_dir : rootlibexecdir)
 endif
 
-if conf.get('ENABLE_RANDOMSEED', false)
+if conf.get('feature:randomseed', false)
         executable('systemd-random-seed',
                    'src/random-seed/random-seed.c',
                    include_directories : includes,
@@ -1813,7 +1840,7 @@ if conf.get('ENABLE_RANDOMSEED', false)
                    install_dir : rootlibexecdir)
 endif
 
-if conf.get('ENABLE_FIRSTBOOT', false)
+if conf.get('feature:firstboot', false)
         executable('systemd-firstboot',
                    'src/firstboot/firstboot.c',
                    include_directories : includes,
@@ -2022,7 +2049,7 @@ exe = executable('busctl',
                  install : true)
 public_programs += [exe]
 
-if conf.get('ENABLE_SYSUSERS', false)
+if conf.get('feature:sysusers', false)
         exe = executable('systemd-sysusers',
                          'src/sysusers/sysusers.c',
                          include_directories : includes,
@@ -2033,7 +2060,7 @@ if conf.get('ENABLE_SYSUSERS', false)
         public_programs += [exe]
 endif
 
-if conf.get('ENABLE_TMPFILES', false)
+if conf.get('feature:tmpfiles', false)
         exe = executable('systemd-tmpfiles',
                          'src/tmpfiles/tmpfiles.c',
                          include_directories : includes,
@@ -2045,7 +2072,7 @@ if conf.get('ENABLE_TMPFILES', false)
         public_programs += [exe]
 endif
 
-if conf.get('ENABLE_HWDB', false)
+if conf.get('feature:hwdb', false)
         exe = executable('systemd-hwdb',
                          'src/hwdb/hwdb.c',
                          'src/libsystemd/sd-hwdb/hwdb-internal.h',
@@ -2057,7 +2084,7 @@ if conf.get('ENABLE_HWDB', false)
         public_programs += [exe]
 endif
 
-if conf.get('ENABLE_QUOTACHECK', false)
+if conf.get('feature:quotacheck', false)
         executable('systemd-quotacheck',
                    'src/quotacheck/quotacheck.c',
                    include_directories : includes,
@@ -2135,7 +2162,8 @@ executable('systemd-update-utmp',
            install : true,
            install_dir : rootlibexecdir)
 
-if conf.get('HAVE_KMOD', false)
+#!feature:modules-load dep:libkmod
+if conf.get('feature:modules-load', false)
         executable('systemd-modules-load',
                    'src/modules-load/modules-load.c',
                    include_directories : includes,
@@ -2168,7 +2196,7 @@ exe = executable('systemd-nspawn',
                  install : true)
 public_programs += [exe]
 
-if conf.get('ENABLE_NETWORKD', false)
+if conf.get('feature:networkd', false)
         executable('systemd-networkd',
                    systemd_networkd_sources,
                    include_directories : includes,

@@ -49,7 +49,7 @@ option('efi', type : 'boolean',
        description : 'enable systemd-boot and bootctl')
 option('tpm', type : 'boolean', value : false,
        description : 'TPM should be used to log events and extend the registers')
-option('environment-d', type : 'boolean',
+option('feature:environment-d', type : 'boolean',
        description : 'support for environment.d')
 option('binfmt', type : 'boolean',
        description : 'support for custom binary formats')
