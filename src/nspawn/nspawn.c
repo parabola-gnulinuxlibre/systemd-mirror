@@ -358,6 +358,7 @@ static void parse_inner_cgver_env(void) {
 }
 
 static int detect_inner_cgver_from_image(const char *directory, CGroupUnified outer_cgver) {
+        const char *modename;
         int r;
 
         /* The upstream systemd version of this function assumes that all containers are systemd containers; and that
@@ -417,9 +418,19 @@ static int detect_inner_cgver_from_image(const char *directory, CGroupUnified ou
         }
 
  success:
-        log_debug("Using %s hierarchy for container.",
-                  arg_inner_cgver == CGROUP_UNIFIED_NONE ? "legacy" :
-                  arg_inner_cgver == CGROUP_UNIFIED_SYSTEMD233 ? "hybrid" : "unified");
+        switch (arg_inner_cgver) {
+        default:
+        case CGROUP_UNIFIED_UNKNOWN:
+                assert_not_reached("Invalid host cgroup version");
+                modename = "invalid";
+                break;
+        case CGROUP_UNIFIED_INHERIT:    modename = "inherit"; break;
+        case CGROUP_UNIFIED_NONE:       modename = "legacy (sd)"; break;
+        case CGROUP_UNIFIED_SYSTEMD232: modename = "hybrid (sd232)"; break;
+        case CGROUP_UNIFIED_SYSTEMD233: modename = "hybrid (sd233+)"; break;
+        case CGROUP_UNIFIED_ALL:        modename = "unified"; break;
+        }
+        log_debug("Using %s hierarchy for container.", modename);
 
         return 0;
 }
