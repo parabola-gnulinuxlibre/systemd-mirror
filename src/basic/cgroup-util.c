@@ -2490,25 +2490,25 @@ static int cg_unified_update(void) {
                 log_debug("Found cgroup2 on /sys/fs/cgroup/, full unified hierarchy");
                 unified_cache = CGROUP_UNIFIED_ALL;
         } else if (F_TYPE_EQUAL(fs.f_type, TMPFS_MAGIC)) {
-                if (statfs("/sys/fs/cgroup/unified/", &fs) == 0 &&
-                    F_TYPE_EQUAL(fs.f_type, CGROUP2_SUPER_MAGIC)) {
-                        log_debug("Found cgroup2 on /sys/fs/cgroup/unified, unified hierarchy for systemd controller");
-                        unified_cache = CGROUP_UNIFIED_SYSTEMD233;
-                } else {
-                        if (statfs("/sys/fs/cgroup/systemd/", &fs) < 0)
-                                return log_debug_errno(errno, "statfs(\"/sys/fs/cgroup/systemd\" failed: %m");
+                if (statfs("/sys/fs/cgroup/systemd/", &fs) < 0)
+                        return log_debug_errno(errno, "statfs(\"/sys/fs/cgroup/systemd\" failed: %m");
 
-                        if (F_TYPE_EQUAL(fs.f_type, CGROUP2_SUPER_MAGIC)) {
-                                log_debug("Found cgroup2 on /sys/fs/cgroup/systemd, unified hierarchy for systemd controller (v232 variant)");
-                                unified_cache = CGROUP_UNIFIED_SYSTEMD232;
-                        } else if (F_TYPE_EQUAL(fs.f_type, CGROUP_SUPER_MAGIC)) {
-                                log_debug("Found cgroup on /sys/fs/cgroup/systemd, legacy hierarchy");
-                                unified_cache = CGROUP_UNIFIED_NONE;
+                if (F_TYPE_EQUAL(fs.f_type, CGROUP2_SUPER_MAGIC)) {
+                        log_debug("Found cgroup2 on /sys/fs/cgroup/systemd, hybrid hierarchy (systemd v232 variant)");
+                        unified_cache = CGROUP_UNIFIED_SYSTEMD232;
+                } else if (F_TYPE_EQUAL(fs.f_type, CGROUP_SUPER_MAGIC)) {
+                        if (statfs("/sys/fs/cgroup/unified/", &fs) == 0 &&
+                            F_TYPE_EQUAL(fs.f_type, CGROUP2_SUPER_MAGIC)) {
+                                log_debug("Found cgroup on /sys/fs/cgroup/systemd, cgroup2 on /sys/fs/cgroup/unified, hybrid hierarchy (systemd v233+ variant)");
+                                unified_cache = CGROUP_UNIFIED_SYSTEMD233;
                         } else {
-                                log_debug("Unexpected filesystem type %llx mounted on /sys/fs/cgroup/systemd, assuming legacy hierarchy",
-                                          (unsigned long long) fs.f_type);
+                                log_debug("Found cgroup on /sys/fs/cgroup/systemd, no /sys/fs/cgroup/unified, legacy hierarchy (systemd variant)");
                                 unified_cache = CGROUP_UNIFIED_NONE;
                         }
+                } else {
+                        log_debug("Unexpected filesystem type %llx mounted on /sys/fs/cgroup/systemd",
+                                  (unsigned long long) fs.f_type);
+                        return -ENOMEDIUM;
                 }
         } else {
                 log_debug("Unknown filesystem type %llx mounted on /sys/fs/cgroup.",
