@@ -329,15 +329,25 @@ static void parse_inner_cgver_env(void) {
 
         e = getenv("UNIFIED_CGROUP_HIERARCHY");
         if (e) {
-                r = parse_boolean(e);
-                if (r < 0) {
-                        log_warning_errno(r, "Failed to parse UNIFIED_CGROUP_HIERARCHY from environment, ignoring.");
-                        arg_inner_cgver = CGROUP_UNIFIED_UNKNOWN;
-                        return;
-                } else if (r > 0)
-                        arg_inner_cgver = CGROUP_UNIFIED_ALL;
-                else
+                if (streq(e, "legacy") || streq(e, "legacy-sd"))
                         arg_inner_cgver = CGROUP_UNIFIED_NONE;
+                else if (streq(e, "hybrid-sd232"))
+                        arg_inner_cgver = CGROUP_UNIFIED_SYSTEMD232;
+                else if (streq(e, "hybrid") || streq(e, "hybrid-sd233"))
+                        arg_inner_cgver = CGROUP_UNIFIED_SYSTEMD233;
+                else if (streq(e, "unified"))
+                        arg_inner_cgver = CGROUP_UNIFIED_ALL;
+                else {
+                        r = parse_boolean(e);
+                        if (r < 0) {
+                                log_warning_errno(r, "Failed to parse UNIFIED_CGROUP_HIERARCHY from environment, ignoring.");
+                                arg_inner_cgver = CGROUP_UNIFIED_UNKNOWN;
+                                return;
+                        } else if (r > 0)
+                                arg_inner_cgver = CGROUP_UNIFIED_ALL;
+                        else
+                                arg_inner_cgver = CGROUP_UNIFIED_NONE;
+                }
         }
 }
 

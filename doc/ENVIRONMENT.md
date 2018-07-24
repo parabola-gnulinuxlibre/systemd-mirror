@@ -49,8 +49,19 @@ systemctl:
 
 systemd-nspawn:
 
-* `$UNIFIED_CGROUP_HIERARCHY=1` — if set, force nspawn into unified cgroup
-  hierarchy mode.
+* `$UNIFIED_CGROUP_HIERARCHY=…` — if set, force nspawn into the
+  specified cgroup hierarchy mode:
+
+   - "legacy", "legacy-sd", or falsey values sets it to systemd's
+     cgroup-v1 mode,
+   - "hybrid-sd232" sets it to systemd-v232's cgroup-v1/v2 hybrid
+     mode,
+   - "hybrid" or "hybrid-sd233" sets it to systemd-v233+'s
+     cgroup-v1/v2 hybrid mode,
+   - "unified" or truthy values sets it to cgroup-v2 mode,
+
+  Leaving it unset causes it to try to magically sniff the appropriate
+  cgroup mode from the container's image.
 
 * `$SYSTEMD_NSPAWN_API_VFS_WRITABLE=1` — if set, make /sys and /proc/sys and
   friends writable in the container. If set to "network", leave only
