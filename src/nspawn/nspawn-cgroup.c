@@ -100,7 +100,8 @@ static int cgfile_get_cgroup(FILE *cgfile, const char *opts, char **ret_cgroup) 
         }
 }
 
-static int chown_cgroup_path(const char *path, uid_t uid_shift) {
+static int cgdir_chown(const char *path, uid_t uid_shift) {
+
         _cleanup_close_ int fd = -1;
         const char *fn;
 
@@ -140,7 +141,7 @@ static int chown_cgroup(pid_t pid, CGroupUnified inner_cgver, uid_t uid_shift) {
         if (r < 0)
                 return log_error_errno(r, "Failed to get file system path for container cgroup: %m");
 
-        r = chown_cgroup_path(fs, uid_shift);
+        r = cgdir_chown(fs, uid_shift);
         if (r < 0)
                 return log_error_errno(r, "Failed to chown() cgroup %s: %m", fs);
 
@@ -152,7 +153,7 @@ static int chown_cgroup(pid_t pid, CGroupUnified inner_cgver, uid_t uid_shift) {
                 if (r < 0)
                         return log_error_errno(r, "Failed to get file system path for container cgroup: %m");
 
-                r = chown_cgroup_path(lfs, uid_shift);
+                r = cgdir_chown(lfs, uid_shift);
                 if (r < 0)
                         return log_error_errno(r, "Failed to chown() cgroup %s: %m", lfs);
         }
@@ -208,7 +209,7 @@ static int sync_cgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner
         }
 
         fn = strjoina(mountpoint, cgroup);
-        r = chown_cgroup_path(fn, uid_shift);
+        r = cgdir_chown(fn, uid_shift);
         if (r < 0)
                 log_error_errno(r, "Failed to chown() cgroup %s: %m", fn);
 finish:
