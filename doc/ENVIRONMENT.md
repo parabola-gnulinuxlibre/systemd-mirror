@@ -59,9 +59,10 @@ systemd-nspawn:
    - "hybrid" or "hybrid-sd233" sets it to systemd-v233+'s
      cgroup-v1/v2 hybrid mode,
    - "unified" or truthy values sets it to cgroup-v2 mode,
+   - "inherit" sets it to inherit the host's cgroup mode
 
   Leaving it unset causes it to try to magically sniff the appropriate
-  cgroup mode from the container's image.
+  cgroup mode from the container's image, falling back to "inherit".
 
 * `$SYSTEMD_NSPAWN_API_VFS_WRITABLE=1` — if set, make /sys and /proc/sys and
   friends writable in the container. If set to "network", leave only
