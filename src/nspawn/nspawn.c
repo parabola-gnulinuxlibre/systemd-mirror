@@ -341,6 +341,8 @@ static void parse_inner_cgver_env(void) {
                         arg_inner_cgver = CGROUP_UNIFIED_SYSTEMD233;
                 else if (streq(e, "unified"))
                         arg_inner_cgver = CGROUP_UNIFIED_ALL;
+                else if (streq(e, "inherit"))
+                        arg_inner_cgver = CGROUP_UNIFIED_INHERIT;
                 else {
                         r = parse_boolean(e);
                         if (r < 0) {
@@ -362,8 +364,12 @@ static int detect_inner_cgver_from_image(const char *directory, CGroupUnified ou
          * by checking libsystemd-shared). */
         switch (outer_cgver) {
         default:
+        case CGROUP_UNIFIED_INHERIT:
+                assert_not_reached("Invalid host cgroup version");
+                return -EINVAL;
         case CGROUP_UNIFIED_UNKNOWN:
-                assert_not_reached("unknown cgroup version");
+                arg_inner_cgver = CGROUP_UNIFIED_INHERIT;
+                break;
         case CGROUP_UNIFIED_ALL:
                 /* Unified cgroup hierarchy support was added in 230.  Unfortunately, libsystemd-shared (which we use
                  * to sniff the systemd version) was only added in 231, so we'll have a false negative here for 230. */
@@ -371,7 +377,7 @@ static int detect_inner_cgver_from_image(const char *directory, CGroupUnified ou
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_inner_cgver = CGROUP_UNIFIED_ALL;
+                        arg_inner_cgver = CGROUP_UNIFIED_INHERIT;
                 else
                         arg_inner_cgver = CGROUP_UNIFIED_NONE;
                 break;
@@ -381,7 +387,7 @@ static int detect_inner_cgver_from_image(const char *directory, CGroupUnified ou
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_inner_cgver = CGROUP_UNIFIED_SYSTEMD233;
+                        arg_inner_cgver = CGROUP_UNIFIED_INHERIT;
                 else
                         arg_inner_cgver = CGROUP_UNIFIED_NONE;
                 break;
@@ -391,12 +397,12 @@ static int detect_inner_cgver_from_image(const char *directory, CGroupUnified ou
                 if (r < 0)
                         return log_error_errno(r, "Failed to decide cgroup version to use: Failed to determine systemd version in container: %m");
                 if (r > 0)
-                        arg_inner_cgver = CGROUP_UNIFIED_SYSTEMD232;
+                        arg_inner_cgver = CGROUP_UNIFIED_INHERIT;
                 else
                         arg_inner_cgver = CGROUP_UNIFIED_NONE;
                 break;
         case CGROUP_UNIFIED_NONE:
-                arg_inner_cgver = CGROUP_UNIFIED_NONE;
+                arg_inner_cgver = CGROUP_UNIFIED_INHERIT;
                 break;
         }
 
@@ -4275,8 +4281,12 @@ int main(int argc, char *argv[]) {
                 goto finish;
 
         r = cg_version(&outer_cgver);
-        if (r < 0) {
-                log_error_errno(r, "Failed to determine whether the unified cgroups hierarchy is used: %m");
+        if (r < 0)
+                outer_cgver = CGROUP_UNIFIED_UNKNOWN;
+
+        if (outer_cgver == CGROUP_UNIFIED_UNKNOWN && arg_inner_cgver > CGROUP_UNIFIED_UNKNOWN) {
+                log_error("Cannot set cgroup version of container unless running on a host with a recognized (systemd or unified) cgroup setup");
+                r = -EINVAL;
                 goto finish;
         }
 

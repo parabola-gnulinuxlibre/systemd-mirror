@@ -1,8 +1,11 @@
 /* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <sys/mount.h>
+#include <libmount.h>
 
 #include "alloc-util.h"
+#include "dirent-util.h"
+#include "escape.h"
 #include "fd-util.h"
 #include "fileio.h"
 #include "fs-util.h"
@@ -392,12 +395,55 @@ int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver
         _cleanup_free_ char *cg1sd_mountpoint = NULL;
         int r, q;
 
-        assert(outer_cgver != CGROUP_UNIFIED_UNKNOWN);
-        assert(inner_cgver != CGROUP_UNIFIED_UNKNOWN);
+        /* For purposes of version comparison */
+        if (inner_cgver == CGROUP_UNIFIED_INHERIT)
+                inner_cgver = outer_cgver;
 
         cg1sd_used = inner_cgver == CGROUP_UNIFIED_NONE || inner_cgver == CGROUP_UNIFIED_SYSTEMD233;
-        cg2_used = inner_cgver >= CGROUP_UNIFIED_SYSTEMD232;
-        if (cg2_used) {
+        cg2_used = inner_cgver >= CGROUP_UNIFIED_SYSTEMD232; /* or ... */
+        if (inner_cgver == CGROUP_UNIFIED_UNKNOWN) {
+                _cleanup_fclose_ FILE *proc_self_mountinfo = NULL;
+
+                proc_self_mountinfo = fopen("/proc/self/mountinfo", "re");
+                if (!proc_self_mountinfo)
+                        return -errno;
+
+                for (;;) {
+                        _cleanup_free_ char *escmountpoint = NULL, *mountpoint = NULL, *fstype = NULL;
+                        int k;
+
+                        k = fscanf(proc_self_mountinfo,
+                                   "%*s "       /* (1) mount id */
+                                   "%*s "       /* (2) parent id */
+                                   "%*s "       /* (3) major:minor */
+                                   "%*s "       /* (4) root */
+                                   "%ms "       /* (5) mount point */
+                                   "%*s"        /* (6) per-mount options */
+                                   "%*[^-]"     /* (7) optional fields */
+                                   "- "         /* (8) separator */
+                                   "%ms "       /* (9) file system type */
+                                   "%*s"        /* (10) mount source */
+                                   "%*s"        /* (11) per-superblock options */
+                                   "%*[^\n]",   /* some rubbish at the end */
+                                   &escmountpoint,
+                                   &fstype
+                                   );
+                        if (k != 2) {
+                                if (k == EOF)
+                                        break;
+                                continue;
+                        }
+
+                        r = cunescape(escmountpoint, UNESCAPE_RELAX, &mountpoint);
+                        if (r < 0)
+                                return r;
+
+                        if (path_startswith(mountpoint, "/sys/fs/cgroup") && streq(fstype, "cgroup2")) {
+                                cg2_used = true;
+                                cg2_mountpoint = strdup(mountpoint);
+                        }
+                }
+        } else if (cg2_used) {
                 switch (outer_cgver) {
                 case CGROUP_UNIFIED_SYSTEMD233: cg2_mountpoint = strdup("/sys/fs/cgroup/unified"); break;
                 case CGROUP_UNIFIED_SYSTEMD232: cg2_mountpoint = strdup("/sys/fs/cgroup/systemd"); break;
@@ -465,6 +511,104 @@ int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver
 }
 
 /* cgroup_decide_mounts *********************************************/
+
+static int cgroup_decide_mounts_inherit(CGMounts *ret_mounts) {
+        _cleanup_fclose_ FILE *proc_self_mountinfo = NULL;
+        _cleanup_(cgroup_free_mounts) CGMounts mounts = {};
+        int r;
+
+        proc_self_mountinfo = fopen("/proc/self/mountinfo", "re");
+        if (!proc_self_mountinfo)
+                return -errno;
+
+        for (;;) {
+                _cleanup_free_ char *escmountpoint = NULL, *mountpoint = NULL, *fstype = NULL, *superopts = NULL, *fsopts = NULL;
+                char *name;
+                CGMountType type;
+                int k;
+
+                k = fscanf(proc_self_mountinfo,
+                           "%*s "       /* (1) mount id */
+                           "%*s "       /* (2) parent id */
+                           "%*s "       /* (3) major:minor */
+                           "%*s "       /* (4) root */
+                           "%ms "       /* (5) mount point */
+                           "%*s"        /* (6) per-mount options */
+                           "%*[^-]"     /* (7) optional fields */
+                           "- "         /* (8) separator */
+                           "%ms "       /* (9) file system type */
+                           "%*s"        /* (10) mount source */
+                           "%ms"        /* (11) per-superblock options */
+                           "%*[^\n]",   /* some rubbish at the end */
+                           &escmountpoint,
+                           &fstype,
+                           &superopts
+                );
+                if (k != 3) {
+                        if (k == EOF)
+                                break;
+
+                        continue;
+                }
+
+                r = cunescape(escmountpoint, UNESCAPE_RELAX, &mountpoint);
+                if (r < 0)
+                        return r;
+
+                name = path_startswith(mountpoint, "/sys/fs/cgroup");
+                if (!name)
+                        continue;
+
+                if (!filename_is_valid(name) && !isempty(name))
+                        continue;
+
+                if (streq(fstype, "tmpfs"))
+                        type = CGMOUNT_TMPFS;
+                else if(streq(fstype, "cgroup"))
+                        type = CGMOUNT_CGROUP1;
+                else if (streq(fstype, "cgroup2")) {
+                        type = CGMOUNT_CGROUP2;
+                } else
+                        continue;
+
+                r = mnt_split_optstr(superopts, NULL, NULL, &fsopts, 0, 0);
+                if (r < 0)
+                        return r;
+
+                if (!cgmount_add(&mounts, type, fsopts, name)) {
+                        return -ENOMEM;
+                }
+
+                if (type == CGMOUNT_TMPFS) {
+                        _cleanup_closedir_ DIR *dir;
+                        struct dirent *entry;
+
+                        dir = opendir(mountpoint);
+                        if (!dir)
+                                return log_error_errno(errno, "Failed to open directory %s: %m", mountpoint);
+
+                        FOREACH_DIRENT(entry, dir, break) {
+                                _cleanup_free_ char *target = NULL;
+                                r = dirent_ensure_type(dir, entry);
+                                if (r < 0)
+                                        return r;
+                                if (entry->d_type != DT_LNK)
+                                        continue;
+                                r = readlinkat_malloc(dirfd(dir), entry->d_name, &target);
+                                if (r < 0)
+                                        return r;
+                                if (!cgmount_add(&mounts, CGMOUNT_SYMLINK, target, entry->d_name))
+                                        return -ENOMEM;
+                        }
+                }
+        }
+
+        *ret_mounts = mounts;
+        mounts.mounts = NULL;
+        mounts.n = 0;
+
+        return 0;
+}
 
 /* Retrieve a list of cgroup v1 hierarchies. */
 static int get_v1_hierarchies(Set **ret) {
@@ -688,6 +832,8 @@ int cgroup_decide_mounts(
         default:
         case CGROUP_UNIFIED_UNKNOWN:
                 assert_not_reached("unknown inner_cgver");
+        case CGROUP_UNIFIED_INHERIT:
+                return cgroup_decide_mounts_inherit(ret_mounts);
         case CGROUP_UNIFIED_NONE:
         case CGROUP_UNIFIED_SYSTEMD232:
         case CGROUP_UNIFIED_SYSTEMD233:

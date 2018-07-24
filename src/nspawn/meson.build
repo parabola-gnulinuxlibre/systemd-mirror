@@ -37,6 +37,7 @@ libnspawn_core = static_library(
         libnspawn_core_sources,
         include_directories : includes,
         dependencies : [libacl,
+                        libmount,
                         libseccomp,
                         libselinux])
 
