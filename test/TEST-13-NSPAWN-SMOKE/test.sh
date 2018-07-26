@@ -180,4 +180,10 @@ EOF
     umount $TESTDIR/root
 }
 
+test_cleanup() {
+    umount $TESTDIR/root 2>/dev/null || true
+    [[ $LOOPDEV ]] && losetup -d $LOOPDEV || true
+    rm -f has-overflow
+}
+
 do_test "$@"
