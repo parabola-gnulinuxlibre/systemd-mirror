@@ -57,6 +57,7 @@ struct CGMount {
 };
 
 static CGMount *cgmount_add(CGMounts *mounts, CGMountType type, const char *src, const char *dst) {
+
         char *hsrc = NULL, *hdst = NULL;
         CGMount *c, *ret;
 
@@ -90,6 +91,7 @@ static CGMount *cgmount_add(CGMounts *mounts, CGMountType type, const char *src,
 }
 
 void cgroup_free_mounts(CGMounts *mounts) {
+
         for (size_t i = 0; i < mounts->n; i++) {
                 free(mounts->mounts[i].src);
                 free(mounts->mounts[i].dst);
@@ -230,7 +232,8 @@ static int create_subcgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified 
         return 0;
 }
 
-static int cgpath_count_procs(const char *cgpath, Set **ret_pids) {
+static int cgpath_list_procs(const char *cgpath, Set **ret_pids) {
+
         char line[LINE_MAX];
         _cleanup_set_free_ Set *pid_set = NULL;
         _cleanup_fclose_ FILE *procs = NULL;
@@ -262,6 +265,7 @@ static int cgpath_count_procs(const char *cgpath, Set **ret_pids) {
 }
 
 int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver, uid_t uid_shift) {
+
         _cleanup_free_ char *cgpath = NULL, *cgroup = NULL;
         _cleanup_set_free_ Set *peers = NULL;
         int r;
@@ -288,7 +292,7 @@ int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver
         if (r < 0)
                 return log_error_errno(r, "Failed to get host file system path for container cgroup: %m");
 
-        r = cgpath_count_procs(cgpath, &peers);
+        r = cgpath_list_procs(cgpath, &peers);
         if (r < 0)
                 return log_error_errno(r, "Unable to count the processes in the container's cgroup: %m");
 
@@ -469,6 +473,7 @@ static int get_v1_hierarchies(Set *subsystems) {
 static int cgroup_decide_mounts_sd_y_cgns(
                 CGMounts *ret_mounts,
                 CGroupUnified outer_cgver, CGroupUnified inner_cgver) {
+
         _cleanup_(cgroup_free_mounts) CGMounts mounts = {};
         _cleanup_set_free_free_ Set *hierarchies = NULL;
         const char *c;
@@ -524,10 +529,10 @@ static int cgroup_decide_mounts_sd_y_cgns(
 skip_controllers:
         switch (inner_cgver) {
         case CGROUP_UNIFIED_NONE:
-                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, "name=systmed", "systemd"))
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, "none,name=systmed,xattr", "systemd"))
                         return log_oom();
                 break;
-        case CGROUP_UNIFIED_ALL:
+        case CGROUP_UNIFIED_SYSTEMD:
                 if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "", "systemd"))
                         return log_oom();
                 break;
@@ -546,6 +551,7 @@ skip_controllers:
 static int cgroup_decide_mounts_sd_n_cgns(
                 CGMounts *ret_mounts,
                 CGroupUnified outer_cgver, CGroupUnified inner_cgver) {
+
         _cleanup_(cgroup_free_mounts) CGMounts mounts = {};
         _cleanup_set_free_free_ Set *controllers = NULL;
         int r;
@@ -604,10 +610,10 @@ static int cgroup_decide_mounts_sd_n_cgns(
 skip_controllers:
         switch (inner_cgver) {
         case CGROUP_UNIFIED_NONE:
-                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, "name=systmed", "systemd"))
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, "none,name=systmed,xattr", "systemd"))
                         return log_oom();
                 break;
-        case CGROUP_UNIFIED_ALL:
+        case CGROUP_UNIFIED_SYSTEMD:
                 if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "", "systemd"))
                         return log_oom();
                 break;
@@ -626,6 +632,7 @@ int cgroup_decide_mounts(
                 CGMounts *ret_mounts,
                 CGroupUnified outer_cgver, CGroupUnified inner_cgver,
                 bool use_cgns) {
+
         switch (inner_cgver) {
         case CGROUP_UNIFIED_INHERIT:
                 return cgroup_decide_mounts_inherit(ret_mounts);
@@ -654,11 +661,13 @@ int cgroup_decide_mounts(
 static int cgroup_mount_cg(
                 const char *mountpoint, const char *opts, CGMountType fstype,
                 FILE *cgfile, bool use_userns) {
+
         const bool use_cgns = cgfile == NULL;
         /* If we are using userns and cgns, then we always let it be RW, because we can count on the shifted root user
          * to not have access to the things that would make us want to mount it RO.  Otherwise, we only give the
          * container RW access to its unified or name=systemd cgroup. */
         const bool rw = (use_userns && use_cgns) || fstype == CGMOUNT_CGROUP2 || streq(mountpoint, "/sys/fs/cgroup/systemd");
+
         int r;
 
         r = mount_verbose(LOG_ERR, "cgroup", mountpoint, fstype == CGMOUNT_CGROUP1 ? "cgroup" : "cgroup2",
@@ -709,6 +718,7 @@ static int cgroup_mount_cg(
 }
 
 int cgroup_mount_mounts(CGMounts m, FILE *cgfile, uid_t uid_shift, const char *selinux_apifs_context) {
+
         const bool use_cgns = cgfile == NULL;
         const bool use_userns = uid_shift != UID_INVALID;
 
