@@ -576,6 +576,7 @@ int job_run_and_invalidate(Job *j) {
         if (!job_is_runnable(j))
                 return -EAGAIN;
 
+        job_start_timer(j, true);
         job_set_state(j, JOB_RUNNING);
         job_add_to_dbus_queue(j);
 
@@ -745,7 +746,7 @@ static void job_print_status_message(Unit *u, JobType t, JobResult result) {
         if (t == JOB_START && result == JOB_FAILED) {
                 _cleanup_free_ char *quoted;
 
-                quoted = shell_maybe_quote(u->id);
+                quoted = shell_maybe_quote(u->id, ESCAPE_BACKSLASH);
                 manager_status_printf(u->manager, STATUS_TYPE_NORMAL, NULL, "See 'systemctl status %s' for details.", strna(quoted));
         }
 }
@@ -804,18 +805,18 @@ static void job_log_status_message(Unit *u, JobType t, JobResult result) {
 
         default:
                 log_struct(job_result_log_level[result],
-                           LOG_UNIT_ID(u),
                            LOG_MESSAGE("%s", buf),
                            "RESULT=%s", job_result_to_string(result),
+                           LOG_UNIT_ID(u),
                            NULL);
                 return;
         }
 
         log_struct(job_result_log_level[result],
-                   mid,
-                   LOG_UNIT_ID(u),
                    LOG_MESSAGE("%s", buf),
                    "RESULT=%s", job_result_to_string(result),
+                   LOG_UNIT_ID(u),
+                   mid,
                    NULL);
 }
 
@@ -953,22 +954,46 @@ static int job_dispatch_timer(sd_event_source *s, uint64_t monotonic, void *user
         return 0;
 }
 
-int job_start_timer(Job *j) {
+int job_start_timer(Job *j, bool job_running) {
         int r;
+        usec_t timeout_time, old_timeout_time;
 
-        if (j->timer_event_source)
-                return 0;
+        if (job_running) {
+                j->begin_running_usec = now(CLOCK_MONOTONIC);
 
-        j->begin_usec = now(CLOCK_MONOTONIC);
+                if (j->unit->job_running_timeout == USEC_INFINITY)
+                        return 0;
 
-        if (j->unit->job_timeout == USEC_INFINITY)
-                return 0;
+                timeout_time = usec_add(j->begin_running_usec, j->unit->job_running_timeout);
+
+                if (j->timer_event_source) {
+                        /* Update only if JobRunningTimeoutSec= results in earlier timeout */
+                        r = sd_event_source_get_time(j->timer_event_source, &old_timeout_time);
+                        if (r < 0)
+                                return r;
+
+                        if (old_timeout_time <= timeout_time)
+                                return 0;
+
+                        return sd_event_source_set_time(j->timer_event_source, timeout_time);
+                }
+        } else {
+                if (j->timer_event_source)
+                        return 0;
+
+                j->begin_usec = now(CLOCK_MONOTONIC);
+
+                if (j->unit->job_timeout == USEC_INFINITY)
+                        return 0;
+
+                timeout_time = usec_add(j->begin_usec, j->unit->job_timeout);
+        }
 
         r = sd_event_add_time(
                         j->manager->event,
                         &j->timer_event_source,
                         CLOCK_MONOTONIC,
-                        usec_add(j->begin_usec, j->unit->job_timeout), 0,
+                        timeout_time, 0,
                         job_dispatch_timer, j);
         if (r < 0)
                 return r;
@@ -1031,6 +1056,8 @@ int job_serialize(Job *j, FILE *f) {
 
         if (j->begin_usec > 0)
                 fprintf(f, "job-begin="USEC_FMT"\n", j->begin_usec);
+        if (j->begin_running_usec > 0)
+                fprintf(f, "job-begin-running="USEC_FMT"\n", j->begin_running_usec);
 
         bus_track_serialize(j->bus_track, f, "subscribed");
 
@@ -1128,6 +1155,14 @@ int job_deserialize(Job *j, FILE *f) {
                         else
                                 j->begin_usec = ull;
 
+                } else if (streq(l, "job-begin-running")) {
+                        unsigned long long ull;
+
+                        if (sscanf(v, "%llu", &ull) != 1)
+                                log_debug("Failed to parse job-begin-running value %s", v);
+                        else
+                                j->begin_running_usec = ull;
+
                 } else if (streq(l, "subscribed")) {
 
                         if (strv_extend(&j->deserialized_clients, v) < 0)
@@ -1138,6 +1173,7 @@ int job_deserialize(Job *j, FILE *f) {
 
 int job_coldplug(Job *j) {
         int r;
+        usec_t timeout_time = USEC_INFINITY;
 
         assert(j);
 
@@ -1151,7 +1187,18 @@ int job_coldplug(Job *j) {
         /* Maybe due to new dependencies we don't actually need this job anymore? */
         job_add_to_gc_queue(j);
 
-        if (j->begin_usec == 0 || j->unit->job_timeout == USEC_INFINITY)
+        /* Create timer only when job began or began running and the respective timeout is finite.
+         * Follow logic of job_start_timer() if both timeouts are finite */
+        if (j->begin_usec == 0)
+                return 0;
+
+        if (j->unit->job_timeout != USEC_INFINITY)
+                timeout_time = usec_add(j->begin_usec, j->unit->job_timeout);
+
+        if (j->begin_running_usec > 0 && j->unit->job_running_timeout != USEC_INFINITY)
+                timeout_time = MIN(timeout_time, usec_add(j->begin_running_usec, j->unit->job_running_timeout));
+
+        if (timeout_time == USEC_INFINITY)
                 return 0;
 
         j->timer_event_source = sd_event_source_unref(j->timer_event_source);
@@ -1160,7 +1207,7 @@ int job_coldplug(Job *j) {
                         j->manager->event,
                         &j->timer_event_source,
                         CLOCK_MONOTONIC,
-                        usec_add(j->begin_usec, j->unit->job_timeout), 0,
+                        timeout_time, 0,
                         job_dispatch_timer, j);
         if (r < 0)
                 log_debug_errno(r, "Failed to restart timeout for job: %m");

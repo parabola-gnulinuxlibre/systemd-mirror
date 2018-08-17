@@ -398,8 +398,7 @@ static int whitelist_major(const char *path, const char *name, char type, const 
         return 0;
 
 fail:
-        log_warning_errno(errno, "Failed to read /proc/devices: %m");
-        return -errno;
+        return log_warning_errno(errno, "Failed to read /proc/devices: %m");
 }
 
 static bool cgroup_context_has_cpu_weight(CGroupContext *c) {
@@ -1594,7 +1593,7 @@ int unit_search_main_pid(Unit *u, pid_t *ret) {
         if (r < 0)
                 return r;
 
-        mypid = getpid();
+        mypid = getpid_cached();
         while (cg_read_pid(f, &npid) > 0)  {
                 pid_t ppid;
 

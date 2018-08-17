@@ -18,8 +18,8 @@ struct ConfigPerfItem;
 m4_dnl Define the context options only once
 m4_define(`EXEC_CONTEXT_CONFIG_ITEMS',
 `$1.WorkingDirectory,            config_parse_working_directory,     0,                             offsetof($1, exec_context)
-$1.RootDirectory,                config_parse_unit_path_printf,      0,                             offsetof($1, exec_context.root_directory)
-$1.RootImage,                    config_parse_unit_path_printf,      0,                             offsetof($1, exec_context.root_image)
+$1.RootDirectory,                config_parse_unit_path_printf,      true,                          offsetof($1, exec_context.root_directory)
+$1.RootImage,                    config_parse_unit_path_printf,      true,                          offsetof($1, exec_context.root_image)
 $1.User,                         config_parse_user_group,            0,                             offsetof($1, exec_context.user)
 $1.Group,                        config_parse_user_group,            0,                             offsetof($1, exec_context.group)
 $1.SupplementaryGroups,          config_parse_user_group_strv,       0,                             offsetof($1, exec_context.supplementary_groups)
@@ -35,7 +35,7 @@ $1.UMask,                        config_parse_mode,                  0,         
 $1.Environment,                  config_parse_environ,               0,                             offsetof($1, exec_context.environment)
 $1.EnvironmentFile,              config_parse_unit_env_file,         0,                             offsetof($1, exec_context.environment_files)
 $1.PassEnvironment,              config_parse_pass_environ,          0,                             offsetof($1, exec_context.pass_environment)
-$1.DynamicUser,                  config_parse_bool,                  0,                             offsetof($1, exec_context.dynamic_user)
+$1.DynamicUser,                  config_parse_bool,                  true,                          offsetof($1, exec_context.dynamic_user)
 $1.StandardInput,                config_parse_exec_input,            0,                             offsetof($1, exec_context)
 $1.StandardOutput,               config_parse_exec_output,           0,                             offsetof($1, exec_context)
 $1.StandardError,                config_parse_exec_output,           0,                             offsetof($1, exec_context)
@@ -194,6 +194,7 @@ Unit.OnFailureIsolate,           config_parse_job_mode_isolate,      0,         
 Unit.IgnoreOnIsolate,            config_parse_bool,                  0,                             offsetof(Unit, ignore_on_isolate)
 Unit.IgnoreOnSnapshot,           config_parse_warn_compat,           DISABLED_LEGACY,               0
 Unit.JobTimeoutSec,              config_parse_sec_fix_0,             0,                             offsetof(Unit, job_timeout)
+Unit.JobRunningTimeoutSec,       config_parse_sec_fix_0,             0,                             offsetof(Unit, job_running_timeout)
 Unit.JobTimeoutAction,           config_parse_emergency_action,      0,                             offsetof(Unit, job_timeout_action)
 Unit.JobTimeoutRebootArgument,   config_parse_unit_string_printf,    0,                             offsetof(Unit, job_timeout_reboot_arg)
 Unit.StartLimitIntervalSec,      config_parse_sec,                   0,                             offsetof(Unit, start_limit.interval)
@@ -220,6 +221,8 @@ Unit.ConditionSecurity,          config_parse_unit_condition_string, CONDITION_S
 Unit.ConditionCapability,        config_parse_unit_condition_string, CONDITION_CAPABILITY,          offsetof(Unit, conditions)
 Unit.ConditionHost,              config_parse_unit_condition_string, CONDITION_HOST,                offsetof(Unit, conditions)
 Unit.ConditionACPower,           config_parse_unit_condition_string, CONDITION_AC_POWER,            offsetof(Unit, conditions)
+Unit.ConditionUser,              config_parse_unit_condition_string, CONDITION_USER,                offsetof(Unit, conditions)
+Unit.ConditionGroup,             config_parse_unit_condition_string, CONDITION_GROUP,               offsetof(Unit, conditions)
 Unit.ConditionNull,              config_parse_unit_condition_null,   0,                             offsetof(Unit, conditions)
 Unit.AssertPathExists,           config_parse_unit_condition_path,   CONDITION_PATH_EXISTS,         offsetof(Unit, asserts)
 Unit.AssertPathExistsGlob,       config_parse_unit_condition_path,   CONDITION_PATH_EXISTS_GLOB,    offsetof(Unit, asserts)
@@ -239,6 +242,8 @@ Unit.AssertSecurity,             config_parse_unit_condition_string, CONDITION_S
 Unit.AssertCapability,           config_parse_unit_condition_string, CONDITION_CAPABILITY,          offsetof(Unit, asserts)
 Unit.AssertHost,                 config_parse_unit_condition_string, CONDITION_HOST,                offsetof(Unit, asserts)
 Unit.AssertACPower,              config_parse_unit_condition_string, CONDITION_AC_POWER,            offsetof(Unit, asserts)
+Unit.AssertUser,                 config_parse_unit_condition_string, CONDITION_USER,                offsetof(Unit, asserts)
+Unit.AssertGroup,                config_parse_unit_condition_string, CONDITION_GROUP,               offsetof(Unit, asserts)
 Unit.AssertNull,                 config_parse_unit_condition_null,   0,                             offsetof(Unit, asserts)
 m4_dnl
 Service.PIDFile,                 config_parse_unit_path_printf,      0,                             offsetof(Service, pid_file)

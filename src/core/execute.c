@@ -157,22 +157,26 @@ static int shift_fds(int fds[], unsigned n_fds) {
         return 0;
 }
 
-static int flags_fds(const int fds[], unsigned n_fds, bool nonblock) {
-        unsigned i;
+static int flags_fds(const int fds[], unsigned n_storage_fds, unsigned n_socket_fds, bool nonblock) {
+        unsigned i, n_fds;
         int r;
 
+        n_fds = n_storage_fds + n_socket_fds;
         if (n_fds <= 0)
                 return 0;
 
         assert(fds);
 
-        /* Drops/Sets O_NONBLOCK and FD_CLOEXEC from the file flags */
+        /* Drops/Sets O_NONBLOCK and FD_CLOEXEC from the file flags.
+         * O_NONBLOCK only applies to socket activation though. */
 
         for (i = 0; i < n_fds; i++) {
 
-                r = fd_nonblock(fds[i], nonblock);
-                if (r < 0)
-                        return r;
+                if (i < n_socket_fds) {
+                        r = fd_nonblock(fds[i], nonblock);
+                        if (r < 0)
+                                return r;
+                }
 
                 /* We unconditionally drop FD_CLOEXEC from the fds,
                  * since after all we want to pass these fds to our
@@ -1095,7 +1099,7 @@ static int setup_pam(
 
         assert_se(sigprocmask_many(SIG_BLOCK, &old_ss, SIGTERM, -1) >= 0);
 
-        parent_pid = getpid();
+        parent_pid = getpid_cached();
 
         pam_pid = fork();
         if (pam_pid < 0) {
@@ -1502,7 +1506,7 @@ static int build_environment(
         if (n_fds > 0) {
                 _cleanup_free_ char *joined = NULL;
 
-                if (asprintf(&x, "LISTEN_PID="PID_FMT, getpid()) < 0)
+                if (asprintf(&x, "LISTEN_PID="PID_FMT, getpid_cached()) < 0)
                         return -ENOMEM;
                 our_env[n_env++] = x;
 
@@ -1521,7 +1525,7 @@ static int build_environment(
         }
 
         if ((p->flags & EXEC_SET_WATCHDOG) && p->watchdog_usec > 0) {
-                if (asprintf(&x, "WATCHDOG_PID="PID_FMT, getpid()) < 0)
+                if (asprintf(&x, "WATCHDOG_PID="PID_FMT, getpid_cached()) < 0)
                         return -ENOMEM;
                 our_env[n_env++] = x;
 
@@ -1670,7 +1674,7 @@ static bool exec_needs_mount_namespace(
             context->protect_control_groups)
                 return true;
 
-        if (context->mount_apivfs)
+        if (context->mount_apivfs && (context->root_image || context->root_directory))
                 return true;
 
         return false;
@@ -2188,7 +2192,9 @@ static int exec_child(
                 char **argv,
                 int socket_fd,
                 int named_iofds[3],
-                int *fds, unsigned n_fds,
+                int *fds,
+                unsigned n_storage_fds,
+                unsigned n_socket_fds,
                 char **files_env,
                 int user_lookup_fd,
                 int *exit_status,
@@ -2205,6 +2211,7 @@ static int exec_child(
         uid_t uid = UID_INVALID;
         gid_t gid = GID_INVALID;
         int i, r, ngids = 0;
+        unsigned n_fds;
 
         assert(unit);
         assert(command);
@@ -2245,6 +2252,7 @@ static int exec_child(
 
         log_forget_fds();
 
+        n_fds = n_storage_fds + n_socket_fds;
         r = close_remaining_fds(params, runtime, dcreds, user_lookup_fd, socket_fd, fds, n_fds);
         if (r < 0) {
                 *exit_status = EXIT_FDS;
@@ -2458,7 +2466,7 @@ static int exec_child(
                 }
 
         if (context->utmp_id)
-                utmp_put_init_process(context->utmp_id, getpid(), getsid(0),
+                utmp_put_init_process(context->utmp_id, getpid_cached(), getsid(0),
                                       context->tty_path,
                                       context->utmp_mode == EXEC_UTMP_INIT  ? INIT_PROCESS :
                                       context->utmp_mode == EXEC_UTMP_LOGIN ? LOGIN_PROCESS :
@@ -2610,7 +2618,7 @@ static int exec_child(
         if (r >= 0)
                 r = shift_fds(fds, n_fds);
         if (r >= 0)
-                r = flags_fds(fds, n_fds, context->non_blocking);
+                r = flags_fds(fds, n_storage_fds, n_socket_fds, context->non_blocking);
         if (r < 0) {
                 *exit_status = EXIT_FDS;
                 return r;
@@ -2828,9 +2836,9 @@ static int exec_child(
                 if (line) {
                         log_open();
                         log_struct(LOG_DEBUG,
-                                   LOG_UNIT_ID(unit),
                                    "EXECUTABLE=%s", command->path,
                                    LOG_UNIT_MESSAGE(unit, "Executing: %s", line),
+                                   LOG_UNIT_ID(unit),
                                    NULL);
                         log_close();
                 }
@@ -2850,7 +2858,8 @@ int exec_spawn(Unit *unit,
                pid_t *ret) {
 
         _cleanup_strv_free_ char **files_env = NULL;
-        int *fds = NULL; unsigned n_fds = 0;
+        int *fds = NULL;
+        unsigned n_storage_fds = 0, n_socket_fds = 0;
         _cleanup_free_ char *line = NULL;
         int socket_fd, r;
         int named_iofds[3] = { -1, -1, -1 };
@@ -2862,18 +2871,18 @@ int exec_spawn(Unit *unit,
         assert(context);
         assert(ret);
         assert(params);
-        assert(params->fds || params->n_fds <= 0);
+        assert(params->fds || (params->n_storage_fds + params->n_socket_fds <= 0));
 
         if (context->std_input == EXEC_INPUT_SOCKET ||
             context->std_output == EXEC_OUTPUT_SOCKET ||
             context->std_error == EXEC_OUTPUT_SOCKET) {
 
-                if (params->n_fds > 1) {
+                if (params->n_socket_fds > 1) {
                         log_unit_error(unit, "Got more than one socket.");
                         return -EINVAL;
                 }
 
-                if (params->n_fds == 0) {
+                if (params->n_socket_fds == 0) {
                         log_unit_error(unit, "Got no socket.");
                         return -EINVAL;
                 }
@@ -2882,7 +2891,8 @@ int exec_spawn(Unit *unit,
         } else {
                 socket_fd = -1;
                 fds = params->fds;
-                n_fds = params->n_fds;
+                n_storage_fds = params->n_storage_fds;
+                n_socket_fds = params->n_socket_fds;
         }
 
         r = exec_context_named_iofds(unit, context, params, named_iofds);
@@ -2899,9 +2909,9 @@ int exec_spawn(Unit *unit,
                 return log_oom();
 
         log_struct(LOG_DEBUG,
-                   LOG_UNIT_ID(unit),
                    LOG_UNIT_MESSAGE(unit, "About to execute: %s", line),
                    "EXECUTABLE=%s", command->path,
+                   LOG_UNIT_ID(unit),
                    NULL);
         pid = fork();
         if (pid < 0)
@@ -2920,7 +2930,9 @@ int exec_spawn(Unit *unit,
                                argv,
                                socket_fd,
                                named_iofds,
-                               fds, n_fds,
+                               fds,
+                               n_storage_fds,
+                               n_socket_fds,
                                files_env,
                                unit->manager->user_lookup_fds[1],
                                &exit_status,
@@ -2933,6 +2945,14 @@ int exec_spawn(Unit *unit,
                                                  LOG_UNIT_ID(unit),
                                                  LOG_UNIT_MESSAGE(unit, "%s: %m",
                                                                   error_message),
+                                                 "EXECUTABLE=%s", command->path,
+                                                 NULL);
+                        else if (r == -ENOENT && command->ignore)
+                                log_struct_errno(LOG_INFO, r,
+                                                 "MESSAGE_ID=" SD_MESSAGE_SPAWN_FAILED_STR,
+                                                 LOG_UNIT_ID(unit),
+                                                 LOG_UNIT_MESSAGE(unit, "Skipped spawning %s: %m",
+                                                                  command->path),
                                                  "EXECUTABLE=%s", command->path,
                                                  NULL);
                         else
@@ -3020,6 +3040,7 @@ void exec_context_done(ExecContext *c) {
         c->utmp_id = mfree(c->utmp_id);
         c->selinux_context = mfree(c->selinux_context);
         c->apparmor_profile = mfree(c->apparmor_profile);
+        c->smack_process_label = mfree(c->smack_process_label);
 
         c->syscall_filter = set_free(c->syscall_filter);
         c->syscall_archs = set_free(c->syscall_archs);
@@ -3121,6 +3142,7 @@ const char* exec_context_fdname(const ExecContext *c, int fd_index) {
 int exec_context_named_iofds(Unit *unit, const ExecContext *c, const ExecParameters *p, int named_iofds[3]) {
         unsigned i, targets;
         const char* stdio_fdname[3];
+        unsigned n_fds;
 
         assert(c);
         assert(p);
@@ -3132,7 +3154,9 @@ int exec_context_named_iofds(Unit *unit, const ExecContext *c, const ExecParamet
         for (i = 0; i < 3; i++)
                 stdio_fdname[i] = exec_context_fdname(c, i);
 
-        for (i = 0; i < p->n_fds && targets > 0; i++)
+        n_fds = p->n_storage_fds + p->n_socket_fds;
+
+        for (i = 0; i < n_fds  && targets > 0; i++)
                 if (named_iofds[STDIN_FILENO] < 0 &&
                     c->std_input == EXEC_INPUT_NAMED_FD &&
                     stdio_fdname[STDIN_FILENO] &&
@@ -3170,10 +3194,10 @@ int exec_context_load_environment(Unit *unit, const ExecContext *c, char ***l) {
         STRV_FOREACH(i, c->environment_files) {
                 char *fn;
                 int k;
+                unsigned n;
                 bool ignore = false;
                 char **p;
                 _cleanup_globfree_ glob_t pglob = {};
-                int count, n;
 
                 fn = *i;
 
@@ -3191,23 +3215,19 @@ int exec_context_load_environment(Unit *unit, const ExecContext *c, char ***l) {
                 }
 
                 /* Filename supports globbing, take all matching files */
-                errno = 0;
-                if (glob(fn, 0, NULL, &pglob) != 0) {
+                k = safe_glob(fn, 0, &pglob);
+                if (k < 0) {
                         if (ignore)
                                 continue;
 
                         strv_free(r);
-                        return errno > 0 ? -errno : -EINVAL;
+                        return k;
                 }
-                count = pglob.gl_pathc;
-                if (count == 0) {
-                        if (ignore)
-                                continue;
 
-                        strv_free(r);
-                        return -EINVAL;
-                }
-                for (n = 0; n < count; n++) {
+                /* When we don't match anything, -ENOENT should be returned */
+                assert(pglob.gl_pathc > 0);
+
+                for (n = 0; n < pglob.gl_pathc; n++) {
                         k = load_env_file(NULL, pglob.gl_pathv[n], NULL, &p);
                         if (k < 0) {
                                 if (ignore)
@@ -3535,6 +3555,16 @@ void exec_context_dump(ExecContext *c, FILE* f, const char *prefix) {
                         "%sSELinuxContext: %s%s\n",
                         prefix, c->selinux_context_ignore ? "-" : "", c->selinux_context);
 
+        if (c->apparmor_profile)
+                fprintf(f,
+                        "%sAppArmorProfile: %s%s\n",
+                        prefix, c->apparmor_profile_ignore ? "-" : "", c->apparmor_profile);
+
+        if (c->smack_process_label)
+                fprintf(f,
+                        "%sSmackProcessLabel: %s%s\n",
+                        prefix, c->smack_process_label_ignore ? "-" : "", c->smack_process_label);
+
         if (c->personality != PERSONALITY_INVALID)
                 fprintf(f,
                         "%sPersonality: %s\n",
@@ -3621,6 +3651,21 @@ bool exec_context_maintains_privileges(ExecContext *c) {
                 return true;
 
         return false;
+}
+
+int exec_context_get_effective_ioprio(ExecContext *c) {
+        int p;
+
+        assert(c);
+
+        if (c->ioprio_set)
+                return c->ioprio;
+
+        p = ioprio_get(IOPRIO_WHO_PROCESS, 0);
+        if (p < 0)
+                return IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, 4);
+
+        return p;
 }
 
 void exec_status_start(ExecStatus *s, pid_t pid) {

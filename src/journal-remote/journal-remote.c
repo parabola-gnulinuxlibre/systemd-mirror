@@ -86,7 +86,7 @@ static int spawn_child(const char* child, char** argv) {
         if (pipe(fd) < 0)
                 return log_error_errno(errno, "Failed to create pager pipe: %m");
 
-        parent_pid = getpid();
+        parent_pid = getpid_cached();
 
         child_pid = fork();
         if (child_pid < 0) {
@@ -529,7 +529,7 @@ static int process_http_upload(
                         log_warning("Failed to process data for connection %p", connection);
                         if (r == -E2BIG)
                                 return mhd_respondf(connection,
-                                                    r, MHD_HTTP_REQUEST_ENTITY_TOO_LARGE,
+                                                    r, MHD_HTTP_PAYLOAD_TOO_LARGE,
                                                     "Entry is too large, maximum is " STRINGIFY(DATA_SIZE_MAX) " bytes.");
                         else
                                 return mhd_respondf(connection,
@@ -1200,9 +1200,9 @@ static int parse_config(void) {
                 {}};
 
         return config_parse_many_nulstr(PKGSYSCONFDIR "/journal-remote.conf",
-                                 CONF_PATHS_NULSTR("systemd/journal-remote.conf.d"),
-                                 "Remote\0", config_item_table_lookup, items,
-                                 false, NULL);
+                                        CONF_PATHS_NULSTR("systemd/journal-remote.conf.d"),
+                                        "Remote\0", config_item_table_lookup, items,
+                                        false, NULL);
 }
 
 static void help(void) {
@@ -1564,7 +1564,7 @@ int main(int argc, char **argv) {
                 log_debug("Watchdog is %sd.", enable_disable(r > 0));
 
         log_debug("%s running as pid "PID_FMT,
-                  program_invocation_short_name, getpid());
+                  program_invocation_short_name, getpid_cached());
         sd_notify(false,
                   "READY=1\n"
                   "STATUS=Processing requests...");

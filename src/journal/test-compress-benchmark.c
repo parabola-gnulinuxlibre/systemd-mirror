@@ -30,6 +30,8 @@ typedef int (compress_t)(const void *src, uint64_t src_size, void *dst,
 typedef int (decompress_t)(const void *src, uint64_t src_size,
                            void **dst, size_t *dst_alloc_size, size_t* dst_size, size_t dst_max);
 
+#if defined(HAVE_XZ) || defined(HAVE_LZ4)
+
 static usec_t arg_duration = 2 * USEC_PER_SEC;
 static size_t arg_start;
 
@@ -151,8 +153,10 @@ static void test_compress_decompress(const char* label, const char* type,
                  100 - compressed * 100. / total,
                  skipped);
 }
+#endif
 
 int main(int argc, char *argv[]) {
+#if defined(HAVE_XZ) || defined(HAVE_LZ4)
         const char *i;
 
         log_set_max_level(LOG_INFO);
@@ -166,7 +170,7 @@ int main(int argc, char *argv[]) {
         if (argc == 3)
                 (void) safe_atozu(argv[2], &arg_start);
         else
-                arg_start = getpid();
+                arg_start = getpid_cached();
 
         NULSTR_FOREACH(i, "zeros\0simple\0random\0") {
 #ifdef HAVE_XZ
@@ -177,4 +181,7 @@ int main(int argc, char *argv[]) {
 #endif
         }
         return 0;
+#else
+        return EXIT_TEST_SKIP;
+#endif
 }

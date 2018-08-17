@@ -474,10 +474,10 @@ static int automount_send_ready(Automount *a, Set *tokens, int status) {
         while ((token = PTR_TO_UINT(set_steal_first(tokens)))) {
                 int k;
 
-                /* Autofs fun fact II:
+                /* Autofs fun fact:
                  *
-                 * if you pass a positive status code here, the kernel will
-                 * freeze! Yay! */
+                 * if you pass a positive status code here, kernels
+                 * prior to 4.12 will freeze! Yay! */
 
                 k = autofs_send_ready(UNIT(a)->manager->dev_autofs_fd,
                                       ioctl_fd,
@@ -590,7 +590,7 @@ static void automount_enter_waiting(Automount *a) {
         }
 
         xsprintf(options, "fd=%i,pgrp="PID_FMT",minproto=5,maxproto=5,direct", p[1], getpgrp());
-        xsprintf(name, "systemd-"PID_FMT, getpid());
+        xsprintf(name, "systemd-"PID_FMT, getpid_cached());
         if (mount(name, a->where, "autofs", 0, options) < 0) {
                 r = -errno;
                 goto fail;
@@ -618,12 +618,6 @@ static void automount_enter_waiting(Automount *a) {
         r = autofs_set_timeout(dev_autofs_fd, ioctl_fd, a->timeout_idle_usec);
         if (r < 0)
                 goto fail;
-
-        /* Autofs fun fact:
-         *
-         * Unless we close the ioctl fd here, for some weird reason
-         * the direct mount will not receive events from the
-         * kernel. */
 
         r = sd_event_add_io(UNIT(a)->manager->event, &a->pipe_event_source, p[0], EPOLLIN, automount_dispatch_io, a);
         if (r < 0)
@@ -745,8 +739,9 @@ static void automount_stop_expire(Automount *a) {
         (void) sd_event_source_set_enabled(a->expire_event_source, SD_EVENT_OFF);
 }
 
-static void automount_enter_runnning(Automount *a) {
+static void automount_enter_running(Automount *a) {
         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
+        Unit *trigger;
         struct stat st;
         int r;
 
@@ -775,22 +770,24 @@ static void automount_enter_runnning(Automount *a) {
                 goto fail;
         }
 
-        if (!S_ISDIR(st.st_mode) || st.st_dev != a->dev_id)
+        /* The mount unit may have been explicitly started before we got the
+         * autofs request. Ack it to unblock anything waiting on the mount point. */
+        if (!S_ISDIR(st.st_mode) || st.st_dev != a->dev_id) {
                 log_unit_info(UNIT(a), "Automount point already active?");
-        else {
-                Unit *trigger;
+                automount_send_ready(a, a->tokens, 0);
+                return;
+        }
 
-                trigger = UNIT_TRIGGER(UNIT(a));
-                if (!trigger) {
-                        log_unit_error(UNIT(a), "Unit to trigger vanished.");
-                        goto fail;
-                }
+        trigger = UNIT_TRIGGER(UNIT(a));
+        if (!trigger) {
+                log_unit_error(UNIT(a), "Unit to trigger vanished.");
+                goto fail;
+        }
 
-                r = manager_add_job(UNIT(a)->manager, JOB_START, trigger, JOB_REPLACE, &error, NULL);
-                if (r < 0) {
-                        log_unit_warning(UNIT(a), "Failed to queue mount startup job: %s", bus_error_message(&error, r));
-                        goto fail;
-                }
+        r = manager_add_job(UNIT(a)->manager, JOB_START, trigger, JOB_REPLACE, &error, NULL);
+        if (r < 0) {
+                log_unit_warning(UNIT(a), "Failed to queue mount startup job: %s", bus_error_message(&error, r));
+                goto fail;
         }
 
         automount_set_state(a, AUTOMOUNT_RUNNING);
@@ -973,7 +970,6 @@ static int automount_dispatch_io(sd_event_source *s, int fd, uint32_t events, vo
         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
         union autofs_v5_packet_union packet;
         Automount *a = AUTOMOUNT(userdata);
-        struct stat st;
         Unit *trigger;
         int r;
 
@@ -1015,7 +1011,7 @@ static int automount_dispatch_io(sd_event_source *s, int fd, uint32_t events, vo
                         goto fail;
                 }
 
-                automount_enter_runnning(a);
+                automount_enter_running(a);
                 break;
 
         case autofs_ptype_expire_direct:
@@ -1033,18 +1029,6 @@ static int automount_dispatch_io(sd_event_source *s, int fd, uint32_t events, vo
                 if (r < 0) {
                         log_unit_error_errno(UNIT(a), r, "Failed to remember token: %m");
                         goto fail;
-                }
-
-                /* Before we do anything, let's see if somebody is playing games with us? */
-                if (lstat(a->where, &st) < 0) {
-                        log_unit_warning_errno(UNIT(a), errno, "Failed to stat automount point: %m");
-                        goto fail;
-                }
-
-                if (!S_ISDIR(st.st_mode) || st.st_dev == a->dev_id) {
-                        log_unit_info(UNIT(a), "Automount point already unmounted?");
-                        automount_send_ready(a, a->expire_tokens, 0);
-                        break;
                 }
 
                 trigger = UNIT_TRIGGER(UNIT(a));

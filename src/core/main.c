@@ -154,7 +154,7 @@ noreturn static void crash(int sig) {
         struct sigaction sa;
         pid_t pid;
 
-        if (getpid() != 1)
+        if (getpid_cached() != 1)
                 /* Pass this on immediately, if this is not PID 1 */
                 (void) raise(sig);
         else if (!arg_dump_core)
@@ -536,7 +536,7 @@ static int config_parse_cpu_affinity2(
                 return ncpus;
 
         if (sched_setaffinity(0, CPU_ALLOC_SIZE(ncpus), c) < 0)
-                log_warning("Failed to set CPU affinity: %m");
+                log_warning_errno(errno, "Failed to set CPU affinity: %m");
 
         return 0;
 }
@@ -860,7 +860,7 @@ static int parse_argv(int argc, char *argv[]) {
         assert(argc >= 1);
         assert(argv);
 
-        if (getpid() == 1)
+        if (getpid_cached() == 1)
                 opterr = 0;
 
         while ((c = getopt_long(argc, argv, "hDbsz:", options, NULL)) >= 0)
@@ -1066,7 +1066,7 @@ static int parse_argv(int argc, char *argv[]) {
                          * parse_proc_cmdline_word() or ignore. */
 
                 case '?':
-                        if (getpid() != 1)
+                        if (getpid_cached() != 1)
                                 return -EINVAL;
                         else
                                 return 0;
@@ -1075,7 +1075,7 @@ static int parse_argv(int argc, char *argv[]) {
                         assert_not_reached("Unhandled option code.");
                 }
 
-        if (optind < argc && getpid() != 1) {
+        if (optind < argc && getpid_cached() != 1) {
                 /* Hmm, when we aren't run as init system
                  * let's complain about excess arguments */
 
@@ -1091,6 +1091,7 @@ static int help(void) {
         printf("%s [OPTIONS...]\n\n"
                "Starts up and maintains the system or user services.\n\n"
                "  -h --help                      Show this help\n"
+               "     --version                   Show version\n"
                "     --test                      Determine startup sequence, dump it and exit\n"
                "     --no-pager                  Do not pipe output into a pager\n"
                "     --dump-configuration-items  Dump understood unit configuration items\n"
@@ -1162,6 +1163,8 @@ static int prepare_reexecute(Manager *m, FILE **_f, FDSet **_fds, bool switching
 static int bump_rlimit_nofile(struct rlimit *saved_rlimit) {
         struct rlimit nl;
         int r;
+        int min_max;
+        _cleanup_free_ char *nr_open = NULL;
 
         assert(saved_rlimit);
 
@@ -1182,8 +1185,16 @@ static int bump_rlimit_nofile(struct rlimit *saved_rlimit) {
                 arg_default_rlimit[RLIMIT_NOFILE] = rl;
         }
 
+        /* Get current RLIMIT_NOFILE maximum compiled into the kernel. */
+        r = read_one_line_file("/proc/sys/fs/nr_open", &nr_open);
+        if (r == 0)
+                r = safe_atoi(nr_open, &min_max);
+        /* If we fail, fallback to the hard-coded kernel limit of 1024 * 1024. */
+        if (r < 0)
+                min_max = 1024 * 1024;
+
         /* Bump up the resource limit for ourselves substantially */
-        nl.rlim_cur = nl.rlim_max = 64*1024;
+        nl.rlim_cur = nl.rlim_max = min_max;
         r = setrlimit_closest(RLIMIT_NOFILE, &nl);
         if (r < 0)
                 return log_warning_errno(r, "Setting RLIMIT_NOFILE failed, ignoring: %m");
@@ -1378,7 +1389,7 @@ int main(int argc, char *argv[]) {
         const char *error_message = NULL;
 
 #ifdef HAVE_SYSV_COMPAT
-        if (getpid() != 1 && strstr(program_invocation_short_name, "init")) {
+        if (getpid_cached() != 1 && strstr(program_invocation_short_name, "init")) {
                 /* This is compatibility support for SysV, where
                  * calling init as a user is identical to telinit. */
 
@@ -1414,7 +1425,7 @@ int main(int argc, char *argv[]) {
 
         log_set_upgrade_syslog_to_journal(true);
 
-        if (getpid() == 1) {
+        if (getpid_cached() == 1) {
                 /* Disable the umask logic */
                 umask(0);
 
@@ -1425,7 +1436,7 @@ int main(int argc, char *argv[]) {
                 log_set_always_reopen_console(true);
         }
 
-        if (getpid() == 1 && detect_container() <= 0) {
+        if (getpid_cached() == 1 && detect_container() <= 0) {
 
                 /* Running outside of a container as PID 1 */
                 arg_system = true;
@@ -1510,7 +1521,7 @@ int main(int argc, char *argv[]) {
                  * might redirect output elsewhere. */
                 log_set_target(LOG_TARGET_JOURNAL_OR_KMSG);
 
-        } else if (getpid() == 1) {
+        } else if (getpid_cached() == 1) {
                 /* Running inside a container, as PID 1 */
                 arg_system = true;
                 log_set_target(LOG_TARGET_CONSOLE);
@@ -1534,7 +1545,7 @@ int main(int argc, char *argv[]) {
                 kernel_timestamp = DUAL_TIMESTAMP_NULL;
         }
 
-        if (getpid() == 1) {
+        if (getpid_cached() == 1) {
                 /* Don't limit the core dump size, so that coredump handlers such as systemd-coredump (which honour the limit)
                  * will process core dumps for system services by default. */
                 if (setrlimit(RLIMIT_CORE, &RLIMIT_MAKE_CONST(RLIM_INFINITY)) < 0)
@@ -1569,7 +1580,7 @@ int main(int argc, char *argv[]) {
 
         /* Mount /proc, /sys and friends, so that /proc/cmdline and
          * /proc/$PID/fd is available. */
-        if (getpid() == 1) {
+        if (getpid_cached() == 1) {
 
                 /* Load the kernel modules early, so that we kdbus.ko is loaded before kdbusfs shall be mounted */
                 if (!skip_setup)
@@ -1695,7 +1706,7 @@ int main(int argc, char *argv[]) {
                  * tty. */
                 release_terminal();
 
-                if (getpid() == 1 && !skip_setup)
+                if (getpid_cached() == 1 && !skip_setup)
                         console_setup();
         }
 
@@ -1707,7 +1718,7 @@ int main(int argc, char *argv[]) {
 
         /* Make sure we leave a core dump without panicing the
          * kernel. */
-        if (getpid() == 1) {
+        if (getpid_cached() == 1) {
                 install_crash_handler();
 
                 r = mount_cgroup_controllers(arg_join_controllers);
@@ -1770,7 +1781,7 @@ int main(int argc, char *argv[]) {
                 if (prctl(PR_SET_TIMERSLACK, arg_timer_slack_nsec) < 0)
                         log_error_errno(errno, "Failed to adjust timer slack: %m");
 
-        if (!cap_test_all(arg_capability_bounding_set)) {
+        if (arg_system && !cap_test_all(arg_capability_bounding_set)) {
                 r = capability_bounding_set_drop_usermode(arg_capability_bounding_set);
                 if (r < 0) {
                         log_emergency_errno(r, "Failed to drop capability bounding set of usermode helpers: %m");
@@ -2141,7 +2152,7 @@ finish:
          * here explicitly. valgrind will only generate nice output on
          * exit(), not on exec(), hence let's do the former not the
          * latter here. */
-        if (getpid() == 1 && RUNNING_ON_VALGRIND)
+        if (getpid_cached() == 1 && RUNNING_ON_VALGRIND)
                 return 0;
 #endif
 
@@ -2217,10 +2228,10 @@ finish:
 
                 execve(SYSTEMD_SHUTDOWN_BINARY_PATH, (char **) command_line, env_block);
                 log_error_errno(errno, "Failed to execute shutdown binary, %s: %m",
-                          getpid() == 1 ? "freezing" : "quitting");
+                          getpid_cached() == 1 ? "freezing" : "quitting");
         }
 
-        if (getpid() == 1) {
+        if (getpid_cached() == 1) {
                 if (error_message)
                         manager_status_printf(NULL, STATUS_TYPE_EMERGENCY,
                                               ANSI_HIGHLIGHT_RED "!!!!!!" ANSI_NORMAL,

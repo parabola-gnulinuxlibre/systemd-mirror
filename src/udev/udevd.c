@@ -174,7 +174,7 @@ static void event_free(struct event *event) {
 
         if (udev_list_node_is_empty(&event->manager->events)) {
                 /* only clean up the queue from the process that created it */
-                if (event->manager->pid == getpid()) {
+                if (event->manager->pid == getpid_cached()) {
                         r = unlink("/run/udev/queue");
                         if (r < 0)
                                 log_warning_errno(errno, "could not unlink /run/udev/queue: %m");
@@ -284,12 +284,12 @@ static void worker_attach_event(struct worker *worker, struct event *event) {
 
         e = worker->manager->event;
 
-        assert_se(sd_event_now(e, clock_boottime_or_monotonic(), &usec) >= 0);
+        assert_se(sd_event_now(e, CLOCK_MONOTONIC, &usec) >= 0);
 
-        (void) sd_event_add_time(e, &event->timeout_warning, clock_boottime_or_monotonic(),
+        (void) sd_event_add_time(e, &event->timeout_warning, CLOCK_MONOTONIC,
                                  usec + arg_event_timeout_warn_usec, USEC_PER_SEC, on_event_timeout_warning, event);
 
-        (void) sd_event_add_time(e, &event->timeout, clock_boottime_or_monotonic(),
+        (void) sd_event_add_time(e, &event->timeout, CLOCK_MONOTONIC,
                                  usec + arg_event_timeout_usec, USEC_PER_SEC, on_event_timeout, event);
 }
 
@@ -593,9 +593,9 @@ static int event_queue_insert(Manager *manager, struct udev_device *dev) {
 
         /* only one process can add events to the queue */
         if (manager->pid == 0)
-                manager->pid = getpid();
+                manager->pid = getpid_cached();
 
-        assert(manager->pid == getpid());
+        assert(manager->pid == getpid_cached());
 
         event = new0(struct event, 1);
         if (!event)
@@ -755,9 +755,9 @@ static void manager_exit(Manager *manager) {
         event_queue_cleanup(manager, EVENT_QUEUED);
         manager_kill_workers(manager);
 
-        assert_se(sd_event_now(manager->event, clock_boottime_or_monotonic(), &usec) >= 0);
+        assert_se(sd_event_now(manager->event, CLOCK_MONOTONIC, &usec) >= 0);
 
-        r = sd_event_add_time(manager->event, NULL, clock_boottime_or_monotonic(),
+        r = sd_event_add_time(manager->event, NULL, CLOCK_MONOTONIC,
                               usec + 30 * USEC_PER_SEC, USEC_PER_SEC, on_exit_timeout, manager);
         if (r < 0)
                 return;
@@ -791,7 +791,7 @@ static void event_queue_start(Manager *manager) {
             manager->exit || manager->stop_exec_queue)
                 return;
 
-        assert_se(sd_event_now(manager->event, clock_boottime_or_monotonic(), &usec) >= 0);
+        assert_se(sd_event_now(manager->event, CLOCK_MONOTONIC, &usec) >= 0);
         /* check for changed config, every 3 seconds at most */
         if (manager->last_usec == 0 ||
             (usec - manager->last_usec) > 3 * USEC_PER_SEC) {
@@ -1492,7 +1492,7 @@ static int parse_argv(int argc, char *argv[]) {
                         help();
                         return 0;
                 case 'V':
-                        printf("%s\n", VERSION);
+                        printf("%s\n", PACKAGE_VERSION);
                         return 0;
                 case '?':
                         return -EINVAL;
@@ -1663,6 +1663,7 @@ int main(int argc, char *argv[]) {
         int r;
 
         log_set_target(LOG_TARGET_AUTO);
+        udev_parse_config();
         log_parse_environment();
         log_open();
 
@@ -1740,7 +1741,7 @@ int main(int argc, char *argv[]) {
         if (arg_daemonize) {
                 pid_t pid;
 
-                log_info("starting version " VERSION);
+                log_info("starting version " PACKAGE_VERSION);
 
                 /* connect /dev/null to stdin, stdout, stderr */
                 if (log_get_max_level() < LOG_DEBUG) {

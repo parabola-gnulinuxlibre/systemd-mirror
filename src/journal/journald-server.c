@@ -918,7 +918,7 @@ static void dispatch_message_real(
                 }
 
 #ifdef HAVE_SELINUX
-                if (mac_selinux_have()) {
+                if (mac_selinux_use()) {
                         if (label) {
                                 x = alloca(strlen("_SELINUX_CONTEXT=") + label_len + 1);
 
@@ -1095,7 +1095,7 @@ void server_driver_message(Server *s, const char *message_id, const char *format
         /* Error handling below */
         va_end(ap);
 
-        ucred.pid = getpid();
+        ucred.pid = getpid_cached();
         ucred.uid = getuid();
         ucred.gid = getgid();
 
@@ -1637,10 +1637,10 @@ static int server_parse_config_file(Server *s) {
         assert(s);
 
         return config_parse_many_nulstr(PKGSYSCONFDIR "/journald.conf",
-                                 CONF_PATHS_NULSTR("systemd/journald.conf.d"),
-                                 "Journal\0",
-                                 config_item_perf_lookup, journald_gperf_lookup,
-                                 false, s);
+                                        CONF_PATHS_NULSTR("systemd/journald.conf.d"),
+                                        "Journal\0",
+                                        config_item_perf_lookup, journald_gperf_lookup,
+                                        false, s);
 }
 
 static int server_dispatch_sync(sd_event_source *es, usec_t t, void *userdata) {

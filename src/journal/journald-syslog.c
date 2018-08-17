@@ -99,7 +99,7 @@ static void forward_syslog_iovec(Server *s, const struct iovec *iovec, unsigned 
                  * let's fix it as good as we can, and retry */
 
                 u = *ucred;
-                u.pid = getpid();
+                u.pid = getpid_cached();
                 memcpy(CMSG_DATA(cmsg), &u, sizeof(struct ucred));
 
                 if (sendmsg(s->syslog_fd, &msghdr, MSG_NOSIGNAL) >= 0)
@@ -410,7 +410,7 @@ int server_open_syslog_socket(Server *s) {
                 return log_error_errno(errno, "SO_PASSCRED failed: %m");
 
 #ifdef HAVE_SELINUX
-        if (mac_selinux_have()) {
+        if (mac_selinux_use()) {
                 r = setsockopt(s->syslog_fd, SOL_SOCKET, SO_PASSSEC, &one, sizeof(one));
                 if (r < 0)
                         log_warning_errno(errno, "SO_PASSSEC failed: %m");
