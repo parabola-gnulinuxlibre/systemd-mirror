@@ -26,7 +26,7 @@
 #include "escape.h"
 #include "fd-util.h"
 #include "fileio.h"
-#include "formats-util.h"
+#include "format-util.h"
 #include "logind-inhibit.h"
 #include "mkdir.h"
 #include "parse-util.h"
@@ -294,7 +294,7 @@ int inhibitor_create_fifo(Inhibitor *i) {
                 if (r < 0)
                         return r;
 
-                i->fifo_path = strjoin("/run/systemd/inhibit/", i->id, ".ref", NULL);
+                i->fifo_path = strjoin("/run/systemd/inhibit/", i->id, ".ref");
                 if (!i->fifo_path)
                         return -ENOMEM;
 
@@ -347,7 +347,7 @@ InhibitWhat manager_inhibit_what(Manager *m, InhibitMode mm) {
         assert(m);
 
         HASHMAP_FOREACH(i, m->inhibitors, j)
-                if (i->mode == mm)
+                if (i->mode == mm && i->started)
                         what |= i->what;
 
         return what;
@@ -388,6 +388,9 @@ bool manager_is_inhibited(
         assert(w > 0 && w < _INHIBIT_WHAT_MAX);
 
         HASHMAP_FOREACH(i, m->inhibitors, j) {
+                if (!i->started)
+                        continue;
+
                 if (!(i->what & w))
                         continue;
 

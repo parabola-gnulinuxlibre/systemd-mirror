@@ -24,7 +24,9 @@
 #include "dhcp-lease-internal.h"
 #include "hostname-util.h"
 #include "network-internal.h"
-#include "networkd.h"
+#include "networkd-link.h"
+#include "networkd-manager.h"
+#include "networkd-network.h"
 
 static int dhcp4_route_handler(sd_netlink *rtnl, sd_netlink_message *m,
                                void *userdata) {
@@ -50,8 +52,21 @@ static int dhcp4_route_handler(sd_netlink *rtnl, sd_netlink_message *m,
         return 1;
 }
 
+static int route_scope_from_address(const Route *route, const struct in_addr *self_addr) {
+        assert(route);
+        assert(self_addr);
+
+        if (in_addr_is_localhost(AF_INET, &route->dst) ||
+            (self_addr->s_addr && route->dst.in.s_addr == self_addr->s_addr))
+                return RT_SCOPE_HOST;
+        else if (in4_addr_is_null(&route->gw.in))
+                return RT_SCOPE_LINK;
+        else
+                return RT_SCOPE_UNIVERSE;
+}
+
 static int link_set_dhcp_routes(Link *link) {
-        struct in_addr gateway;
+        struct in_addr gateway, address;
         _cleanup_free_ sd_dhcp_route **static_routes = NULL;
         int r, n, i;
 
@@ -62,18 +77,17 @@ static int link_set_dhcp_routes(Link *link) {
         if (!link->network->dhcp_use_routes)
                 return 0;
 
+        r = sd_dhcp_lease_get_address(link->dhcp_lease, &address);
+        if (r < 0)
+                return log_link_warning_errno(link, r, "DHCP error: could not get address: %m");
+
         r = sd_dhcp_lease_get_router(link->dhcp_lease, &gateway);
         if (r < 0 && r != -ENODATA)
                 return log_link_warning_errno(link, r, "DHCP error: could not get gateway: %m");
 
         if (r >= 0) {
-                struct in_addr address;
                 _cleanup_route_free_ Route *route = NULL;
                 _cleanup_route_free_ Route *route_gw = NULL;
-
-                r = sd_dhcp_lease_get_address(link->dhcp_lease, &address);
-                if (r < 0)
-                        return log_link_warning_errno(link, r, "DHCP error: could not get address: %m");
 
                 r = route_new(&route);
                 if (r < 0)
@@ -139,6 +153,7 @@ static int link_set_dhcp_routes(Link *link) {
                 assert_se(sd_dhcp_route_get_destination_prefix_length(static_routes[i], &route->dst_prefixlen) >= 0);
                 route->priority = link->network->dhcp_route_metric;
                 route->table = link->network->dhcp_route_table;
+                route->scope = route_scope_from_address(route, &address);
 
                 r = route_configure(route, link, dhcp4_route_handler);
                 if (r < 0)
@@ -253,7 +268,7 @@ static int dhcp_lease_lost(Link *link) {
 
                 if (hostname) {
                         /* If a hostname was set due to the lease, then unset it now. */
-                        r = link_set_hostname(link, NULL);
+                        r = manager_set_hostname(link->manager, NULL);
                         if (r < 0)
                                 log_link_warning_errno(link, r, "Failed to reset transient hostname: %m");
                 }
@@ -437,7 +452,7 @@ static int dhcp_lease_acquired(sd_dhcp_client *client, Link *link) {
                         (void) sd_dhcp_lease_get_hostname(lease, &hostname);
 
                 if (hostname) {
-                        r = link_set_hostname(link, hostname);
+                        r = manager_set_hostname(link->manager, hostname);
                         if (r < 0)
                                 log_link_error_errno(link, r, "Failed to set transient hostname to '%s': %m", hostname);
                 }
@@ -449,7 +464,7 @@ static int dhcp_lease_acquired(sd_dhcp_client *client, Link *link) {
                 (void) sd_dhcp_lease_get_timezone(link->dhcp_lease, &tz);
 
                 if (tz) {
-                        r = link_set_timezone(link, tz);
+                        r = manager_set_timezone(link->manager, tz);
                         if (r < 0)
                                 log_link_error_errno(link, r, "Failed to set timezone to '%s': %m", tz);
                 }
@@ -534,6 +549,28 @@ static void dhcp4_handler(sd_dhcp_client *client, int event, void *userdata) {
         return;
 }
 
+static int dhcp4_set_hostname(Link *link) {
+        _cleanup_free_ char *hostname = NULL;
+        const char *hn;
+        int r;
+
+        assert(link);
+
+        if (!link->network->dhcp_send_hostname)
+                hn = NULL;
+        else if (link->network->dhcp_hostname)
+                hn = link->network->dhcp_hostname;
+        else {
+                r = gethostname_strict(&hostname);
+                if (r < 0 && r != -ENXIO) /* ENXIO: no hostname set or hostname is "localhost" */
+                        return r;
+
+                hn = hostname;
+        }
+
+        return sd_dhcp_client_set_hostname(link->dhcp_client, hn);
+}
+
 int dhcp4_configure(Link *link) {
         int r;
 
@@ -603,29 +640,19 @@ int dhcp4_configure(Link *link) {
         if (r < 0)
                 return r;
 
-        if (link->network->dhcp_send_hostname) {
-                _cleanup_free_ char *hostname = NULL;
-                const char *hn = NULL;
-
-                if (!link->network->dhcp_hostname) {
-                        hostname = gethostname_malloc();
-                        if (!hostname)
-                                return -ENOMEM;
-
-                        hn = hostname;
-                } else
-                        hn = link->network->dhcp_hostname;
-
-                if (!is_localhost(hn)) {
-                        r = sd_dhcp_client_set_hostname(link->dhcp_client, hn);
-                        if (r < 0)
-                                return r;
-                }
-        }
+        r = dhcp4_set_hostname(link);
+        if (r < 0)
+                return r;
 
         if (link->network->dhcp_vendor_class_identifier) {
                 r = sd_dhcp_client_set_vendor_class_identifier(link->dhcp_client,
                                                                link->network->dhcp_vendor_class_identifier);
+                if (r < 0)
+                        return r;
+        }
+
+        if (link->network->dhcp_client_port) {
+                r = sd_dhcp_client_set_client_port(link->dhcp_client, link->network->dhcp_client_port);
                 if (r < 0)
                         return r;
         }

@@ -42,6 +42,7 @@
 #include "sd-event.h"
 #include "set.h"
 #include "string-util.h"
+#include "strv.h"
 #include "xattr-util.h"
 
 #define DEFAULT_DATA_HASH_TABLE_SIZE (2047ULL*sizeof(HashItem))
@@ -507,8 +508,45 @@ static int journal_file_refresh_header(JournalFile *f) {
         return r;
 }
 
-static int journal_file_verify_header(JournalFile *f) {
+static bool warn_wrong_flags(const JournalFile *f, bool compatible) {
+        const uint32_t any = compatible ? HEADER_COMPATIBLE_ANY : HEADER_INCOMPATIBLE_ANY,
+                supported = compatible ? HEADER_COMPATIBLE_SUPPORTED : HEADER_INCOMPATIBLE_SUPPORTED;
+        const char *type = compatible ? "compatible" : "incompatible";
         uint32_t flags;
+
+        flags = le32toh(compatible ? f->header->compatible_flags : f->header->incompatible_flags);
+
+        if (flags & ~supported) {
+                if (flags & ~any)
+                        log_debug("Journal file %s has unknown %s flags 0x%"PRIx32,
+                                  f->path, type, flags & ~any);
+                flags = (flags & any) & ~supported;
+                if (flags) {
+                        const char* strv[3];
+                        unsigned n = 0;
+                        _cleanup_free_ char *t = NULL;
+
+                        if (compatible && (flags & HEADER_COMPATIBLE_SEALED))
+                                strv[n++] = "sealed";
+                        if (!compatible && (flags & HEADER_INCOMPATIBLE_COMPRESSED_XZ))
+                                strv[n++] = "xz-compressed";
+                        if (!compatible && (flags & HEADER_INCOMPATIBLE_COMPRESSED_LZ4))
+                                strv[n++] = "lz4-compressed";
+                        strv[n] = NULL;
+                        assert(n < ELEMENTSOF(strv));
+
+                        t = strv_join((char**) strv, ", ");
+                        log_debug("Journal file %s uses %s %s %s disabled at compilation time.",
+                                  f->path, type, n > 1 ? "flags" : "flag", strnull(t));
+                }
+                return true;
+        }
+
+        return false;
+}
+
+static int journal_file_verify_header(JournalFile *f) {
+        uint64_t arena_size, header_size;
 
         assert(f);
         assert(f->header);
@@ -516,48 +554,33 @@ static int journal_file_verify_header(JournalFile *f) {
         if (memcmp(f->header->signature, HEADER_SIGNATURE, 8))
                 return -EBADMSG;
 
-        /* In both read and write mode we refuse to open files with
-         * incompatible flags we don't know */
-        flags = le32toh(f->header->incompatible_flags);
-        if (flags & ~HEADER_INCOMPATIBLE_SUPPORTED) {
-                if (flags & ~HEADER_INCOMPATIBLE_ANY)
-                        log_debug("Journal file %s has unknown incompatible flags %"PRIx32,
-                                  f->path, flags & ~HEADER_INCOMPATIBLE_ANY);
-                flags = (flags & HEADER_INCOMPATIBLE_ANY) & ~HEADER_INCOMPATIBLE_SUPPORTED;
-                if (flags)
-                        log_debug("Journal file %s uses incompatible flags %"PRIx32
-                                  " disabled at compilation time.", f->path, flags);
+        /* In both read and write mode we refuse to open files with incompatible
+         * flags we don't know. */
+        if (warn_wrong_flags(f, false))
                 return -EPROTONOSUPPORT;
-        }
 
-        /* When open for writing we refuse to open files with
-         * compatible flags, too */
-        flags = le32toh(f->header->compatible_flags);
-        if (f->writable && (flags & ~HEADER_COMPATIBLE_SUPPORTED)) {
-                if (flags & ~HEADER_COMPATIBLE_ANY)
-                        log_debug("Journal file %s has unknown compatible flags %"PRIx32,
-                                  f->path, flags & ~HEADER_COMPATIBLE_ANY);
-                flags = (flags & HEADER_COMPATIBLE_ANY) & ~HEADER_COMPATIBLE_SUPPORTED;
-                if (flags)
-                        log_debug("Journal file %s uses compatible flags %"PRIx32
-                                  " disabled at compilation time.", f->path, flags);
+        /* When open for writing we refuse to open files with compatible flags, too. */
+        if (f->writable && warn_wrong_flags(f, true))
                 return -EPROTONOSUPPORT;
-        }
 
         if (f->header->state >= _STATE_MAX)
                 return -EBADMSG;
 
+        header_size = le64toh(f->header->header_size);
+
         /* The first addition was n_data, so check that we are at least this large */
-        if (le64toh(f->header->header_size) < HEADER_SIZE_MIN)
+        if (header_size < HEADER_SIZE_MIN)
                 return -EBADMSG;
 
         if (JOURNAL_HEADER_SEALED(f->header) && !JOURNAL_HEADER_CONTAINS(f->header, n_entry_arrays))
                 return -EBADMSG;
 
-        if ((le64toh(f->header->header_size) + le64toh(f->header->arena_size)) > (uint64_t) f->last_stat.st_size)
+        arena_size = le64toh(f->header->arena_size);
+
+        if (UINT64_MAX - header_size < arena_size || header_size + arena_size > (uint64_t) f->last_stat.st_size)
                 return -ENODATA;
 
-        if (le64toh(f->header->tail_object_offset) > (le64toh(f->header->header_size) + le64toh(f->header->arena_size)))
+        if (le64toh(f->header->tail_object_offset) > header_size + arena_size)
                 return -ENODATA;
 
         if (!VALID64(le64toh(f->header->data_hash_table_offset)) ||
@@ -580,15 +603,18 @@ static int journal_file_verify_header(JournalFile *f) {
 
                 state = f->header->state;
 
-                if (state == STATE_ONLINE) {
+                if (state == STATE_ARCHIVED)
+                        return -ESHUTDOWN; /* Already archived */
+                else if (state == STATE_ONLINE) {
                         log_debug("Journal file %s is already online. Assuming unclean closing.", f->path);
                         return -EBUSY;
-                } else if (state == STATE_ARCHIVED)
-                        return -ESHUTDOWN;
-                else if (state != STATE_OFFLINE) {
+                } else if (state != STATE_OFFLINE) {
                         log_debug("Journal file %s has unknown state %i.", f->path, state);
                         return -EBUSY;
                 }
+
+                if (f->header->field_hash_table_size == 0 || f->header->data_hash_table_size == 0)
+                        return -EBADMSG;
 
                 /* Don't permit appending to files from the future. Because otherwise the realtime timestamps wouldn't
                  * be strictly ordered in the entries in the file anymore, and we can't have that since it breaks
@@ -3087,13 +3113,18 @@ int journal_file_open(
                 }
         }
 
-        if (fname)
+        if (fname) {
                 f->path = strdup(fname);
-        else /* If we don't know the path, fill in something explanatory and vaguely useful */
-                asprintf(&f->path, "/proc/self/%i", fd);
-        if (!f->path) {
-                r = -ENOMEM;
-                goto fail;
+                if (!f->path) {
+                        r = -ENOMEM;
+                        goto fail;
+                }
+        } else {
+                /* If we don't know the path, fill in something explanatory and vaguely useful */
+                if (asprintf(&f->path, "/proc/self/%i", fd) < 0) {
+                        r = -ENOMEM;
+                        goto fail;
+                }
         }
 
         f->chain_cache = ordered_hashmap_new(&uint64_hash_ops);
@@ -3261,7 +3292,7 @@ int journal_file_rotate(JournalFile **f, bool compress, bool seal, Set *deferred
                 return -EINVAL;
 
         /* Is this a journal file that was passed to us as fd? If so, we synthesized a path name for it, and we refuse
-         * rotation, since we don't know the actual path, and couldn't rename the file hence.*/
+         * rotation, since we don't know the actual path, and couldn't rename the file hence. */
         if (path_startswith(old_file->path, "/proc/self/fd"))
                 return -EINVAL;
 
@@ -3330,12 +3361,12 @@ int journal_file_open_reliably(
 
         r = journal_file_open(-1, fname, flags, mode, compress, seal, metrics, mmap_cache, deferred_closes, template, ret);
         if (!IN_SET(r,
-                    -EBADMSG,           /* corrupted */
-                    -ENODATA,           /* truncated */
-                    -EHOSTDOWN,         /* other machine */
-                    -EPROTONOSUPPORT,   /* incompatible feature */
-                    -EBUSY,             /* unclean shutdown */
-                    -ESHUTDOWN,         /* already archived */
+                    -EBADMSG,           /* Corrupted */
+                    -ENODATA,           /* Truncated */
+                    -EHOSTDOWN,         /* Other machine */
+                    -EPROTONOSUPPORT,   /* Incompatible feature */
+                    -EBUSY,             /* Unclean shutdown */
+                    -ESHUTDOWN,         /* Already archived */
                     -EIO,               /* IO error, including SIGBUS on mmap */
                     -EIDRM,             /* File has been deleted */
                     -ETXTBSY))          /* File is from the future */

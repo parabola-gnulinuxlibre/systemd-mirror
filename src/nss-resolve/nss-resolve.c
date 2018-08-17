@@ -17,7 +17,6 @@
   along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#include <dlfcn.h>
 #include <errno.h>
 #include <netdb.h>
 #include <nss.h>
@@ -38,20 +37,6 @@ NSS_GETHOSTBYNAME_PROTOTYPES(resolve);
 NSS_GETHOSTBYADDR_PROTOTYPES(resolve);
 
 #define DNS_CALL_TIMEOUT_USEC (45*USEC_PER_SEC)
-
-typedef void (*voidfunc_t)(void);
-
-static voidfunc_t find_fallback(const char *module, const char *symbol) {
-        void *dl;
-
-        /* Try to find a fallback NSS module symbol */
-
-        dl = dlopen(module, RTLD_LAZY|RTLD_NODELETE);
-        if (!dl)
-                return NULL;
-
-        return dlsym(dl, symbol);
-}
 
 static bool bus_error_shall_fallback(sd_bus_error *e) {
         return sd_bus_error_has_name(e, SD_BUS_ERROR_SERVICE_UNKNOWN) ||
@@ -110,6 +95,20 @@ static int count_addresses(sd_bus_message *m, int af, const char **canonical) {
         return c;
 }
 
+static uint32_t ifindex_to_scopeid(int family, const void *a, int ifindex) {
+        struct in6_addr in6;
+
+        if (family != AF_INET6)
+                return 0;
+
+        /* Some apps can't deal with the scope ID attached to non-link-local addresses. Hence, let's suppress that. */
+
+        assert(sizeof(in6) == FAMILY_ADDRESS_SIZE(AF_INET6));
+        memcpy(&in6, a, sizeof(struct in6_addr));
+
+        return IN6_IS_ADDR_LINKLOCAL(&in6) ? ifindex : 0;
+}
+
 enum nss_status _nss_resolve_gethostbyname4_r(
                 const char *name,
                 struct gaih_addrtuple **pat,
@@ -137,7 +136,7 @@ enum nss_status _nss_resolve_gethostbyname4_r(
 
         r = sd_bus_open_system(&bus);
         if (r < 0)
-                goto fallback;
+                goto fail;
 
         r = sd_bus_message_new_method_call(
                         bus,
@@ -165,13 +164,14 @@ enum nss_status _nss_resolve_gethostbyname4_r(
                         return NSS_STATUS_NOTFOUND;
                 }
 
-                if (bus_error_shall_fallback(&error))
-                        goto fallback;
+                /* Return NSS_STATUS_UNAVAIL when communication with systemd-resolved fails,
+                   allowing falling back to other nss modules. Treat all other error conditions as
+                   NOTFOUND. This includes DNSSEC errors and suchlike. (We don't use UNAVAIL in this
+                   case so that the nsswitch.conf configuration can distuingish such executed but
+                   negative replies from complete failure to talk to resolved). */
+                if (!bus_error_shall_fallback(&error))
+                        ret = NSS_STATUS_NOTFOUND;
 
-                /* Treat all other error conditions as NOTFOUND, and fail. This includes DNSSEC errors and
-                   suchlike. (We don't use UNAVAIL in this case so that the nsswitch.conf configuration can distuingish
-                   such executed but negative replies from complete failure to talk to resolved. */
-                ret = NSS_STATUS_NOTFOUND;
                 goto fail;
         }
 
@@ -192,8 +192,8 @@ enum nss_status _nss_resolve_gethostbyname4_r(
         l = strlen(canonical);
         ms = ALIGN(l+1) + ALIGN(sizeof(struct gaih_addrtuple)) * c;
         if (buflen < ms) {
-                *errnop = ENOMEM;
-                *h_errnop = TRY_AGAIN;
+                *errnop = ERANGE;
+                *h_errnop = NETDB_INTERNAL;
                 return NSS_STATUS_TRYAGAIN;
         }
 
@@ -245,7 +245,7 @@ enum nss_status _nss_resolve_gethostbyname4_r(
                 r_tuple->next = i == c-1 ? NULL : (struct gaih_addrtuple*) ((char*) r_tuple + ALIGN(sizeof(struct gaih_addrtuple)));
                 r_tuple->name = r_name;
                 r_tuple->family = family;
-                r_tuple->scopeid = ifindex;
+                r_tuple->scopeid = ifindex_to_scopeid(family, a, ifindex);
                 memcpy(r_tuple->addr, a, sz);
 
                 idx += ALIGN(sizeof(struct gaih_addrtuple));
@@ -271,17 +271,6 @@ enum nss_status _nss_resolve_gethostbyname4_r(
         h_errno = 0;
 
         return NSS_STATUS_SUCCESS;
-
-fallback:
-        {
-                _nss_gethostbyname4_r_t fallback;
-
-                fallback = (_nss_gethostbyname4_r_t)
-                        find_fallback("libnss_dns.so.2", "_nss_dns_gethostbyname4_r");
-
-                if (fallback)
-                        return fallback(name, pat, buffer, buflen, errnop, h_errnop, ttlp);
-        }
 
 fail:
         *errnop = -r;
@@ -325,7 +314,7 @@ enum nss_status _nss_resolve_gethostbyname3_r(
 
         r = sd_bus_open_system(&bus);
         if (r < 0)
-                goto fallback;
+                goto fail;
 
         r = sd_bus_message_new_method_call(
                         bus,
@@ -353,10 +342,9 @@ enum nss_status _nss_resolve_gethostbyname3_r(
                         return NSS_STATUS_NOTFOUND;
                 }
 
-                if (bus_error_shall_fallback(&error))
-                        goto fallback;
+                if (!bus_error_shall_fallback(&error))
+                        ret = NSS_STATUS_NOTFOUND;
 
-                ret = NSS_STATUS_NOTFOUND;
                 goto fail;
         }
 
@@ -380,8 +368,8 @@ enum nss_status _nss_resolve_gethostbyname3_r(
         ms = ALIGN(l+1) + c * ALIGN(alen) + (c+2) * sizeof(char*);
 
         if (buflen < ms) {
-                *errnop = ENOMEM;
-                *h_errnop = TRY_AGAIN;
+                *errnop = ERANGE;
+                *h_errnop = NETDB_INTERNAL;
                 return NSS_STATUS_TRYAGAIN;
         }
 
@@ -470,16 +458,6 @@ enum nss_status _nss_resolve_gethostbyname3_r(
 
         return NSS_STATUS_SUCCESS;
 
-fallback:
-        {
-                _nss_gethostbyname3_r_t fallback;
-
-                fallback = (_nss_gethostbyname3_r_t)
-                        find_fallback("libnss_dns.so.2", "_nss_dns_gethostbyname3_r");
-                if (fallback)
-                        return fallback(name, af, result, buffer, buflen, errnop, h_errnop, ttlp, canonp);
-        }
-
 fail:
         *errnop = -r;
         *h_errnop = NO_RECOVERY;
@@ -526,7 +504,7 @@ enum nss_status _nss_resolve_gethostbyaddr2_r(
 
         r = sd_bus_open_system(&bus);
         if (r < 0)
-                goto fallback;
+                goto fail;
 
         r = sd_bus_message_new_method_call(
                         bus,
@@ -562,10 +540,9 @@ enum nss_status _nss_resolve_gethostbyaddr2_r(
                         return NSS_STATUS_NOTFOUND;
                 }
 
-                if (bus_error_shall_fallback(&error))
-                        goto fallback;
+                if (!bus_error_shall_fallback(&error))
+                        ret = NSS_STATUS_NOTFOUND;
 
-                ret = NSS_STATUS_NOTFOUND;
                 goto fail;
         }
 
@@ -601,8 +578,8 @@ enum nss_status _nss_resolve_gethostbyaddr2_r(
               c * sizeof(char*);        /* pointers to aliases, plus trailing NULL */
 
         if (buflen < ms) {
-                *errnop = ENOMEM;
-                *h_errnop = TRY_AGAIN;
+                *errnop = ERANGE;
+                *h_errnop = NETDB_INTERNAL;
                 return NSS_STATUS_TRYAGAIN;
         }
 
@@ -659,17 +636,6 @@ enum nss_status _nss_resolve_gethostbyaddr2_r(
         h_errno = 0;
 
         return NSS_STATUS_SUCCESS;
-
-fallback:
-        {
-                _nss_gethostbyaddr2_r_t fallback;
-
-                fallback = (_nss_gethostbyaddr2_r_t)
-                        find_fallback("libnss_dns.so.2", "_nss_dns_gethostbyaddr2_r");
-
-                if (fallback)
-                        return fallback(addr, len, af, result, buffer, buflen, errnop, h_errnop, ttlp);
-        }
 
 fail:
         *errnop = -r;

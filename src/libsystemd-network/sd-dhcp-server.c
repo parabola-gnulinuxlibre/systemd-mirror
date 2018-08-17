@@ -197,7 +197,11 @@ int sd_dhcp_server_new(sd_dhcp_server **ret, int ifindex) {
         server->address = htobe32(INADDR_ANY);
         server->netmask = htobe32(INADDR_ANY);
         server->ifindex = ifindex;
+
         server->leases_by_client_id = hashmap_new(&client_id_hash_ops);
+        if (!server->leases_by_client_id)
+                return -ENOMEM;
+
         server->default_lease_time = DIV_ROUND_UP(DHCP_DEFAULT_LEASE_TIME_USEC, USEC_PER_SEC);
         server->max_lease_time = DIV_ROUND_UP(DHCP_MAX_LEASE_TIME_USEC, USEC_PER_SEC);
 
@@ -857,7 +861,9 @@ int dhcp_server_handle_message(sd_dhcp_server *server, DHCPMessage *message,
 
                         if (!existing_lease) {
                                 lease = new0(DHCPLease, 1);
-                                lease->address = req->requested_ip;
+                                if (!lease)
+                                        return -ENOMEM;
+                                lease->address = address;
                                 lease->client_id.data = memdup(req->client_id.data,
                                                                req->client_id.length);
                                 if (!lease->client_id.data) {
@@ -1022,7 +1028,7 @@ int sd_dhcp_server_start(sd_dhcp_server *server) {
         }
         server->fd_raw = r;
 
-        r = dhcp_network_bind_udp_socket(INADDR_ANY, DHCP_PORT_SERVER);
+        r = dhcp_network_bind_udp_socket(server->ifindex, INADDR_ANY, DHCP_PORT_SERVER);
         if (r < 0) {
                 sd_dhcp_server_stop(server);
                 return r;

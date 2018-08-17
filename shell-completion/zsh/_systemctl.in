@@ -29,6 +29,8 @@
     "list-unit-files:List installed unit files"
     "enable:Enable one or more unit files"
     "disable:Disable one or more unit files"
+    "add-wants:Add Wants= dependencies to a unit"
+    "add-requires:Add Requires= dependencies to a unit"
     "reenable:Reenable one or more unit files"
     "preset:Enable/disable one or more unit files based on preset configuration"
     "set-default:Set the default target"
@@ -58,6 +60,7 @@
     "kexec:Shut down and reboot the system with kexec"
     "exit:Ask for user instance termination"
     "switch-root:Change root directory"
+    "revert:Revert unit files to their vendor versions"
   )
 
   if (( CURRENT == 1 )); then
@@ -91,18 +94,18 @@
 
 __systemctl()
 {
-  systemctl $_sys_service_mgr --full --no-legend --no-pager "$@"
+  systemctl $_sys_service_mgr --full --no-legend --no-pager "$@" 2>/dev/null
 }
 
 
 # Fills the unit list
 _systemctl_all_units()
 {
-  if ( [[ ${+_sys_all_units} -eq 0 ]] || _cache_invalid SYS_ALL_UNITS ) &&
-    ! _retrieve_cache SYS_ALL_UNITS;
+  if ( [[ ${+_sys_all_units} -eq 0 ]] || _cache_invalid SYS_ALL_UNITS$_sys_service_mgr ) ||
+    ! _retrieve_cache SYS_ALL_UNITS$_sys_service_mgr;
   then
     _sys_all_units=( ${${(f)"$(__systemctl list-units --all)"}%% *} )
-    _store_cache SYS_ALL_UNITS _sys_all_units
+    _store_cache SYS_ALL_UNITS$_sys_service_mgr _sys_all_units
   fi
 }
 
@@ -111,14 +114,14 @@ _systemctl_really_all_units()
 {
   local -a all_unit_files;
   local -a really_all_units;
-  if ( [[ ${+_sys_really_all_units} -eq 0 ]] || _cache_invalid SYS_REALLY_ALL_UNITS ) &&
-    ! _retrieve_cache SYS_REALLY_ALL_UNITS;
+  if ( [[ ${+_sys_really_all_units} -eq 0 ]] || _cache_invalid SYS_REALLY_ALL_UNITS$_sys_service_mgr ) ||
+    ! _retrieve_cache SYS_REALLY_ALL_UNITS$_sys_service_mgr;
   then
     all_unit_files=( ${${(f)"$(__systemctl list-unit-files)"}%% *} )
     _systemctl_all_units
     really_all_units=($_sys_all_units $all_unit_files)
     _sys_really_all_units=(${(u)really_all_units})
-    _store_cache SYS_REALLY_ALL_UNITS _sys_really_all_units
+    _store_cache SYS_REALLY_ALL_UNITS$_sys_service_mgr _sys_really_all_units
   fi
 }
 
@@ -157,7 +160,7 @@ _systemctl_unit_state() { typeset -gA _sys_unit_state; _sys_unit_state=( $(__sys
 
 local fun
 # Completion functions for ALL_UNITS
-for fun in is-active is-failed is-enabled status show cat mask preset help list-dependencies edit ; do
+for fun in is-active is-failed is-enabled status show cat mask preset help list-dependencies edit revert add-wants add-requires ; do
   (( $+functions[_systemctl_$fun] )) || _systemctl_$fun()
   {
     _systemctl_really_all_units
@@ -330,13 +333,13 @@ _unit_types() {
 }
 
 _unit_properties() {
-  if ( [[ ${+_sys_all_properties} -eq 0 ]] || _cache_invalid SYS_ALL_PROPERTIES ) &&
-    ! _retrieve_cache SYS_ALL_PROPERTIES;
+  if ( [[ ${+_sys_all_properties} -eq 0 ]] || _cache_invalid SYS_ALL_PROPERTIES$_sys_service_mgr ) ||
+    ! _retrieve_cache SYS_ALL_PROPERTIES$_sys_service_mgr;
   then
     _sys_all_properties=( ${${(M)${(f)"$(__systemctl show --all;
     @rootlibexecdir@/systemd --dump-configuration-items)"}##[[:alnum:]]##=*}%%=*}
     )
-    _store_cache SYS_ALL_PROPRTIES _sys_all_properties
+    _store_cache SYS_ALL_PROPERTIES$_sys_service_mgr _sys_all_properties
   fi
   _values -s , "${_sys_all_properties[@]}"
 }
@@ -386,4 +389,5 @@ _arguments -s \
     {-o+,--output=}'[Change journal output mode]:modes:_sd_outputmodes' \
     '--firmware-setup[Tell the firmware to show the setup menu on next boot]' \
     '--plain[When used with list-dependencies, print output as a list]' \
+    '--failed[Show failed units]' \
     '*::systemctl command:_systemctl_command'

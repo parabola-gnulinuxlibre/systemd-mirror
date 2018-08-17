@@ -12,6 +12,8 @@ Documentation=http://www.freedesktop.org/wiki/Software/systemd/resolved
 Documentation=http://www.freedesktop.org/wiki/Software/systemd/writing-network-configuration-managers
 Documentation=http://www.freedesktop.org/wiki/Software/systemd/writing-resolver-clients
 After=systemd-networkd.service network.target
+Before=network-online.target nss-lookup.target
+Wants=nss-lookup.target
 
 # On kdbus systems we pull in the busname explicitly, because it
 # carries policy that allows the daemon to acquire its name.
@@ -38,3 +40,4 @@ SystemCallFilter=~@clock @cpu-emulation @debug @keyring @module @mount @obsolete
 
 [Install]
 WantedBy=multi-user.target
+Alias=dbus-org.freedesktop.resolve1.service

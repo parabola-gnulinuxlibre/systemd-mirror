@@ -148,7 +148,7 @@ static int sync_cgroup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner
         if (!mkdtemp(mountpoint))
                 return log_error_errno(errno, LOG_PFIX ": failed to create temporary mount point for container cgroup hierarchy: %m", pid);
 
-        if (outer_cgver >= CGROUP_UNIFIED_SYSTEMD) {
+        if (outer_cgver >= CGROUP_UNIFIED_SYSTEMD232) {
                 /* host: v2 ; container: v1 */
                 inner_hier = "?:name=systemd";
                 r = mount_verbose(LOG_ERR, "cgroup", mountpoint, "cgroup",
@@ -277,7 +277,7 @@ int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver
         if (outer_cgver == CGROUP_UNIFIED_UNKNOWN)
                 return 0;
 
-        if ((outer_cgver >= CGROUP_UNIFIED_SYSTEMD) != (inner_cgver >= CGROUP_UNIFIED_SYSTEMD)) {
+        if ((outer_cgver >= CGROUP_UNIFIED_SYSTEMD232) != (inner_cgver >= CGROUP_UNIFIED_SYSTEMD232)) {
                 /* sync the name=systemd hierarchy with the unified hierarchy */
                 r = sync_cgroup(pid, outer_cgver, inner_cgver, uid_shift);
                 if (r < 0)
@@ -297,7 +297,7 @@ int cgroup_setup(pid_t pid, CGroupUnified outer_cgver, CGroupUnified inner_cgver
                 return log_error_errno(r, "Unable to count the processes in the container's cgroup: %m");
 
         /* This applies only to the unified hierarchy */
-        if (outer_cgver >= CGROUP_UNIFIED_SYSTEMD && inner_cgver >= CGROUP_UNIFIED_SYSTEMD) {
+        if (outer_cgver >= CGROUP_UNIFIED_SYSTEMD232 && inner_cgver >= CGROUP_UNIFIED_SYSTEMD232) {
                 if (set_size(peers) == 2 && set_contains(peers, PID_TO_PTR(getpid()))) {
                         char *tmp;
 
@@ -528,17 +528,23 @@ static int cgroup_decide_mounts_sd_y_cgns(
 
 skip_controllers:
         switch (inner_cgver) {
-        case CGROUP_UNIFIED_NONE:
-                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, "none,name=systmed,xattr", "systemd"))
-                        return log_oom();
-                break;
-        case CGROUP_UNIFIED_SYSTEMD:
+        default:
+        case CGROUP_UNIFIED_UNKNOWN:
+                assert_not_reached("unknown inner_cgver");
+        case CGROUP_UNIFIED_ALL:
+                assert_not_reached("cgroup v2 requested in cgroup v1 function");
+        case CGROUP_UNIFIED_SYSTEMD232:
                 if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "", "systemd"))
                         return log_oom();
                 break;
-        default:
-                assert_not_reached("non-legacy cgroup version desired in legacy setup function");
-                return -EINVAL;
+        case CGROUP_UNIFIED_SYSTEMD233:
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "", "unified"))
+                        return log_oom();
+                /* fall through */
+        case CGROUP_UNIFIED_NONE:
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, "none,name=systemd,xattr", "systemd"))
+                        return log_oom();
+                break;
         }
 
         *ret_mounts = mounts;
@@ -609,17 +615,23 @@ static int cgroup_decide_mounts_sd_n_cgns(
 
 skip_controllers:
         switch (inner_cgver) {
-        case CGROUP_UNIFIED_NONE:
-                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, "none,name=systmed,xattr", "systemd"))
-                        return log_oom();
-                break;
-        case CGROUP_UNIFIED_SYSTEMD:
+        default:
+        case CGROUP_UNIFIED_UNKNOWN:
+                assert_not_reached("unknown inner_cgver");
+        case CGROUP_UNIFIED_ALL:
+                assert_not_reached("cgroup v2 requested in cgroup v1 function");
+        case CGROUP_UNIFIED_SYSTEMD232:
                 if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "", "systemd"))
                         return log_oom();
                 break;
-        default:
-                assert_not_reached("non-legacy cgroup version desired in legacy setup function");
-                return -EINVAL;
+        case CGROUP_UNIFIED_SYSTEMD233:
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP2, "", "unified"))
+                        return log_oom();
+                /* fall through */
+        case CGROUP_UNIFIED_NONE:
+                if (!cgmount_add(&mounts, CGMOUNT_CGROUP1, "none,name=systemd,xattr", "systemd"))
+                        return log_oom();
+                break;
         }
 
         *ret_mounts = mounts;
@@ -634,10 +646,14 @@ int cgroup_decide_mounts(
                 bool use_cgns) {
 
         switch (inner_cgver) {
+        default:
+        case CGROUP_UNIFIED_UNKNOWN:
+                assert_not_reached("unknown inner_cgver");
         case CGROUP_UNIFIED_INHERIT:
                 return cgroup_decide_mounts_inherit(ret_mounts);
         case CGROUP_UNIFIED_NONE:
-        case CGROUP_UNIFIED_SYSTEMD:
+        case CGROUP_UNIFIED_SYSTEMD232:
+        case CGROUP_UNIFIED_SYSTEMD233:
                 /* Historically, if use_cgns, then this ran inside the container; if !use_cgns, then it ran outside.
                  * The use_cgns one had to be added because running inside the container, it couldn't look at the host
                  * '/sys'.  Now that they both run outside the container again, I'm afraid to unify them because I'm
@@ -650,9 +666,6 @@ int cgroup_decide_mounts(
                 if (!cgmount_add(ret_mounts, CGMOUNT_CGROUP2, "cgroup", ""))
                         return log_oom();
                 return 0;
-        default:
-                assert_not_reached("Invalid cgroup ver requested");
-                return -EINVAL;
         }
 }
 
@@ -717,10 +730,15 @@ static int cgroup_mount_cg(
         return 0;
 }
 
-int cgroup_mount_mounts(CGMounts m, FILE *cgfile, uid_t uid_shift, const char *selinux_apifs_context) {
+int cgroup_mount_mounts(
+                CGMounts m,
+                FILE *cgfile,
+                uid_t uid_shift,
+                const char *selinux_apifs_context) {
 
         const bool use_cgns = cgfile == NULL;
         const bool use_userns = uid_shift != UID_INVALID;
+        const char *cgroup_root = "/sys/fs/cgroup";
 
         bool used_tmpfs = false;
 
@@ -729,7 +747,7 @@ int cgroup_mount_mounts(CGMounts m, FILE *cgfile, uid_t uid_shift, const char *s
                 const char *dst;
                 int r;
 
-                dst = prefix_roota("/sys/fs/cgroup", m.mounts[i].dst);
+                dst = prefix_roota(cgroup_root, m.mounts[i].dst);
 
                 /* The checks here to see if things are already mounted are kind of primative.  Perhaps they should
                  * actually check the statfs() f_type to verify that the thing mounted is what we want to be mounted
@@ -745,7 +763,7 @@ int cgroup_mount_mounts(CGMounts m, FILE *cgfile, uid_t uid_shift, const char *s
                         break;
                 case CGMOUNT_TMPFS:
                         used_tmpfs = true;
-                        r = path_is_mount_point(dst, AT_SYMLINK_FOLLOW);
+                        r = path_is_mount_point(dst, NULL, path_equal(cgroup_root, dst) ? AT_SYMLINK_FOLLOW : 0);
                         if (r < 0)
                                 return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
                         if (r > 0)
@@ -760,7 +778,7 @@ int cgroup_mount_mounts(CGMounts m, FILE *cgfile, uid_t uid_shift, const char *s
                         break;
                 case CGMOUNT_CGROUP1:
                 case CGMOUNT_CGROUP2:
-                        r = path_is_mount_point(dst, 0);
+                        r = path_is_mount_point(dst, NULL, path_equal(cgroup_root, dst) ? AT_SYMLINK_FOLLOW : 0);
                         if (r < 0 && r != -ENOENT)
                                 return log_error_errno(r, "Failed to determine if %s is mounted already: %m", dst);
                         if (r > 0) {

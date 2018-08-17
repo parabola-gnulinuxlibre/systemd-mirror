@@ -58,15 +58,13 @@ struct DnsPacketHeader {
 /* The various DNS protocols deviate in how large a packet can grow,
    but the TCP transport has a 16bit size field, hence that appears to
    be the absolute maximum. */
-#define DNS_PACKET_SIZE_MAX 0xFFFF
+#define DNS_PACKET_SIZE_MAX 0xFFFFu
 
 /* RFC 1035 say 512 is the maximum, for classic unicast DNS */
-#define DNS_PACKET_UNICAST_SIZE_MAX 512
+#define DNS_PACKET_UNICAST_SIZE_MAX 512u
 
 /* With EDNS0 we can use larger packets, default to 4096, which is what is commonly used */
-#define DNS_PACKET_UNICAST_SIZE_LARGE_MAX 4096
-
-#define DNS_PACKET_SIZE_START 512
+#define DNS_PACKET_UNICAST_SIZE_LARGE_MAX 4096u
 
 struct DnsPacket {
         int n_ref;
@@ -209,8 +207,8 @@ int dns_packet_append_string(DnsPacket *p, const char *s, size_t *start);
 int dns_packet_append_raw_string(DnsPacket *p, const void *s, size_t size, size_t *start);
 int dns_packet_append_label(DnsPacket *p, const char *s, size_t l, bool canonical_candidate, size_t *start);
 int dns_packet_append_name(DnsPacket *p, const char *name, bool allow_compression, bool canonical_candidate, size_t *start);
-int dns_packet_append_key(DnsPacket *p, const DnsResourceKey *key, size_t *start);
-int dns_packet_append_rr(DnsPacket *p, const DnsResourceRecord *rr, size_t *start, size_t *rdata_start);
+int dns_packet_append_key(DnsPacket *p, const DnsResourceKey *key, const DnsAnswerFlags flags, size_t *start);
+int dns_packet_append_rr(DnsPacket *p, const DnsResourceRecord *rr, const DnsAnswerFlags flags, size_t *start, size_t *rdata_start);
 int dns_packet_append_opt(DnsPacket *p, uint16_t max_udp_size, bool edns0_do, int rcode, size_t *start);
 int dns_packet_append_question(DnsPacket *p, DnsQuestion *q);
 int dns_packet_append_answer(DnsPacket *p, DnsAnswer *a);

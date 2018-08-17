@@ -34,6 +34,7 @@
 #include <net/ethernet.h>
 #include <stdlib.h>
 #include <sys/resource.h>
+#include <sys/socket.h>
 #include <sys/syscall.h>
 #include <uchar.h>
 #include <unistd.h>
@@ -49,6 +50,23 @@
 #ifdef HAVE_LINUX_BTRFS_H
 #include <linux/btrfs.h>
 #endif
+
+#ifdef HAVE_LINUX_VM_SOCKETS_H
+#include <linux/vm_sockets.h>
+#else
+#define VMADDR_CID_ANY -1U
+struct sockaddr_vm {
+        unsigned short svm_family;
+        unsigned short svm_reserved1;
+        unsigned int svm_port;
+        unsigned int svm_cid;
+        unsigned char svm_zero[sizeof(struct sockaddr) -
+                               sizeof(unsigned short) -
+                               sizeof(unsigned short) -
+                               sizeof(unsigned int) -
+                               sizeof(unsigned int)];
+};
+#endif /* !HAVE_LINUX_VM_SOCKETS_H */
 
 #include "macro.h"
 
@@ -141,6 +159,10 @@
 
 #ifndef GRND_RANDOM
 #define GRND_RANDOM 0x0002
+#endif
+
+#ifndef FS_NOCOW_FL
+#define FS_NOCOW_FL 0x00800000
 #endif
 
 #ifndef BTRFS_IOCTL_MAGIC
@@ -1076,6 +1098,41 @@ typedef int32_t key_serial_t;
 #define IFA_F_MCAUTOJOIN 0x400
 #endif
 
+#ifndef HAVE_STRUCT_ETHTOOL_LINK_SETTINGS
+
+#define ETHTOOL_GLINKSETTINGS   0x0000004c /* Get ethtool_link_settings */
+#define ETHTOOL_SLINKSETTINGS   0x0000004d /* Set ethtool_link_settings */
+
+struct ethtool_link_settings {
+        __u32   cmd;
+        __u32   speed;
+        __u8    duplex;
+        __u8    port;
+        __u8    phy_address;
+        __u8    autoneg;
+        __u8    mdio_support;
+        __u8    eth_tp_mdix;
+        __u8    eth_tp_mdix_ctrl;
+        __s8    link_mode_masks_nwords;
+        __u32   reserved[8];
+        __u32   link_mode_masks[0];
+        /* layout of link_mode_masks fields:
+         * __u32 map_supported[link_mode_masks_nwords];
+         * __u32 map_advertising[link_mode_masks_nwords];
+         * __u32 map_lp_advertising[link_mode_masks_nwords];
+         */
+};
+
+#endif
+
+#endif
+
+#ifndef SOL_ALG
+#define SOL_ALG 279
+#endif
+
+#ifndef AF_VSOCK
+#define AF_VSOCK 40
 #endif
 
 #include "missing_syscall.h"

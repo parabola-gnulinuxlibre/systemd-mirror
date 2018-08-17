@@ -10,9 +10,8 @@ Description=Network Service
 Documentation=man:systemd-networkd.service(8)
 ConditionCapability=CAP_NET_ADMIN
 DefaultDependencies=no
-# dbus.service can be dropped once on kdbus, and systemd-udevd.service can be
-# dropped once tuntap is moved to netlink
-After=systemd-udevd.service dbus.service network-pre.target systemd-sysusers.service systemd-sysctl.service
+# systemd-udevd.service can be dropped once tuntap is moved to netlink
+After=systemd-udevd.service network-pre.target systemd-sysusers.service systemd-sysctl.service
 Before=network.target multi-user.target shutdown.target
 Conflicts=shutdown.target
 Wants=network.target
@@ -40,3 +39,9 @@ SystemCallFilter=~@clock @cpu-emulation @debug @keyring @module @mount @obsolete
 [Install]
 WantedBy=multi-user.target
 Also=systemd-networkd.socket
+
+# We want to enable systemd-networkd-wait-online.service whenever this service
+# is enabled. systemd-networkd-wait-online.service has
+# WantedBy=network-online.target, so enabling it only has an effect if
+# network-online.target itself is enabled or pulled in by some other unit.
+Also=systemd-networkd-wait-online.service

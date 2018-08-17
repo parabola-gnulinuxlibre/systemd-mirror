@@ -330,11 +330,13 @@ static int manager_adjust_clock(Manager *m, double offset, int leap_sec) {
                 tmx.esterror = 0;
                 log_debug("  adjust (slew): %+.3f sec", offset);
         } else {
-                tmx.modes = ADJ_STATUS | ADJ_NANO | ADJ_SETOFFSET;
+                tmx.modes = ADJ_STATUS | ADJ_NANO | ADJ_SETOFFSET | ADJ_MAXERROR | ADJ_ESTERROR;
 
                 /* ADJ_NANO uses nanoseconds in the microseconds field */
                 tmx.time.tv_sec = (long)offset;
                 tmx.time.tv_usec = (offset - tmx.time.tv_sec) * NSEC_PER_SEC;
+                tmx.maxerror = 0;
+                tmx.esterror = 0;
 
                 /* the kernel expects -0.3s as {-1, 7000.000.000} */
                 if (tmx.time.tv_usec < 0) {
@@ -376,12 +378,12 @@ static int manager_adjust_clock(Manager *m, double offset, int leap_sec) {
         m->drift_ppm = tmx.freq / 65536;
 
         log_debug("  status       : %04i %s\n"
-                  "  time now     : %li.%03llu\n"
-                  "  constant     : %li\n"
+                  "  time now     : %"PRI_TIME".%03"PRI_USEC"\n"
+                  "  constant     : %"PRI_TIMEX"\n"
                   "  offset       : %+.3f sec\n"
-                  "  freq offset  : %+li (%i ppm)\n",
+                  "  freq offset  : %+"PRI_TIMEX" (%i ppm)\n",
                   tmx.status, tmx.status & STA_UNSYNC ? "unsync" : "sync",
-                  tmx.time.tv_sec, (unsigned long long) (tmx.time.tv_usec / NSEC_PER_MSEC),
+                  tmx.time.tv_sec, tmx.time.tv_usec / NSEC_PER_MSEC,
                   tmx.constant,
                   (double)tmx.offset / NSEC_PER_SEC,
                   tmx.freq, m->drift_ppm);
@@ -1121,10 +1123,6 @@ int manager_new(Manager **ret) {
         m->server_socket = m->clock_watch_fd = -1;
 
         RATELIMIT_INIT(m->ratelimit, RATELIMIT_INTERVAL_USEC, RATELIMIT_BURST);
-
-        r = manager_parse_server_string(m, SERVER_FALLBACK, NTP_SERVERS);
-        if (r < 0)
-                return r;
 
         r = sd_event_default(&m->event);
         if (r < 0)

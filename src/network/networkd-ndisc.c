@@ -18,14 +18,16 @@
 ***/
 
 #include <netinet/icmp6.h>
+#include <arpa/inet.h>
 
 #include "sd-ndisc.h"
 
-#include "networkd.h"
 #include "networkd-ndisc.h"
+#include "networkd-route.h"
 
 #define NDISC_DNSSL_MAX 64U
 #define NDISC_RDNSS_MAX 64U
+#define NDISC_PREFIX_LFT_MIN 7200U
 
 static int ndisc_netlink_handler(sd_netlink *rtnl, sd_netlink_message *m, void *userdata) {
         _cleanup_link_unref_ Link *link = userdata;
@@ -55,6 +57,7 @@ static void ndisc_router_process_default(Link *link, sd_ndisc_router *rt) {
         struct in6_addr gateway;
         uint16_t lifetime;
         unsigned preference;
+        uint32_t mtu;
         usec_t time_now;
         int r;
         Address *address;
@@ -115,6 +118,14 @@ static void ndisc_router_process_default(Link *link, sd_ndisc_router *rt) {
                 return;
         }
 
+        r = sd_ndisc_router_get_mtu(rt, &mtu);
+        if (r == -ENODATA)
+                mtu = 0;
+        else if (r < 0) {
+                log_link_warning_errno(link, r, "Failed to get default router MTU from RA: %m");
+                return;
+        }
+
         r = route_new(&route);
         if (r < 0) {
                 log_link_error_errno(link, r, "Could not allocate route: %m");
@@ -123,10 +134,12 @@ static void ndisc_router_process_default(Link *link, sd_ndisc_router *rt) {
 
         route->family = AF_INET6;
         route->table = link->network->ipv6_accept_ra_route_table;
+        route->priority = link->network->dhcp_route_metric;
         route->protocol = RTPROT_RA;
         route->pref = preference;
         route->gw.in6 = gateway;
         route->lifetime = time_now + lifetime * USEC_PER_SEC;
+        route->mtu = mtu;
 
         r = route_configure(route, link, ndisc_netlink_handler);
         if (r < 0) {
@@ -140,12 +153,20 @@ static void ndisc_router_process_default(Link *link, sd_ndisc_router *rt) {
 
 static void ndisc_router_process_autonomous_prefix(Link *link, sd_ndisc_router *rt) {
         _cleanup_address_free_ Address *address = NULL;
-        uint32_t lifetime_valid, lifetime_preferred;
+        Address *existing_address;
+        uint32_t lifetime_valid, lifetime_preferred, lifetime_remaining;
+        usec_t time_now;
         unsigned prefixlen;
         int r;
 
         assert(link);
         assert(rt);
+
+        r = sd_ndisc_router_get_timestamp(rt, clock_boottime_or_monotonic(), &time_now);
+        if (r < 0) {
+                log_link_warning_errno(link, r, "Failed to get RA timestamp: %m");
+                return;
+        }
 
         r = sd_ndisc_router_prefix_get_prefixlen(rt, &prefixlen);
         if (r < 0) {
@@ -195,7 +216,24 @@ static void ndisc_router_process_autonomous_prefix(Link *link, sd_ndisc_router *
         address->prefixlen = prefixlen;
         address->flags = IFA_F_NOPREFIXROUTE|IFA_F_MANAGETEMPADDR;
         address->cinfo.ifa_prefered = lifetime_preferred;
-        address->cinfo.ifa_valid = lifetime_valid;
+
+        /* see RFC4862 section 5.5.3.e */
+        r = address_get(link, address->family, &address->in_addr, address->prefixlen, &existing_address);
+        if (r > 0) {
+                lifetime_remaining = existing_address->cinfo.tstamp / 100 + existing_address->cinfo.ifa_valid - time_now / USEC_PER_SEC;
+                if (lifetime_valid > NDISC_PREFIX_LFT_MIN || lifetime_valid > lifetime_remaining)
+                        address->cinfo.ifa_valid = lifetime_valid;
+                else if (lifetime_remaining <= NDISC_PREFIX_LFT_MIN)
+                        address->cinfo.ifa_valid = lifetime_remaining;
+                else
+                        address->cinfo.ifa_valid = NDISC_PREFIX_LFT_MIN;
+        } else if (lifetime_valid > 0)
+                address->cinfo.ifa_valid = lifetime_valid;
+        else
+                return; /* see RFC4862 section 5.5.3.d */
+
+        if (address->cinfo.ifa_valid == 0)
+                return;
 
         r = address_configure(address, link, ndisc_netlink_handler, true);
         if (r < 0) {
@@ -243,6 +281,7 @@ static void ndisc_router_process_onlink_prefix(Link *link, sd_ndisc_router *rt) 
 
         route->family = AF_INET6;
         route->table = link->network->ipv6_accept_ra_route_table;
+        route->priority = link->network->dhcp_route_metric;
         route->protocol = RTPROT_RA;
         route->flags = RTM_F_PREFIX;
         route->dst_prefixlen = prefixlen;
@@ -574,11 +613,13 @@ static void ndisc_router_process_options(Link *link, sd_ndisc_router *rt) {
                         break;
 
                 case SD_NDISC_OPTION_RDNSS:
-                        ndisc_router_process_rdnss(link, rt);
+                        if (link->network->ipv6_accept_ra_use_dns)
+                                ndisc_router_process_rdnss(link, rt);
                         break;
 
                 case SD_NDISC_OPTION_DNSSL:
-                        ndisc_router_process_dnssl(link, rt);
+                        if (link->network->ipv6_accept_ra_use_dns)
+                                ndisc_router_process_dnssl(link, rt);
                         break;
                 }
 

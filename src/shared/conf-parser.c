@@ -101,7 +101,7 @@ int config_item_perf_lookup(
         else {
                 char *key;
 
-                key = strjoin(section, ".", lvalue, NULL);
+                key = strjoin(section, ".", lvalue);
                 if (!key)
                         return -ENOMEM;
 
@@ -781,7 +781,7 @@ int config_parse_strv(const char *unit,
         for (;;) {
                 char *word = NULL;
 
-                r = extract_first_word(&rvalue, &word, WHITESPACE, EXTRACT_QUOTES|EXTRACT_RETAIN_ESCAPE);
+                r = extract_first_word(&rvalue, &word, NULL, EXTRACT_QUOTES|EXTRACT_RETAIN_ESCAPE);
                 if (r == 0)
                         break;
                 if (r == -ENOMEM)
@@ -792,7 +792,7 @@ int config_parse_strv(const char *unit,
                 }
 
                 if (!utf8_is_valid(word)) {
-                        log_syntax_invalid_utf8(unit, LOG_ERR, filename, line, rvalue);
+                        log_syntax_invalid_utf8(unit, LOG_ERR, filename, line, word);
                         free(word);
                         continue;
                 }
