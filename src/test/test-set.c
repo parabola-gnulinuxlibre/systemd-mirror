@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd
-
-  Copyright 2014 Zbigniew Jędrzejewski-Szmek
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include "set.h"
 
@@ -39,6 +22,29 @@ static void test_set_steal_first(void) {
         assert_se(set_isempty(m));
 }
 
+typedef struct Item {
+        int seen;
+} Item;
+static void item_seen(Item *item) {
+        item->seen++;
+}
+
+static void test_set_free_with_destructor(void) {
+        Set *m;
+        struct Item items[4] = {};
+        unsigned i;
+
+        assert_se(m = set_new(NULL));
+        for (i = 0; i < ELEMENTSOF(items) - 1; i++)
+                assert_se(set_put(m, items + i) == 1);
+
+        m = set_free_with_destructor(m, item_seen);
+        assert_se(items[0].seen == 1);
+        assert_se(items[1].seen == 1);
+        assert_se(items[2].seen == 1);
+        assert_se(items[3].seen == 0);
+}
+
 static void test_set_put(void) {
         _cleanup_set_free_ Set *m = NULL;
 
@@ -57,6 +63,7 @@ static void test_set_put(void) {
 
 int main(int argc, const char *argv[]) {
         test_set_steal_first();
+        test_set_free_with_destructor();
         test_set_put();
 
         return 0;

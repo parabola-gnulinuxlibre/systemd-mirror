@@ -3,22 +3,7 @@
   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 
 <!--
-  This file is part of systemd.
-
-  Copyright 2014 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+  SPDX-License-Identifier: LGPL-2.1+
 -->
 
 <refentry id="systemd-escape"
@@ -27,15 +12,6 @@
   <refentryinfo>
     <title>systemd-escape</title>
     <productname>systemd</productname>
-
-    <authorgroup>
-      <author>
-        <contrib>Developer</contrib>
-        <firstname>Lennart</firstname>
-        <surname>Poettering</surname>
-        <email>lennart@poettering.net</email>
-      </author>
-    </authorgroup>
   </refentryinfo>
 
   <refmeta>
@@ -45,7 +21,7 @@
 
   <refnamediv>
     <refname>systemd-escape</refname>
-    <refpurpose>Escape strings for usage in system unit names</refpurpose>
+    <refpurpose>Escape strings for usage in systemd unit names</refpurpose>
   </refnamediv>
 
   <refsynopsisdiv>
@@ -73,6 +49,9 @@
     special mode of escaping is applied instead, which assumes the
     string is already escaped but will escape everything that
     appears obviously non-escaped.</para>
+
+    <para>For details on the escaping and unescaping algorithms see the relevant section in
+    <citerefentry><refentrytitle>systemd.unit</refentrytitle><manvolnum>5</manvolnum></citerefentry>.</para>
   </refsect1>
 
   <refsect1>
@@ -107,15 +86,17 @@
         <term><option>--path</option></term>
         <term><option>-p</option></term>
 
-        <listitem><para>When escaping or unescaping a string, assume
-        it refers to a file system path. This eliminates leading,
-        trailing or duplicate <literal>/</literal> characters
-        and rejects <literal>.</literal> and <literal>..</literal>
-        path components.</para></listitem>
+        <listitem><para>When escaping or unescaping a string, assume it refers to a file system path. This eliminates
+        leading, trailing or duplicate <literal>/</literal> characters and rejects <literal>.</literal> and
+        <literal>..</literal> path components. This is particularly useful for generating strings suitable for
+        unescaping with the <literal>%f</literal> specifier in unit files, see
+        <citerefentry><refentrytitle>systemd.unit</refentrytitle><manvolnum>5</manvolnum></citerefentry>.
+        </para></listitem>
       </varlistentry>
 
       <varlistentry>
         <term><option>--unescape</option></term>
+        <term><option>-u</option></term>
 
         <listitem><para>Instead of escaping the specified strings,
         undo the escaping, reversing the operation. May not be used in
@@ -126,6 +107,7 @@
 
       <varlistentry>
         <term><option>--mangle</option></term>
+        <term><option>-m</option></term>
 
         <listitem><para>Like <option>--escape</option>, but only
         escape characters that are obviously not escaped yet, and
@@ -172,6 +154,7 @@ systemd-nspawn@My\x20Container\x201.service systemd-nspawn@containerb.service sy
     <title>See Also</title>
     <para>
       <citerefentry><refentrytitle>systemd</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
+      <citerefentry><refentrytitle>systemd.unit</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
       <citerefentry><refentrytitle>systemctl</refentrytitle><manvolnum>1</manvolnum></citerefentry>
     </para>
   </refsect1>

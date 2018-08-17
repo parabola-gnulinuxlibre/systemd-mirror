@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <stdarg.h>
@@ -152,7 +135,7 @@ int extract_first_word(const char **p, char **ret, const char *separators, Extra
                         for (;; (*p)++, c = **p) {
                                 if (c == 0)
                                         goto finish_force_terminate;
-                                else if ((c == '\'' || c == '"') && (flags & EXTRACT_QUOTES)) {
+                                else if (IN_SET(c, '\'', '"') && (flags & EXTRACT_QUOTES)) {
                                         quote = c;
                                         break;
                                 } else if (c == '\\' && !(flags & EXTRACT_RETAIN_ESCAPE)) {
@@ -193,8 +176,7 @@ finish:
 
 finish_force_next:
         s[sz] = 0;
-        *ret = s;
-        s = NULL;
+        *ret = TAKE_PTR(s);
 
         return 1;
 }

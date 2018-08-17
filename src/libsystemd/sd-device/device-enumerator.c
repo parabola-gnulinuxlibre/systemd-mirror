@@ -1,22 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2008-2012 Kay Sievers <kay@vrfy.org>
-  Copyright 2014-2015 Tom Gundersen <teg@jklm.no>
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include "sd-device.h"
 
@@ -70,8 +52,7 @@ _public_ int sd_device_enumerator_new(sd_device_enumerator **ret) {
         enumerator->n_ref = 1;
         enumerator->type = _DEVICE_ENUMERATION_TYPE_INVALID;
 
-        *ret = enumerator;
-        enumerator = NULL;
+        *ret = TAKE_PTR(enumerator);
 
         return 0;
 }
@@ -292,7 +273,7 @@ static int device_compare(const void *_a, const void *_b) {
                  * entire sound card completed. The kernel makes this guarantee
                  * when creating those devices, and hence we should too when
                  * enumerating them. */
-                sound_a += strlen("/sound/card");
+                sound_a += STRLEN("/sound/card");
                 sound_a = strchr(sound_a, '/');
 
                 if (sound_a) {

@@ -1,20 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Copyright (C) IBM Corp. 2003
+ * Copyright © IBM Corp. 2003
  *
  * Author: Patrick Mansfield<patmans@us.ibm.com>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <errno.h>
@@ -115,9 +104,8 @@ static int sg_err_category_new(struct udev *udev,
         if (!scsi_status && !host_status && !driver_status)
                 return SG_ERR_CAT_CLEAN;
 
-        if ((scsi_status == SCSI_CHECK_CONDITION) ||
-            (scsi_status == SCSI_COMMAND_TERMINATED) ||
-            ((driver_status & 0xf) == DRIVER_SENSE)) {
+        if (IN_SET(scsi_status, SCSI_CHECK_CONDITION, SCSI_COMMAND_TERMINATED) ||
+            (driver_status & 0xf) == DRIVER_SENSE) {
                 if (sense_buffer && (sb_len > 2)) {
                         int sense_key;
                         unsigned char asc;
@@ -143,9 +131,7 @@ static int sg_err_category_new(struct udev *udev,
                 return SG_ERR_CAT_SENSE;
         }
         if (host_status) {
-                if ((host_status == DID_NO_CONNECT) ||
-                    (host_status == DID_BUS_BUSY) ||
-                    (host_status == DID_TIME_OUT))
+                if (IN_SET(host_status, DID_NO_CONNECT, DID_BUS_BUSY, DID_TIME_OUT))
                         return SG_ERR_CAT_TIMEOUT;
         }
         if (driver_status) {
@@ -215,7 +201,7 @@ static int scsi_dump_sense(struct udev *udev,
                                   dev_scsi->kernel, sb_len, s - sb_len);
                         return -1;
                 }
-                if ((code == 0x0) || (code == 0x1)) {
+                if (IN_SET(code, 0x0, 0x1)) {
                         sense_key = sense_buffer[2] & 0xf;
                         if (s < 14) {
                                 /*
@@ -227,7 +213,7 @@ static int scsi_dump_sense(struct udev *udev,
                         }
                         asc = sense_buffer[12];
                         ascq = sense_buffer[13];
-                } else if ((code == 0x2) || (code == 0x3)) {
+                } else if (IN_SET(code, 0x2, 0x3)) {
                         sense_key = sense_buffer[1] & 0xf;
                         asc = sense_buffer[2];
                         ascq = sense_buffer[3];
@@ -358,7 +344,7 @@ resend:
 
         retval = ioctl(fd, SG_IO, io_buf);
         if (retval < 0) {
-                if ((errno == EINVAL || errno == ENOSYS) && dev_scsi->use_sg == 4) {
+                if (IN_SET(errno, EINVAL, ENOSYS) && dev_scsi->use_sg == 4) {
                         dev_scsi->use_sg = 3;
                         goto resend;
                 }
@@ -374,7 +360,7 @@ resend:
         switch (retval) {
                 case SG_ERR_CAT_NOTSUPPORTED:
                         buf[1] = 0;
-                        /* Fallthrough */
+                        _fallthrough_;
                 case SG_ERR_CAT_CLEAN:
                 case SG_ERR_CAT_RECOVERED:
                         retval = 0;
@@ -592,7 +578,7 @@ static int check_fill_0x83_prespc3(struct udev *udev,
 {
         int i, j;
 
-        serial[0] = hex_str[id_search->id_type];
+        serial[0] = hex_str[SCSI_ID_NAA];
         /* serial has been memset to zero before */
         j = strlen(serial);        /* j = 1; */
 
@@ -604,7 +590,6 @@ static int check_fill_0x83_prespc3(struct udev *udev,
         strncpy(serial_short, serial, max_len-1);
         return 0;
 }
-
 
 /* Get device identification VPD page */
 static int do_scsi_page83_inquiry(struct udev *udev,
@@ -741,7 +726,7 @@ static int do_scsi_page83_prespc3_inquiry(struct udev *udev,
         if (page_83[6] == 0)
                 return 2;
 
-        serial[0] = hex_str[id_search_list[0].id_type];
+        serial[0] = hex_str[SCSI_ID_NAA];
         /*
          * The first four bytes contain data, not a descriptor.
          */

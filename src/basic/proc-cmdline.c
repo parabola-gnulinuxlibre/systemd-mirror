@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -203,10 +186,8 @@ int proc_cmdline_get_key(const char *key, unsigned flags, char **value) {
                 }
         }
 
-        if (value) {
-                *value = ret;
-                ret = NULL;
-        }
+        if (value)
+                *value = TAKE_PTR(ret);
 
         return found;
 }
@@ -270,17 +251,21 @@ static const char * const rlmap_initrd[] = {
 };
 
 const char* runlevel_to_target(const char *word) {
+        const char * const *rlmap_ptr;
         size_t i;
-        const char * const *rlmap_ptr = in_initrd() ? rlmap_initrd
-                                                    : rlmap;
 
         if (!word)
                 return NULL;
 
-        if (in_initrd() && (word = startswith(word, "rd.")) == NULL)
-                return NULL;
+        if (in_initrd()) {
+                word = startswith(word, "rd.");
+                if (!word)
+                        return NULL;
+        }
 
-        for (i = 0; rlmap_ptr[i] != NULL; i += 2)
+        rlmap_ptr = in_initrd() ? rlmap_initrd : rlmap;
+
+        for (i = 0; rlmap_ptr[i]; i += 2)
                 if (streq(word, rlmap_ptr[i]))
                         return rlmap_ptr[i+1];
 

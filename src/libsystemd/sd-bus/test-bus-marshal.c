@@ -1,30 +1,15 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 /***
-  This file is part of systemd.
-
-  Copyright 2013 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
 #include <math.h>
 #include <stdlib.h>
 
-#ifdef HAVE_GLIB
+#if HAVE_GLIB
 #include <gio/gio.h>
 #endif
 
-#ifdef HAVE_DBUS
+#if HAVE_DBUS
 #include <dbus/dbus.h>
 #endif
 
@@ -137,7 +122,7 @@ int main(int argc, char *argv[]) {
         double dbl;
         uint64_t u64;
 
-        r = sd_bus_default_system(&bus);
+        r = sd_bus_default_user(&bus);
         if (r < 0)
                 return EXIT_TEST_SKIP;
 
@@ -196,7 +181,7 @@ int main(int argc, char *argv[]) {
         r = sd_bus_message_append(m, "a(stdo)", 1, "foo", 815ULL, 47.0, "/");
         assert_se(r >= 0);
 
-        r = bus_message_seal(m, 4711, 0);
+        r = sd_bus_message_seal(m, 4711, 0);
         assert_se(r >= 0);
 
         bus_message_dump(m, stdout, BUS_MESSAGE_DUMP_WITH_HEADER);
@@ -215,7 +200,8 @@ int main(int argc, char *argv[]) {
         log_info("message size = %zu, contents =\n%s", sz, h);
         free(h);
 
-#ifdef HAVE_GLIB
+#if HAVE_GLIB
+#ifndef __SANITIZE_ADDRESS__
         {
                 GDBusMessage *g;
                 char *p;
@@ -231,8 +217,9 @@ int main(int argc, char *argv[]) {
                 g_object_unref(g);
         }
 #endif
+#endif
 
-#ifdef HAVE_DBUS
+#if HAVE_DBUS
         {
                 DBusMessage *w;
                 DBusError error;
@@ -359,7 +346,7 @@ int main(int argc, char *argv[]) {
         r = sd_bus_message_copy(copy, m, true);
         assert_se(r >= 0);
 
-        r = bus_message_seal(copy, 4712, 0);
+        r = sd_bus_message_seal(copy, 4712, 0);
         assert_se(r >= 0);
 
         fclose(ms);

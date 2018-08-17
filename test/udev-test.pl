@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # udev test
 #
@@ -14,8 +14,7 @@
 # After creation and removal the result is checked against the
 # expected value and the result is printed.
 #
-# Copyright (C) 2004-2012 Kay Sievers <kay@vrfy.org>
-# Copyright (C) 2004 Leann Ogasawara <ogasawara@osdl.org>
+# Copyright © 2004 Leann Ogasawara <ogasawara@osdl.org>
 
 use warnings;
 use strict;
@@ -333,6 +332,30 @@ SUBSYSTEMS=="scsi", PROGRAM=="/bin/echo -n 'foo3 foo4'   'foo5   foo6   foo7 foo
 EOF
         },
         {
+                desc            => "program arguments combined with escaped double quotes, part 1",
+                devpath         => "/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda/sda5",
+                exp_name        => "foo2" ,
+                rules           => <<EOF
+SUBSYSTEMS=="scsi", PROGRAM=="/bin/sh -c 'printf %%s \\\"foo1 foo2\\\" | grep \\\"foo1 foo2\\\"'", KERNEL=="sda5", SYMLINK+="%c{2}"
+EOF
+        },
+        {
+                desc            => "program arguments combined with escaped double quotes, part 2",
+                devpath         => "/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda/sda5",
+                exp_name        => "foo2" ,
+                rules           => <<EOF
+SUBSYSTEMS=="scsi", PROGRAM=="/bin/sh -c \\\"printf %%s 'foo1 foo2' | grep 'foo1 foo2'\\\"", KERNEL=="sda5", SYMLINK+="%c{2}"
+EOF
+        },
+        {
+                desc            => "program arguments combined with escaped double quotes, part 3",
+                devpath         => "/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda/sda5",
+                exp_name        => "foo2" ,
+                rules           => <<EOF
+SUBSYSTEMS=="scsi", PROGRAM=="/bin/sh -c 'printf \\\"%%s %%s\\\" \\\"foo1 foo2\\\" \\\"foo3\\\"| grep \\\"foo1 foo2\\\"'", KERNEL=="sda5", SYMLINK+="%c{2}"
+EOF
+        },
+        {
                 desc            => "characters before the %c{N} substitution",
                 devpath         => "/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda/sda5",
                 exp_name        => "my-foo9" ,
@@ -582,9 +605,9 @@ EOF
                 desc            => "textual user id",
                 devpath         => "/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda",
                 exp_name        => "node",
-                exp_perms       => "nobody::0600",
+                exp_perms       => "daemon::0600",
                 rules           => <<EOF
-SUBSYSTEMS=="scsi", KERNEL=="sda", SYMLINK+="node", OWNER="nobody"
+SUBSYSTEMS=="scsi", KERNEL=="sda", SYMLINK+="node", OWNER="daemon"
 EOF
         },
         {

@@ -1,20 +1,6 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 /***
-  This file is part of systemd.
-
-  Copyright (C) 2016 Canonical Ltd.
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+  Copyright © 2016 Canonical Ltd.
 ***/
 
 #include <unistd.h>
@@ -66,7 +52,7 @@ static void test_clock_is_localtime(void) {
                 log_info("%s", scenarios[i].contents);
                 rewind(f);
                 ftruncate(fd, 0);
-                assert_se(write_string_stream(f, scenarios[i].contents, false) == 0);
+                assert_se(write_string_stream(f, scenarios[i].contents, WRITE_STRING_FILE_AVOID_NEWLINE) == 0);
                 assert_se(clock_is_localtime(adjtime) == scenarios[i].expected_result);
         }
 
@@ -82,7 +68,7 @@ static void test_clock_is_localtime_system(void) {
                 log_info("/etc/adjtime exists, clock_is_localtime() == %i", r);
                 /* if /etc/adjtime exists we expect some answer, no error or
                  * crash */
-                assert_se(r == 0 || r == 1);
+                assert_se(IN_SET(r, 0, 1));
         } else
                 /* default is UTC if there is no /etc/adjtime */
                 assert_se(r == 0);

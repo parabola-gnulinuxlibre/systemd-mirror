@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2012 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <stddef.h>
@@ -54,7 +37,7 @@ static int get_variable(const char *b, char **r) {
         return 1;
 }
 
-char *replace_var(const char *text, char *(*lookup)(const char *variable, void*userdata), void *userdata) {
+char *replace_var(const char *text, char *(*lookup)(const char *variable, void *userdata), void *userdata) {
         char *r, *t;
         const char *f;
         size_t l;

@@ -1,21 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * manage device node user ACL
  *
- * Copyright 2010-2012 Kay Sievers <kay@vrfy.org>
- * Copyright 2010 Lennart Poettering
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <errno.h>
@@ -47,7 +34,7 @@ static int builtin_uaccess(struct udev_device *dev, int argc, char *argv[], bool
                 seat = "seat0";
 
         r = sd_seat_get_active(seat, NULL, &uid);
-        if (r == -ENXIO || r == -ENODATA) {
+        if (IN_SET(r, -ENXIO, -ENODATA)) {
                 /* No active session on this seat */
                 r = 0;
                 goto finish;

@@ -1,22 +1,4 @@
-/***
-    This file is part of systemd.
-
-    Copyright 2014  Tom Gundersen <teg@jklm.no>
-    Copyright 2014  Susant Sahani
-
-    systemd is free software; you can redistribute it and/or modify it
-    under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.
-
-    systemd is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-    Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <net/if.h>
 
@@ -28,7 +10,7 @@
 
 /* callback for brige netdev's parameter set */
 static int netdev_bridge_set_handler(sd_netlink *rtnl, sd_netlink_message *m, void *userdata) {
-        _cleanup_netdev_unref_ NetDev *netdev = userdata;
+        _cleanup_(netdev_unrefp) NetDev *netdev = userdata;
         int r;
 
         assert(netdev);
@@ -91,7 +73,7 @@ static int netdev_bridge_post_create(NetDev *netdev, Link *link, sd_netlink_mess
                         return log_netdev_error_errno(netdev, r, "Could not append IFLA_BR_MAX_AGE attribute: %m");
         }
 
-        if (b->ageing_time > 0) {
+        if (b->ageing_time != USEC_INFINITY) {
                 r = sd_netlink_message_append_u32(req, IFLA_BR_AGEING_TIME, usec_to_jiffies(b->ageing_time));
                 if (r < 0)
                         return log_netdev_error_errno(netdev, r, "Could not append IFLA_BR_AGEING_TIME attribute: %m");
@@ -101,6 +83,12 @@ static int netdev_bridge_post_create(NetDev *netdev, Link *link, sd_netlink_mess
                 r = sd_netlink_message_append_u16(req, IFLA_BR_PRIORITY, b->priority);
                 if (r < 0)
                         return log_netdev_error_errno(netdev, r, "Could not append IFLA_BR_PRIORITY attribute: %m");
+        }
+
+        if (b->group_fwd_mask > 0) {
+                r = sd_netlink_message_append_u16(req, IFLA_BR_GROUP_FWD_MASK, b->group_fwd_mask);
+                if (r < 0)
+                        return log_netdev_error_errno(netdev, r, "Could not append IFLA_BR_GROUP_FWD_MASK attribute: %m");
         }
 
         if (b->default_pvid != VLANID_INVALID) {
@@ -163,6 +151,7 @@ static void bridge_init(NetDev *n) {
         b->stp = -1;
         b->default_pvid = VLANID_INVALID;
         b->forward_delay = USEC_INFINITY;
+        b->ageing_time = USEC_INFINITY;
 }
 
 const NetDevVTable bridge_vtable = {

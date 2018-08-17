@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2011 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <string.h>
@@ -98,42 +81,8 @@ static int property_get_seat(
 
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_type, session_type, SessionType);
 static BUS_DEFINE_PROPERTY_GET_ENUM(property_get_class, session_class, SessionClass);
-
-static int property_get_active(
-                sd_bus *bus,
-                const char *path,
-                const char *interface,
-                const char *property,
-                sd_bus_message *reply,
-                void *userdata,
-                sd_bus_error *error) {
-
-        Session *s = userdata;
-
-        assert(bus);
-        assert(reply);
-        assert(s);
-
-        return sd_bus_message_append(reply, "b", session_is_active(s));
-}
-
-static int property_get_state(
-                sd_bus *bus,
-                const char *path,
-                const char *interface,
-                const char *property,
-                sd_bus_message *reply,
-                void *userdata,
-                sd_bus_error *error) {
-
-        Session *s = userdata;
-
-        assert(bus);
-        assert(reply);
-        assert(s);
-
-        return sd_bus_message_append(reply, "s", session_state_to_string(session_get_state(s)));
-}
+static BUS_DEFINE_PROPERTY_GET(property_get_active, "b", Session, session_is_active);
+static BUS_DEFINE_PROPERTY_GET2(property_get_state, "s", Session, session_get_state, session_state_to_string);
 
 static int property_get_idle_hint(
                 sd_bus *bus,
@@ -457,7 +406,7 @@ static int method_take_device(sd_bus_message *message, void *userdata, sd_bus_er
                 goto error;
 
         session_save(s);
-        return 0;
+        return 1;
 
 error:
         session_device_free(sd);
@@ -580,23 +529,15 @@ int session_object_find(sd_bus *bus, const char *path, const char *interface, vo
         assert(m);
 
         if (streq(path, "/org/freedesktop/login1/session/self")) {
-                _cleanup_(sd_bus_creds_unrefp) sd_bus_creds *creds = NULL;
                 sd_bus_message *message;
-                const char *name;
 
                 message = sd_bus_get_current_message(bus);
                 if (!message)
                         return 0;
 
-                r = sd_bus_query_sender_creds(message, SD_BUS_CREDS_SESSION|SD_BUS_CREDS_AUGMENT, &creds);
+                r = manager_get_session_from_creds(m, message, NULL, error, &session);
                 if (r < 0)
                         return r;
-
-                r = sd_bus_creds_get_session(creds, &name);
-                if (r < 0)
-                        return r;
-
-                session = hashmap_get(m->sessions, name);
         } else {
                 _cleanup_free_ char *e = NULL;
                 const char *p;
@@ -610,10 +551,9 @@ int session_object_find(sd_bus *bus, const char *path, const char *interface, vo
                         return -ENOMEM;
 
                 session = hashmap_get(m->sessions, e);
+                if (!session)
+                        return 0;
         }
-
-        if (!session)
-                return 0;
 
         *found = session;
         return 1;
@@ -674,8 +614,7 @@ int session_node_enumerator(sd_bus *bus, const char *path, void *userdata, char 
                 }
         }
 
-        *nodes = l;
-        l = NULL;
+        *nodes = TAKE_PTR(l);
 
         return 1;
 }

@@ -3,36 +3,13 @@
   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 
 <!--
-  This file is part of systemd.
-
-  Copyright 2014 Tom Gundersen
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+  SPDX-License-Identifier: LGPL-2.1+
 -->
 
 <refentry id="systemd.link">
   <refentryinfo>
     <title>systemd.link</title>
     <productname>systemd</productname>
-
-    <authorgroup>
-      <author>
-        <contrib>Developer</contrib>
-        <firstname>Tom</firstname>
-        <surname>Gundersen</surname>
-      </author>
-    </authorgroup>
   </refentryinfo>
 
   <refmeta>
@@ -79,7 +56,7 @@
     how the device should be configured. The first (in lexical order)
     of the link files that matches a given device is applied. Note
     that a default file <filename>99-default.link</filename> is
-    shipped by the system, any user-supplied
+    shipped by the system. Any user-supplied
     <filename>.link</filename> should hence have a lexically earlier
     name to be considered at all.</para>
 
@@ -99,7 +76,12 @@
       <varlistentry>
         <term><varname>MACAddress=</varname></term>
         <listitem>
-          <para>The hardware address.</para>
+          <para>A whitespace-separated list of hardware addresses. Use full colon-, hyphen- or dot-delimited hexadecimal. See the example below.
+          This option may appear more than once, in which case the lists are merged. If the empty string is assigned to this option, the list
+          of hardware addresses defined prior to this is reset.</para>
+
+          <para>Example:
+          <programlisting>MACAddress=01:23:45:67:89:ab 00-11-22-33-44-55 AABB.CCDD.EEFF</programlisting></para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -170,6 +152,17 @@
           for details.</para>
         </listitem>
       </varlistentry>
+        <varlistentry>
+          <term><varname>KernelVersion=</varname></term>
+          <listitem>
+            <para>Checks whether the kernel version (as reported by <command>uname -r</command>) matches a certain
+            expression (or if prefixed with the exclamation mark does not match it). See
+            <literal>ConditionKernelVersion=</literal> in
+            <citerefentry><refentrytitle>systemd.unit</refentrytitle><manvolnum>5</manvolnum></citerefentry> for
+            details.
+            </para>
+          </listitem>
+        </varlistentry>
       <varlistentry>
         <term><varname>Architecture=</varname></term>
         <listitem>
@@ -332,6 +325,16 @@
           <varname>NamePolicy=</varname> fail, or in case
           <varname>NamePolicy=</varname> is missing or
           disabled.</para>
+
+          <para>Note that specifying a name that the kernel might use for another
+          interface (for example <literal>eth0</literal>) is dangerous because the
+          name assignment done by udev will race with the assignment done by the
+          kernel, and only one interface may use the name. Depending on the order of
+          operations, either udev or the kernel will win, making the naming
+          unpredictable. It is best to use some different prefix, for example
+          <literal>internal0</literal>/<literal>external0</literal> or
+          <literal>lan0</literal>/<literal>lan1</literal>/<literal>lan3</literal>.
+          </para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -386,9 +389,40 @@
               </listitem>
             </varlistentry>
             <varlistentry>
+              <term><literal>unicast</literal></term>
+              <listitem>
+                <para>Wake on unicast messages.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term><literal>multicast</literal></term>
+              <listitem>
+                <para>Wake on multicast messages.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term><literal>broadcast</literal></term>
+              <listitem>
+                <para>Wake on broadcast messages.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term><literal>arp</literal></term>
+              <listitem>
+                <para>Wake on ARP.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
               <term><literal>magic</literal></term>
               <listitem>
                 <para>Wake on receipt of a magic packet.
+                </para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term><literal>secureon</literal></term>
+              <listitem>
+                <para>Enable secureon(tm) password for MagicPacket(tm).
                 </para>
               </listitem>
             </varlistentry>
@@ -399,6 +433,8 @@
               </listitem>
             </varlistentry>
           </variablelist>
+
+          <para>Defaults to <literal>off</literal>.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -450,19 +486,19 @@
           Defaults to "unset".</para>
         </listitem>
       </varlistentry>
+       <varlistentry>
+      <term><varname>TCP6SegmentationOffload=</varname></term>
+        <listitem>
+          <para>The TCP6 Segmentation Offload (tx-tcp6-segmentation) when true enables
+          TCP6 segmentation offload. Takes a boolean value.
+          Defaults to "unset".</para>
+        </listitem>
+      </varlistentry>
       <varlistentry>
         <term><varname>GenericSegmentationOffload=</varname></term>
         <listitem>
           <para>The Generic Segmentation Offload (GSO) when true enables
           generic segmentation offload. Takes a boolean value.
-          Defaults to "unset".</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term><varname>UDPSegmentationOffload=</varname></term>
-        <listitem>
-          <para>The UDP Segmentation Offload (USO) when true enables
-          UDP segmentation offload. Takes a boolean value.
           Defaults to "unset".</para>
         </listitem>
       </varlistentry>
@@ -480,6 +516,30 @@
           <para>The Large Receive Offload (LRO) when true enables
           large receive offload. Takes a boolean value.
           Defaults to "unset".</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>RxChannels=</varname></term>
+        <listitem>
+          <para>Sets the number of receive channels (a number between 1 and 4294967295) .</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>TxChannels=</varname></term>
+        <listitem>
+          <para>Sets the number of transmit channels (a number between 1 and 4294967295).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>OtherChannels=</varname></term>
+        <listitem>
+          <para>Sets the number of other channels (a number between 1 and 4294967295).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>CombinedChannels=</varname></term>
+        <listitem>
+          <para>Sets the number of combined set channels (a number between 1 and 4294967295).</para>
         </listitem>
       </varlistentry>
     </variablelist>

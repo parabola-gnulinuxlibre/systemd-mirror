@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 hwdb_files = files('''
         20-pci-vendor-model.hwdb
         20-pci-classes.hwdb
@@ -9,6 +11,7 @@ hwdb_files = files('''
         20-acpi-vendor.hwdb
         20-OUI.hwdb
         20-net-ifname.hwdb
+        20-vmbus-class.hwdb
         60-evdev.hwdb
         60-keyboard.hwdb
         60-sensor.hwdb
@@ -18,7 +21,7 @@ hwdb_files = files('''
         70-touchpad.hwdb
 '''.split())
 
-if conf.get('ENABLE_HWDB', false)
+if conf.get('ENABLE_HWDB') == 1
         install_data(hwdb_files,
                      install_dir : udevhwdbdir)
 
@@ -40,5 +43,5 @@ test('parse-hwdb',
 ############################################################
 
 run_target(
-        'update',
+        'hwdb-update',
         command : [hwdb_update_sh, meson.current_source_dir()])

@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <string.h>
@@ -37,15 +20,25 @@ static int show_sysfs_one(
                 struct udev_list_entry **item,
                 const char *sub,
                 const char *prefix,
-                unsigned n_columns) {
+                unsigned n_columns,
+                OutputFlags flags) {
+
+        size_t max_width;
 
         assert(udev);
         assert(seat);
         assert(item);
         assert(prefix);
 
+        if (flags & OUTPUT_FULL_WIDTH)
+                max_width = (size_t) -1;
+        else if (n_columns < 10)
+                max_width = 10;
+        else
+                max_width = n_columns;
+
         while (*item) {
-                _cleanup_udev_device_unref_ struct udev_device *d = NULL;
+                _cleanup_(udev_device_unrefp) struct udev_device *d = NULL;
                 struct udev_list_entry *next, *lookahead;
                 const char *sn, *name, *sysfs, *subsystem, *sysname;
                 _cleanup_free_ char *k = NULL, *l = NULL;
@@ -88,7 +81,7 @@ static int show_sysfs_one(
 
                         if (path_startswith(lookahead_sysfs, sub) &&
                             !path_startswith(lookahead_sysfs, sysfs)) {
-                                _cleanup_udev_device_unref_ struct udev_device *lookahead_d = NULL;
+                                _cleanup_(udev_device_unrefp) struct udev_device *lookahead_d = NULL;
 
                                 lookahead_d = udev_device_new_from_syspath(udev, lookahead_sysfs);
                                 if (lookahead_d) {
@@ -106,7 +99,7 @@ static int show_sysfs_one(
                         lookahead = udev_list_entry_get_next(lookahead);
                 }
 
-                k = ellipsize(sysfs, n_columns, 20);
+                k = ellipsize(sysfs, max_width, 20);
                 if (!k)
                         return -ENOMEM;
 
@@ -120,7 +113,7 @@ static int show_sysfs_one(
                         return -ENOMEM;
 
                 free(k);
-                k = ellipsize(l, n_columns, 70);
+                k = ellipsize(l, max_width, 70);
                 if (!k)
                         return -ENOMEM;
 
@@ -134,24 +127,25 @@ static int show_sysfs_one(
                         if (!p)
                                 return -ENOMEM;
 
-                        show_sysfs_one(udev, seat, item, sysfs, p, n_columns - 2);
+                        show_sysfs_one(udev, seat, item, sysfs, p,
+                                       n_columns == (unsigned) -1 || n_columns < 2 ? n_columns : n_columns - 2,
+                                       flags);
                 }
         }
 
         return 0;
 }
 
-int show_sysfs(const char *seat, const char *prefix, unsigned n_columns) {
-        _cleanup_udev_enumerate_unref_ struct udev_enumerate *e = NULL;
-        _cleanup_udev_unref_ struct udev *udev = NULL;
+int show_sysfs(const char *seat, const char *prefix, unsigned n_columns, OutputFlags flags) {
+        _cleanup_(udev_enumerate_unrefp) struct udev_enumerate *e = NULL;
+        _cleanup_(udev_unrefp) struct udev *udev = NULL;
         struct udev_list_entry *first = NULL;
         int r;
 
         if (n_columns <= 0)
                 n_columns = columns();
 
-        if (!prefix)
-                prefix = "";
+        prefix = strempty(prefix);
 
         if (isempty(seat))
                 seat = "seat0";
@@ -181,7 +175,7 @@ int show_sysfs(const char *seat, const char *prefix, unsigned n_columns) {
 
         first = udev_enumerate_get_list_entry(e);
         if (first)
-                show_sysfs_one(udev, seat, &first, "/", prefix, n_columns);
+                show_sysfs_one(udev, seat, &first, "/", prefix, n_columns, flags);
         else
                 printf("%s%s%s\n", prefix, special_glyph(TREE_RIGHT), "(none)");
 

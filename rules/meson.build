@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 rules = files('''
         60-block.rules
         60-cdrom_id.rules
@@ -11,7 +13,6 @@ rules = files('''
         60-persistent-v4l.rules
         60-sensor.rules
         60-serial.rules
-        64-btrfs.rules
         70-joystick.rules
         70-mouse.rules
         70-touchpad.rules
@@ -25,8 +26,11 @@ rules = files('''
 install_data(rules,
              install_dir : udevrulesdir)
 
+all_rules = rules
+
 rules_in = '''
         50-udev-default.rules
+        64-btrfs.rules
         99-systemd.rules
 '''.split()
 
@@ -37,4 +41,5 @@ foreach file : rules_in
                 configuration : substs)
         install_data(gen,
                      install_dir : udevrulesdir)
+        all_rules += gen
 endforeach

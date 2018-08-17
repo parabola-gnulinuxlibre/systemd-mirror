@@ -1,25 +1,9 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2011 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdio_ext.h>
 
 #include "sd-messages.h"
 
@@ -42,6 +26,7 @@
 #include "string-table.h"
 #include "terminal-util.h"
 #include "unit-name.h"
+#include "user-util.h"
 #include "util.h"
 
 Machine* machine_new(Manager *manager, MachineClass class, const char *name) {
@@ -128,7 +113,7 @@ int machine_save(Machine *m) {
         if (!m->started)
                 return 0;
 
-        r = mkdir_safe_label("/run/systemd/machines", 0755, 0, 0);
+        r = mkdir_safe_label("/run/systemd/machines", 0755, 0, 0, MKDIR_WARN_MODE);
         if (r < 0)
                 goto fail;
 
@@ -136,6 +121,7 @@ int machine_save(Machine *m) {
         if (r < 0)
                 goto fail;
 
+        (void) __fsetlocking(f, FSETLOCKING_BYCALLER);
         (void) fchmod(fileno(f), 0644);
 
         fprintf(f,
@@ -245,7 +231,6 @@ static void machine_unlink(Machine *m) {
         assert(m);
 
         if (m->unit) {
-
                 char *sl;
 
                 sl = strjoina("/run/systemd/machines/unit:", m->unit);
@@ -265,7 +250,7 @@ int machine_load(Machine *m) {
         if (!m->state_file)
                 return 0;
 
-        r = parse_env_file(m->state_file, NEWLINE,
+        r = parse_env_file(NULL, m->state_file, NEWLINE,
                            "SCOPE",     &m->unit,
                            "SCOPE_JOB", &m->scope_job,
                            "SERVICE",   &m->service,
@@ -405,8 +390,7 @@ int machine_start(Machine *m, sd_bus_message *properties, sd_bus_error *error) {
                    "MESSAGE_ID=" SD_MESSAGE_MACHINE_START_STR,
                    "NAME=%s", m->name,
                    "LEADER="PID_FMT, m->leader,
-                   LOG_MESSAGE("New machine %s.", m->name),
-                   NULL);
+                   LOG_MESSAGE("New machine %s.", m->name));
 
         if (!dual_timestamp_is_set(&m->timestamp))
                 dual_timestamp_get(&m->timestamp);
@@ -468,8 +452,7 @@ int machine_finalize(Machine *m) {
                            "MESSAGE_ID=" SD_MESSAGE_MACHINE_STOP_STR,
                            "NAME=%s", m->name,
                            "LEADER="PID_FMT, m->leader,
-                           LOG_MESSAGE("Machine %s terminated.", m->name),
-                           NULL);
+                           LOG_MESSAGE("Machine %s terminated.", m->name));
 
         machine_unlink(m);
         machine_add_to_gc_queue(m);
@@ -482,22 +465,22 @@ int machine_finalize(Machine *m) {
         return 0;
 }
 
-bool machine_check_gc(Machine *m, bool drop_not_started) {
+bool machine_may_gc(Machine *m, bool drop_not_started) {
         assert(m);
 
         if (m->class == MACHINE_HOST)
-                return true;
-
-        if (drop_not_started && !m->started)
                 return false;
 
-        if (m->scope_job && manager_job_is_active(m->manager, m->scope_job))
+        if (drop_not_started && !m->started)
                 return true;
+
+        if (m->scope_job && manager_job_is_active(m->manager, m->scope_job))
+                return false;
 
         if (m->unit && manager_unit_is_active(m->manager, m->unit))
-                return true;
+                return false;
 
-        return false;
+        return true;
 }
 
 void machine_add_to_gc_queue(Machine *m) {
@@ -606,7 +589,7 @@ void machine_release_unit(Machine *m) {
 }
 
 int machine_get_uid_shift(Machine *m, uid_t *ret) {
-        char p[strlen("/proc//uid_map") + DECIMAL_STR_MAX(pid_t) + 1];
+        char p[STRLEN("/proc//uid_map") + DECIMAL_STR_MAX(pid_t) + 1];
         uid_t uid_base, uid_shift, uid_range;
         gid_t gid_base, gid_shift, gid_range;
         _cleanup_fclose_ FILE *f = NULL;
@@ -655,7 +638,7 @@ int machine_get_uid_shift(Machine *m, uid_t *ret) {
         if (uid_base != 0)
                 return -ENXIO;
         /* Insist that at least the nobody user is mapped, everything else is weird, and hence complex, and we don't support it */
-        if (uid_range < (uid_t) 65534U)
+        if (uid_range < UID_NOBODY)
                 return -ENXIO;
 
         /* If there's more than one line, then we don't support this mapping. */

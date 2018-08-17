@@ -1,23 +1,8 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 /***
-  This file is part of systemd.
-
-  Copyright 2013 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
-#ifdef HAVE_GLIB
+#if HAVE_GLIB
 #include <glib.h>
 #endif
 
@@ -137,7 +122,7 @@ static void test_marshal(void) {
         size_t sz;
         int r;
 
-        r = sd_bus_open_system(&bus);
+        r = sd_bus_open_user(&bus);
         if (r < 0)
                 exit(EXIT_TEST_SKIP);
 
@@ -153,9 +138,9 @@ static void test_marshal(void) {
                                         4712, "second-string-parameter", "(a(si))", 2, "Y", 5, "Z", 6,
                                         4713, "third-string-parameter", "(uu)", 1, 2) >= 0);
 
-        assert_se(bus_message_seal(m, 4711, 0) >= 0);
+        assert_se(sd_bus_message_seal(m, 4711, 0) >= 0);
 
-#ifdef HAVE_GLIB
+#if HAVE_GLIB
         {
                 GVariant *v;
                 char *t;
@@ -184,7 +169,7 @@ static void test_marshal(void) {
 
         assert_se(bus_message_get_blob(m, &blob, &sz) >= 0);
 
-#ifdef HAVE_GLIB
+#if HAVE_GLIB
         {
                 GVariant *v;
                 char *t;
@@ -209,7 +194,7 @@ static void test_marshal(void) {
 
         assert_se(sd_bus_message_append(m, "as", 0) >= 0);
 
-        assert_se(bus_message_seal(m, 4712, 0) >= 0);
+        assert_se(sd_bus_message_seal(m, 4712, 0) >= 0);
         assert_se(bus_message_dump(m, NULL, BUS_MESSAGE_DUMP_WITH_HEADER) >= 0);
 }
 

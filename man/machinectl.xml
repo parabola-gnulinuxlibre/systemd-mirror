@@ -3,22 +3,7 @@
   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 
 <!--
-  This file is part of systemd.
-
-  Copyright 2013 Zbigniew Jędrzejewski-Szmek
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+  SPDX-License-Identifier: LGPL-2.1+
 -->
 
 <refentry id="machinectl" conditional='ENABLE_MACHINED'
@@ -27,15 +12,6 @@
   <refentryinfo>
     <title>machinectl</title>
     <productname>systemd</productname>
-
-    <authorgroup>
-      <author>
-        <contrib>Developer</contrib>
-        <firstname>Lennart</firstname>
-        <surname>Poettering</surname>
-        <email>lennart@poettering.net</email>
-      </author>
-    </authorgroup>
   </refentryinfo>
 
   <refmeta>
@@ -79,17 +55,18 @@
       OS kernel with the host OS, in order to run
       OS userspace instances on top the host OS.</para></listitem>
 
-      <listitem><para>The host system itself</para></listitem>
+      <listitem><para>The host system itself.</para></listitem>
     </itemizedlist>
 
     <para>Machines are identified by names that follow the same rules
-    as UNIX and DNS host names, for details, see below. Machines are
-    instantiated from disk or file system images that frequently — but not
-    necessarily — carry the same name as machines running from
-    them. Images in this sense are considered:</para>
+    as UNIX and DNS host names. For details, see below.</para>
+
+    <para>Machines are instantiated from disk or file system images that
+    frequently — but not necessarily — carry the same name as machines running
+    from them. Images in this sense may be:</para>
 
     <itemizedlist>
-      <listitem><para>Directory trees containing an OS, including its
+      <listitem><para>Directory trees containing an OS, including the
       top-level directories <filename>/usr</filename>,
       <filename>/etc</filename>, and so on.</para></listitem>
 
@@ -154,13 +131,6 @@
       </varlistentry>
 
       <varlistentry>
-        <term><option>--no-ask-password</option></term>
-
-        <listitem><para>Do not query the user for authentication for
-        privileged operations.</para></listitem>
-      </varlistentry>
-
-      <varlistentry>
         <term><option>--kill-who=</option></term>
 
         <listitem><para>When used with <command>kill</command>, choose
@@ -207,16 +177,16 @@
       <varlistentry>
         <term><option>--mkdir</option></term>
 
-        <listitem><para>When used with <command>bind</command>, creates
-        the destination directory before applying the bind
-        mount.</para></listitem>
+        <listitem><para>When used with <command>bind</command>, creates the destination file or directory before
+        applying the bind mount. Note that even though the name of this option suggests that it is suitable only for
+        directories, this option also creates the destination file node to mount over if the object to mount is not
+        a directory, but a regular file, device node, socket or FIFO.</para></listitem>
       </varlistentry>
 
       <varlistentry>
         <term><option>--read-only</option></term>
 
-        <listitem><para>When used with <command>bind</command>, applies
-        a read-only bind mount.</para>
+        <listitem><para>When used with <command>bind</command>, creates a read-only bind mount.</para>
 
         <para>When used with <command>clone</command>, <command>import-raw</command> or <command>import-tar</command> a
         read-only container or VM image is created.</para></listitem>
@@ -298,11 +268,28 @@
         <literal>,</literal> if another address will be output afterwards. </para></listitem>
       </varlistentry>
 
+      <varlistentry>
+        <term><option>-q</option></term>
+        <term><option>--quiet</option></term>
+
+        <listitem><para>Suppresses additional informational output while running.</para></listitem>
+      </varlistentry>
+
       <xi:include href="user-system-options.xml" xpointer="host" />
-      <xi:include href="user-system-options.xml" xpointer="machine" />
+
+      <varlistentry>
+        <term><option>-M</option></term>
+        <term><option>--machine=</option></term>
+
+        <listitem><para>Connect to
+        <citerefentry><refentrytitle>systemd-machined.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+        running in a local container, to perform the specified operation within
+        the container.</para></listitem>
+      </varlistentry>
 
       <xi:include href="standard-options.xml" xpointer="no-pager" />
       <xi:include href="standard-options.xml" xpointer="no-legend" />
+      <xi:include href="standard-options.xml" xpointer="no-ask-password" />
       <xi:include href="standard-options.xml" xpointer="help" />
       <xi:include href="standard-options.xml" xpointer="version" />
     </variablelist>
@@ -420,9 +407,9 @@
         specified, the connection is made to the local host
         instead. This works similar to <command>login</command> but
         immediately invokes a user process. This command runs the
-        specified executable with the specified arguments, or
-        <filename>/bin/sh</filename> if none is specified. By default,
-        opens a <literal>root</literal> shell, but by using
+        specified executable with the specified arguments, or the
+        default shell for the user if none is specified, or
+        <filename>/bin/sh</filename> if no default shell is found. By default,
         <option>--uid=</option>, or by prefixing the machine name with
         a username and an <literal>@</literal> character, a different
         user may be selected. Use <option>--setenv=</option> to set
@@ -518,14 +505,16 @@
       <varlistentry>
         <term><command>bind</command> <replaceable>NAME</replaceable> <replaceable>PATH</replaceable> [<replaceable>PATH</replaceable>]</term>
 
-        <listitem><para>Bind mounts a directory from the host into the specified container. The first directory
-        argument is the source directory on the host, the second directory argument is the destination directory in the
-        container. When the latter is omitted, the destination path in the container is the same as the source path on
-        the host. When combined with the <option>--read-only</option> switch, a ready-only bind mount is created. When
-        combined with the <option>--mkdir</option> switch, the destination path is first created before the mount is
-        applied. Note that this option is currently only supported for
+        <listitem><para>Bind mounts a file or directory from the host into the specified container. The first path
+        argument is the source file or directory on the host, the second path argument is the destination file or
+        directory in the container. When the latter is omitted, the destination path in the container is the same as
+        the source path on the host. When combined with the <option>--read-only</option> switch, a ready-only bind
+        mount is created. When combined with the <option>--mkdir</option> switch, the destination path is first created
+        before the mount is applied. Note that this option is currently only supported for
         <citerefentry><refentrytitle>systemd-nspawn</refentrytitle><manvolnum>1</manvolnum></citerefentry> containers,
-        and only if user namespacing (<option>--private-users</option>) is not used.</para></listitem>
+        and only if user namespacing (<option>--private-users</option>) is not used. This command supports bind
+        mounting directories, regular files, device nodes, <constant>AF_UNIX</constant> socket nodes, as well as
+        FIFOs.</para></listitem>
       </varlistentry>
 
       <varlistentry>
@@ -809,7 +798,7 @@
         qcow2 or raw disk image, possibly compressed with xz, gzip or
         bzip2. If the second argument (the resulting image name) is
         not specified, it is automatically derived from the file
-        name. If the file name is passed as <literal>-</literal>, the
+        name. If the filename is passed as <literal>-</literal>, the
         image is read from standard input, in which case the second
         argument is mandatory.</para>
 
@@ -860,7 +849,7 @@
       </varlistentry>
 
       <varlistentry>
-        <term><command>cancel-transfers</command> <replaceable>ID</replaceable>…</term>
+        <term><command>cancel-transfer</command> <replaceable>ID</replaceable>…</term>
 
         <listitem><para>Aborts a download, import or export of the
         container or VM image with the specified ID. To list ongoing
@@ -878,7 +867,7 @@
     <para>The <command>machinectl</command> tool operates on machines
     and images whose names must be chosen following strict
     rules. Machine names must be suitable for use as host names
-    following a conservative subset of DNS and UNIX/Linux
+    following a conservative subset of DNS and GNU/Linux
     semantics. Specifically, they must consist of one or more
     non-empty label strings, separated by dots. No leading or trailing
     dots are allowed. No sequences of multiple dots are allowed. The
@@ -978,12 +967,12 @@
       <title>Download a Fedora image, set a root password in it, start
       it as service</title>
 
-      <programlisting># machinectl pull-raw --verify=no https://dl.fedoraproject.org/pub/fedora/linux/releases/23/Cloud/x86_64/Images/Fedora-Cloud-Base-23-20151030.x86_64.raw.xz
-# systemd-nspawn -M Fedora-Cloud-Base-23-20151030
+      <programlisting># machinectl pull-raw --verify=no https://dl.fedoraproject.org/pub/fedora/linux/releases/27/CloudImages/x86_64/images/Fedora-Cloud-Base-27-1.6.x86_64.raw.xz
+# systemd-nspawn -M Fedora-Cloud-Base-27-1.6.x86_64
 # passwd
 # exit
-# machinectl start Fedora-Cloud-Base-23-20151030
-# machinectl login Fedora-Cloud-Base-23-20151030</programlisting>
+# machinectl start Fedora-Cloud-Base-27-1.6.x86_64
+# machinectl login Fedora-Cloud-Base-27-1.6.x86_64</programlisting>
 
       <para>This downloads the specified <filename>.raw</filename>
       image with verification disabled. Then, a shell is opened in it
@@ -1027,6 +1016,7 @@
   <refsect1>
     <title>See Also</title>
     <para>
+      <citerefentry><refentrytitle>systemd</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
       <citerefentry><refentrytitle>systemd-machined.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
       <citerefentry><refentrytitle>systemd-nspawn</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
       <citerefentry><refentrytitle>systemd.special</refentrytitle><manvolnum>7</manvolnum></citerefentry>,

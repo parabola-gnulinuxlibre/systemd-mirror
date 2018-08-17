@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2014 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <netdb.h>
 #include <nss.h>
@@ -435,7 +418,7 @@ enum nss_status _nss_mymachines_getpwnam_r(
         if (!machine_name_is_valid(machine))
                 goto not_found;
 
-        if (getenv_bool("SYSTEMD_NSS_BYPASS_BUS") > 0)
+        if (getenv_bool_secure("SYSTEMD_NSS_BYPASS_BUS") > 0)
                 /* Make sure we can't deadlock if we are invoked by dbus-daemon. This way, it won't be able to resolve
                  * these UIDs, but that should be unproblematic as containers should never be able to connect to a bus
                  * running on the host. */
@@ -479,7 +462,7 @@ enum nss_status _nss_mymachines_getpwnam_r(
 
         pwd->pw_name = buffer;
         pwd->pw_uid = mapped;
-        pwd->pw_gid = 65534; /* nobody */
+        pwd->pw_gid = GID_NOBODY;
         pwd->pw_gecos = buffer;
         pwd->pw_passwd = (char*) "*"; /* locked */
         pwd->pw_dir = (char*) "/";
@@ -506,7 +489,7 @@ enum nss_status _nss_mymachines_getpwuid_r(
         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
         _cleanup_(sd_bus_message_unrefp) sd_bus_message* reply = NULL;
         _cleanup_(sd_bus_flush_close_unrefp) sd_bus *bus = NULL;
-        const char *machine, *object;
+        const char *machine;
         uint32_t mapped;
         int r;
 
@@ -519,7 +502,7 @@ enum nss_status _nss_mymachines_getpwuid_r(
         if (uid < HOST_UID_LIMIT)
                 goto not_found;
 
-        if (getenv_bool("SYSTEMD_NSS_BYPASS_BUS") > 0)
+        if (getenv_bool_secure("SYSTEMD_NSS_BYPASS_BUS") > 0)
                 goto not_found;
 
         r = sd_bus_open_system(&bus);
@@ -542,7 +525,7 @@ enum nss_status _nss_mymachines_getpwuid_r(
                 goto fail;
         }
 
-        r = sd_bus_message_read(reply, "sou", &machine, &object, &mapped);
+        r = sd_bus_message_read(reply, "sou", &machine, NULL, &mapped);
         if (r < 0)
                 goto fail;
 
@@ -556,7 +539,7 @@ enum nss_status _nss_mymachines_getpwuid_r(
 
         pwd->pw_name = buffer;
         pwd->pw_uid = uid;
-        pwd->pw_gid = 65534; /* nobody */
+        pwd->pw_gid = GID_NOBODY;
         pwd->pw_gecos = buffer;
         pwd->pw_passwd = (char*) "*"; /* locked */
         pwd->pw_dir = (char*) "/";
@@ -573,6 +556,8 @@ fail:
         *errnop = -r;
         return NSS_STATUS_UNAVAIL;
 }
+
+#pragma GCC diagnostic ignored "-Wsizeof-pointer-memaccess"
 
 enum nss_status _nss_mymachines_getgrnam_r(
                 const char *name,
@@ -613,7 +598,7 @@ enum nss_status _nss_mymachines_getgrnam_r(
         if (!machine_name_is_valid(machine))
                 goto not_found;
 
-        if (getenv_bool("SYSTEMD_NSS_BYPASS_BUS") > 0)
+        if (getenv_bool_secure("SYSTEMD_NSS_BYPASS_BUS") > 0)
                 goto not_found;
 
         r = sd_bus_open_system(&bus);
@@ -653,7 +638,7 @@ enum nss_status _nss_mymachines_getgrnam_r(
         strcpy(buffer + sizeof(char*), name);
 
         gr->gr_name = buffer + sizeof(char*);
-        gr->gr_gid = gid;
+        gr->gr_gid = mapped;
         gr->gr_passwd = (char*) "*"; /* locked */
         gr->gr_mem = (char**) buffer;
 
@@ -678,7 +663,7 @@ enum nss_status _nss_mymachines_getgrgid_r(
         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
         _cleanup_(sd_bus_message_unrefp) sd_bus_message* reply = NULL;
         _cleanup_(sd_bus_flush_close_unrefp) sd_bus *bus = NULL;
-        const char *machine, *object;
+        const char *machine;
         uint32_t mapped;
         int r;
 
@@ -691,7 +676,7 @@ enum nss_status _nss_mymachines_getgrgid_r(
         if (gid < HOST_GID_LIMIT)
                 goto not_found;
 
-        if (getenv_bool("SYSTEMD_NSS_BYPASS_BUS") > 0)
+        if (getenv_bool_secure("SYSTEMD_NSS_BYPASS_BUS") > 0)
                 goto not_found;
 
         r = sd_bus_open_system(&bus);
@@ -714,7 +699,7 @@ enum nss_status _nss_mymachines_getgrgid_r(
                 goto fail;
         }
 
-        r = sd_bus_message_read(reply, "sou", &machine, &object, &mapped);
+        r = sd_bus_message_read(reply, "sou", &machine, NULL, &mapped);
         if (r < 0)
                 goto fail;
 

@@ -1,18 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Copyright (C) 2004-2009 Kay Sievers <kay@vrfy.org>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <ctype.h>
@@ -136,14 +124,15 @@ static void print_record(struct udev_device *device) {
 
         str = udev_device_get_devnode(device);
         if (str != NULL)
-                printf("N: %s\n", str + strlen("/dev/"));
+                printf("N: %s\n", str + STRLEN("/dev/"));
 
         i = udev_device_get_devlink_priority(device);
         if (i != 0)
                 printf("L: %i\n", i);
 
         udev_list_entry_foreach(list_entry, udev_device_get_devlinks_list_entry(device))
-                printf("S: %s\n", udev_list_entry_get_name(list_entry) + strlen("/dev/"));
+                printf("S: %s\n",
+                       udev_list_entry_get_name(list_entry) + STRLEN("/dev/"));
 
         udev_list_entry_foreach(list_entry, udev_device_get_properties_list_entry(device))
                 printf("E: %s=%s\n",
@@ -171,7 +160,7 @@ static int stat_device(const char *name, bool export, const char *prefix) {
 }
 
 static int export_devices(struct udev *udev) {
-        _cleanup_udev_enumerate_unref_ struct udev_enumerate *udev_enumerate;
+        _cleanup_(udev_enumerate_unrefp) struct udev_enumerate *udev_enumerate;
         struct udev_list_entry *list_entry;
 
         udev_enumerate = udev_enumerate_new(udev);
@@ -180,7 +169,7 @@ static int export_devices(struct udev *udev) {
 
         udev_enumerate_scan_devices(udev_enumerate);
         udev_list_entry_foreach(list_entry, udev_enumerate_get_list_entry(udev_enumerate)) {
-                _cleanup_udev_device_unref_ struct udev_device *device;
+                _cleanup_(udev_device_unrefp) struct udev_device *device;
 
                 device = udev_device_new_from_syspath(udev, udev_list_entry_get_name(list_entry));
                 if (device != NULL)
@@ -249,7 +238,7 @@ static void help(void) {
         printf("%s info [OPTIONS] [DEVPATH|FILE]\n\n"
                "Query sysfs or the udev database.\n\n"
                "  -h --help                   Print this message\n"
-               "     --version                Print version of the program\n"
+               "  -V --version                Print version of the program\n"
                "  -q --query=TYPE             Query device information:\n"
                "       name                     Name of device node\n"
                "       symlink                  Pointing to node\n"
@@ -270,7 +259,7 @@ static void help(void) {
 }
 
 static int uinfo(struct udev *udev, int argc, char *argv[]) {
-        _cleanup_udev_device_unref_ struct udev_device *device = NULL;
+        _cleanup_(udev_device_unrefp) struct udev_device *device = NULL;
         bool root = 0;
         bool export = 0;
         const char *export_prefix = NULL;
@@ -376,7 +365,7 @@ static int uinfo(struct udev *udev, int argc, char *argv[]) {
                         export_prefix = optarg;
                         break;
                 case 'V':
-                        printf("%s\n", PACKAGE_VERSION);
+                        print_version();
                         return 0;
                 case 'h':
                         help();
@@ -411,7 +400,8 @@ static int uinfo(struct udev *udev, int argc, char *argv[]) {
                         if (root)
                                 printf("%s\n", udev_device_get_devnode(device));
                         else
-                                printf("%s\n", udev_device_get_devnode(device) + strlen("/dev/"));
+                                printf("%s\n",
+                                       udev_device_get_devnode(device) + STRLEN("/dev/"));
                         break;
                 }
                 case QUERY_SYMLINK:
@@ -420,7 +410,8 @@ static int uinfo(struct udev *udev, int argc, char *argv[]) {
                                 if (root)
                                         printf("%s", udev_list_entry_get_name(list_entry));
                                 else
-                                        printf("%s", udev_list_entry_get_name(list_entry) + strlen("/dev/"));
+                                        printf("%s",
+                                               udev_list_entry_get_name(list_entry) + STRLEN("/dev/"));
                                 list_entry = udev_list_entry_get_next(list_entry);
                                 if (list_entry != NULL)
                                         printf(" ");

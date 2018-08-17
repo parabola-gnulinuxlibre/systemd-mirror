@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2014 Tom Gundersen <teg@jklm.no>
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include "sd-daemon.h"
 #include "sd-event.h"
@@ -61,21 +44,26 @@ int main(int argc, char *argv[]) {
         }
 
         /* Always create the directory where resolv.conf will live */
-        r = mkdir_safe_label("/run/systemd/resolve", 0755, uid, gid);
+        r = mkdir_safe_label("/run/systemd/resolve", 0755, uid, gid, MKDIR_WARN_MODE);
         if (r < 0) {
                 log_error_errno(r, "Could not create runtime directory: %m");
                 goto finish;
         }
 
-        /* Drop privileges, but keep three caps. Note that we drop those too, later on (see below) */
-        r = drop_privileges(uid, gid,
-                            (UINT64_C(1) << CAP_NET_RAW)|          /* needed for SO_BINDTODEVICE */
-                            (UINT64_C(1) << CAP_NET_BIND_SERVICE)| /* needed to bind on port 53 */
-                            (UINT64_C(1) << CAP_SETPCAP)           /* needed in order to drop the caps later */);
-        if (r < 0)
-                goto finish;
+        /* Drop privileges, but only if we have been started as root. If we are not running as root we assume all
+         * privileges are already dropped. */
+        if (getuid() == 0) {
 
-        assert_se(sigprocmask_many(SIG_BLOCK, NULL, SIGTERM, SIGINT, SIGUSR1, SIGUSR2, -1) >= 0);
+                /* Drop privileges, but keep three caps. Note that we drop those too, later on (see below) */
+                r = drop_privileges(uid, gid,
+                                    (UINT64_C(1) << CAP_NET_RAW)|          /* needed for SO_BINDTODEVICE */
+                                    (UINT64_C(1) << CAP_NET_BIND_SERVICE)| /* needed to bind on port 53 */
+                                    (UINT64_C(1) << CAP_SETPCAP)           /* needed in order to drop the caps later */);
+                if (r < 0)
+                        goto finish;
+        }
+
+        assert_se(sigprocmask_many(SIG_BLOCK, NULL, SIGTERM, SIGINT, SIGUSR1, SIGUSR2, SIGRTMIN+1, -1) >= 0);
 
         r = manager_new(&m);
         if (r < 0) {
@@ -112,10 +100,6 @@ int main(int argc, char *argv[]) {
         sd_event_get_exit_code(m->event, &r);
 
 finish:
-        /* systemd-nspawn checks for private resolv.conf to decide whether
-           or not to mount it into the container. So just delete it. */
-        (void) unlink(PRIVATE_RESOLV_CONF);
-
         sd_notify(false,
                   "STOPPING=1\n"
                   "STATUS=Shutting down...");

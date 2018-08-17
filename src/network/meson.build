@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 sources = files('''
         netdev/bond.c
         netdev/bond.h
@@ -27,6 +29,12 @@ sources = files('''
         netdev/vxlan.h
         netdev/geneve.c
         netdev/geneve.h
+        netdev/vxcan.c
+        netdev/vxcan.h
+        netdev/wireguard.c
+        netdev/wireguard.h
+        netdev/netdevsim.c
+        netdev/netdevsim.h
         networkd-address-label.c
         networkd-address-label.h
         networkd-address-pool.c
@@ -61,6 +69,8 @@ sources = files('''
         networkd-network.h
         networkd-route.c
         networkd-route.h
+        networkd-routing-policy-rule.c
+        networkd-routing-policy-rule.h
         networkd-util.c
         networkd-util.h
 '''.split())
@@ -79,7 +89,7 @@ networkctl_sources = files('networkctl.c')
 
 network_include_dir = include_directories('.')
 
-if conf.get('ENABLE_NETWORKD', false)
+if conf.get('ENABLE_NETWORKD') == 1
         networkd_gperf_c = custom_target(
                 'networkd-gperf.c',
                 input : 'networkd-gperf.gperf',
@@ -130,16 +140,22 @@ if conf.get('ENABLE_NETWORKD', false)
 
     [['src/network/test-network.c'],
      [libnetworkd_core,
-      libudev_internal,
+      libudev_static,
       libsystemd_network,
       libshared],
      [threads]],
+
+    [['src/network/test-routing-policy-rule.c'],
+     [libnetworkd_core,
+      libsystemd_network,
+      libudev],
+     []],
 
     [['src/network/test-network-tables.c',
       'src/network/test-network-tables.c',
       test_tables_h],
      [libnetworkd_core,
-      libudev_internal,
+      libudev_static,
       libudev_core,
       libsystemd_network,
       libshared],

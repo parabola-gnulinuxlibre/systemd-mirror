@@ -1,22 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2008-2012 Kay Sievers <kay@vrfy.org>
-  Copyright 2014 Tom Gundersen <teg@jklm.no>
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <ctype.h>
 #include <net/if.h>
@@ -466,6 +448,8 @@ static const char* const device_action_table[_DEVICE_ACTION_MAX] = {
         [DEVICE_ACTION_MOVE] = "move",
         [DEVICE_ACTION_ONLINE] = "online",
         [DEVICE_ACTION_OFFLINE] = "offline",
+        [DEVICE_ACTION_BIND] = "bind",
+        [DEVICE_ACTION_UNBIND] = "unbind",
 };
 
 DEFINE_STRING_TABLE_LOOKUP(device_action, DeviceAction);
@@ -583,8 +567,7 @@ int device_new_from_strv(sd_device **ret, char **strv) {
         if (r < 0)
                 return r;
 
-        *ret = device;
-        device = NULL;
+        *ret = TAKE_PTR(device);
 
         return 0;
 }
@@ -632,8 +615,7 @@ int device_new_from_nulstr(sd_device **ret, uint8_t *nulstr, size_t len) {
         if (r < 0)
                 return r;
 
-        *ret = device;
-        device = NULL;
+        *ret = TAKE_PTR(device);
 
         return 0;
 }
@@ -675,13 +657,9 @@ static int device_update_properties_bufs(sd_device *device) {
                 i++;
         }
 
-        free(device->properties_nulstr);
-        device->properties_nulstr = buf_nulstr;
-        buf_nulstr = NULL;
+        free_and_replace(device->properties_nulstr, buf_nulstr);
         device->properties_nulstr_len = nulstr_len;
-        free(device->properties_strv);
-        device->properties_strv = buf_strv;
-        buf_strv = NULL;
+        free_and_replace(device->properties_strv, buf_strv);
 
         device->properties_buf_outdated = false;
 
@@ -813,8 +791,7 @@ int device_shallow_clone(sd_device *old_device, sd_device **new_device) {
 
         ret->devnum = old_device->devnum;
 
-        *new_device = ret;
-        ret = NULL;
+        *new_device = TAKE_PTR(ret);
 
         return 0;
 }
@@ -836,8 +813,7 @@ int device_clone_with_db(sd_device *old_device, sd_device **new_device) {
 
         ret->sealed = true;
 
-        *new_device = ret;
-        ret = NULL;
+        *new_device = TAKE_PTR(ret);
 
         return 0;
 }
@@ -862,8 +838,7 @@ int device_new_from_synthetic_event(sd_device **new_device, const char *syspath,
         if (r < 0)
                 return r;
 
-        *new_device = ret;
-        ret = NULL;
+        *new_device = TAKE_PTR(ret);
 
         return 0;
 }
@@ -1051,7 +1026,7 @@ int device_update_db(sd_device *device) {
                         const char *devlink;
 
                         FOREACH_DEVICE_DEVLINK(device, devlink)
-                                fprintf(f, "S:%s\n", devlink + strlen("/dev/"));
+                                fprintf(f, "S:%s\n", devlink + STRLEN("/dev/"));
 
                         if (device->devlink_priority != 0)
                                 fprintf(f, "L:%i\n", device->devlink_priority);

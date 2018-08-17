@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2011 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <string.h>
@@ -28,6 +11,8 @@
 #include "signal-util.h"
 #include "strv.h"
 #include "user-util.h"
+
+static BUS_DEFINE_PROPERTY_GET2(property_get_state, "s", User, user_get_state, user_state_to_string);
 
 static int property_get_display(
                 sd_bus *bus,
@@ -50,24 +35,6 @@ static int property_get_display(
                 return -ENOMEM;
 
         return sd_bus_message_append(reply, "(so)", u->display ? u->display->id : "", p);
-}
-
-static int property_get_state(
-                sd_bus *bus,
-                const char *path,
-                const char *interface,
-                const char *property,
-                sd_bus_message *reply,
-                void *userdata,
-                sd_bus_error *error) {
-
-        User *u = userdata;
-
-        assert(bus);
-        assert(reply);
-        assert(u);
-
-        return sd_bus_message_append(reply, "s", user_state_to_string(user_get_state(u)));
 }
 
 static int property_get_sessions(
@@ -270,18 +237,15 @@ int user_object_find(sd_bus *bus, const char *path, const char *interface, void 
         assert(m);
 
         if (streq(path, "/org/freedesktop/login1/user/self")) {
-                _cleanup_(sd_bus_creds_unrefp) sd_bus_creds *creds = NULL;
                 sd_bus_message *message;
 
                 message = sd_bus_get_current_message(bus);
                 if (!message)
                         return 0;
 
-                r = sd_bus_query_sender_creds(message, SD_BUS_CREDS_OWNER_UID|SD_BUS_CREDS_AUGMENT, &creds);
+                r = manager_get_user_from_creds(m, message, UID_INVALID, error, &user);
                 if (r < 0)
                         return r;
-
-                r = sd_bus_creds_get_owner_uid(creds, &uid);
         } else {
                 const char *p;
 
@@ -290,13 +254,13 @@ int user_object_find(sd_bus *bus, const char *path, const char *interface, void 
                         return 0;
 
                 r = parse_uid(p, &uid);
-        }
-        if (r < 0)
-                return 0;
+                if (r < 0)
+                        return 0;
 
-        user = hashmap_get(m->users, UID_TO_PTR(uid));
-        if (!user)
-                return 0;
+                user = hashmap_get(m->users, UID_TO_PTR(uid));
+                if (!user)
+                        return 0;
+        }
 
         *found = user;
         return 1;
@@ -356,8 +320,7 @@ int user_node_enumerator(sd_bus *bus, const char *path, void *userdata, char ***
                 }
         }
 
-        *nodes = l;
-        l = NULL;
+        *nodes = TAKE_PTR(l);
 
         return 1;
 }

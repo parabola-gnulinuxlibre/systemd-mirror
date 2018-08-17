@@ -1,19 +1,7 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Copyright (C) 2003-2004 Greg Kroah-Hartman <greg@kroah.com>
- * Copyright (C) 2004-2008 Kay Sievers <kay@vrfy.org>
+ * Copyright © 2003-2004 Greg Kroah-Hartman <greg@kroah.com>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <errno.h>
@@ -28,13 +16,14 @@
 #include "string-util.h"
 #include "udev-util.h"
 #include "udev.h"
+#include "udevadm-util.h"
 
 static void help(void) {
 
-        printf("%s test OPTIONS <syspath>\n\n"
-               "Test an event run.\n"
+        printf("%s test [OPTIONS] DEVPATH\n\n"
+               "Test an event run.\n\n"
                "  -h --help                            Show this help\n"
-               "     --version                         Show package version\n"
+               "  -V --version                         Show package version\n"
                "  -a --action=ACTION                   Set action string\n"
                "  -N --resolve-names=early|late|never  When to resolve names\n"
                , program_invocation_short_name);
@@ -46,22 +35,23 @@ static int adm_test(struct udev *udev, int argc, char *argv[]) {
         const char *action = "add";
         const char *syspath = NULL;
         struct udev_list_entry *entry;
-        _cleanup_udev_rules_unref_ struct udev_rules *rules = NULL;
-        _cleanup_udev_device_unref_ struct udev_device *dev = NULL;
-        _cleanup_udev_event_unref_ struct udev_event *event = NULL;
+        _cleanup_(udev_rules_unrefp) struct udev_rules *rules = NULL;
+        _cleanup_(udev_device_unrefp) struct udev_device *dev = NULL;
+        _cleanup_(udev_event_unrefp) struct udev_event *event = NULL;
         sigset_t mask, sigmask_orig;
         int rc = 0, c;
 
         static const struct option options[] = {
-                { "action", required_argument, NULL, 'a' },
+                { "action",        required_argument, NULL, 'a' },
                 { "resolve-names", required_argument, NULL, 'N' },
-                { "help", no_argument, NULL, 'h' },
+                { "version",       no_argument,       NULL, 'V' },
+                { "help",          no_argument,       NULL, 'h' },
                 {}
         };
 
         log_debug("version %s", PACKAGE_VERSION);
 
-        while ((c = getopt_long(argc, argv, "a:N:h", options, NULL)) >= 0)
+        while ((c = getopt_long(argc, argv, "a:N:Vh", options, NULL)) >= 0)
                 switch (c) {
                 case 'a':
                         action = optarg;
@@ -79,6 +69,9 @@ static int adm_test(struct udev *udev, int argc, char *argv[]) {
                                 exit(EXIT_FAILURE);
                         }
                         break;
+                case 'V':
+                        print_version();
+                        exit(EXIT_SUCCESS);
                 case 'h':
                         help();
                         exit(EXIT_SUCCESS);
@@ -116,7 +109,7 @@ static int adm_test(struct udev *udev, int argc, char *argv[]) {
                 strscpyl(filename, sizeof(filename), "/sys", syspath, NULL);
         else
                 strscpy(filename, sizeof(filename), syspath);
-        util_remove_trailing_chars(filename, '/');
+        delete_trailing_chars(filename, "/");
 
         dev = udev_device_new_from_synthetic_event(udev, filename, action);
         if (dev == NULL) {

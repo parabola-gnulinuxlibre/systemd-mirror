@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2013 Zbigniew Jędrzejewski-Szmek
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <stdio.h>
 
@@ -37,8 +20,8 @@ static int test_bus_open(void) {
         _cleanup_(sd_bus_flush_close_unrefp) sd_bus *bus = NULL;
         int r;
 
-        r = sd_bus_open_system(&bus);
-        if (r == -ECONNREFUSED || r == -ENOENT)
+        r = sd_bus_open_user(&bus);
+        if (IN_SET(r, -ECONNREFUSED, -ENOENT))
                 return r;
 
         assert_se(r >= 0);
@@ -51,7 +34,7 @@ static void test_bus_new_method_call(void) {
         sd_bus *bus = NULL;
         _cleanup_(sd_bus_message_unrefp) sd_bus_message *m = NULL;
 
-        assert_se(sd_bus_open_system(&bus) >= 0);
+        assert_se(sd_bus_open_user(&bus) >= 0);
 
         assert_se(sd_bus_message_new_method_call(bus, &m, "a.service.name", "/an/object/path", "an.interface.name", "AMethodName") >= 0);
 
@@ -65,7 +48,7 @@ static void test_bus_new_signal(void) {
         sd_bus *bus = NULL;
         _cleanup_(sd_bus_message_unrefp) sd_bus_message *m = NULL;
 
-        assert_se(sd_bus_open_system(&bus) >= 0);
+        assert_se(sd_bus_open_user(&bus) >= 0);
 
         assert_se(sd_bus_message_new_signal(bus, &m, "/an/object/path", "an.interface.name", "Name") >= 0);
 

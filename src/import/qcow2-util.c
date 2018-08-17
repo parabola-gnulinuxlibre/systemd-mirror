@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2015 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <zlib.h>
 
@@ -213,8 +196,7 @@ static int verify_header(const Header *header) {
         if (HEADER_MAGIC(header) != QCOW2_MAGIC)
                 return -EBADMSG;
 
-        if (HEADER_VERSION(header) != 2 &&
-            HEADER_VERSION(header) != 3)
+        if (!IN_SET(HEADER_VERSION(header), 2, 3))
                 return -EOPNOTSUPP;
 
         if (HEADER_CRYPT_METHOD(header) != 0)

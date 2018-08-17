@@ -1,22 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
-
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include "conf-parser.h"
 #include "fs-util.h"
@@ -30,26 +12,21 @@
 #include "unit.h"
 
 static int unit_name_compatible(const char *a, const char *b) {
-        _cleanup_free_ char *prefix = NULL;
+        _cleanup_free_ char *template = NULL;
         int r;
 
-        /* the straightforward case: the symlink name matches the target */
+        /* The straightforward case: the symlink name matches the target */
         if (streq(a, b))
                 return 1;
 
-        r = unit_name_template(a, &prefix);
+        r = unit_name_template(a, &template);
         if (r == -EINVAL)
-                /* not a template */
-                return 0;
+                return 0; /* Not a template */
         if (r < 0)
-                /* oom, or some other failure. Just skip the warning. */
-                return r;
+                return r; /* OOM, or some other failure. Just skip the warning. */
 
-        /* an instance name points to a target that is just the template name */
-        if (streq(prefix, b))
-                return 1;
-
-        return 0;
+        /* An instance name points to a target that is just the template name */
+        return streq(template, b);
 }
 
 static int process_deps(Unit *u, UnitDependency dependency, const char *dir_suffix) {
@@ -68,8 +45,8 @@ static int process_deps(Unit *u, UnitDependency dependency, const char *dir_suff
                 return r;
 
         STRV_FOREACH(p, paths) {
-                const char *entry;
                 _cleanup_free_ char *target = NULL;
+                const char *entry;
 
                 entry = basename(*p);
 
@@ -115,10 +92,10 @@ static int process_deps(Unit *u, UnitDependency dependency, const char *dir_suff
                         log_unit_warning(u, "%s dependency dropin %s target %s has different name",
                                          unit_dependency_to_string(dependency), *p, target);
 
-                r = unit_add_dependency_by_name(u, dependency, entry, *p, true);
+                r = unit_add_dependency_by_name(u, dependency, entry, *p, true, UNIT_DEPENDENCY_FILE);
                 if (r < 0)
-                        log_unit_error_errno(u, r, "cannot add %s dependency on %s, ignoring: %m",
-                                             unit_dependency_to_string(dependency), entry);
+                        log_unit_warning_errno(u, r, "Cannot add %s dependency on %s, ignoring: %m",
+                                               unit_dependency_to_string(dependency), entry);
         }
 
         return 0;
@@ -145,21 +122,19 @@ int unit_load_dropin(Unit *u) {
         if (r <= 0)
                 return 0;
 
-        if (!u->dropin_paths) {
-                u->dropin_paths = l;
-                l = NULL;
-        } else {
+        if (!u->dropin_paths)
+                u->dropin_paths = TAKE_PTR(l);
+        else {
                 r = strv_extend_strv(&u->dropin_paths, l, true);
                 if (r < 0)
                         return log_oom();
         }
 
-        STRV_FOREACH(f, u->dropin_paths) {
-                config_parse(u->id, *f, NULL,
-                             UNIT_VTABLE(u)->sections,
-                             config_item_perf_lookup, load_fragment_gperf_lookup,
-                             false, false, false, u);
-        }
+        STRV_FOREACH(f, u->dropin_paths)
+                (void) config_parse(u->id, *f, NULL,
+                                    UNIT_VTABLE(u)->sections,
+                                    config_item_perf_lookup, load_fragment_gperf_lookup,
+                                    0, u);
 
         u->dropin_mtime = now(CLOCK_REALTIME);
 

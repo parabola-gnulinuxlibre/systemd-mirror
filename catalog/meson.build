@@ -1,7 +1,10 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 in_files = '''
         systemd.bg.catalog
         systemd.be.catalog
         systemd.be@latin.catalog
+        systemd.de.catalog
         systemd.fr.catalog
         systemd.it.catalog
         systemd.pl.catalog
@@ -26,3 +29,7 @@ foreach file : in_files
                 install : true,
                 install_dir : catalogdir)
 endforeach
+
+meson.add_install_script('sh', '-c',
+                         'test -n "$DESTDIR" || @0@/journalctl --update-catalog'
+                         .format(rootbindir))

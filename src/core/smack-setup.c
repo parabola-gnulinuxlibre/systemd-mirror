@@ -1,28 +1,15 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 /***
-  This file is part of systemd.
-
-  Copyright (C) 2013 Intel Corporation
+  Copyright © 2013 Intel Corporation
   Authors:
         Nathaniel Chen <nathaniel.chen@intel.com>
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published
-  by the Free Software Foundation; either version 2.1 of the License,
-  or (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -36,7 +23,7 @@
 #include "string-util.h"
 #include "util.h"
 
-#ifdef HAVE_SMACK
+#if ENABLE_SMACK
 
 static int write_access2_rules(const char* srcdir) {
         _cleanup_close_ int load2_fd = -1, change_fd = -1;
@@ -102,7 +89,7 @@ static int write_access2_rules(const char* srcdir) {
 
                         _cleanup_free_ char *sbj = NULL, *obj = NULL, *acc1 = NULL, *acc2 = NULL;
 
-                        if (isempty(truncate_nl(buf)))
+                        if (isempty(truncate_nl(buf)) || strchr(COMMENTS, *buf))
                                 continue;
 
                         /* if 3 args -> load rule   : subject object access1 */
@@ -179,7 +166,7 @@ static int write_cipso2_rules(const char* srcdir) {
                              log_error_errno(errno, "Failed to read line from '%s': %m",
                                              entry->d_name)) {
 
-                        if (isempty(truncate_nl(buf)))
+                        if (isempty(truncate_nl(buf)) || strchr(COMMENTS, *buf))
                                 continue;
 
                         if (write(cipso2_fd, buf, strlen(buf)) < 0) {
@@ -242,20 +229,25 @@ static int write_netlabel_rules(const char* srcdir) {
                         continue;
                 }
 
+                (void) __fsetlocking(policy, FSETLOCKING_BYCALLER);
+
                 /* load2 write rules in the kernel require a line buffered stream */
                 FOREACH_LINE(buf, policy,
-                             log_error_errno(errno, "Failed to read line from %s: %m",
-                                       entry->d_name)) {
+                             log_error_errno(errno, "Failed to read line from %s: %m", entry->d_name)) {
+
+                        int q;
+
                         if (!fputs(buf, dst)) {
                                 if (r == 0)
                                         r = -EINVAL;
                                 log_error_errno(errno, "Failed to write line to /sys/fs/smackfs/netlabel");
                                 break;
                         }
-                        if (fflush(dst)) {
+                        q = fflush_and_check(dst);
+                        if (q < 0) {
                                 if (r == 0)
-                                        r = -errno;
-                                log_error_errno(errno, "Failed to flush writes to /sys/fs/smackfs/netlabel: %m");
+                                        r = q;
+                                log_error_errno(q, "Failed to flush writes to /sys/fs/smackfs/netlabel: %m");
                                 break;
                         }
                 }
@@ -316,7 +308,7 @@ static int write_onlycap_list(void) {
 
 int mac_smack_setup(bool *loaded_policy) {
 
-#ifdef HAVE_SMACK
+#if ENABLE_SMACK
 
         int r;
 

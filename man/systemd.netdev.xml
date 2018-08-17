@@ -3,22 +3,7 @@
   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 
 <!--
-  This file is part of systemd.
-
-  Copyright 2013 Tom Gundersen
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+  SPDX-License-Identifier: LGPL-2.1+
 -->
 
 <refentry id="systemd.netdev" conditional='ENABLE_NETWORKD'>
@@ -26,15 +11,6 @@
   <refentryinfo>
     <title>systemd.network</title>
     <productname>systemd</productname>
-
-    <authorgroup>
-      <author>
-        <contrib>Developer</contrib>
-        <firstname>Tom</firstname>
-        <surname>Gundersen</surname>
-        <email>teg@jklm.no</email>
-      </author>
-    </authorgroup>
   </refentryinfo>
 
   <refmeta>
@@ -178,6 +154,15 @@
           <row><entry><varname>vcan</varname></entry>
           <entry>The virtual CAN driver (vcan). Similar to the network loopback devices, vcan offers a virtual local CAN interface.</entry></row>
 
+          <row><entry><varname>vxcan</varname></entry>
+          <entry>The virtual CAN tunnel driver (vxcan). Similar to the virtual ethernet driver veth, vxcan implements a local CAN traffic tunnel between two virtual CAN network devices. When creating a vxcan, two vxcan devices are created as pair. When one end receives the packet it appears on its pair and vice versa. The vxcan can be used for cross namespace communication.
+          </entry></row>
+
+          <row><entry><varname>wireguard</varname></entry>
+          <entry>WireGuard Secure Network Tunnel.</entry></row>
+
+          <row><entry><varname>netdevsim</varname></entry>
+          <entry> A simulator. This simulated networking device is used for testing various networking APIs and at this time is particularly focused on testing hardware offloading related interfaces.</entry></row>
         </tbody>
       </tgroup>
     </table>
@@ -223,6 +208,16 @@
           <literal>ConditionKernelCommandLine=</literal> in
           <citerefentry><refentrytitle>systemd.unit</refentrytitle><manvolnum>5</manvolnum></citerefentry>
           for details.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>KernelVersion=</varname></term>
+        <listitem>
+          <para>Checks whether the kernel version (as reported by <command>uname -r</command>) matches a certain
+          expression (or if prefixed with the exclamation mark does not match it). See
+          <literal>ConditionKernelVersion=</literal> in
+          <citerefentry><refentrytitle>systemd.unit</refentrytitle><manvolnum>5</manvolnum></citerefentry> for details.
           </para>
         </listitem>
       </varlistentry>
@@ -339,6 +334,16 @@
           <listitem>
             <para>The priority of the bridge. An integer between 0 and 65535. A lower value
             means higher priority. The bridge having the lowest priority will be elected as root bridge.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><varname>GroupForwardMask=</varname></term>
+          <listitem>
+            <para>A 16-bit bitmask represented as an integer which allows forwarding of link
+            local frames with 802.1D reserved addresses (01:80:C2:00:00:0X). A logical AND
+            is performed between the specified bitmask and the exponentiation of 2^X, the
+            lower nibble of the last octet of the MAC address. For example, a value of 8
+            would allow forwarding of frames addressed to 01:80:C2:00:00:03 (802.1X PAE).</para>
           </listitem>
         </varlistentry>
         <varlistentry>
@@ -483,7 +488,15 @@
         <term><varname>Mode=</varname></term>
           <listitem>
             <para>The IPVLAN mode to use. The supported options are
-            <literal>L2</literal> and <literal>L3</literal>.
+            <literal>L2</literal>,<literal>L3</literal> and <literal>L3S</literal>.
+            </para>
+          </listitem>
+      </varlistentry>
+       <varlistentry>
+        <term><varname>Flags=</varname></term>
+          <listitem>
+            <para>The IPVLAN flags to use. The supported options are
+            <literal>bridge</literal>,<literal>private</literal> and <literal>vepa</literal>.
             </para>
           </listitem>
       </varlistentry>
@@ -507,7 +520,7 @@
       <varlistentry>
         <term><varname>Remote=</varname></term>
         <listitem>
-          <para>Configures destination multicast group IP address.</para>
+          <para>Configures destination IP address.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -660,7 +673,7 @@
       <varlistentry>
         <term><varname>Id=</varname></term>
         <listitem>
-          <para>Specifies the Virtual Network Identifer (VNI) to use. Ranges [0-16777215].</para>
+          <para>Specifies the Virtual Network Identifier (VNI) to use. Ranges [0-16777215].</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -847,6 +860,22 @@
           </para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term><varname>Independent=</varname></term>
+        <listitem>
+          <para>A boolean. When true tunnel does not require .network file. Created as "tunnel@NONE".
+          Defaults to <literal>false</literal>.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>AllowLocalRemote=</varname></term>
+        <listitem>
+          <para>A boolean. When true allows tunnel traffic on <varname>ip6tnl</varname> devices where the remote endpoint is a local host address.
+          Defaults to unset.
+          </para>
+        </listitem>
+      </varlistentry>
     </variablelist>
   </refsect1>
   <refsect1>
@@ -870,6 +899,22 @@
             <para>The peer MACAddress, if not set, it is generated in
             the same way as the MAC address of the main
             interface.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+  </refsect1>
+  <refsect1>
+  <title>[VXCAN] Section Options</title>
+      <para>The <literal>[VXCAN]</literal> section only applies for
+      netdevs of kind <literal>vxcan</literal> and accepts the
+      following key:</para>
+
+      <variablelist class='network-directives'>
+        <varlistentry>
+          <term><varname>Peer=</varname></term>
+          <listitem>
+            <para>The peer interface name used when creating the netdev.
+            This option is compulsory.</para>
           </listitem>
         </varlistentry>
       </variablelist>
@@ -941,6 +986,109 @@
     <para>The <literal>[Tap]</literal> section only applies for
     netdevs of kind <literal>tap</literal>, and accepts the same keys
     as the <literal>[Tun]</literal> section.</para>
+  </refsect1>
+
+  <refsect1>
+    <title>[WireGuard] Section Options</title>
+
+    <para>The <literal>[WireGuard]</literal> section accepts the following
+    keys:</para>
+
+    <variablelist class='network-directives'>
+      <varlistentry>
+        <term><varname>PrivateKey=</varname></term>
+        <listitem>
+          <para>The Base64 encoded private key for the interface. It can be
+            generated using the <command>wg genkey</command> command
+            (see <citerefentry project="wireguard"><refentrytitle>wg</refentrytitle><manvolnum>8</manvolnum></citerefentry>).
+            This option is mandatory to use WireGuard.
+            Note that because this information is secret, you may want to set
+            the permissions of the .netdev file to be owned by <literal>root:systemd-networkd</literal>
+            with a <literal>0640</literal> file mode.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>ListenPort=</varname></term>
+        <listitem>
+          <para>Sets UDP port for listening. Takes either value between 1 and 65535
+            or <literal>auto</literal>. If <literal>auto</literal> is specified,
+            the port is automatically generated based on interface name.
+            Defaults to <literal>auto</literal>.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>FwMark=</varname></term>
+        <listitem>
+          <para>Sets a firewall mark on outgoing WireGuard packets from this interface.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>[WireGuardPeer] Section Options</title>
+
+    <para>The <literal>[WireGuardPeer]</literal> section accepts the following
+    keys:</para>
+
+    <variablelist class='network-directives'>
+      <varlistentry>
+        <term><varname>PublicKey=</varname></term>
+        <listitem>
+          <para>Sets a Base64 encoded public key calculated by <command>wg pubkey</command>
+            (see <citerefentry project="wireguard"><refentrytitle>wg</refentrytitle><manvolnum>8</manvolnum></citerefentry>)
+            from a private key, and usually transmitted out of band to the
+            author of the configuration file. This option is mandatory for this
+            section.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>PresharedKey=</varname></term>
+        <listitem>
+          <para>Optional preshared key for the interface. It can be generated
+            by the <command>wg genpsk</command> command. This option adds an
+            additional layer of symmetric-key cryptography to be mixed into the
+            already existing public-key cryptography, for post-quantum
+            resistance.
+            Note that because this information is secret, you may want to set
+            the permissions of the .netdev file to be owned by <literal>root:systemd-networkd</literal>
+            with a <literal>0640</literal> file mode.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>AllowedIPs=</varname></term>
+        <listitem>
+          <para>Sets a comma-separated list of IP (v4 or v6) addresses with CIDR masks
+            from which this peer is allowed to send incoming traffic and to
+            which outgoing traffic for this peer is directed. The catch-all
+            0.0.0.0/0 may be specified for matching all IPv4 addresses, and
+            ::/0 may be specified for matching all IPv6 addresses. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>Endpoint=</varname></term>
+        <listitem>
+          <para>Sets an endpoint IP address or hostname, followed by a colon, and then
+            a port number. This endpoint will be updated automatically once to
+            the most recent source IP address and port of correctly
+            authenticated packets from the peer at configuration time.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><varname>PersistentKeepalive=</varname></term>
+        <listitem>
+          <para>Sets a seconds interval, between 1 and 65535 inclusive, of how often
+            to send an authenticated empty packet to the peer for the purpose
+            of keeping a stateful firewall or NAT mapping valid persistently.
+            For example, if the interface very rarely sends traffic, but it
+            might at anytime receive traffic from a peer, and it is behind NAT,
+            the interface might benefit from having a persistent keepalive
+            interval of 25 seconds. If set to 0 or "off", this option is
+            disabled. By default or when unspecified, this option is off.
+            Most users will not need this.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
   </refsect1>
 
   <refsect1>
@@ -1185,34 +1333,6 @@
           </para>
         </listitem>
       </varlistentry>
-
-      <varlistentry>
-        <term><varname>ActiveSlave=</varname></term>
-        <listitem>
-          <para>A boolean. Specifies the new active slave. The <literal>ActiveSlave=</literal>
-          option is only valid for following modes:
-          <literal>active-backup</literal>,
-          <literal>balance-alb</literal> and
-          <literal>balance-tlb</literal>. Defaults to false.
-          </para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term><varname>PrimarySlave=</varname></term>
-        <listitem>
-          <para>A boolean. Specifies which slave is the primary device. The specified
-          device will always be the active slave while it is available. Only when the
-          primary is off-line will alternate devices be used.  This is useful when
-          one slave is preferred over another, e.g. when one slave has higher throughput
-          than another. The <literal>PrimarySlave=</literal> option is only valid for
-          following modes:
-          <literal>active-backup</literal>,
-          <literal>balance-alb</literal> and
-          <literal>balance-tlb</literal>. Defaults to false.
-          </para>
-        </listitem>
-      </varlistentry>
     </variablelist>
 
     <para>For more detail information see
@@ -1342,7 +1462,7 @@ Name=vrf-test
 Kind=vrf
 
 [VRF]
-TableId=42</programlisting>
+Table=42</programlisting>
     </example>
 
     <example>
@@ -1352,6 +1472,21 @@ TableId=42</programlisting>
 Name=macvtap-test
 Kind=macvtap
       </programlisting>
+    </example>
+    <example>
+      <title>/etc/systemd/network/25-wireguard.netdev</title>
+      <programlisting>[NetDev]
+Name=wg0
+Kind=wireguard
+
+[WireGuard]
+PrivateKey=EEGlnEPYJV//kbvvIqxKkQwOiS+UENyPncC4bF46ong=
+ListenPort=51820
+
+[WireGuardPeer]
+PublicKey=RDf+LSpeEre7YEIKaxg+wbpsNV7du+ktR99uBEtIiCA=
+AllowedIPs=fd31:bf08:57cb::/48,192.168.26.0/24
+Endpoint=wireguard.example.com:51820</programlisting>
     </example>
   </refsect1>
   <refsect1>

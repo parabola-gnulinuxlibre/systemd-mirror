@@ -1,22 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-  Copyright 2013 Thomas H.P. Andersen
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <string.h>
@@ -71,10 +53,14 @@ static const gather_stdout_callback_t ignore_stdout[] = {
 };
 
 static void test_execute_directory(bool gather_stdout) {
-        char template_lo[] = "/tmp/test-exec-util.XXXXXXX";
-        char template_hi[] = "/tmp/test-exec-util.XXXXXXX";
+        char template_lo[] = "/tmp/test-exec-util.lo.XXXXXXX";
+        char template_hi[] = "/tmp/test-exec-util.hi.XXXXXXX";
         const char * dirs[] = {template_hi, template_lo, NULL};
-        const char *name, *name2, *name3, *overridden, *override, *masked, *mask;
+        const char *name, *name2, *name3,
+                *overridden, *override,
+                *masked, *mask,
+                *masked2, *mask2,   /* the mask is non-executable */
+                *masked2e, *mask2e; /* the mask is executable */
 
         log_info("/* %s (%s) */", __func__, gather_stdout ? "gathering stdout" : "asynchronous");
 
@@ -88,6 +74,10 @@ static void test_execute_directory(bool gather_stdout) {
         override = strjoina(template_hi, "/overridden");
         masked = strjoina(template_lo, "/masked");
         mask = strjoina(template_hi, "/masked");
+        masked2 = strjoina(template_lo, "/masked2");
+        mask2 = strjoina(template_hi, "/masked2");
+        masked2e = strjoina(template_lo, "/masked2e");
+        mask2e = strjoina(template_hi, "/masked2e");
 
         assert_se(write_string_file(name,
                                     "#!/bin/sh\necho 'Executing '$0\ntouch $(dirname $0)/it_works",
@@ -104,7 +94,15 @@ static void test_execute_directory(bool gather_stdout) {
         assert_se(write_string_file(masked,
                                     "#!/bin/sh\necho 'Executing '$0\ntouch $(dirname $0)/failed",
                                     WRITE_STRING_FILE_CREATE) == 0);
+        assert_se(write_string_file(masked2,
+                                    "#!/bin/sh\necho 'Executing '$0\ntouch $(dirname $0)/failed",
+                                    WRITE_STRING_FILE_CREATE) == 0);
+        assert_se(write_string_file(masked2e,
+                                    "#!/bin/sh\necho 'Executing '$0\ntouch $(dirname $0)/failed",
+                                    WRITE_STRING_FILE_CREATE) == 0);
         assert_se(symlink("/dev/null", mask) == 0);
+        assert_se(touch(mask2) == 0);
+        assert_se(touch(mask2e) == 0);
         assert_se(touch(name3) >= 0);
 
         assert_se(chmod(name, 0755) == 0);
@@ -112,6 +110,9 @@ static void test_execute_directory(bool gather_stdout) {
         assert_se(chmod(overridden, 0755) == 0);
         assert_se(chmod(override, 0755) == 0);
         assert_se(chmod(masked, 0755) == 0);
+        assert_se(chmod(masked2, 0755) == 0);
+        assert_se(chmod(masked2e, 0755) == 0);
+        assert_se(chmod(mask2e, 0755) == 0);
 
         if (gather_stdout)
                 execute_directories(dirs, DEFAULT_TIMEOUT_USEC, ignore_stdout, ignore_stdout_args, NULL);
@@ -228,7 +229,6 @@ const gather_stdout_callback_t gather_stdout[] = {
         gather_stdout_two,
         gather_stdout_three,
 };
-
 
 static void test_stdout_gathering(void) {
         char template[] = "/tmp/test-exec-util.XXXXXXX";

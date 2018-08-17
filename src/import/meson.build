@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 systemd_importd_sources = files('''
         importd.c
 '''.split())
@@ -48,19 +50,13 @@ systemd_export_sources = files('''
         import-compress.h
 '''.split())
 
-if conf.get('ENABLE_IMPORTD', false)
+if conf.get('ENABLE_IMPORTD') == 1
         install_data('org.freedesktop.import1.conf',
                      install_dir : dbuspolicydir)
         install_data('org.freedesktop.import1.service',
                      install_dir : dbussystemservicedir)
-
-        custom_target(
-                'org.freedesktop.import1.policy',
-                input : 'org.freedesktop.import1.policy.in',
-                output : 'org.freedesktop.import1.policy',
-                command : intltool_command,
-                install : install_polkit,
-                install_dir : polkitpolicydir)
+        install_data('org.freedesktop.import1.policy',
+                     install_dir : polkitpolicydir)
 
         install_data('import-pubring.gpg',
                      install_dir : rootlibexecdir)

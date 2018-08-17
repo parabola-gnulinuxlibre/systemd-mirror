@@ -1,23 +1,11 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * USB device properties and persistent device path
  *
  * Copyright (c) 2005 SUSE Linux Products GmbH, Germany
  *   Author: Hannes Reinecke <hare@suse.de>
  *
- * Copyright (C) 2005-2011 Kay Sievers <kay@vrfy.org>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <ctype.h>
@@ -175,7 +163,7 @@ static int dev_if_packed_info(struct udev_device *dev, char *ifs_str, size_t len
                 return log_debug_errno(errno, "Error opening USB device 'descriptors' file: %m");
 
         size = read(fd, buf, sizeof(buf));
-        if (size < 18 || size == sizeof(buf))
+        if (size < 18 || (size_t) size >= sizeof(buf))
                 return -EIO;
 
         ifs_str[0] = '\0';
@@ -307,7 +295,7 @@ static int builtin_usb_id(struct udev_device *dev, int argc, char *argv[], bool 
         dev_if_packed_info(dev_usb, packed_if_str, sizeof(packed_if_str));
 
         /* mass storage : SCSI or ATAPI */
-        if (protocol == 6 || protocol == 2) {
+        if (IN_SET(protocol, 6, 2)) {
                 struct udev_device *dev_scsi;
                 const char *scsi_model, *scsi_vendor, *scsi_type, *scsi_rev;
                 int host, bus, target, lun;

@@ -1,23 +1,5 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 #pragma once
-
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
 
 #include <dirent.h>
 #include <stdbool.h>
@@ -29,20 +11,29 @@
 #include "time-util.h"
 
 typedef enum {
-        WRITE_STRING_FILE_CREATE = 1,
-        WRITE_STRING_FILE_ATOMIC = 2,
-        WRITE_STRING_FILE_AVOID_NEWLINE = 4,
-        WRITE_STRING_FILE_VERIFY_ON_FAILURE = 8,
+        WRITE_STRING_FILE_CREATE            = 1 << 0,
+        WRITE_STRING_FILE_ATOMIC            = 1 << 1,
+        WRITE_STRING_FILE_AVOID_NEWLINE     = 1 << 2,
+        WRITE_STRING_FILE_VERIFY_ON_FAILURE = 1 << 3,
+        WRITE_STRING_FILE_SYNC              = 1 << 4,
+        WRITE_STRING_FILE_DISABLE_BUFFER    = 1 << 5,
+
+        /* And before you wonder, why write_string_file_atomic_label_ts() is a separate function instead of just one
+           more flag here: it's about linking: we don't want to pull -lselinux into all users of write_string_file()
+           and friends. */
+
 } WriteStringFileFlags;
 
-int write_string_stream_ts(FILE *f, const char *line, bool enforce_newline, struct timespec *ts);
-static inline int write_string_stream(FILE *f, const char *line, bool enforce_newline) {
-        return write_string_stream_ts(f, line, enforce_newline, NULL);
+int write_string_stream_ts(FILE *f, const char *line, WriteStringFileFlags flags, struct timespec *ts);
+static inline int write_string_stream(FILE *f, const char *line, WriteStringFileFlags flags) {
+        return write_string_stream_ts(f, line, flags, NULL);
 }
 int write_string_file_ts(const char *fn, const char *line, WriteStringFileFlags flags, struct timespec *ts);
 static inline int write_string_file(const char *fn, const char *line, WriteStringFileFlags flags) {
         return write_string_file_ts(fn, line, flags, NULL);
 }
+
+int write_string_filef(const char *fn, WriteStringFileFlags flags, const char *format, ...) _printf_(3, 4);
 
 int read_one_line_file(const char *fn, char **line);
 int read_full_file(const char *fn, char **contents, size_t *size);
@@ -50,7 +41,8 @@ int read_full_stream(FILE *f, char **contents, size_t *size);
 
 int verify_file(const char *fn, const char *blob, bool accept_extra_nl);
 
-int parse_env_file(const char *fname, const char *separator, ...) _sentinel_;
+int parse_env_filev(FILE *f, const char *fname, const char *separator, va_list ap);
+int parse_env_file(FILE *f, const char *fname, const char *separator, ...) _sentinel_;
 int load_env_file(FILE *f, const char *fname, const char *separator, char ***l);
 int load_env_file_pairs(FILE *f, const char *fname, const char *separator, char ***l);
 
@@ -77,6 +69,7 @@ int search_and_fopen_nulstr(const char *path, const char *mode, const char *root
                 } else
 
 int fflush_and_check(FILE *f);
+int fflush_sync_and_check(FILE *f);
 
 int fopen_temporary(const char *path, FILE **_f, char **_temp_path);
 int mkostemp_safe(char *pattern);
@@ -99,3 +92,5 @@ int link_tmpfile(int fd, const char *path, const char *target);
 int read_nul_string(FILE *f, char **ret);
 
 int mkdtemp_malloc(const char *template, char **ret);
+
+int read_line(FILE *f, size_t limit, char **ret);

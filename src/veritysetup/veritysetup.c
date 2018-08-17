@@ -1,30 +1,14 @@
-/***
-  This file is part of systemd.
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
-  Copyright 2016 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
-
-#include <libcryptsetup.h>
+#include <errno.h>
 #include <stdio.h>
 #include <sys/stat.h>
 
-#include "log.h"
-#include "hexdecoct.h"
-#include "string-util.h"
 #include "alloc-util.h"
+#include "crypt-util.h"
+#include "hexdecoct.h"
+#include "log.h"
+#include "string-util.h"
 
 static char *arg_root_hash = NULL;
 static char *arg_data_what = NULL;
@@ -40,12 +24,8 @@ static int help(void) {
         return 0;
 }
 
-static void log_glue(int level, const char *msg, void *usrptr) {
-        log_debug("%s", msg);
-}
-
 int main(int argc, char *argv[]) {
-        struct crypt_device *cd = NULL;
+        _cleanup_(crypt_freep) struct crypt_device *cd = NULL;
         int r;
 
         if (argc <= 1) {
@@ -88,10 +68,10 @@ int main(int argc, char *argv[]) {
                         goto finish;
                 }
 
-                crypt_set_log_callback(cd, log_glue, NULL);
+                crypt_set_log_callback(cd, cryptsetup_log_glue, NULL);
 
                 status = crypt_status(cd, argv[2]);
-                if (status == CRYPT_ACTIVE || status == CRYPT_BUSY) {
+                if (IN_SET(status, CRYPT_ACTIVE, CRYPT_BUSY)) {
                         log_info("Volume %s already active.", argv[2]);
                         r = 0;
                         goto finish;
@@ -126,7 +106,7 @@ int main(int argc, char *argv[]) {
                         goto finish;
                 }
 
-                crypt_set_log_callback(cd, log_glue, NULL);
+                crypt_set_log_callback(cd, cryptsetup_log_glue, NULL);
 
                 r = crypt_deactivate(cd, argv[2]);
                 if (r < 0) {
@@ -143,9 +123,6 @@ int main(int argc, char *argv[]) {
         r = 0;
 
 finish:
-        if (cd)
-                crypt_free(cd);
-
         free(arg_root_hash);
         free(arg_data_what);
         free(arg_hash_what);

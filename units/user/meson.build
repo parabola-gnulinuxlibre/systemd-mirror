@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 units = [
         'basic.target',
         'bluetooth.target',
@@ -12,6 +14,7 @@ units = [
         'sockets.target',
         'sound.target',
         'timers.target',
+        'systemd-tmpfiles-clean.timer',
 ]
 
 foreach file : units
@@ -21,6 +24,8 @@ endforeach
 
 in_units = [
         'systemd-exit.service',
+        'systemd-tmpfiles-clean.service',
+        'systemd-tmpfiles-setup.service',
 ]
 
 foreach file : in_units

@@ -1,6 +1,8 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 in_files = ['basic.conf']
 
-enable_sysusers = conf.get('ENABLE_SYSUSERS', false)
+enable_sysusers = conf.get('ENABLE_SYSUSERS') == 1
 
 foreach file : in_files
         gen = configure_file(
@@ -15,7 +17,7 @@ endforeach
 
 m4_files = ['systemd.conf']
 
-if conf.get('ENABLE_REMOTE', false) and conf.get('HAVE_MICROHTTPD', false)
+if conf.get('ENABLE_REMOTE') == 1 and conf.get('HAVE_MICROHTTPD') == 1
         m4_files += ['systemd-remote.conf']
 endif
 
@@ -24,7 +26,7 @@ foreach file : m4_files
                 'sysusers.d_' + file,
                 input : file + '.m4',
                 output: file,
-                command : [m4, '-P'] + m4_defines + ['@INPUT@'],
+                command : [meson_apply_m4, config_h, '@INPUT@'],
                 capture : true,
                 install : enable_sysusers,
                 install_dir : sysusersdir)

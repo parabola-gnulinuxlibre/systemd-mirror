@@ -1,23 +1,5 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 #pragma once
-
-/***
-  This file is part of systemd.
-
-  Copyright 2012 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
 
 /* A structure for specifying (possibly repetitive) points in calendar
  * time, a la cron */
@@ -40,6 +22,7 @@ typedef struct CalendarSpec {
         bool end_of_month;
         bool utc;
         int dst;
+        char *timezone;
 
         CalendarComponent *year;
         CalendarComponent *month;
@@ -50,7 +33,7 @@ typedef struct CalendarSpec {
         CalendarComponent *microsecond;
 } CalendarSpec;
 
-void calendar_spec_free(CalendarSpec *c);
+CalendarSpec* calendar_spec_free(CalendarSpec *c);
 
 int calendar_spec_normalize(CalendarSpec *spec);
 bool calendar_spec_valid(CalendarSpec *spec);
@@ -59,3 +42,5 @@ int calendar_spec_to_string(const CalendarSpec *spec, char **p);
 int calendar_spec_from_string(const char *p, CalendarSpec **spec);
 
 int calendar_spec_next_usec(const CalendarSpec *spec, usec_t usec, usec_t *next);
+
+DEFINE_TRIVIAL_CLEANUP_FUNC(CalendarSpec*, calendar_spec_free);

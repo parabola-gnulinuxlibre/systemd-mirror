@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2016 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include "fd-util.h"
 #include "resolved-dns-stub.h"
@@ -30,9 +13,12 @@ static int manager_dns_stub_tcp_fd(Manager *m);
 
 static int dns_stub_make_reply_packet(
                 DnsPacket **p,
+                size_t max_size,
                 DnsQuestion *q,
-                DnsAnswer *answer) {
+                DnsAnswer *answer,
+                bool *ret_truncated) {
 
+        bool truncated = false;
         DnsResourceRecord *rr;
         unsigned c = 0;
         int r;
@@ -43,7 +29,7 @@ static int dns_stub_make_reply_packet(
          * roundtrips aren't expensive. */
 
         if (!*p) {
-                r = dns_packet_new(p, DNS_PROTOCOL_DNS, 0);
+                r = dns_packet_new(p, DNS_PROTOCOL_DNS, 0, max_size);
                 if (r < 0)
                         return r;
 
@@ -71,11 +57,20 @@ static int dns_stub_make_reply_packet(
                 continue;
         add:
                 r = dns_packet_append_rr(*p, rr, 0, NULL, NULL);
+                if (r == -EMSGSIZE) {
+                        truncated = true;
+                        break;
+                }
                 if (r < 0)
                         return r;
 
                 c++;
         }
+
+        if (ret_truncated)
+                *ret_truncated = truncated;
+        else if (truncated)
+                return -EMSGSIZE;
 
         DNS_PACKET_HEADER(*p)->ancount = htobe16(be16toh(DNS_PACKET_HEADER(*p)->ancount) + c);
 
@@ -86,6 +81,7 @@ static int dns_stub_finish_reply_packet(
                 DnsPacket *p,
                 uint16_t id,
                 int rcode,
+                bool tc,        /* set the Truncated bit? */
                 bool add_opt,   /* add an OPT RR to this packet? */
                 bool edns0_do,  /* set the EDNS0 DNSSEC OK bit? */
                 bool ad) {      /* set the DNSSEC authenticated data bit? */
@@ -110,14 +106,14 @@ static int dns_stub_finish_reply_packet(
         DNS_PACKET_HEADER(p)->id = id;
 
         DNS_PACKET_HEADER(p)->flags = htobe16(DNS_PACKET_MAKE_FLAGS(
-                                                              1 /* qr */,
-                                                              0 /* opcode */,
-                                                              0 /* aa */,
-                                                              0 /* tc */,
-                                                              1 /* rd */,
-                                                              1 /* ra */,
+                                                              1  /* qr */,
+                                                              0  /* opcode */,
+                                                              0  /* aa */,
+                                                              tc /* tc */,
+                                                              1  /* rd */,
+                                                              1  /* ra */,
                                                               ad /* ad */,
-                                                              0 /* cd */,
+                                                              0  /* cd */,
                                                               rcode));
 
         if (add_opt) {
@@ -149,12 +145,6 @@ static int dns_stub_send(Manager *m, DnsStream *s, DnsPacket *p, DnsPacket *repl
         else {
                 int fd;
 
-                /* Truncate the message to the right size */
-                if (reply->size > DNS_PACKET_PAYLOAD_SIZE_MAX(p)) {
-                        dns_packet_truncate(reply, DNS_PACKET_UNICAST_SIZE_MAX);
-                        DNS_PACKET_HEADER(reply)->flags = htobe16(be16toh(DNS_PACKET_HEADER(reply)->flags) | DNS_PACKET_FLAG_TC);
-                }
-
                 fd = manager_dns_stub_udp_fd(m);
                 if (fd < 0)
                         return log_debug_errno(fd, "Failed to get reply socket: %m");
@@ -178,11 +168,11 @@ static int dns_stub_send_failure(Manager *m, DnsStream *s, DnsPacket *p, int rco
         assert(m);
         assert(p);
 
-        r = dns_stub_make_reply_packet(&reply, p->question, NULL);
+        r = dns_stub_make_reply_packet(&reply, DNS_PACKET_PAYLOAD_SIZE_MAX(p), p->question, NULL, NULL);
         if (r < 0)
                 return log_debug_errno(r, "Failed to make failure packet: %m");
 
-        r = dns_stub_finish_reply_packet(reply, DNS_PACKET_ID(p), rcode, !!p->opt, DNS_PACKET_DO(p), authenticated);
+        r = dns_stub_finish_reply_packet(reply, DNS_PACKET_ID(p), rcode, false, !!p->opt, DNS_PACKET_DO(p), authenticated);
         if (r < 0)
                 return log_debug_errno(r, "Failed to build failure packet: %m");
 
@@ -197,9 +187,10 @@ static void dns_stub_query_complete(DnsQuery *q) {
 
         switch (q->state) {
 
-        case DNS_TRANSACTION_SUCCESS:
+        case DNS_TRANSACTION_SUCCESS: {
+                bool truncated;
 
-                r = dns_stub_make_reply_packet(&q->reply_dns_packet, q->question_idna, q->answer);
+                r = dns_stub_make_reply_packet(&q->reply_dns_packet, DNS_PACKET_PAYLOAD_SIZE_MAX(q->request_dns_packet), q->question_idna, q->answer, &truncated);
                 if (r < 0) {
                         log_debug_errno(r, "Failed to build reply packet: %m");
                         break;
@@ -221,6 +212,7 @@ static void dns_stub_query_complete(DnsQuery *q) {
                                 q->reply_dns_packet,
                                 DNS_PACKET_ID(q->request_dns_packet),
                                 q->answer_rcode,
+                                truncated,
                                 !!q->request_dns_packet->opt,
                                 DNS_PACKET_DO(q->request_dns_packet),
                                 dns_query_fully_authenticated(q));
@@ -231,6 +223,7 @@ static void dns_stub_query_complete(DnsQuery *q) {
 
                 (void) dns_stub_send(q->manager, q->request_dns_stream, q->request_dns_packet, q->reply_dns_packet);
                 break;
+        }
 
         case DNS_TRANSACTION_RCODE_FAILURE:
                 (void) dns_stub_send_failure(q->manager, q->request_dns_stream, q->request_dns_packet, q->answer_rcode, dns_query_fully_authenticated(q));
@@ -436,10 +429,8 @@ static int manager_dns_stub_udp_fd(Manager *m) {
                 return r;
 
         (void) sd_event_source_set_description(m->dns_stub_udp_event_source, "dns-stub-udp");
-        m->dns_stub_udp_fd = fd;
-        fd = -1;
 
-        return m->dns_stub_udp_fd;
+        return m->dns_stub_udp_fd = TAKE_FD(fd);
 }
 
 static int on_dns_stub_stream_packet(DnsStream *s) {
@@ -467,13 +458,13 @@ static int on_dns_stub_stream(sd_event_source *s, int fd, uint32_t revents, void
 
         cfd = accept4(fd, NULL, NULL, SOCK_NONBLOCK|SOCK_CLOEXEC);
         if (cfd < 0) {
-                if (errno == EAGAIN || errno == EINTR)
+                if (IN_SET(errno, EAGAIN, EINTR))
                         return 0;
 
                 return -errno;
         }
 
-        r = dns_stream_new(m, &stream, DNS_PROTOCOL_DNS, cfd);
+        r = dns_stream_new(m, &stream, DNS_PROTOCOL_DNS, cfd, NULL);
         if (r < 0) {
                 safe_close(cfd);
                 return r;
@@ -531,10 +522,8 @@ static int manager_dns_stub_tcp_fd(Manager *m) {
                 return r;
 
         (void) sd_event_source_set_description(m->dns_stub_tcp_event_source, "dns-stub-tcp");
-        m->dns_stub_tcp_fd = fd;
-        fd = -1;
 
-        return m->dns_stub_tcp_fd;
+        return m->dns_stub_tcp_fd = TAKE_FD(fd);
 }
 
 int manager_dns_stub_start(Manager *m) {
@@ -542,6 +531,14 @@ int manager_dns_stub_start(Manager *m) {
         int r = 0;
 
         assert(m);
+
+        if (m->dns_stub_listener_mode == DNS_STUB_LISTENER_NO)
+                log_debug("Not creating stub listener.");
+        else
+                log_debug("Creating stub listener using %s.",
+                          m->dns_stub_listener_mode == DNS_STUB_LISTENER_UDP ? "UDP" :
+                          m->dns_stub_listener_mode == DNS_STUB_LISTENER_TCP ? "TCP" :
+                          "UDP/TCP");
 
         if (IN_SET(m->dns_stub_listener_mode, DNS_STUB_LISTENER_YES, DNS_STUB_LISTENER_UDP))
                 r = manager_dns_stub_udp_fd(m);

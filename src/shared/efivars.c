@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2013 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <dirent.h>
 #include <errno.h>
@@ -42,7 +25,7 @@
 #include "util.h"
 #include "virt.h"
 
-#ifdef ENABLE_EFI
+#if ENABLE_EFI
 
 #define LOAD_OPTION_ACTIVE            0x00000001
 #define MEDIA_DEVICE_PATH                   0x04
@@ -84,10 +67,10 @@ bool is_efi_boot(void) {
 }
 
 static int read_flag(const char *varname) {
-        int r;
         _cleanup_free_ void *v = NULL;
-        size_t s;
         uint8_t b;
+        size_t s;
+        int r;
 
         r = efi_get_variable(EFI_VENDOR_GLOBAL, varname, NULL, &v, &s);
         if (r < 0)
@@ -97,8 +80,7 @@ static int read_flag(const char *varname) {
                 return -EINVAL;
 
         b = *(uint8_t *)v;
-        r = b > 0;
-        return r;
+        return b > 0;
 }
 
 bool is_efi_secure_boot(void) {
@@ -110,29 +92,33 @@ bool is_efi_secure_boot_setup_mode(void) {
 }
 
 int efi_reboot_to_firmware_supported(void) {
-        int r;
-        size_t s;
-        uint64_t b;
         _cleanup_free_ void *v = NULL;
+        uint64_t b;
+        size_t s;
+        int r;
 
         if (!is_efi_boot() || detect_container() > 0)
                 return -EOPNOTSUPP;
 
         r = efi_get_variable(EFI_VENDOR_GLOBAL, "OsIndicationsSupported", NULL, &v, &s);
+        if (r == -ENOENT) /* variable doesn't exist? it's not supported then */
+                return -EOPNOTSUPP;
         if (r < 0)
                 return r;
-        else if (s != sizeof(uint64_t))
+        if (s != sizeof(uint64_t))
                 return -EINVAL;
 
-        b = *(uint64_t *)v;
-        b &= EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
-        return b > 0 ? 0 : -EOPNOTSUPP;
+        b = *(uint64_t*) v;
+        if (!(b & EFI_OS_INDICATIONS_BOOT_TO_FW_UI))
+                return -EOPNOTSUPP; /* bit unset? it's not supported then */
+
+        return 0;
 }
 
 static int get_os_indications(uint64_t *os_indication) {
-        int r;
-        size_t s;
         _cleanup_free_ void *v = NULL;
+        size_t s;
+        int r;
 
         r = efi_reboot_to_firmware_supported();
         if (r < 0)
@@ -245,8 +231,7 @@ int efi_get_variable(
         ((char*) buf)[st.st_size - 4] = 0;
         ((char*) buf)[st.st_size - 4 + 1] = 0;
 
-        *value = buf;
-        buf = NULL;
+        *value = TAKE_PTR(buf);
         *size = (size_t) st.st_size - 4;
 
         if (attribute)
@@ -269,7 +254,7 @@ int efi_set_variable(
         _cleanup_close_ int fd = -1;
 
         assert(name);
-        assert(value);
+        assert(value || size == 0);
 
         if (asprintf(&p,
                      "/sys/firmware/efi/efivars/%s-%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
@@ -424,16 +409,12 @@ int efi_get_boot_option(
                 }
         }
 
-        if (title) {
-                *title = s;
-                s = NULL;
-        }
+        if (title)
+                *title = TAKE_PTR(s);
         if (part_uuid)
                 *part_uuid = p_uuid;
-        if (path) {
-                *path = p;
-                p = NULL;
-        }
+        if (path)
+                *path = TAKE_PTR(p);
         if (active)
                 *active = !!(header->attr & LOAD_OPTION_ACTIVE);
 
@@ -559,8 +540,7 @@ int efi_get_boot_order(uint16_t **order) {
             l / sizeof(uint16_t) > INT_MAX)
                 return -EINVAL;
 
-        *order = buf;
-        buf = NULL;
+        *order = TAKE_PTR(buf);
         return (int) (l / sizeof(uint16_t));
 }
 
@@ -626,8 +606,8 @@ int efi_get_boot_options(uint16_t **options) {
 
         qsort_safe(list, count, sizeof(uint16_t), cmp_uint16);
 
-        *options = list;
-        list = NULL;
+        *options = TAKE_PTR(list);
+
         return count;
 }
 

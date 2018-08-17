@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 bashcompletiondir = get_option('bashcompletiondir')
 if bashcompletiondir == ''
         bash_completion = dependency('bash-completion', required : false)
@@ -37,12 +39,14 @@ if bashcompletiondir != 'no'
                  ['loginctl',            'ENABLE_LOGIND'],
                  ['machinectl',          'ENABLE_MACHINED'],
                  ['networkctl',          'ENABLE_NETWORKD'],
-                 ['systemd-resolve',     'ENABLE_RESOLVED'],
+                 ['portablectl',         'ENABLE_PORTABLED'],
+                 ['resolvectl',          'ENABLE_RESOLVE'],
+                 ['systemd-resolve',     'ENABLE_RESOLVE'],
                  ['timedatectl',         'ENABLE_TIMEDATED'],
                 ]
 
         foreach item : items
-                if item[1] == '' or conf.get(item[1], false)
+                if item[1] == '' or conf.get(item[1]) == 1
                         install_data(item[0],
                                      install_dir : bashcompletiondir)
                 endif

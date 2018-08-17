@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2014 Susant Sahani
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <arpa/inet.h>
 #include <libkmod.h>
@@ -26,37 +9,32 @@
 #include "sd-netlink.h"
 
 #include "macro.h"
+#include "module-util.h"
 #include "util.h"
 
 static int load_module(const char *mod_name) {
-        struct kmod_ctx *ctx;
-        struct kmod_list *list = NULL, *l;
+        _cleanup_(kmod_unrefp) struct kmod_ctx *ctx = NULL;
+        _cleanup_(kmod_module_unref_listp) struct kmod_list *list = NULL;
+        struct kmod_list *l;
         int r;
 
         ctx = kmod_new(NULL, NULL);
-        if (!ctx) {
-                kmod_unref(ctx);
-                return -ENOMEM;
-        }
+        if (!ctx)
+                return log_oom();
 
         r = kmod_module_new_from_lookup(ctx, mod_name, &list);
         if (r < 0)
-                return -1;
+                return r;
 
         kmod_list_foreach(l, list) {
-                struct kmod_module *mod = kmod_module_get_module(l);
+                _cleanup_(kmod_module_unrefp) struct kmod_module *mod = NULL;
+
+                mod = kmod_module_get_module(l);
 
                 r = kmod_module_probe_insert_module(mod, 0, NULL, NULL, NULL, NULL);
-                if (r >= 0)
-                        r = 0;
-                else
-                        r = -1;
-
-                kmod_module_unref(mod);
+                if (r > 0)
+                        r = -EINVAL;
         }
-
-        kmod_module_unref_list(list);
-        kmod_unref(ctx);
 
         return r;
 }

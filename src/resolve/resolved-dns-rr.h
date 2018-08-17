@@ -1,22 +1,7 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 #pragma once
 
 /***
-  This file is part of systemd.
-
-  Copyright 2014 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
  ***/
 
 #include <netinet/in.h>
@@ -56,6 +41,8 @@ enum {
         DNSSEC_ALGORITHM_ECC_GOST = 12,        /* RFC 5933 */
         DNSSEC_ALGORITHM_ECDSAP256SHA256 = 13, /* RFC 6605 */
         DNSSEC_ALGORITHM_ECDSAP384SHA384 = 14, /* RFC 6605 */
+        DNSSEC_ALGORITHM_ED25519 = 15,         /* RFC 8080 */
+        DNSSEC_ALGORITHM_ED448 = 16,           /* RFC 8080 */
         DNSSEC_ALGORITHM_INDIRECT = 252,
         DNSSEC_ALGORITHM_PRIVATEDNS,
         DNSSEC_ALGORITHM_PRIVATEOID,
@@ -96,7 +83,6 @@ struct DnsResourceKey {
                 .type = t,                              \
                 ._name = (char*) n,                     \
         })
-
 
 struct DnsTxtItem {
         size_t length;
@@ -297,6 +283,7 @@ DnsResourceKey* dns_resource_key_ref(DnsResourceKey *key);
 DnsResourceKey* dns_resource_key_unref(DnsResourceKey *key);
 const char* dns_resource_key_name(const DnsResourceKey *key);
 bool dns_resource_key_is_address(const DnsResourceKey *key);
+bool dns_resource_key_is_dnssd_ptr(const DnsResourceKey *key);
 int dns_resource_key_equal(const DnsResourceKey *a, const DnsResourceKey *b);
 int dns_resource_key_match_rr(const DnsResourceKey *key, DnsResourceRecord *rr, const char *search_domain);
 int dns_resource_key_match_cname_or_dname(const DnsResourceKey *key, const DnsResourceKey *cname, const char *search_domain);
@@ -340,6 +327,7 @@ int dns_resource_record_clamp_ttl(DnsResourceRecord **rr, uint32_t max_ttl);
 DnsTxtItem *dns_txt_item_free_all(DnsTxtItem *i);
 bool dns_txt_item_equal(DnsTxtItem *a, DnsTxtItem *b);
 DnsTxtItem *dns_txt_item_copy(DnsTxtItem *i);
+int dns_txt_item_new_empty(DnsTxtItem **ret);
 
 void dns_resource_record_hash_func(const void *i, struct siphash *state);
 

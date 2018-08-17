@@ -1,36 +1,20 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <elf.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <sys/time.h>
 #include <linux/random.h>
+#include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/time.h>
 
-#ifdef HAVE_SYS_AUXV_H
+#if HAVE_SYS_AUXV_H
 #  include <sys/auxv.h>
 #endif
 
-#ifdef USE_SYS_RANDOM_H
+#if USE_SYS_RANDOM_H
 #  include <sys/random.h>
 #else
 #  include <linux/random.h>
@@ -46,7 +30,7 @@ int acquire_random_bytes(void *p, size_t n, bool high_quality_required) {
         static int have_syscall = -1;
 
         _cleanup_close_ int fd = -1;
-        unsigned already_done = 0;
+        size_t already_done = 0;
         int r;
 
         /* Gathers some randomness from the kernel. This call will never block. If
@@ -57,14 +41,14 @@ int acquire_random_bytes(void *p, size_t n, bool high_quality_required) {
          * for us. */
 
         /* Use the getrandom() syscall unless we know we don't have it. */
-        if (have_syscall != 0) {
+        if (have_syscall != 0 && !HAS_FEATURE_MEMORY_SANITIZER) {
                 r = getrandom(p, n, GRND_NONBLOCK);
                 if (r > 0) {
                         have_syscall = true;
                         if ((size_t) r == n)
                                 return 0;
                         if (!high_quality_required) {
-                                /* Fill in the remaing bytes using pseudorandom values */
+                                /* Fill in the remaining bytes using pseudorandom values */
                                 pseudorandom_bytes((uint8_t*) p + r, n - r);
                                 return 0;
                         }
@@ -100,14 +84,14 @@ int acquire_random_bytes(void *p, size_t n, bool high_quality_required) {
 void initialize_srand(void) {
         static bool srand_called = false;
         unsigned x;
-#ifdef HAVE_SYS_AUXV_H
+#if HAVE_SYS_AUXV_H
         void *auxv;
 #endif
 
         if (srand_called)
                 return;
 
-#ifdef HAVE_SYS_AUXV_H
+#if HAVE_SYS_AUXV_H
         /* The kernel provides us with 16 bytes of entropy in auxv, so let's
          * try to make use of that to seed the pseudo-random generator. It's
          * better than nothing... */
@@ -119,7 +103,6 @@ void initialize_srand(void) {
         } else
 #endif
                 x = 0;
-
 
         x ^= (unsigned) now(CLOCK_REALTIME);
         x ^= (unsigned) gettid();

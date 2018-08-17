@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 systemd_machined_sources = files('''
         machined.c
         machined.h
@@ -21,19 +23,13 @@ libmachine_core = static_library(
         include_directories : includes,
         dependencies : [threads])
 
-if conf.get('ENABLE_MACHINED', false)
+if conf.get('ENABLE_MACHINED') == 1
         install_data('org.freedesktop.machine1.conf',
                      install_dir : dbuspolicydir)
         install_data('org.freedesktop.machine1.service',
                      install_dir : dbussystemservicedir)
-
-        custom_target(
-                'org.freedesktop.machine1.policy',
-                input : 'org.freedesktop.machine1.policy.in',
-                output : 'org.freedesktop.machine1.policy',
-                command : intltool_command,
-                install : install_polkit,
-                install_dir : polkitpolicydir)
+        install_data('org.freedesktop.machine1.policy',
+                     install_dir : polkitpolicydir)
 endif
 
 tests += [

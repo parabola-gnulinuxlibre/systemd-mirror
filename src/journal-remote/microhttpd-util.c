@@ -1,28 +1,10 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2012 Lennart Poettering
-  Copyright 2012 Zbigniew Jędrzejewski-Szmek
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
-#ifdef HAVE_GNUTLS
+#if HAVE_GNUTLS
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #endif
@@ -44,7 +26,6 @@ void microhttpd_logger(void *arg, const char *fmt, va_list ap) {
         log_internalv(LOG_INFO, 0, NULL, 0, NULL, f, ap);
         REENABLE_WARNING;
 }
-
 
 static int mhd_respond_internal(struct MHD_Connection *connection,
                                 enum MHD_RequestTerminationCode code,
@@ -115,7 +96,7 @@ int mhd_respondf(struct MHD_Connection *connection,
         return mhd_respond_internal(connection, code, m, r, MHD_RESPMEM_MUST_FREE);
 }
 
-#ifdef HAVE_GNUTLS
+#if HAVE_GNUTLS
 
 static struct {
         const char *const names[4];
@@ -313,10 +294,8 @@ int check_permissions(struct MHD_Connection *connection, int *code, char **hostn
 
         log_debug("Connection from %s", buf);
 
-        if (hostname) {
-                *hostname = buf;
-                buf = NULL;
-        }
+        if (hostname)
+                *hostname = TAKE_PTR(buf);
 
         r = verify_cert_authorized(session);
         if (r < 0) {

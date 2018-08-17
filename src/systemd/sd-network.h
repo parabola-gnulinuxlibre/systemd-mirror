@@ -1,12 +1,8 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 #ifndef foosdnetworkhfoo
 #define foosdnetworkhfoo
 
 /***
-  This file is part of systemd.
-
-  Copyright 2011 Lennart Poettering
-  Copyright 2014 Tom Gundersen
-
   systemd is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation; either version 2.1 of the License, or
@@ -94,6 +90,14 @@ int sd_network_link_get_setup_state(int ifindex, char **state);
  */
 int sd_network_link_get_operational_state(int ifindex, char **state);
 
+/* Indicates whether the network is relevant to being online.
+ * Possible return codes:
+ *   0: the connection is not required
+ *   1: the connection is required to consider the system online
+ *   <0: networkd is not aware of the link
+ */
+int sd_network_link_get_required_for_online(int ifindex);
+
 /* Get path to .network file applied to link */
 int sd_network_link_get_network_file(int ifindex, char **filename);
 
@@ -119,6 +123,14 @@ int sd_network_link_get_llmnr(int ifindex, char **llmnr);
  *   -ENODATA: networkd is not aware of the link
  */
 int sd_network_link_get_mdns(int ifindex, char **mdns);
+
+/* Indicates whether or not DNS-over-TLS should be enabled for the
+ * link.
+ * Possible levels of support: strict, no, opportunistic
+ * Possible return codes:
+ *   -ENODATA: networkd is not aware of the link
+ */
+int sd_network_link_get_dns_over_tls(int ifindex, char **dns_over_tls);
 
 /* Indicates whether or not DNSSEC should be enabled for the link
  * Possible levels of support: yes, no, allow-downgrade

@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2011 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <string.h>
@@ -29,6 +12,10 @@
 #include "strv.h"
 #include "user-util.h"
 #include "util.h"
+
+static BUS_DEFINE_PROPERTY_GET(property_get_can_multi_session, "b", Seat, seat_can_multi_session);
+static BUS_DEFINE_PROPERTY_GET(property_get_can_tty, "b", Seat, seat_can_tty);
+static BUS_DEFINE_PROPERTY_GET(property_get_can_graphical, "b", Seat, seat_can_graphical);
 
 static int property_get_active_session(
                 sd_bus *bus,
@@ -51,60 +38,6 @@ static int property_get_active_session(
                 return -ENOMEM;
 
         return sd_bus_message_append(reply, "(so)", s->active ? s->active->id : "", p);
-}
-
-static int property_get_can_multi_session(
-                sd_bus *bus,
-                const char *path,
-                const char *interface,
-                const char *property,
-                sd_bus_message *reply,
-                void *userdata,
-                sd_bus_error *error) {
-
-        Seat *s = userdata;
-
-        assert(bus);
-        assert(reply);
-        assert(s);
-
-        return sd_bus_message_append(reply, "b", seat_can_multi_session(s));
-}
-
-static int property_get_can_tty(
-                sd_bus *bus,
-                const char *path,
-                const char *interface,
-                const char *property,
-                sd_bus_message *reply,
-                void *userdata,
-                sd_bus_error *error) {
-
-        Seat *s = userdata;
-
-        assert(bus);
-        assert(reply);
-        assert(s);
-
-        return sd_bus_message_append(reply, "b", seat_can_tty(s));
-}
-
-static int property_get_can_graphical(
-                sd_bus *bus,
-                const char *path,
-                const char *interface,
-                const char *property,
-                sd_bus_message *reply,
-                void *userdata,
-                sd_bus_error *error) {
-
-        Seat *s = userdata;
-
-        assert(bus);
-        assert(reply);
-        assert(s);
-
-        return sd_bus_message_append(reply, "b", seat_can_graphical(s));
 }
 
 static int property_get_sessions(
@@ -332,28 +265,15 @@ int seat_object_find(sd_bus *bus, const char *path, const char *interface, void 
         assert(m);
 
         if (streq(path, "/org/freedesktop/login1/seat/self")) {
-                _cleanup_(sd_bus_creds_unrefp) sd_bus_creds *creds = NULL;
                 sd_bus_message *message;
-                Session *session;
-                const char *name;
 
                 message = sd_bus_get_current_message(bus);
                 if (!message)
                         return 0;
 
-                r = sd_bus_query_sender_creds(message, SD_BUS_CREDS_SESSION|SD_BUS_CREDS_AUGMENT, &creds);
+                r = manager_get_seat_from_creds(m, message, NULL, error, &seat);
                 if (r < 0)
                         return r;
-
-                r = sd_bus_creds_get_session(creds, &name);
-                if (r < 0)
-                        return r;
-
-                session = hashmap_get(m->sessions, name);
-                if (!session)
-                        return 0;
-
-                seat = session->seat;
         } else {
                 _cleanup_free_ char *e = NULL;
                 const char *p;
@@ -367,10 +287,9 @@ int seat_object_find(sd_bus *bus, const char *path, const char *interface, void 
                         return -ENOMEM;
 
                 seat = hashmap_get(m->seats, e);
+                if (!seat)
+                        return 0;
         }
-
-        if (!seat)
-                return 0;
 
         *found = seat;
         return 1;
@@ -432,8 +351,7 @@ int seat_node_enumerator(sd_bus *bus, const char *path, void *userdata, char ***
                 }
         }
 
-        *nodes = l;
-        l = NULL;
+        *nodes = TAKE_PTR(l);
 
         return 1;
 }

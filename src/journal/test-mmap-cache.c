@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2012 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -51,23 +34,23 @@ int main(int argc, char *argv[]) {
         assert_se(z >= 0);
         unlink(pz);
 
-        r = mmap_cache_get(m, fx, PROT_READ, 0, false, 1, 2, NULL, &p);
+        r = mmap_cache_get(m, fx, PROT_READ, 0, false, 1, 2, NULL, &p, NULL);
         assert_se(r >= 0);
 
-        r = mmap_cache_get(m, fx, PROT_READ, 0, false, 2, 2, NULL, &q);
+        r = mmap_cache_get(m, fx, PROT_READ, 0, false, 2, 2, NULL, &q, NULL);
         assert_se(r >= 0);
 
         assert_se((uint8_t*) p + 1 == (uint8_t*) q);
 
-        r = mmap_cache_get(m, fx, PROT_READ, 1, false, 3, 2, NULL, &q);
+        r = mmap_cache_get(m, fx, PROT_READ, 1, false, 3, 2, NULL, &q, NULL);
         assert_se(r >= 0);
 
         assert_se((uint8_t*) p + 2 == (uint8_t*) q);
 
-        r = mmap_cache_get(m, fx, PROT_READ, 0, false, 16ULL*1024ULL*1024ULL, 2, NULL, &p);
+        r = mmap_cache_get(m, fx, PROT_READ, 0, false, 16ULL*1024ULL*1024ULL, 2, NULL, &p, NULL);
         assert_se(r >= 0);
 
-        r = mmap_cache_get(m, fx, PROT_READ, 1, false, 16ULL*1024ULL*1024ULL+1, 2, NULL, &q);
+        r = mmap_cache_get(m, fx, PROT_READ, 1, false, 16ULL*1024ULL*1024ULL+1, 2, NULL, &q, NULL);
         assert_se(r >= 0);
 
         assert_se((uint8_t*) p + 1 == (uint8_t*) q);

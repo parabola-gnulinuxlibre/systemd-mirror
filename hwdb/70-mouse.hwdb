@@ -198,6 +198,10 @@ mouse:usb:v413cp3012:name:Dell Dell USB Optical Mouse:
 mouse:usb:v046dpc063:name:DELL DELL USB Laser Mouse:
  MOUSE_DPI=1000@125
 
+# Dell MS116t
+mouse:usb:v413cp301a:name:PixArt Dell MS116 USB Optical Mouse:
+ MOUSE_DPI=1000@125
+
 ##########################################
 # Dynex
 #########################################
@@ -220,6 +224,18 @@ mouse:usb:v0461p4d16:name:USB Optical Mouse:
 # SNES Mouse plugged into a Retrode 2
 mouse:usb:v0403p97c1:name:Retrode SNES Mouse:
  MOUSE_DPI=235@126
+
+##########################################
+# Generic
+##########################################
+
+# FM-901 Wireless Mouse
+mouse:usb:v1ea7p000b:name:2.4G RF Mouse:
+ MOUSE_DPI=*800@125 1600@125
+
+# WK-727
+mouse:usb:v04d9p0499:name:*
+ MOUSE_DPI=800@125
 
 ##########################################
 # HandShoe Mouse
@@ -247,9 +263,14 @@ mouse:usb:v0458p0133:name:Mouse Laser Mouse:
  MOUSE_WHEEL_CLICK_ANGLE=15
 
 # HP X1000
+# Dell MS111-T
 mouse:usb:v093ap2510:name:PixArt USB Optical Mouse:
 mouse:usb:v093ap2510:name:PIXART USB OPTICAL MOUSE:
  MOUSE_DPI=1000@125
+
+# HP X1200 Optical Mouse
+mouse:usb:v03f0p0641:name:PixArt HP X1200 USB Optical Mouse:
+ MOUSE_DPI=1100@125
 
 ##########################################
 # IBM
@@ -295,6 +316,11 @@ mouse:usb:v17efp6045:name:Lenovo USB Laser Mouse:
 # model name. The usb vid/pid is the same for all those devices.
 # Until 3.19 is available, this list just has the Wireless PID entry.
 
+# Logitech Anywhere MX
+mouse:usb:v046dpc52b:name:Logitech Unifying Device. Wireless PID:1017:
+mouse:usb:v046dp1017:name:Logitech Anywhere MX:
+ MOUSE_WHEEL_CLICK_ANGLE=20
+
 # Logitech M-BJ58 Optical Mouse
 mouse:usb:v046dpc00e:name:Logitech USB-PS/2 Optical Mouse:
 # Logitech Mini Optical Mouse
@@ -306,6 +332,10 @@ mouse:usb:v046dpc03e:name:Logitech USB-PS/2 Optical Mouse:
 # Logitech TrackMan Marble Wheel USB
 mouse:usb:v046dpc401:name:Logitech USB-PS/2 Trackball:
  MOUSE_DPI=400@125
+
+# Logitech Cordless MouseMan Optical M-RM63
+mouse:usb:v046dpc501:name:Logitech USB Receiver:
+ MOUSE_DPI=800@63
 
 # Lenovo USB mouse model MO28UOL
 mouse:usb:v04b3p310c:name:USB Optical Mouse:
@@ -352,7 +382,7 @@ mouse:usb:v046dp1025:name:Logitech M510:
 # Logitech M705 (marathon mouse)
 mouse:usb:v046dp101b:name:Logitech M705:
 mouse:usb:v046dpc52b:name:Logitech Unifying Device. Wireless PID:101b:
- MOUSE_DPI=800@166
+ MOUSE_DPI=1000@125
 
 # Logitech MX Revolution
 mouse:usb:v046dpc51a:name:Logitech USB Receiver:
@@ -413,6 +443,10 @@ mouse:usb:v046dp402d:name:Logitech M560:
 mouse:usb:v046dpc52b:name:Logitech Unifying Device. Wireless PID:402d:
  MOUSE_DPI=1000@125
 
+# Logitech M305 Wireless Optical Mouse
+mouse:usb:v046dpc52f:name:Logitech USB Receiver:
+ MOUSE_DPI=1000@170
+
 # Logitech Performance MX
 mouse:usb:v046dp101a:name:Logitech Performance MX:
  MOUSE_DPI=1000@166
@@ -426,9 +460,22 @@ mouse:usb:v046dp4041:name:Logitech MX Master:
  MOUSE_WHEEL_CLICK_COUNT=24
  MOUSE_WHEEL_CLICK_COUNT_HORIZONTAL=14
 
+# Logitech MX Master 2s
+# Horiz wheel has 14 stops, angle is rounded up
+mouse:usb:v046dp4069:name:Logitech MX Master 2s:
+ MOUSE_DPI=1000@125
+ MOUSE_WHEEL_CLICK_ANGLE=15
+ MOUSE_WHEEL_CLICK_ANGLE_HORIZONTAL=26
+ MOUSE_WHEEL_CLICK_COUNT=24
+ MOUSE_WHEEL_CLICK_COUNT_HORIZONTAL=14
+
 # Logitech MK260 Wireless Combo Receiver aka M-R0011
 mouse:usb:v046dpc52e:name:Logitech USB Receiver:
  MOUSE_DPI=1000@200
+
+# Logitech G100s Optical Gaming Mouse
+mouse:usb:v046dpc247:name:Logitech G100s Optical Gaming Mouse:
+ MOUSE_DPI=*1000@500 1750@500 2500@500
 
 # Logitech G700 Laser Mouse (Wired)
 mouse:usb:v046dpc06b:name:Logitech G700 Laser Mouse:
@@ -492,6 +539,10 @@ mouse:usb:v045ep0040:name:Microsoft Microsoft 3-Button Mouse with IntelliEye(TM)
 mouse:usb:v045ep0745:name:Microsoft Microsoft® 2.4GHz Transceiver v6.0:
  MOUSE_DPI=800@142
 
+# Microsoft Comfort Mouse 4500
+mouse:usb:v045ep076c:name:Microsoft Microsoft® Comfort Mouse 4500:
+ MOUSE_DPI=1000@125
+
 # Microsoft Wireless Mobile Mouse 4000
 mouse:usb:v045ep0745:name:Microsoft Microsoft® Nano Transceiver v2.0:
 # Microsoft Sculpt Ergonomic Mouse
@@ -505,6 +556,10 @@ mouse:usb:v045ep07b1:name:Microsoft Microsoft® Nano Transceiver v1.0:
 # Microsoft  Wireless Laser Mouse 8000
 mouse:bluetooth:v045ep0702:name:Microsoft  Wireless Laser Mouse 8000:
  MOUSE_DPI=1000@1000
+
+# Microsoft Sculpt Comfort Mouse
+mouse:bluetooth:v045ep07a2:name:Microsoft Sculpt Comfort Mouse:
+ MOUSE_DPI=1000@2000
 
 # Microsoft Arc Touch Mouse SE:
 mouse:bluetooth:v045ep07f3:name:Arc Touch Mouse SE:
@@ -538,6 +593,14 @@ mouse:usb:v0e8fp00a7:name:DaKai 2.4G RX:
 # Oklick 406S Bluetooth Laser Mouse
 mouse:bluetooth:v056ep0061:name:Laser  BTmouse:
  MOUSE_DPI=*800@333 1600@333
+
+##########################################
+# P-Active
+##########################################
+
+# P-Active Wireless Mouse PA-27K2
+mouse:usb:v0425p0101:name:G-Tech CHINA    USB Wireless Mouse & KeyBoard V1.01  :
+ MOUSE_DPI=800@125
 
 ##########################################
 # Razer

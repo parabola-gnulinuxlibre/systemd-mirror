@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Collect variables across events.
  *
@@ -10,7 +11,7 @@
  * number of missing IDs otherwise.
  * A negative number is returned on error.
  *
- * Copyright(C) 2007, Hannes Reinecke <hare@suse.de>
+ * Copyright © 2007, Hannes Reinecke <hare@suse.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +58,7 @@ static inline struct _mate *node_to_mate(struct udev_list_node *node)
         return container_of(node, struct _mate, node);
 }
 
-noreturn static void sig_alrm(int signo)
+_noreturn_ static void sig_alrm(int signo)
 {
         exit(4);
 }
@@ -102,7 +103,7 @@ static int prepare(char *dir, char *filename)
         if (lockf(fd,F_TLOCK,0) < 0) {
                 if (debug)
                         fprintf(stderr, "Lock taken, wait for %d seconds\n", UDEV_ALARM_TIMEOUT);
-                if (errno == EAGAIN || errno == EACCES) {
+                if (IN_SET(errno, EAGAIN, EACCES)) {
                         alarm(UDEV_ALARM_TIMEOUT);
                         lockf(fd, F_LOCK, 0);
                         if (debug)
@@ -134,7 +135,8 @@ static int prepare(char *dir, char *filename)
 static int checkout(int fd)
 {
         int len;
-        char *buf, *ptr, *word = NULL;
+        _cleanup_free_ char *buf = NULL;
+        char *ptr, *word = NULL;
         struct _mate *him;
 
  restart:
@@ -154,26 +156,22 @@ static int checkout(int fd)
                                 bufsize = bufsize << 1;
                                 if (debug)
                                         fprintf(stderr, "ID overflow, restarting with size %zu\n", bufsize);
-                                free(buf);
                                 lseek(fd, 0, SEEK_SET);
                                 goto restart;
                         }
                         if (ptr) {
                                 *ptr = '\0';
                                 ptr++;
-                                if (!strlen(word))
+                                if (isempty(word))
                                         continue;
 
                                 if (debug)
                                         fprintf(stderr, "Found word %s\n", word);
                                 him = malloc(sizeof (struct _mate));
-                                if (!him) {
-                                        free(buf);
+                                if (!him)
                                         return log_oom();
-                                }
                                 him->name = strdup(word);
                                 if (!him->name) {
-                                        free(buf);
                                         free(him);
                                         return log_oom();
                                 }
@@ -187,12 +185,9 @@ static int checkout(int fd)
 
                 if (!ptr)
                         ptr = word;
-                if (!ptr)
-                        break;
                 ptr -= len;
         }
 
-        free(buf);
         return 0;
 }
 

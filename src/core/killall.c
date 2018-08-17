@@ -1,20 +1,6 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 /***
-  This file is part of systemd.
-
-  Copyright 2010 ProFUSION embedded systems
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+  Copyright © 2010 ProFUSION embedded systems
 ***/
 
 #include <errno.h>
@@ -88,7 +74,7 @@ static bool ignore_proc(pid_t pid, bool warn_rootfs) {
         return true;
 }
 
-static void wait_for_children(Set *pids, sigset_t *mask) {
+static void wait_for_children(Set *pids, sigset_t *mask, usec_t timeout) {
         usec_t until;
 
         assert(mask);
@@ -96,7 +82,7 @@ static void wait_for_children(Set *pids, sigset_t *mask) {
         if (set_isempty(pids))
                 return;
 
-        until = now(CLOCK_MONOTONIC) + DEFAULT_TIMEOUT_USEC;
+        until = now(CLOCK_MONOTONIC) + timeout;
         for (;;) {
                 struct timespec ts;
                 int k;
@@ -129,9 +115,9 @@ static void wait_for_children(Set *pids, sigset_t *mask) {
                  * might not be our child. */
                 SET_FOREACH(p, pids, i) {
 
-                        /* We misuse getpgid as a check whether a
-                         * process still exists. */
-                        if (getpgid(PTR_TO_PID(p)) >= 0)
+                        /* kill(pid, 0) sends no signal, but it tells
+                         * us whether the process still exists. */
+                        if (kill(PTR_TO_PID(p), 0) == 0)
                                 continue;
 
                         if (errno != ESRCH)
@@ -174,8 +160,7 @@ static int killall(int sig, Set *pids, bool send_sighup) {
                 pid_t pid;
                 int r;
 
-                if (d->d_type != DT_DIR &&
-                    d->d_type != DT_UNKNOWN)
+                if (!IN_SET(d->d_type, DT_DIR, DT_UNKNOWN))
                         continue;
 
                 if (parse_pid(d->d_name, &pid) < 0)
@@ -211,7 +196,6 @@ static int killall(int sig, Set *pids, bool send_sighup) {
                         make sure to only send this after SIGTERM so
                         that SIGTERM is always first in the queue. */
 
-
                         if (get_ctty_devnr(pid, NULL) >= 0)
                                 /* it's OK if the process is gone, just ignore the result */
                                 (void) kill(pid, SIGHUP);
@@ -221,7 +205,7 @@ static int killall(int sig, Set *pids, bool send_sighup) {
         return set_size(pids);
 }
 
-void broadcast_signal(int sig, bool wait_for_exit, bool send_sighup) {
+void broadcast_signal(int sig, bool wait_for_exit, bool send_sighup, usec_t timeout) {
         sigset_t mask, oldmask;
         _cleanup_set_free_ Set *pids = NULL;
 
@@ -241,7 +225,7 @@ void broadcast_signal(int sig, bool wait_for_exit, bool send_sighup) {
                 log_warning_errno(errno, "kill(-1, SIGCONT) failed: %m");
 
         if (wait_for_exit)
-                wait_for_children(pids, &mask);
+                wait_for_children(pids, &mask, timeout);
 
         assert_se(sigprocmask(SIG_SETMASK, &oldmask, NULL) == 0);
 }

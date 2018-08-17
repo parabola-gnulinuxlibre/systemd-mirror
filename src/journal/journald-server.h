@@ -1,23 +1,5 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 #pragma once
-
-/***
-  This file is part of systemd.
-
-  Copyright 2011 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
 
 #include <stdbool.h>
 #include <sys/types.h>
@@ -26,11 +8,14 @@
 
 typedef struct Server Server;
 
+#include "conf-parser.h"
 #include "hashmap.h"
 #include "journal-file.h"
+#include "journald-context.h"
 #include "journald-rate-limit.h"
 #include "journald-stream.h"
 #include "list.h"
+#include "prioq.h"
 
 typedef enum Storage {
         STORAGE_AUTO,
@@ -48,6 +33,11 @@ typedef enum SplitMode {
         _SPLIT_MAX,
         _SPLIT_INVALID = -1
 } SplitMode;
+
+typedef struct JournalCompressOptions {
+        bool enabled;
+        uint64_t threshold_bytes;
+} JournalCompressOptions;
 
 typedef struct JournalStorageSpace {
         usec_t   timestamp;
@@ -110,8 +100,9 @@ struct Server {
         JournalStorage runtime_storage;
         JournalStorage system_storage;
 
-        bool compress;
+        JournalCompressOptions compress;
         bool seal;
+        bool read_kmsg;
 
         bool forward_to_kmsg;
         bool forward_to_syslog;
@@ -165,28 +156,48 @@ struct Server {
         usec_t watchdog_usec;
 
         usec_t last_realtime_clock;
+
+        size_t line_max;
+
+        /* Caching of client metadata */
+        Hashmap *client_contexts;
+        Prioq *client_contexts_lru;
+
+        ClientContext *my_context; /* the context of journald itself */
+        ClientContext *pid1_context; /* the context of PID 1 */
 };
 
-#define SERVER_MACHINE_ID(s) ((s)->machine_id_field + strlen("_MACHINE_ID="))
+#define SERVER_MACHINE_ID(s) ((s)->machine_id_field + STRLEN("_MACHINE_ID="))
 
+/* Extra fields for any log messages */
 #define N_IOVEC_META_FIELDS 22
-#define N_IOVEC_KERNEL_FIELDS 64
-#define N_IOVEC_UDEV_FIELDS 32
-#define N_IOVEC_OBJECT_FIELDS 14
-#define N_IOVEC_PAYLOAD_FIELDS 15
 
-void server_dispatch_message(Server *s, struct iovec *iovec, unsigned n, unsigned m, const struct ucred *ucred, const struct timeval *tv, const char *label, size_t label_len, const char *unit_id, int priority, pid_t object_pid);
-void server_driver_message(Server *s, const char *message_id, const char *format, ...) _printf_(3,0) _sentinel_;
+/* Extra fields for log messages that contain OBJECT_PID= (i.e. log about another process) */
+#define N_IOVEC_OBJECT_FIELDS 18
+
+/* Maximum number of fields we'll add in for driver (i.e. internal) messages */
+#define N_IOVEC_PAYLOAD_FIELDS 16
+
+/* kmsg: Maximum number of extra fields we'll import from the kernel's /dev/kmsg */
+#define N_IOVEC_KERNEL_FIELDS 64
+
+/* kmsg: Maximum number of extra fields we'll import from udev's devices */
+#define N_IOVEC_UDEV_FIELDS 32
+
+void server_dispatch_message(Server *s, struct iovec *iovec, size_t n, size_t m, ClientContext *c, const struct timeval *tv, int priority, pid_t object_pid);
+void server_driver_message(Server *s, pid_t object_pid, const char *message_id, const char *format, ...) _sentinel_ _printf_(4,0);
 
 /* gperf lookup function */
 const struct ConfigPerfItem* journald_gperf_lookup(const char *key, GPERF_LEN_TYPE length);
 
-int config_parse_storage(const char *unit, const char *filename, unsigned line, const char *section, unsigned section_line, const char *lvalue, int ltype, const char *rvalue, void *data, void *userdata);
+CONFIG_PARSER_PROTOTYPE(config_parse_storage);
+CONFIG_PARSER_PROTOTYPE(config_parse_line_max);
+CONFIG_PARSER_PROTOTYPE(config_parse_compress);
 
 const char *storage_to_string(Storage s) _const_;
 Storage storage_from_string(const char *s) _pure_;
 
-int config_parse_split_mode(const char *unit, const char *filename, unsigned line, const char *section, unsigned section_line, const char *lvalue, int ltype, const char *rvalue, void *data, void *userdata);
+CONFIG_PARSER_PROTOTYPE(config_parse_split_mode);
 
 const char *split_mode_to_string(SplitMode s) _const_;
 SplitMode split_mode_from_string(const char *s) _pure_;

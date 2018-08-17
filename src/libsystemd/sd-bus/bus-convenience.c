@@ -1,20 +1,5 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 /***
-  This file is part of systemd.
-
-  Copyright 2013 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
 #include "bus-internal.h"
@@ -35,6 +20,7 @@ _public_ int sd_bus_emit_signal(
         int r;
 
         assert_return(bus, -EINVAL);
+        assert_return(bus = bus_resolve(bus), -ENOPKG);
         assert_return(!bus_pid_changed(bus), -ECHILD);
 
         if (!BUS_IS_OPEN(bus->state))
@@ -72,6 +58,7 @@ _public_ int sd_bus_call_method_async(
         int r;
 
         assert_return(bus, -EINVAL);
+        assert_return(bus = bus_resolve(bus), -ENOPKG);
         assert_return(!bus_pid_changed(bus), -ECHILD);
 
         if (!BUS_IS_OPEN(bus->state))
@@ -533,19 +520,12 @@ _public_ int sd_bus_query_sender_creds(sd_bus_message *call, uint64_t mask, sd_b
                  * to get it from the sender or peer. */
 
                 if (call->sender)
-                        /* There's a sender, but the creds are
-                         * missing. This means we are talking via
-                         * dbus1, or are getting a message that was
-                         * sent to us via kdbus, but was converted
-                         * from a dbus1 message by the bus-proxy and
-                         * thus also lacks the creds. */
+                        /* There's a sender, but the creds are missing. */
                         return sd_bus_get_name_creds(call->bus, call->sender, mask, creds);
                 else
-                        /* There's no sender, hence we are on a dbus1
-                         * direct connection. For direct connections
+                        /* There's no sender. For direct connections
                          * the credentials of the AF_UNIX peer matter,
-                         * which may be queried via
-                         * sd_bus_get_owner_creds(). */
+                         * which may be queried via sd_bus_get_owner_creds(). */
                         return sd_bus_get_owner_creds(call->bus, mask, creds);
         }
 
@@ -579,9 +559,6 @@ _public_ int sd_bus_query_sender_privilege(sd_bus_message *call, int capability)
                  * here. */
                 assert_return((sd_bus_creds_get_augmented_mask(creds) & SD_BUS_CREDS_EFFECTIVE_CAPS) == 0, -EPERM);
 
-                /* Note that not even on kdbus we might have the caps
-                 * field, due to faked identities, or namespace
-                 * translation issues. */
                 r = sd_bus_creds_has_effective_cap(creds, capability);
                 if (r > 0)
                         return 1;
@@ -623,4 +600,72 @@ _public_ int sd_bus_query_sender_privilege(sd_bus_message *call, int capability)
         }
 
         return 0;
+}
+
+#define make_expression(sender, path, interface, member)        \
+        strjoina(                                               \
+                "type='signal'",                                \
+                sender ? ",sender='" : "",                      \
+                sender ?: "",                                   \
+                sender ? "'" : "",                              \
+                path ? ",path='" : "",                          \
+                path ?: "",                                     \
+                path ? "'" : "",                                \
+                interface ? ",interface='" : "",                \
+                interface ?: "",                                \
+                interface ? "'" : "",                           \
+                member ? ",member='" : "",                      \
+                member ?: "",                                   \
+                member ? "'" : ""                               \
+        )
+
+_public_ int sd_bus_match_signal(
+                sd_bus *bus,
+                sd_bus_slot **ret,
+                const char *sender,
+                const char *path,
+                const char *interface,
+                const char *member,
+                sd_bus_message_handler_t callback,
+                void *userdata) {
+
+        const char *expression;
+
+        assert_return(bus, -EINVAL);
+        assert_return(bus = bus_resolve(bus), -ENOPKG);
+        assert_return(!bus_pid_changed(bus), -ECHILD);
+        assert_return(!sender || service_name_is_valid(sender), -EINVAL);
+        assert_return(!path || object_path_is_valid(path), -EINVAL);
+        assert_return(!interface || interface_name_is_valid(interface), -EINVAL);
+        assert_return(!member || member_name_is_valid(member), -EINVAL);
+
+        expression = make_expression(sender, path, interface, member);
+
+        return sd_bus_add_match(bus, ret, expression, callback, userdata);
+}
+
+_public_ int sd_bus_match_signal_async(
+                sd_bus *bus,
+                sd_bus_slot **ret,
+                const char *sender,
+                const char *path,
+                const char *interface,
+                const char *member,
+                sd_bus_message_handler_t callback,
+                sd_bus_message_handler_t install_callback,
+                void *userdata) {
+
+        const char *expression;
+
+        assert_return(bus, -EINVAL);
+        assert_return(bus = bus_resolve(bus), -ENOPKG);
+        assert_return(!bus_pid_changed(bus), -ECHILD);
+        assert_return(!sender || service_name_is_valid(sender), -EINVAL);
+        assert_return(!path || object_path_is_valid(path), -EINVAL);
+        assert_return(!interface || interface_name_is_valid(interface), -EINVAL);
+        assert_return(!member || member_name_is_valid(member), -EINVAL);
+
+        expression = make_expression(sender, path, interface, member);
+
+        return sd_bus_add_match_async(bus, ret, expression, callback, install_callback, userdata);
 }

@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <linux/netlink.h>
@@ -54,7 +37,7 @@ int audit_session_from_pid(pid_t pid, uint32_t *id) {
         if (r < 0)
                 return r;
 
-        if (u == AUDIT_SESSION_INVALID || u <= 0)
+        if (!audit_session_is_valid(u))
                 return -ENODATA;
 
         *id = u;
@@ -81,7 +64,7 @@ int audit_loginuid_from_pid(pid_t pid, uid_t *uid) {
         if (r < 0)
                 return r;
 
-        *uid = (uid_t) u;
+        *uid = u;
         return 0;
 }
 
@@ -94,10 +77,9 @@ bool use_audit(void) {
                 fd = socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC|SOCK_NONBLOCK, NETLINK_AUDIT);
                 if (fd < 0) {
                         cached_use = !IN_SET(errno, EAFNOSUPPORT, EPROTONOSUPPORT, EPERM);
-                        if (errno == EPERM)
-                                log_debug_errno(errno, "Audit access prohibited, won't talk to audit");
-                }
-                else {
+                        if (!cached_use)
+                                log_debug_errno(errno, "Won't talk to audit: %m");
+                } else {
                         cached_use = true;
                         safe_close(fd);
                 }

@@ -1,24 +1,6 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2013 Zbigniew Jędrzejewski-Szmek
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <stdio.h>
-#include <sys/mount.h>
 #include <unistd.h>
 
 #include "alloc-util.h"
@@ -38,6 +20,16 @@
                 assert_se(path_equal(a, b) == !result);   \
                 assert_se(path_equal(b, a) == !result);   \
         }
+
+static void test_path_simplify(const char *in, const char *out, const char *out_dot) {
+        char *p;
+
+        p = strdupa(in);
+        assert_se(streq(path_simplify(p, false), out));
+
+        p = strdupa(in);
+        assert_se(streq(path_simplify(p, true), out_dot));
+}
 
 static void test_path(void) {
         _cleanup_close_ int fd = -1;
@@ -82,15 +74,28 @@ static void test_path(void) {
         assert_se(fd >= 0);
         assert_se(fd_is_mount_point(fd, "/", 0) > 0);
 
-        {
-                char p1[] = "aaa/bbb////ccc";
-                char p2[] = "//aaa/.////ccc";
-                char p3[] = "/./";
-
-                assert_se(path_equal(path_kill_slashes(p1), "aaa/bbb/ccc"));
-                assert_se(path_equal(path_kill_slashes(p2), "/aaa/./ccc"));
-                assert_se(path_equal(path_kill_slashes(p3), "/./"));
-        }
+        test_path_simplify("aaa/bbb////ccc", "aaa/bbb/ccc", "aaa/bbb/ccc");
+        test_path_simplify("//aaa/.////ccc", "/aaa/./ccc", "/aaa/ccc");
+        test_path_simplify("///", "/", "/");
+        test_path_simplify("///.//", "/.", "/");
+        test_path_simplify("///.//.///", "/./.", "/");
+        test_path_simplify("////.././///../.", "/.././../.", "/../..");
+        test_path_simplify(".", ".", "");
+        test_path_simplify("./", ".", "");
+        test_path_simplify(".///.//./.", "./././.", "");
+        test_path_simplify(".///.//././/", "./././.", "");
+        test_path_simplify("//./aaa///.//./.bbb/..///c.//d.dd///..eeee/.",
+                           "/./aaa/././.bbb/../c./d.dd/..eeee/.",
+                           "/aaa/.bbb/../c./d.dd/..eeee");
+        test_path_simplify("//./aaa///.//./.bbb/..///c.//d.dd///..eeee/..",
+                           "/./aaa/././.bbb/../c./d.dd/..eeee/..",
+                           "/aaa/.bbb/../c./d.dd/..eeee/..");
+        test_path_simplify(".//./aaa///.//./.bbb/..///c.//d.dd///..eeee/..",
+                           "././aaa/././.bbb/../c./d.dd/..eeee/..",
+                           "aaa/.bbb/../c./d.dd/..eeee/..");
+        test_path_simplify("..//./aaa///.//./.bbb/..///c.//d.dd///..eeee/..",
+                           ".././aaa/././.bbb/../c./d.dd/..eeee/..",
+                           "../aaa/.bbb/../c./d.dd/..eeee/..");
 
         assert_se(PATH_IN_SET("/bin", "/", "/bin", "/foo"));
         assert_se(PATH_IN_SET("/bin", "/bin"));
@@ -261,6 +266,7 @@ static void test_make_relative(void) {
 
         assert_se(path_make_relative("some/relative/path", "/some/path", &result) < 0);
         assert_se(path_make_relative("/some/path", "some/relative/path", &result) < 0);
+        assert_se(path_make_relative("/some/dotdot/../path", "/some/path", &result) < 0);
 
 #define test(from_dir, to_path, expected) {                \
                 _cleanup_free_ char *z = NULL;             \
@@ -274,7 +280,8 @@ static void test_make_relative(void) {
         test("/some/path", "/some/path/in/subdir", "in/subdir");
         test("/some/path", "/", "../..");
         test("/some/path", "/some/other/path", "../other/path");
-        test("//extra/////slashes///won't////fool///anybody//", "////extra///slashes////are/just///fine///", "../../../are/just/fine");
+        test("/some/path/./dot", "/some/further/path", "../../further/path");
+        test("//extra.//.//./.slashes//./won't////fo.ol///anybody//", "/././/extra././/.slashes////ar.e/.just/././.fine///", "../../../ar.e/.just/.fine");
 }
 
 static void test_strv_resolve(void) {
@@ -373,143 +380,6 @@ static void test_prefix_root(void) {
         test_prefix_root_one("/foo///", "//bar", "/foo/bar");
 }
 
-static void test_path_is_mount_point(void) {
-        int fd;
-        char tmp_dir[] = "/tmp/test-path-is-mount-point-XXXXXX";
-        _cleanup_free_ char *file1 = NULL, *file2 = NULL, *link1 = NULL, *link2 = NULL;
-        _cleanup_free_ char *dir1 = NULL, *dir1file = NULL, *dirlink1 = NULL, *dirlink1file = NULL;
-        _cleanup_free_ char *dir2 = NULL, *dir2file = NULL;
-
-        assert_se(path_is_mount_point("/", NULL, AT_SYMLINK_FOLLOW) > 0);
-        assert_se(path_is_mount_point("/", NULL, 0) > 0);
-
-        assert_se(path_is_mount_point("/proc", NULL, AT_SYMLINK_FOLLOW) > 0);
-        assert_se(path_is_mount_point("/proc", NULL, 0) > 0);
-
-        assert_se(path_is_mount_point("/proc/1", NULL, AT_SYMLINK_FOLLOW) == 0);
-        assert_se(path_is_mount_point("/proc/1", NULL, 0) == 0);
-
-        assert_se(path_is_mount_point("/sys", NULL, AT_SYMLINK_FOLLOW) > 0);
-        assert_se(path_is_mount_point("/sys", NULL, 0) > 0);
-
-        /* we'll create a hierarchy of different kinds of dir/file/link
-         * layouts:
-         *
-         * <tmp>/file1, <tmp>/file2
-         * <tmp>/link1 -> file1, <tmp>/link2 -> file2
-         * <tmp>/dir1/
-         * <tmp>/dir1/file
-         * <tmp>/dirlink1 -> dir1
-         * <tmp>/dirlink1file -> dirlink1/file
-         * <tmp>/dir2/
-         * <tmp>/dir2/file
-         */
-
-        /* file mountpoints */
-        assert_se(mkdtemp(tmp_dir) != NULL);
-        file1 = path_join(NULL, tmp_dir, "file1");
-        assert_se(file1);
-        file2 = path_join(NULL, tmp_dir, "file2");
-        assert_se(file2);
-        fd = open(file1, O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC, 0664);
-        assert_se(fd > 0);
-        close(fd);
-        fd = open(file2, O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC, 0664);
-        assert_se(fd > 0);
-        close(fd);
-        link1 = path_join(NULL, tmp_dir, "link1");
-        assert_se(link1);
-        assert_se(symlink("file1", link1) == 0);
-        link2 = path_join(NULL, tmp_dir, "link2");
-        assert_se(link1);
-        assert_se(symlink("file2", link2) == 0);
-
-        assert_se(path_is_mount_point(file1, NULL, AT_SYMLINK_FOLLOW) == 0);
-        assert_se(path_is_mount_point(file1, NULL, 0) == 0);
-        assert_se(path_is_mount_point(link1, NULL, AT_SYMLINK_FOLLOW) == 0);
-        assert_se(path_is_mount_point(link1, NULL, 0) == 0);
-
-        /* directory mountpoints */
-        dir1 = path_join(NULL, tmp_dir, "dir1");
-        assert_se(dir1);
-        assert_se(mkdir(dir1, 0755) == 0);
-        dirlink1 = path_join(NULL, tmp_dir, "dirlink1");
-        assert_se(dirlink1);
-        assert_se(symlink("dir1", dirlink1) == 0);
-        dirlink1file = path_join(NULL, tmp_dir, "dirlink1file");
-        assert_se(dirlink1file);
-        assert_se(symlink("dirlink1/file", dirlink1file) == 0);
-        dir2 = path_join(NULL, tmp_dir, "dir2");
-        assert_se(dir2);
-        assert_se(mkdir(dir2, 0755) == 0);
-
-        assert_se(path_is_mount_point(dir1, NULL, AT_SYMLINK_FOLLOW) == 0);
-        assert_se(path_is_mount_point(dir1, NULL, 0) == 0);
-        assert_se(path_is_mount_point(dirlink1, NULL, AT_SYMLINK_FOLLOW) == 0);
-        assert_se(path_is_mount_point(dirlink1, NULL, 0) == 0);
-
-        /* file in subdirectory mountpoints */
-        dir1file = path_join(NULL, dir1, "file");
-        assert_se(dir1file);
-        fd = open(dir1file, O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC, 0664);
-        assert_se(fd > 0);
-        close(fd);
-
-        assert_se(path_is_mount_point(dir1file, NULL, AT_SYMLINK_FOLLOW) == 0);
-        assert_se(path_is_mount_point(dir1file, NULL, 0) == 0);
-        assert_se(path_is_mount_point(dirlink1file, NULL, AT_SYMLINK_FOLLOW) == 0);
-        assert_se(path_is_mount_point(dirlink1file, NULL, 0) == 0);
-
-        /* these tests will only work as root */
-        if (mount(file1, file2, NULL, MS_BIND, NULL) >= 0) {
-                int rt, rf, rlt, rlf, rl1t, rl1f;
-
-                /* files */
-                /* capture results in vars, to avoid dangling mounts on failure */
-                rf = path_is_mount_point(file2, NULL, 0);
-                rt = path_is_mount_point(file2, NULL, AT_SYMLINK_FOLLOW);
-                rlf = path_is_mount_point(link2, NULL, 0);
-                rlt = path_is_mount_point(link2, NULL, AT_SYMLINK_FOLLOW);
-
-                assert_se(umount(file2) == 0);
-
-                assert_se(rf == 1);
-                assert_se(rt == 1);
-                assert_se(rlf == 0);
-                assert_se(rlt == 1);
-
-                /* dirs */
-                dir2file = path_join(NULL, dir2, "file");
-                assert_se(dir2file);
-                fd = open(dir2file, O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC, 0664);
-                assert_se(fd > 0);
-                close(fd);
-
-                assert_se(mount(dir2, dir1, NULL, MS_BIND, NULL) >= 0);
-
-                rf = path_is_mount_point(dir1, NULL, 0);
-                rt = path_is_mount_point(dir1, NULL, AT_SYMLINK_FOLLOW);
-                rlf = path_is_mount_point(dirlink1, NULL, 0);
-                rlt = path_is_mount_point(dirlink1, NULL, AT_SYMLINK_FOLLOW);
-                /* its parent is a mount point, but not /file itself */
-                rl1f = path_is_mount_point(dirlink1file, NULL, 0);
-                rl1t = path_is_mount_point(dirlink1file, NULL, AT_SYMLINK_FOLLOW);
-
-                assert_se(umount(dir1) == 0);
-
-                assert_se(rf == 1);
-                assert_se(rt == 1);
-                assert_se(rlf == 0);
-                assert_se(rlt == 1);
-                assert_se(rl1f == 0);
-                assert_se(rl1t == 0);
-
-        } else
-                printf("Skipping bind mount file test: %m\n");
-
-        assert_se(rm_rf(tmp_dir, REMOVE_ROOT|REMOVE_PHYSICAL) == 0);
-}
-
 static void test_file_in_same_dir(void) {
         char *t;
 
@@ -532,6 +402,25 @@ static void test_file_in_same_dir(void) {
         t = file_in_same_dir("bar/foo", "bar");
         assert_se(streq(t, "bar/bar"));
         free(t);
+}
+
+static void test_last_path_component(void) {
+        assert_se(streq(last_path_component("a/b/c"), "c"));
+        assert_se(streq(last_path_component("a/b/c/"), "c/"));
+        assert_se(streq(last_path_component("/"), "/"));
+        assert_se(streq(last_path_component("//"), "/"));
+        assert_se(streq(last_path_component("///"), "/"));
+        assert_se(streq(last_path_component("."), "."));
+        assert_se(streq(last_path_component("./."), "."));
+        assert_se(streq(last_path_component("././"), "./"));
+        assert_se(streq(last_path_component("././/"), ".//"));
+        assert_se(streq(last_path_component("/foo/a"), "a"));
+        assert_se(streq(last_path_component("/foo/a/"), "a/"));
+        assert_se(streq(last_path_component(""), ""));
+        assert_se(streq(last_path_component("a"), "a"));
+        assert_se(streq(last_path_component("a/"), "a/"));
+        assert_se(streq(last_path_component("/a"), "a"));
+        assert_se(streq(last_path_component("/a/"), "a/"));
 }
 
 static void test_filename_is_valid(void) {
@@ -588,6 +477,34 @@ static void test_systemd_installation_has_version(const char *path) {
         }
 }
 
+static void test_skip_dev_prefix(void) {
+
+        assert_se(streq(skip_dev_prefix("/"), "/"));
+        assert_se(streq(skip_dev_prefix("/dev"), ""));
+        assert_se(streq(skip_dev_prefix("/dev/"), ""));
+        assert_se(streq(skip_dev_prefix("/dev/foo"), "foo"));
+        assert_se(streq(skip_dev_prefix("/dev/foo/bar"), "foo/bar"));
+        assert_se(streq(skip_dev_prefix("//dev"), ""));
+        assert_se(streq(skip_dev_prefix("//dev//"), ""));
+        assert_se(streq(skip_dev_prefix("/dev///foo"), "foo"));
+        assert_se(streq(skip_dev_prefix("///dev///foo///bar"), "foo///bar"));
+        assert_se(streq(skip_dev_prefix("//foo"), "//foo"));
+        assert_se(streq(skip_dev_prefix("foo"), "foo"));
+}
+
+static void test_empty_or_root(void) {
+        assert_se(empty_or_root(NULL));
+        assert_se(empty_or_root(""));
+        assert_se(empty_or_root("/"));
+        assert_se(empty_or_root("//"));
+        assert_se(empty_or_root("///"));
+        assert_se(empty_or_root("/////////////////"));
+        assert_se(!empty_or_root("xxx"));
+        assert_se(!empty_or_root("/xxx"));
+        assert_se(!empty_or_root("/xxx/"));
+        assert_se(!empty_or_root("//yy//"));
+}
+
 int main(int argc, char **argv) {
         log_set_max_level(LOG_DEBUG);
         log_parse_environment();
@@ -603,10 +520,12 @@ int main(int argc, char **argv) {
         test_strv_resolve();
         test_path_startswith();
         test_prefix_root();
-        test_path_is_mount_point();
         test_file_in_same_dir();
+        test_last_path_component();
         test_filename_is_valid();
         test_hidden_or_backup_file();
+        test_skip_dev_prefix();
+        test_empty_or_root();
 
         test_systemd_installation_has_version(argv[1]); /* NULL is OK */
 

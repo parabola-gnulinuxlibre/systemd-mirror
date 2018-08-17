@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 install_data('kernel-install',
              install_mode : 'rwxr-xr-x',
              install_dir : bindir)

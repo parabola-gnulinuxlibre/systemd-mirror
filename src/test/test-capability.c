@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd
-
-  Copyright 2014 Ronny Chevalier
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <netinet/in.h>
 #include <pwd.h>
@@ -25,9 +8,12 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "alloc-util.h"
 #include "capability-util.h"
 #include "fd-util.h"
+#include "fileio.h"
 #include "macro.h"
+#include "parse-util.h"
 #include "util.h"
 
 static uid_t test_uid = -1;
@@ -36,6 +22,39 @@ static gid_t test_gid = -1;
 /* We keep CAP_DAC_OVERRIDE to avoid errors with gcov when doing test coverage */
 static uint64_t test_flags = 1ULL << CAP_DAC_OVERRIDE;
 
+/* verify cap_last_cap() against /proc/sys/kernel/cap_last_cap */
+static void test_last_cap_file(void) {
+        _cleanup_free_ char *content = NULL;
+        unsigned long val = 0;
+        int r;
+
+        r = read_one_line_file("/proc/sys/kernel/cap_last_cap", &content);
+        assert_se(r >= 0);
+
+        r = safe_atolu(content, &val);
+        assert_se(r >= 0);
+        assert_se(val != 0);
+        assert_se(val == cap_last_cap());
+}
+
+/* verify cap_last_cap() against syscall probing */
+static void test_last_cap_probe(void) {
+        unsigned long p = (unsigned long)CAP_LAST_CAP;
+
+        if (prctl(PR_CAPBSET_READ, p) < 0) {
+                for (p--; p > 0; p --)
+                        if (prctl(PR_CAPBSET_READ, p) >= 0)
+                                break;
+        } else {
+                for (;; p++)
+                        if (prctl(PR_CAPBSET_READ, p+1) < 0)
+                                break;
+        }
+
+        assert_se(p != 0);
+        assert_se(p == cap_last_cap());
+}
+
 static void fork_test(void (*test_func)(void)) {
         pid_t pid = 0;
 
@@ -43,7 +62,7 @@ static void fork_test(void (*test_func)(void)) {
         assert_se(pid >= 0);
         if (pid == 0) {
                 test_func();
-                exit(0);
+                exit(EXIT_SUCCESS);
         } else if (pid > 0) {
                 int status;
 
@@ -71,7 +90,7 @@ static int setup_tests(bool *run_ambient) {
         struct passwd *nobody;
         int r;
 
-        nobody = getpwnam("nobody");
+        nobody = getpwnam(NOBODY_USER_NAME);
         if (!nobody) {
                 log_error_errno(errno, "Could not find nobody user: %m");
                 return -EXIT_TEST_SKIP;
@@ -202,8 +221,13 @@ int main(int argc, char *argv[]) {
         int r;
         bool run_ambient;
 
+        test_last_cap_file();
+        test_last_cap_probe();
+
         log_parse_environment();
         log_open();
+
+        log_info("have ambient caps: %s", yes_no(ambient_capabilities_supported()));
 
         if (getuid() != 0)
                 return EXIT_TEST_SKIP;

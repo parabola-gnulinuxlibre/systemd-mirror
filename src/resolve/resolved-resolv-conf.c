@@ -1,23 +1,7 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2014 Tom Gundersen <teg@jklm.no>
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
- ***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <resolv.h>
+#include <stdio_ext.h>
 
 #include "alloc-util.h"
 #include "dns-domain.h"
@@ -26,15 +10,47 @@
 #include "fileio.h"
 #include "ordered-set.h"
 #include "resolved-conf.h"
+#include "resolved-dns-server.h"
 #include "resolved-resolv-conf.h"
 #include "string-util.h"
 #include "strv.h"
 
+/* A resolv.conf file containing the DNS server and domain data we learnt from uplink, i.e. the full uplink data */
+#define PRIVATE_UPLINK_RESOLV_CONF "/run/systemd/resolve/resolv.conf"
+
+/* A resolv.conf file containing the domain data we learnt from uplink, but our own DNS server address. */
+#define PRIVATE_STUB_RESOLV_CONF "/run/systemd/resolve/stub-resolv.conf"
+
+/* A static resolv.conf file containing no domains, but only our own DNS sever address */
+#define PRIVATE_STATIC_RESOLV_CONF ROOTLIBEXECDIR "/resolv.conf"
+
+static bool file_is_our_own(const struct stat *st) {
+        const char *path;
+
+        assert(st);
+
+        FOREACH_STRING(path,
+                       PRIVATE_UPLINK_RESOLV_CONF,
+                       PRIVATE_STUB_RESOLV_CONF,
+                       PRIVATE_STATIC_RESOLV_CONF) {
+
+                struct stat own;
+
+                /* Is it symlinked to our own uplink file? */
+                if (stat(path, &own) >= 0 &&
+                    st->st_dev == own.st_dev &&
+                    st->st_ino == own.st_ino)
+                        return true;
+        }
+
+        return false;
+}
+
 int manager_read_resolv_conf(Manager *m) {
         _cleanup_fclose_ FILE *f = NULL;
-        struct stat st, own;
+        struct stat st;
         char line[LINE_MAX];
-        usec_t t;
+        unsigned n = 0;
         int r;
 
         assert(m);
@@ -55,14 +71,10 @@ int manager_read_resolv_conf(Manager *m) {
         }
 
         /* Have we already seen the file? */
-        t = timespec_load(&st.st_mtim);
-        if (t == m->resolv_conf_mtime)
+        if (timespec_load(&st.st_mtim) == m->resolv_conf_mtime)
                 return 0;
 
-        /* Is it symlinked to our own file? */
-        if (stat(PRIVATE_RESOLV_CONF, &own) >= 0 &&
-            st.st_dev == own.st_dev &&
-            st.st_ino == own.st_ino)
+        if (file_is_our_own(&st))
                 return 0;
 
         f = fopen("/etc/resolv.conf", "re");
@@ -79,6 +91,9 @@ int manager_read_resolv_conf(Manager *m) {
                 goto clear;
         }
 
+        if (file_is_our_own(&st))
+                return 0;
+
         dns_server_mark_all(m->dns_servers);
         dns_search_domain_mark_all(m->search_domains);
 
@@ -86,8 +101,10 @@ int manager_read_resolv_conf(Manager *m) {
                 const char *a;
                 char *l;
 
+                n++;
+
                 l = strstrip(line);
-                if (*l == '#' || *l == ';')
+                if (IN_SET(*l, '#', ';', 0))
                         continue;
 
                 a = first_word(l, "nameserver");
@@ -107,9 +124,11 @@ int manager_read_resolv_conf(Manager *m) {
                         if (r < 0)
                                 log_warning_errno(r, "Failed to parse search domain string '%s', ignoring.", a);
                 }
+
+                log_syntax(NULL, LOG_DEBUG, "/etc/resolv.conf", n, 0, "Ignoring resolv.conf line: %s", l);
         }
 
-        m->resolv_conf_mtime = t;
+        m->resolv_conf_mtime = timespec_load(&st.st_mtim);
 
         /* Flush out all servers and search domains that are still
          * marked. Those are then ones that didn't appear in the new
@@ -136,6 +155,11 @@ int manager_read_resolv_conf(Manager *m) {
         if (m->unicast_scope)
                 dns_cache_flush(&m->unicast_scope->cache);
 
+        /* If /etc/resolv.conf changed, make sure to forget everything we learned about the DNS servers. After all we
+         * might now talk to a very different DNS server that just happens to have the same IP address as an old one
+         * (think 192.168.1.1). */
+        dns_server_reset_features_all(m->dns_servers);
+
         return 0;
 
 clear:
@@ -150,7 +174,7 @@ static void write_resolv_conf_server(DnsServer *s, FILE *f, unsigned *count) {
         assert(count);
 
         if (!dns_server_string(s)) {
-                log_warning("Our of memory, or invalid DNS address. Ignoring server.");
+                log_warning("Out of memory, or invalid DNS address. Ignoring server.");
                 return;
         }
 
@@ -200,17 +224,21 @@ static void write_resolv_conf_search(
         fputs("\n", f);
 }
 
-static int write_resolv_conf_contents(FILE *f, OrderedSet *dns, OrderedSet *domains) {
+static int write_uplink_resolv_conf_contents(FILE *f, OrderedSet *dns, OrderedSet *domains) {
         Iterator i;
 
-        fputs("# This file is managed by man:systemd-resolved(8). Do not edit.\n#\n"
+        fputs("# This file is managed by man:systemd-resolved(8). Do not edit.\n"
+              "#\n"
               "# This is a dynamic resolv.conf file for connecting local clients directly to\n"
-              "# all known DNS servers.\n#\n"
+              "# all known uplink DNS servers. This file lists all configured search domains.\n"
+              "#\n"
               "# Third party programs must not access this file directly, but only through the\n"
               "# symlink at /etc/resolv.conf. To manage man:resolv.conf(5) in a different way,\n"
-              "# replace this symlink by a static file or a different symlink.\n#\n"
+              "# replace this symlink by a static file or a different symlink.\n"
+              "#\n"
               "# See man:systemd-resolved.service(8) for details about the supported modes of\n"
-              "# operation for /etc/resolv.conf.\n\n", f);
+              "# operation for /etc/resolv.conf.\n"
+              "\n", f);
 
         if (ordered_set_isempty(dns))
                 fputs("# No DNS servers known.\n", f);
@@ -228,11 +256,36 @@ static int write_resolv_conf_contents(FILE *f, OrderedSet *dns, OrderedSet *doma
         return fflush_and_check(f);
 }
 
+static int write_stub_resolv_conf_contents(FILE *f, OrderedSet *dns, OrderedSet *domains) {
+        fputs_unlocked("# This file is managed by man:systemd-resolved(8). Do not edit.\n"
+                       "#\n"
+                       "# This is a dynamic resolv.conf file for connecting local clients to the\n"
+                       "# internal DNS stub resolver of systemd-resolved. This file lists all\n"
+                       "# configured search domains.\n"
+                       "#\n"
+                       "# Run \"resolvectl status\" to see details about the uplink DNS servers\n"
+                       "# currently in use.\n"
+                       "#\n"
+                       "# Third party programs must not access this file directly, but only through the\n"
+                       "# symlink at /etc/resolv.conf. To manage man:resolv.conf(5) in a different way,\n"
+                       "# replace this symlink by a static file or a different symlink.\n"
+                       "#\n"
+                       "# See man:systemd-resolved.service(8) for details about the supported modes of\n"
+                       "# operation for /etc/resolv.conf.\n"
+                       "\n"
+                       "nameserver 127.0.0.53\n", f);
+
+        if (!ordered_set_isempty(domains))
+                write_resolv_conf_search(domains, f);
+
+        return fflush_and_check(f);
+}
+
 int manager_write_resolv_conf(Manager *m) {
 
         _cleanup_ordered_set_free_ OrderedSet *dns = NULL, *domains = NULL;
-        _cleanup_free_ char *temp_path = NULL;
-        _cleanup_fclose_ FILE *f = NULL;
+        _cleanup_free_ char *temp_path_uplink = NULL, *temp_path_stub = NULL;
+        _cleanup_fclose_ FILE *f_uplink = NULL, *f_stub = NULL;
         int r;
 
         assert(m);
@@ -249,28 +302,49 @@ int manager_write_resolv_conf(Manager *m) {
         if (r < 0)
                 return log_warning_errno(r, "Failed to compile list of search domains: %m");
 
-        r = fopen_temporary_label(PRIVATE_RESOLV_CONF, PRIVATE_RESOLV_CONF, &f, &temp_path);
+        r = fopen_temporary_label(PRIVATE_UPLINK_RESOLV_CONF, PRIVATE_UPLINK_RESOLV_CONF, &f_uplink, &temp_path_uplink);
         if (r < 0)
                 return log_warning_errno(r, "Failed to open private resolv.conf file for writing: %m");
 
-        (void) fchmod(fileno(f), 0644);
+        (void) __fsetlocking(f_uplink, FSETLOCKING_BYCALLER);
+        (void) fchmod(fileno(f_uplink), 0644);
 
-        r = write_resolv_conf_contents(f, dns, domains);
+        r = fopen_temporary_label(PRIVATE_STUB_RESOLV_CONF, PRIVATE_STUB_RESOLV_CONF, &f_stub, &temp_path_stub);
+        if (r < 0)
+                return log_warning_errno(r, "Failed to open private stub-resolv.conf file for writing: %m");
+
+        (void) __fsetlocking(f_stub, FSETLOCKING_BYCALLER);
+        (void) fchmod(fileno(f_stub), 0644);
+
+        r = write_uplink_resolv_conf_contents(f_uplink, dns, domains);
         if (r < 0) {
                 log_error_errno(r, "Failed to write private resolv.conf contents: %m");
                 goto fail;
         }
 
-        if (rename(temp_path, PRIVATE_RESOLV_CONF) < 0) {
+        if (rename(temp_path_uplink, PRIVATE_UPLINK_RESOLV_CONF) < 0) {
                 r = log_error_errno(errno, "Failed to move private resolv.conf file into place: %m");
+                goto fail;
+        }
+
+        r = write_stub_resolv_conf_contents(f_stub, dns, domains);
+        if (r < 0) {
+                log_error_errno(r, "Failed to write private stub-resolv.conf contents: %m");
+                goto fail;
+        }
+
+        if (rename(temp_path_stub, PRIVATE_STUB_RESOLV_CONF) < 0) {
+                r = log_error_errno(errno, "Failed to move private stub-resolv.conf file into place: %m");
                 goto fail;
         }
 
         return 0;
 
 fail:
-        (void) unlink(PRIVATE_RESOLV_CONF);
-        (void) unlink(temp_path);
+        (void) unlink(PRIVATE_UPLINK_RESOLV_CONF);
+        (void) unlink(temp_path_uplink);
+        (void) unlink(PRIVATE_STUB_RESOLV_CONF);
+        (void) unlink(temp_path_stub);
 
         return r;
 }

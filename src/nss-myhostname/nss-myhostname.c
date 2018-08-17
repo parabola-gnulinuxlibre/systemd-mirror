@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2008-2011 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <net/if.h>
@@ -86,7 +69,7 @@ enum nss_status _nss_myhostname_gethostbyname4_r(
                         return NSS_STATUS_NOTFOUND;
                 }
 
-                canonical = "gateway";
+                canonical = "_gateway";
 
         } else {
                 hn = gethostname_malloc();
@@ -211,7 +194,7 @@ static enum nss_status fill_in_hostent(
                         c++;
 
         l_canonical = strlen(canonical);
-        l_additional = additional ? strlen(additional) : 0;
+        l_additional = strlen_ptr(additional);
         ms = ALIGN(l_canonical+1)+
                 (additional ? ALIGN(l_additional+1) : 0) +
                 sizeof(char*) +
@@ -337,7 +320,7 @@ enum nss_status _nss_myhostname_gethostbyname3_r(
         if (af == AF_UNSPEC)
                 af = AF_INET;
 
-        if (af != AF_INET && af != AF_INET6) {
+        if (!IN_SET(af, AF_INET, AF_INET6)) {
                 *errnop = EAFNOSUPPORT;
                 *h_errnop = NO_DATA;
                 return NSS_STATUS_UNAVAIL;
@@ -356,7 +339,7 @@ enum nss_status _nss_myhostname_gethostbyname3_r(
                         return NSS_STATUS_NOTFOUND;
                 }
 
-                canonical = "gateway";
+                canonical = "_gateway";
 
         } else {
                 hn = gethostname_malloc();
@@ -467,7 +450,7 @@ enum nss_status _nss_myhostname_gethostbyaddr2_r(
                         continue;
 
                 if (memcmp(addr, &a->address, FAMILY_ADDRESS_SIZE(af)) == 0) {
-                        canonical = "gateway";
+                        canonical = "_gateway";
                         goto found;
                 }
         }

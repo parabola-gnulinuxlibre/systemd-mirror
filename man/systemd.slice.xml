@@ -3,37 +3,13 @@
 "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 
 <!--
-  This file is part of systemd.
-
-  Copyright 2013 Zbigniew Jędrzejewski-Szmek
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+  SPDX-License-Identifier: LGPL-2.1+
 -->
 
 <refentry id="systemd.slice">
   <refentryinfo>
     <title>systemd.slice</title>
     <productname>systemd</productname>
-
-    <authorgroup>
-      <author>
-        <contrib>Developer</contrib>
-        <firstname>Lennart</firstname>
-        <surname>Poettering</surname>
-        <email>lennart@poettering.net</email>
-      </author>
-    </authorgroup>
   </refentryinfo>
 
   <refmeta>
@@ -53,26 +29,19 @@
   <refsect1>
     <title>Description</title>
 
-    <para>A unit configuration file whose name ends in
-    <literal>.slice</literal> encodes information about a slice which
-    is a concept for hierarchically managing resources of a group of
-    processes. This management is performed by creating a node in the
-    Linux Control Group (cgroup) tree. Units that manage processes
-    (primarily scope and service units) may be assigned to a specific
-    slice. For each slice, certain resource limits may be set that
-    apply to all processes of all units contained in that
-    slice. Slices are organized hierarchically in a tree. The name of
-    the slice encodes the location in the tree. The name consists of a
-    dash-separated series of names, which describes the path to the
-    slice from the root slice. The root slice is named,
-    <filename>-.slice</filename>. Example:
-    <filename>foo-bar.slice</filename> is a slice that is located
-    within <filename>foo.slice</filename>, which in turn is located in
-    the root slice <filename>-.slice</filename>.
+    <para>A unit configuration file whose name ends in <literal>.slice</literal> encodes information about a slice
+    unit. A slice unit is a concept for hierarchically managing resources of a group of processes. This management is
+    performed by creating a node in the Linux Control Group (cgroup) tree. Units that manage processes (primarily scope
+    and service units) may be assigned to a specific slice. For each slice, certain resource limits may be set that
+    apply to all processes of all units contained in that slice. Slices are organized hierarchically in a tree. The
+    name of the slice encodes the location in the tree. The name consists of a dash-separated series of names, which
+    describes the path to the slice from the root slice. The root slice is named <filename>-.slice</filename>. Example:
+    <filename>foo-bar.slice</filename> is a slice that is located within <filename>foo.slice</filename>, which in turn
+    is located in the root slice <filename>-.slice</filename>.
     </para>
 
     <para>Note that slice units cannot be templated, nor is possible to add multiple names to a slice unit by creating
-    additional symlinks to it.</para>
+    additional symlinks to its unit file.</para>
 
     <para>By default, service and scope units are placed in
     <filename>system.slice</filename>, virtual machines and containers
@@ -105,15 +74,31 @@
   <refsect1>
     <title>Automatic Dependencies</title>
 
-    <para>Slice units automatically gain dependencies of type
-    <varname>After=</varname> and <varname>Requires=</varname> on
-    their immediate parent slice unit.</para>
+    <refsect2>
+      <title>Implicit Dependencies</title>
 
-    <para>Unless <varname>DefaultDependencies=false</varname> is used in the <literal>[Unit]</literal> section, slice
-    units will implicitly have dependencies of type <varname>Conflicts=</varname> and <varname>Before=</varname> on
-    <filename>shutdown.target</filename>. These ensure that slice units are removed prior to system shutdown. Only
-    slice units involved with early boot or late system shutdown should disable this option.
-    </para>
+      <para>The following dependencies are implicitly added:</para>
+
+      <itemizedlist>
+        <listitem><para>Slice units automatically gain dependencies of type
+        <varname>After=</varname> and <varname>Requires=</varname> on
+        their immediate parent slice unit.</para></listitem>
+      </itemizedlist>
+    </refsect2>
+
+    <refsect2>
+      <title>Default Dependencies</title>
+
+      <para>The following dependencies are added unless <varname>DefaultDependencies=no</varname> is set:</para>
+
+      <itemizedlist>
+        <listitem><para>Slice units will automatically have dependencies of type <varname>Conflicts=</varname> and
+        <varname>Before=</varname> on
+        <filename>shutdown.target</filename>. These ensure that slice units are removed prior to system shutdown.
+        Only slice units involved with late system shutdown should disable
+        <varname>DefaultDependencies=</varname> option.</para></listitem>
+      </itemizedlist>
+    </refsect2>
   </refsect1>
 
   <refsect1>

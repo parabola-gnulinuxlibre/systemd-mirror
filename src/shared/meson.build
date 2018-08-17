@@ -1,4 +1,6 @@
-shared_sources = '''
+# SPDX-License-Identifier: LGPL-2.1+
+
+shared_sources = files('''
         acl-util.h
         acpi-fpdt.c
         acpi-fpdt.h
@@ -10,6 +12,8 @@ shared_sources = '''
         base-filesystem.h
         boot-timestamps.c
         boot-timestamps.h
+        bootspec.c
+        bootspec.h
         bus-unit-util.c
         bus-unit-util.h
         bus-util.c
@@ -37,8 +41,6 @@ shared_sources = '''
         firewall-util.h
         fstab-util.c
         fstab-util.h
-        gcrypt-util.c
-        gcrypt-util.h
         generator.c
         generator.h
         gpt.h
@@ -65,8 +67,6 @@ shared_sources = '''
         nsflags.h
         output-mode.c
         output-mode.h
-        pager.c
-        pager.h
         path-lookup.c
         path-lookup.h
         ptyfwd.c
@@ -88,6 +88,8 @@ shared_sources = '''
         sysctl-util.h
         tests.c
         tests.h
+        tomoyo-util.c
+        tomoyo-util.h
         udev-util.h
         udev-util.c
         uid-range.c
@@ -99,25 +101,26 @@ shared_sources = '''
         volatile-util.h
         watchdog.c
         watchdog.h
-'''.split()
+        wireguard-netlink.h
+'''.split())
 
 test_tables_h = files('test-tables.h')
 shared_sources += [test_tables_h]
 
-if conf.get('HAVE_ACL', false)
-        shared_sources += ['acl-util.c']
+if conf.get('HAVE_ACL') == 1
+        shared_sources += files('acl-util.c')
 endif
 
-if conf.get('HAVE_UTMP', false)
-        shared_sources += ['utmp-wtmp.c']
+if conf.get('ENABLE_UTMP') == 1
+        shared_sources += files('utmp-wtmp.c')
 endif
 
-if conf.get('HAVE_SECCOMP', false)
-        shared_sources += ['seccomp-util.c']
+if conf.get('HAVE_SECCOMP') == 1
+        shared_sources += files('seccomp-util.c')
 endif
 
-if conf.get('HAVE_LIBIPTC', false)
-        shared_sources += ['firewall-util.c']
+if conf.get('HAVE_LIBIPTC') == 1
+        shared_sources += files('firewall-util.c')
 endif
 
 libshared_name = 'systemd-shared-@0@'.format(meson.project_version())
@@ -136,23 +139,27 @@ libshared_deps = [threads,
                   liblz4,
                   libblkid]
 
-libshared = shared_library(
-        libshared_name,
-        shared_sources,
-        basic_sources,
-        journal_internal_sources,
-        libsystemd_internal_sources,
-        libudev_sources,
-        include_directories : includes,
-        link_args : ['-shared'],
-        c_args : ['-fvisibility=default'],
-        dependencies : libshared_deps,
-        install : true,
-        install_dir : rootlibexecdir)
+libshared_sym_path = '@0@/libshared.sym'.format(meson.current_source_dir())
 
 libshared_static = static_library(
         libshared_name,
         shared_sources,
-        basic_sources,
         include_directories : includes,
-        dependencies : libshared_deps)
+        dependencies : libshared_deps,
+        c_args : ['-fvisibility=default'])
+
+libshared = shared_library(
+        libshared_name,
+        libudev_sources,
+        include_directories : includes,
+        link_args : ['-shared',
+                     '-Wl,--version-script=' + libshared_sym_path],
+        link_whole : [libshared_static,
+                      libbasic,
+                      libbasic_gcrypt,
+                      libsystemd_static,
+                      libjournal_client],
+        c_args : ['-fvisibility=default'],
+        dependencies : libshared_deps,
+        install : true,
+        install_dir : rootlibexecdir)

@@ -1,21 +1,8 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 /***
-  This file is part of systemd.
-
-  Copyright 2013 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
+
+#include <stdio_ext.h>
 
 #include "alloc-util.h"
 #include "bus-internal.h"
@@ -453,7 +440,7 @@ static int bus_match_add_compare_value(
         int r;
 
         assert(where);
-        assert(where->type == BUS_MATCH_ROOT || where->type == BUS_MATCH_VALUE);
+        assert(IN_SET(where->type, BUS_MATCH_ROOT, BUS_MATCH_VALUE));
         assert(BUS_MATCH_IS_COMPARE(t));
         assert(ret);
 
@@ -567,7 +554,7 @@ static int bus_match_find_compare_value(
         struct bus_match_node *c, *n;
 
         assert(where);
-        assert(where->type == BUS_MATCH_ROOT || where->type == BUS_MATCH_VALUE);
+        assert(IN_SET(where->type, BUS_MATCH_ROOT, BUS_MATCH_VALUE));
         assert(BUS_MATCH_IS_COMPARE(t));
         assert(ret);
 
@@ -601,7 +588,7 @@ static int bus_match_add_leaf(
         struct bus_match_node *n;
 
         assert(where);
-        assert(where->type == BUS_MATCH_ROOT || where->type == BUS_MATCH_VALUE);
+        assert(IN_SET(where->type, BUS_MATCH_ROOT, BUS_MATCH_VALUE));
         assert(callback);
 
         n = new0(struct bus_match_node, 1);
@@ -631,7 +618,7 @@ static int bus_match_find_leaf(
         struct bus_match_node *c;
 
         assert(where);
-        assert(where->type == BUS_MATCH_ROOT || where->type == BUS_MATCH_VALUE);
+        assert(IN_SET(where->type, BUS_MATCH_ROOT, BUS_MATCH_VALUE));
         assert(ret);
 
         for (c = where->child; c; c = c->next) {
@@ -900,11 +887,9 @@ int bus_match_parse(
                 }
 
                 components[n_components].type = t;
-                components[n_components].value_str = value;
+                components[n_components].value_str = TAKE_PTR(value);
                 components[n_components].value_u8 = u;
                 n_components++;
-
-                value = NULL;
 
                 if (q[quoted] == 0)
                         break;
@@ -952,6 +937,8 @@ char *bus_match_to_string(struct bus_match_component *components, unsigned n_com
         f = open_memstream(&buffer, &size);
         if (!f)
                 return NULL;
+
+        __fsetlocking(f, FSETLOCKING_BYCALLER);
 
         for (i = 0; i < n_components; i++) {
                 char buf[32];

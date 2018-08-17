@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2008-2012 Kay Sievers <kay@vrfy.org>
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <ctype.h>
 #include <errno.h>
@@ -148,17 +131,6 @@ size_t util_path_encode(const char *src, char *dest, size_t size)
         }
         dest[j] = '\0';
         return j;
-}
-
-void util_remove_trailing_chars(char *path, char c)
-{
-        size_t len;
-
-        if (path == NULL)
-                return;
-        len = strlen(path);
-        while (len > 0 && path[len-1] == c)
-                path[--len] = '\0';
 }
 
 /*

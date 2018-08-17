@@ -1,20 +1,5 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 /***
-  This file is part of systemd.
-
-  Copyright 2013 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
 
 #include <sys/wait.h>
@@ -35,7 +20,6 @@
 static usec_t arg_loop_usec = 100 * USEC_PER_MSEC;
 
 typedef enum Type {
-        TYPE_KDBUS,
         TYPE_LEGACY,
         TYPE_DIRECT,
 } Type;
@@ -190,9 +174,6 @@ static void client_chart(Type type, const char *address, const char *server_name
         assert_se(r >= 0);
 
         switch (type) {
-        case TYPE_KDBUS:
-                printf("SIZE\tCOPY\tMEMFD\n");
-                break;
         case TYPE_LEGACY:
                 printf("SIZE\tLEGACY\n");
                 break;
@@ -203,24 +184,9 @@ static void client_chart(Type type, const char *address, const char *server_name
 
         for (csize = 1; csize <= MAX_SIZE; csize *= 2) {
                 usec_t t;
-                unsigned n_copying, n_memfd;
+                unsigned n_memfd;
 
                 printf("%zu\t", csize);
-
-                if (type == TYPE_KDBUS) {
-                        b->use_memfd = 0;
-
-                        t = now(CLOCK_MONOTONIC);
-                        for (n_copying = 0;; n_copying++) {
-                                transaction(b, csize, server_name);
-                                if (now(CLOCK_MONOTONIC) >= t + arg_loop_usec)
-                                        break;
-                        }
-
-                        printf("%u\t", (unsigned) ((n_copying * USEC_PER_SEC) / arg_loop_usec));
-
-                        b->use_memfd = -1;
-                }
 
                 t = now(CLOCK_MONOTONIC);
                 for (n_memfd = 0;; n_memfd++) {
@@ -245,9 +211,9 @@ int main(int argc, char *argv[]) {
                 MODE_BISECT,
                 MODE_CHART,
         } mode = MODE_BISECT;
-        Type type = TYPE_KDBUS;
+        Type type = TYPE_LEGACY;
         int i, pair[2] = { -1, -1 };
-        _cleanup_free_ char *name = NULL, *bus_name = NULL, *address = NULL, *server_name = NULL;
+        _cleanup_free_ char *address = NULL, *server_name = NULL;
         _cleanup_close_ int bus_ref = -1;
         const char *unique;
         cpu_set_t cpuset;
@@ -271,22 +237,9 @@ int main(int argc, char *argv[]) {
                 assert_se(parse_sec(argv[i], &arg_loop_usec) >= 0);
         }
 
-        assert_se(!MODE_BISECT || TYPE_KDBUS);
-
         assert_se(arg_loop_usec > 0);
 
-        if (type == TYPE_KDBUS) {
-                assert_se(asprintf(&name, "deine-mutter-%u", (unsigned) getpid_cached()) >= 0);
-
-                bus_ref = bus_kernel_create_bus(name, false, &bus_name);
-                if (bus_ref == -ENOENT)
-                        exit(EXIT_TEST_SKIP);
-
-                assert_se(bus_ref >= 0);
-
-                address = strappend("kernel:path=", bus_name);
-                assert_se(address);
-        } else if (type == TYPE_LEGACY) {
+        if (type == TYPE_LEGACY) {
                 const char *e;
 
                 e = secure_getenv("DBUS_SESSION_BUS_ADDRESS");
@@ -350,7 +303,7 @@ int main(int argc, char *argv[]) {
                         break;
                 }
 
-                _exit(0);
+                _exit(EXIT_SUCCESS);
         }
 
         CPU_ZERO(&cpuset);

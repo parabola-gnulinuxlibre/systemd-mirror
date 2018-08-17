@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright Tom Gundersen <teg@jklm.no>
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include "sd-hwdb.h"
 
@@ -57,19 +40,22 @@ _public_ struct udev_hwdb *udev_hwdb_new(struct udev *udev) {
         struct udev_hwdb *hwdb;
         int r;
 
-        assert_return(udev, NULL);
+        assert_return_errno(udev, NULL, EINVAL);
 
         r = sd_hwdb_new(&hwdb_internal);
-        if (r < 0)
+        if (r < 0) {
+                errno = -r;
                 return NULL;
+        }
 
         hwdb = new0(struct udev_hwdb, 1);
-        if (!hwdb)
+        if (!hwdb) {
+                errno = ENOMEM;
                 return NULL;
+        }
 
         hwdb->refcount = 1;
-        hwdb->hwdb = hwdb_internal;
-        hwdb_internal = NULL;
+        hwdb->hwdb = TAKE_PTR(hwdb_internal);
 
         udev_list_init(udev, &hwdb->properties_list, true);
 
@@ -108,8 +94,7 @@ _public_ struct udev_hwdb *udev_hwdb_unref(struct udev_hwdb *hwdb) {
                 return NULL;
         sd_hwdb_unref(hwdb->hwdb);
         udev_list_cleanup(&hwdb->properties_list);
-        free(hwdb);
-        return NULL;
+        return mfree(hwdb);
 }
 
 /**
@@ -127,6 +112,7 @@ _public_ struct udev_hwdb *udev_hwdb_unref(struct udev_hwdb *hwdb) {
  */
 _public_ struct udev_list_entry *udev_hwdb_get_properties_list_entry(struct udev_hwdb *hwdb, const char *modalias, unsigned int flags) {
         const char *key, *value;
+        struct udev_list_entry *e;
 
         if (!hwdb || !modalias) {
                 errno = EINVAL;
@@ -142,5 +128,9 @@ _public_ struct udev_list_entry *udev_hwdb_get_properties_list_entry(struct udev
                 }
         }
 
-        return udev_list_get_entry(&hwdb->properties_list);
+        e = udev_list_get_entry(&hwdb->properties_list);
+        if (!e)
+                errno = ENODATA;
+
+        return e;
 }

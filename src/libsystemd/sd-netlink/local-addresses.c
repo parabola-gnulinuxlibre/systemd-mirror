@@ -1,22 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2008-2011 Lennart Poettering
-  Copyright 2014 Tom Gundersen
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include "sd-netlink.h"
 
@@ -122,7 +104,7 @@ int local_addresses(sd_netlink *context, int ifindex, int af, struct local_addre
                 if (r < 0)
                         return r;
 
-                if (ifindex == 0 && (a->scope == RT_SCOPE_HOST || a->scope == RT_SCOPE_NOWHERE))
+                if (ifindex == 0 && IN_SET(a->scope, RT_SCOPE_HOST, RT_SCOPE_NOWHERE))
                         continue;
 
                 switch (family) {
@@ -157,8 +139,7 @@ int local_addresses(sd_netlink *context, int ifindex, int af, struct local_addre
 
         qsort_safe(list, n_list, sizeof(struct local_address), address_compare);
 
-        *ret = list;
-        list = NULL;
+        *ret = TAKE_PTR(list);
 
         return (int) n_list;
 }
@@ -224,6 +205,8 @@ int local_gateways(sd_netlink *context, int ifindex, int af, struct local_addres
                         continue;
 
                 r = sd_netlink_message_read_u32(m, RTA_OIF, &ifi);
+                if (r == -ENODATA) /* Not all routes have an RTA_OIF attribute (for example nexthop ones) */
+                        continue;
                 if (r < 0)
                         return r;
                 if (ifindex > 0 && (int) ifi != ifindex)
@@ -268,8 +251,7 @@ int local_gateways(sd_netlink *context, int ifindex, int af, struct local_addres
         if (n_list > 0)
                 qsort(list, n_list, sizeof(struct local_address), address_compare);
 
-        *ret = list;
-        list = NULL;
+        *ret = TAKE_PTR(list);
 
         return (int) n_list;
 }

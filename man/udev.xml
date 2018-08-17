@@ -2,24 +2,15 @@
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 
+<!--
+  SPDX-License-Identifier: LGPL-2.1+
+  Copyright © 2014 Jason St. John
+-->
+
 <refentry id="udev">
   <refentryinfo>
     <title>udev</title>
     <productname>systemd</productname>
-    <authorgroup>
-      <author>
-        <contrib>Developer</contrib>
-        <firstname>Greg</firstname>
-        <surname>Kroah-Hartmann</surname>
-        <email>greg@kroah.com</email>
-      </author>
-      <author>
-        <contrib>Developer</contrib>
-        <firstname>Kay</firstname>
-        <surname>Sievers</surname>
-        <email>kay@vrfy.org</email>
-      </author>
-    </authorgroup>
   </refentryinfo>
 
   <refmeta>
@@ -443,6 +434,9 @@
             <para>Starting daemons or other long-running processes is not appropriate
             for udev; the forked processes, detached or not, will be unconditionally
             killed after the event handling has finished.</para>
+            <para>Note that running programs that access the network or mount/unmount
+            filesystems is not allowed inside of udev rules, due to the default sandbox
+            that is enforced on <filename>systemd-udevd.service</filename>.</para>
           </listitem>
         </varlistentry>
 

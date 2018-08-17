@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2012 Kay Sievers <kay@vrfy.org>
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <ctype.h>
 #include <getopt.h>
@@ -33,6 +16,7 @@
 #include "strbuf.h"
 #include "string-util.h"
 #include "udev.h"
+#include "udevadm-util.h"
 #include "util.h"
 
 /*
@@ -92,7 +76,7 @@ static int node_add_child(struct trie *trie, struct trie_node *node, struct trie
         struct trie_child_entry *child;
 
         /* extend array, add new entry, sort for bisection */
-        child = realloc(node->children, (node->children_count + 1) * sizeof(struct trie_child_entry));
+        child = reallocarray(node->children, node->children_count + 1, sizeof(struct trie_child_entry));
         if (!child)
                 return -ENOMEM;
 
@@ -112,7 +96,9 @@ static struct trie_node *node_lookup(const struct trie_node *node, uint8_t c) {
         struct trie_child_entry search;
 
         search.c = c;
-        child = bsearch(&search, node->children, node->children_count, sizeof(struct trie_child_entry), trie_children_cmp);
+        child = bsearch_safe(&search,
+                             node->children, node->children_count, sizeof(struct trie_child_entry),
+                             trie_children_cmp);
         if (child)
                 return child->child;
         return NULL;
@@ -164,7 +150,7 @@ static int trie_node_add_value(struct trie *trie, struct trie_node *node,
         }
 
         /* extend array, add new entry, sort for bisection */
-        val = realloc(node->values, (node->values_count + 1) * sizeof(struct trie_value_entry));
+        val = reallocarray(node->values, node->values_count + 1, sizeof(struct trie_value_entry));
         if (!val)
                 return -ENOMEM;
         trie->values_count++;
@@ -364,18 +350,14 @@ static int trie_store(struct trie *trie, const char *filename) {
         t.strings_off = sizeof(struct trie_header_f);
         trie_store_nodes_size(&t, trie->root);
 
-        err = fopen_temporary(filename , &t.f, &filename_tmp);
+        err = fopen_temporary(filename, &t.f, &filename_tmp);
         if (err < 0)
                 return err;
         fchmod(fileno(t.f), 0444);
 
         /* write nodes */
-        err = fseeko(t.f, sizeof(struct trie_header_f), SEEK_SET);
-        if (err < 0) {
-                fclose(t.f);
-                unlink_noerrno(filename_tmp);
-                return -errno;
-        }
+        if (fseeko(t.f, sizeof(struct trie_header_f), SEEK_SET) < 0)
+                goto error_fclose;
         root_off = trie_store_nodes(&t, trie->root);
         h.nodes_root_off = htole64(root_off);
         pos = ftello(t.f);
@@ -388,21 +370,21 @@ static int trie_store(struct trie *trie, const char *filename) {
         /* write header */
         size = ftello(t.f);
         h.file_size = htole64(size);
-        err = fseeko(t.f, 0, SEEK_SET);
-        if (err < 0) {
-                fclose(t.f);
-                unlink_noerrno(filename_tmp);
-                return -errno;
-        }
+        if (fseeko(t.f, 0, SEEK_SET < 0))
+                goto error_fclose;
         fwrite(&h, sizeof(struct trie_header_f), 1, t.f);
-        err = ferror(t.f);
-        if (err)
-                err = -errno;
+
+        if (ferror(t.f))
+                goto error_fclose;
+        if (fflush(t.f) < 0)
+                goto error_fclose;
+        if (fsync(fileno(t.f)) < 0)
+                goto error_fclose;
+        if (rename(filename_tmp, filename) < 0)
+                goto error_fclose;
+
+        /* write succeeded */
         fclose(t.f);
-        if (err < 0 || rename(filename_tmp, filename) < 0) {
-                unlink_noerrno(filename_tmp);
-                return err < 0 ? err : -errno;
-        }
 
         log_debug("=== trie on-disk ===");
         log_debug("size:             %8"PRIi64" bytes", size);
@@ -417,6 +399,12 @@ static int trie_store(struct trie *trie, const char *filename) {
         log_debug("strings start:    %8"PRIu64, t.strings_off);
 
         return 0;
+
+ error_fclose:
+        err = -errno;
+        fclose(t.f);
+        unlink(filename_tmp);
+        return err;
 }
 
 static int insert_data(struct trie *trie, struct udev_list *match_list,
@@ -457,6 +445,7 @@ static int import_file(struct udev *udev, struct trie *trie, const char *filenam
         FILE *f;
         char line[LINE_MAX];
         struct udev_list match_list;
+        int r = 0, err;
 
         udev_list_init(udev, &match_list, false);
 
@@ -490,6 +479,7 @@ static int import_file(struct udev *udev, struct trie *trie, const char *filenam
 
                         if (line[0] == ' ') {
                                 log_error("Error, MATCH expected but got '%s' in '%s':", line, filename);
+                                r = -EINVAL;
                                 break;
                         }
 
@@ -501,6 +491,7 @@ static int import_file(struct udev *udev, struct trie *trie, const char *filenam
                 case HW_MATCH:
                         if (len == 0) {
                                 log_error("Error, DATA expected but got empty line in '%s':", filename);
+                                r = -EINVAL;
                                 state = HW_NONE;
                                 udev_list_cleanup(&match_list);
                                 break;
@@ -514,7 +505,9 @@ static int import_file(struct udev *udev, struct trie *trie, const char *filenam
 
                         /* first data */
                         state = HW_DATA;
-                        insert_data(trie, &match_list, line, filename);
+                        err = insert_data(trie, &match_list, line, filename);
+                        if (err < 0)
+                                r = err;
                         break;
 
                 case HW_DATA:
@@ -527,28 +520,37 @@ static int import_file(struct udev *udev, struct trie *trie, const char *filenam
 
                         if (line[0] != ' ') {
                                 log_error("Error, DATA expected but got '%s' in '%s':", line, filename);
+                                r = -EINVAL;
                                 state = HW_NONE;
                                 udev_list_cleanup(&match_list);
                                 break;
                         }
 
-                        insert_data(trie, &match_list, line, filename);
+                        err = insert_data(trie, &match_list, line, filename);
+                        if (err < 0)
+                                r = err;
                         break;
                 };
         }
 
         fclose(f);
         udev_list_cleanup(&match_list);
-        return 0;
+        return r;
 }
 
 static void help(void) {
-        printf("Usage: udevadm hwdb OPTIONS\n"
-               "  -u,--update          update the hardware database\n"
-               "  --usr                generate in " UDEVLIBEXECDIR " instead of /etc/udev\n"
-               "  -t,--test=MODALIAS   query database and print result\n"
-               "  -r,--root=PATH       alternative root path in the filesystem\n"
-               "  -h,--help\n\n");
+        printf("%s hwdb [OPTIONS]\n\n"
+               "  -h --help            Print this message\n"
+               "  -V --version         Print version of the program\n"
+               "  -u --update          Update the hardware database\n"
+               "  -s --strict          When updating, return non-zero exit value on any parsing error\n"
+               "     --usr             Generate in " UDEVLIBEXECDIR " instead of /etc/udev\n"
+               "  -t --test=MODALIAS   Query database and print result\n"
+               "  -r --root=PATH       Alternative root path in the filesystem\n\n"
+               "NOTE:\n"
+               "The sub-command 'hwdb' is deprecated, and is left for backwards compatibility.\n"
+               "Please use systemd-hwdb instead.\n"
+               , program_invocation_short_name);
 }
 
 static int adm_hwdb(struct udev *udev, int argc, char *argv[]) {
@@ -557,11 +559,13 @@ static int adm_hwdb(struct udev *udev, int argc, char *argv[]) {
         };
 
         static const struct option options[] = {
-                { "update", no_argument,       NULL, 'u' },
-                { "usr",    no_argument,       NULL, ARG_USR },
-                { "test",   required_argument, NULL, 't' },
-                { "root",   required_argument, NULL, 'r' },
-                { "help",   no_argument,       NULL, 'h' },
+                { "update",  no_argument,       NULL, 'u'     },
+                { "usr",     no_argument,       NULL, ARG_USR },
+                { "strict",  no_argument,       NULL, 's'     },
+                { "test",    required_argument, NULL, 't'     },
+                { "root",    required_argument, NULL, 'r'     },
+                { "version", no_argument,       NULL, 'V'     },
+                { "help",    no_argument,       NULL, 'h'     },
                 {}
         };
         const char *test = NULL;
@@ -571,8 +575,9 @@ static int adm_hwdb(struct udev *udev, int argc, char *argv[]) {
         struct trie *trie = NULL;
         int err, c;
         int rc = EXIT_SUCCESS;
+        bool strict = false;
 
-        while ((c = getopt_long(argc, argv, "ut:r:h", options, NULL)) >= 0)
+        while ((c = getopt_long(argc, argv, "ust:r:Vh", options, NULL)) >= 0)
                 switch(c) {
                 case 'u':
                         update = true;
@@ -580,12 +585,18 @@ static int adm_hwdb(struct udev *udev, int argc, char *argv[]) {
                 case ARG_USR:
                         hwdb_bin_dir = UDEVLIBEXECDIR;
                         break;
+                case 's':
+                        strict = true;
+                        break;
                 case 't':
                         test = optarg;
                         break;
                 case 'r':
                         root = optarg;
                         break;
+                case 'V':
+                        print_version();
+                        return EXIT_SUCCESS;
                 case 'h':
                         help();
                         return EXIT_SUCCESS;
@@ -625,7 +636,7 @@ static int adm_hwdb(struct udev *udev, int argc, char *argv[]) {
                 }
                 trie->nodes_count++;
 
-                err = conf_files_list_strv(&files, ".hwdb", root, conf_file_dirs);
+                err = conf_files_list_strv(&files, ".hwdb", root, 0, conf_file_dirs);
                 if (err < 0) {
                         log_error_errno(err, "failed to enumerate hwdb files: %m");
                         rc = EXIT_FAILURE;
@@ -633,7 +644,8 @@ static int adm_hwdb(struct udev *udev, int argc, char *argv[]) {
                 }
                 STRV_FOREACH(f, files) {
                         log_debug("reading file '%s'", *f);
-                        import_file(udev, trie, *f);
+                        if (import_file(udev, trie, *f) < 0 && strict)
+                                rc = EXIT_FAILURE;
                 }
                 strv_free(files);
 
@@ -667,7 +679,7 @@ static int adm_hwdb(struct udev *udev, int argc, char *argv[]) {
                         rc = EXIT_FAILURE;
                 }
 
-                label_fix(hwdb_bin, false, false);
+                (void) label_fix(hwdb_bin, 0);
         }
 
         if (test) {
@@ -686,7 +698,8 @@ out:
         if (trie) {
                 if (trie->root)
                         trie_node_cleanup(trie->root);
-                strbuf_cleanup(trie->strings);
+                if (trie->strings)
+                        strbuf_cleanup(trie->strings);
                 free(trie);
         }
         return rc;

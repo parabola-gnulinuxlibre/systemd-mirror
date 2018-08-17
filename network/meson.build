@@ -1,4 +1,6 @@
-if conf.get('ENABLE_NETWORKD', false)
+# SPDX-License-Identifier: LGPL-2.1+
+
+if conf.get('ENABLE_NETWORKD') == 1
         install_data('80-container-host0.network',
                      '80-container-ve.network',
                      '80-container-vz.network',

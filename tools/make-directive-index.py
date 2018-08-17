@@ -1,27 +1,11 @@
 #!/usr/bin/env python3
 #  -*- Mode: python; coding: utf-8; indent-tabs-mode: nil -*- */
-#
-#  This file is part of systemd.
-#
-#  Copyright 2012-2013 Zbigniew Jędrzejewski-Szmek
-#
-#  systemd is free software; you can redistribute it and/or modify it
-#  under the terms of the GNU Lesser General Public License as published by
-#  the Free Software Foundation; either version 2.1 of the License, or
-#  (at your option) any later version.
-#
-#  systemd is distributed in the hope that it will be useful, but
-#  WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-#  Lesser General Public License for more details.
-#
-#  You should have received a copy of the GNU Lesser General Public License
-#  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+# SPDX-License-Identifier: LGPL-2.1+
 
 import sys
 import collections
 import re
-from xml_helper import *
+from xml_helper import xml_parse, xml_print, tree
 from copy import deepcopy
 
 TEMPLATE = '''\
@@ -30,15 +14,6 @@ TEMPLATE = '''\
         <refentryinfo>
                 <title>systemd.directives</title>
                 <productname>systemd</productname>
-
-                <authorgroup>
-                        <author>
-                                <contrib>Developer</contrib>
-                                <firstname>Zbigniew</firstname>
-                                <surname>Jędrzejewski-Szmek</surname>
-                                <email>zbyszek@in.waw.pl</email>
-                        </author>
-                </authorgroup>
         </refentryinfo>
 
         <refmeta>

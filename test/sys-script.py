@@ -1,25 +1,13 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: LGPL-2.1+
 #
 # sys-script.py
 #
-# (C) 2017 Canonical Ltd.
+# © 2017 Canonical Ltd.
 # Author: Dan Streetman <dan.streetman@canonical.com>
-#
-# systemd is free software; you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation; either version 2.1 of the License, or
-# (at your option) any later version.
-#
-# systemd is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-# Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with systemd; If not, see <http://www.gnu.org/licenses/>.
-#
 
 import os, sys
+import shutil
 
 def d(path, mode):
     os.mkdir(path, mode)
@@ -32,7 +20,6 @@ def f(path, mode, contents):
         f.write(contents)
     os.chmod(path, mode)
 
-
 if len(sys.argv) < 2:
     exit("Usage: {} <target dir>".format(sys.argv[0]))
 
@@ -41,6 +28,8 @@ if not os.path.isdir(sys.argv[1]):
 
 os.chdir(sys.argv[1])
 
+if os.path.exists('sys'):
+    shutil.rmtree('sys')
 d('sys', 0o755)
 d('sys/kernel', 0o775)
 f('sys/kernel/kexec_crash_loaded', 0o664, b'0\n')

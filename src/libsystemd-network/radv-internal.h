@@ -1,22 +1,8 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 #pragma once
 
 /***
-  This file is part of systemd.
-
-  Copyright (C) 2017 Intel Corporation. All rights reserved.
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+  Copyright © 2017 Intel Corporation. All rights reserved.
 ***/
 
 #include "sd-radv.h"
@@ -25,8 +11,6 @@
 #include "list.h"
 #include "sparse-endian.h"
 
-#define SD_RADV_DEFAULT_MIN_TIMEOUT_USEC        (200*USEC_PER_SEC)
-#define SD_RADV_DEFAULT_MAX_TIMEOUT_USEC        (600*USEC_PER_SEC)
 assert_cc(SD_RADV_DEFAULT_MIN_TIMEOUT_USEC <= SD_RADV_DEFAULT_MAX_TIMEOUT_USEC)
 
 #define SD_RADV_MAX_INITIAL_RTR_ADVERT_INTERVAL_USEC (16*USEC_PER_SEC)
@@ -35,11 +19,21 @@ assert_cc(SD_RADV_DEFAULT_MIN_TIMEOUT_USEC <= SD_RADV_DEFAULT_MAX_TIMEOUT_USEC)
 #define SD_RADV_MIN_DELAY_BETWEEN_RAS           3
 #define SD_RADV_MAX_RA_DELAY_TIME_USEC          (500*USEC_PER_MSEC)
 
+#define SD_RADV_OPT_RDNSS                       25
+#define SD_RADV_OPT_DNSSL                       31
+
 enum RAdvState {
         SD_RADV_STATE_IDLE                      = 0,
         SD_RADV_STATE_ADVERTISING               = 1,
 };
 typedef enum RAdvState RAdvState;
+
+struct sd_radv_opt_dns {
+        uint8_t type;
+        uint8_t length;
+        uint16_t reserved;
+        be32_t lifetime;
+} _packed_;
 
 struct sd_radv {
         unsigned n_ref;
@@ -63,6 +57,10 @@ struct sd_radv {
 
         unsigned n_prefixes;
         LIST_HEAD(sd_radv_prefix, prefixes);
+
+        size_t n_rdnss;
+        struct sd_radv_opt_dns *rdnss;
+        struct sd_radv_opt_dns *dnssl;
 };
 
 struct sd_radv_prefix {
@@ -80,6 +78,9 @@ struct sd_radv_prefix {
         } _packed_ opt;
 
         LIST_FIELDS(struct sd_radv_prefix, prefix);
+
+        usec_t valid_until;
+        usec_t preferred_until;
 };
 
 #define log_radv_full(level, error, fmt, ...) log_internal(level, error, __FILE__, __LINE__, __func__, "RADV: " fmt, ##__VA_ARGS__)

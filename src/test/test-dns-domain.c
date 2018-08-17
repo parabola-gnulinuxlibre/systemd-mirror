@@ -1,20 +1,5 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 /***
-  This file is part of systemd.
-
-  Copyright 2014 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
  ***/
 
 #include "alloc-util.h"
@@ -229,7 +214,7 @@ static void test_dns_name_between_one(const char *a, const char *b, const char *
 
         r = dns_name_between(c, b, a);
         if (ret >= 0)
-                assert_se(r == 0);
+                assert_se(r == 0 || dns_name_equal(a, c) > 0);
         else
                 assert_se(r == ret);
 }
@@ -248,9 +233,11 @@ static void test_dns_name_between(void) {
         test_dns_name_between_one("*.z.example", "\\200.z.example", "example", true);
         test_dns_name_between_one("\\200.z.example", "example", "a.example", true);
 
-        test_dns_name_between_one("example", "a.example", "example", -EINVAL);
+        test_dns_name_between_one("example", "a.example", "example", true);
+        test_dns_name_between_one("example", "example", "example", false);
         test_dns_name_between_one("example", "example", "yljkjljk.a.example", false);
         test_dns_name_between_one("example", "yljkjljk.a.example", "yljkjljk.a.example", false);
+        test_dns_name_between_one("hkps.pool.sks-keyservers.net", "_pgpkey-https._tcp.hkps.pool.sks-keyservers.net", "ipv4.pool.sks-keyservers.net", true);
 }
 
 static void test_dns_name_endswith_one(const char *a, const char *b, int ret) {
@@ -424,6 +411,30 @@ static void test_dns_srv_type_is_valid(void) {
         assert_se(!dns_srv_type_is_valid("_-800._tcp"));
         assert_se(!dns_srv_type_is_valid("_-foo._tcp"));
         assert_se(!dns_srv_type_is_valid("_piep._foo._udp"));
+}
+
+static void test_dnssd_srv_type_is_valid(void) {
+
+        assert_se(dnssd_srv_type_is_valid("_http._tcp"));
+        assert_se(dnssd_srv_type_is_valid("_foo-bar._tcp"));
+        assert_se(dnssd_srv_type_is_valid("_w._udp"));
+        assert_se(dnssd_srv_type_is_valid("_a800._tcp"));
+        assert_se(dnssd_srv_type_is_valid("_a-800._tcp"));
+
+        assert_se(!dnssd_srv_type_is_valid(NULL));
+        assert_se(!dnssd_srv_type_is_valid(""));
+        assert_se(!dnssd_srv_type_is_valid("x"));
+        assert_se(!dnssd_srv_type_is_valid("_foo"));
+        assert_se(!dnssd_srv_type_is_valid("_tcp"));
+        assert_se(!dnssd_srv_type_is_valid("_"));
+        assert_se(!dnssd_srv_type_is_valid("_foo."));
+        assert_se(!dnssd_srv_type_is_valid("_föo._tcp"));
+        assert_se(!dnssd_srv_type_is_valid("_f\no._tcp"));
+        assert_se(!dnssd_srv_type_is_valid("_800._tcp"));
+        assert_se(!dnssd_srv_type_is_valid("_-800._tcp"));
+        assert_se(!dnssd_srv_type_is_valid("_-foo._tcp"));
+        assert_se(!dnssd_srv_type_is_valid("_piep._foo._udp"));
+        assert_se(!dnssd_srv_type_is_valid("_foo._unknown"));
 }
 
 static void test_dns_service_join_one(const char *a, const char *b, const char *c, int r, const char *d) {
@@ -615,13 +626,16 @@ static void test_dns_name_apply_idna_one(const char *s, int expected, const char
         log_debug("dns_name_apply_idna: \"%s\" → %d/\"%s\" (expected %d/\"%s\")",
                   s, r, strnull(buf), expected, strnull(result));
 
-        assert_se(r == expected);
+        /* Different libidn2 versions are more and less accepting
+         * of underscore-prefixed names. So let's list the lowest
+         * expected return value. */
+        assert_se(r >= expected);
         if (expected == 1)
                 assert_se(dns_name_equal(buf, result) == 1);
 }
 
 static void test_dns_name_apply_idna(void) {
-#if defined HAVE_LIBIDN2 || defined HAVE_LIBIDN
+#if HAVE_LIBIDN2 || HAVE_LIBIDN
         const int ret = 1;
 #else
         const int ret = 0;
@@ -635,7 +649,7 @@ static void test_dns_name_apply_idna(void) {
          * labels. If registrars follow IDNA2008 we'll just be performing a
          * useless lookup.
          */
-#if defined HAVE_LIBIDN
+#if HAVE_LIBIDN
         const int ret2 = 1;
 #else
         const int ret2 = 0;
@@ -651,6 +665,12 @@ static void test_dns_name_apply_idna(void) {
         test_dns_name_apply_idna_one("föö.bär", ret, "xn--f-1gaa.xn--br-via");
         test_dns_name_apply_idna_one("föö.bär.", ret, "xn--f-1gaa.xn--br-via");
         test_dns_name_apply_idna_one("xn--f-1gaa.xn--br-via", ret, "xn--f-1gaa.xn--br-via");
+
+        test_dns_name_apply_idna_one("_443._tcp.fedoraproject.org", ret2,
+                                     "_443._tcp.fedoraproject.org");
+        test_dns_name_apply_idna_one("_443", ret2, "_443");
+        test_dns_name_apply_idna_one("gateway", ret, "gateway");
+        test_dns_name_apply_idna_one("_gateway", ret2, "_gateway");
 
         test_dns_name_apply_idna_one("r3---sn-ab5l6ne7.googlevideo.com", ret2,
                                      ret2 ? "r3---sn-ab5l6ne7.googlevideo.com" : "");
@@ -689,6 +709,7 @@ int main(int argc, char *argv[]) {
         test_dns_name_to_wire_format();
         test_dns_service_name_is_valid();
         test_dns_srv_type_is_valid();
+        test_dnssd_srv_type_is_valid();
         test_dns_service_join();
         test_dns_service_split();
         test_dns_name_change_suffix();

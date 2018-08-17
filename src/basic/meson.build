@@ -1,4 +1,8 @@
-basic_sources_plain = files('''
+# SPDX-License-Identifier: LGPL-2.1+
+
+basic_sources = files('''
+        MurmurHash2.c
+        MurmurHash2.h
         af-list.c
         af-list.h
         alloc-util.c
@@ -16,6 +20,10 @@ basic_sources_plain = files('''
         bitmap.c
         bitmap.h
         blkid-util.h
+        blockdev-util.c
+        blockdev-util.h
+        bpf-program.c
+        bpf-program.h
         btrfs-ctree.h
         btrfs-util.c
         btrfs-util.h
@@ -24,10 +32,10 @@ basic_sources_plain = files('''
         bus-label.h
         calendarspec.c
         calendarspec.h
-        capability-util.c
-        capability-util.h
         cap-list.c
         cap-list.h
+        capability-util.c
+        capability-util.h
         cgroup-util.c
         cgroup-util.h
         chattr-util.c
@@ -40,6 +48,8 @@ basic_sources_plain = files('''
         copy.h
         cpu-set-util.c
         cpu-set-util.h
+        crypt-util.c
+        crypt-util.h
         def.h
         device-nodes.c
         device-nodes.h
@@ -61,10 +71,12 @@ basic_sources_plain = files('''
         extract-word.h
         fd-util.c
         fd-util.h
-        fileio.c
-        fileio.h
         fileio-label.c
         fileio-label.h
+        fileio.c
+        fileio.h
+        format-table.c
+        format-table.h
         format-util.h
         fs-util.c
         fs-util.h
@@ -82,9 +94,9 @@ basic_sources_plain = files('''
         hostname-util.h
         in-addr-util.c
         in-addr-util.h
-        ioprio.h
         io-util.c
         io-util.h
+        ioprio.h
         journal-importer.c
         journal-importer.h
         khash.c
@@ -106,16 +118,19 @@ basic_sources_plain = files('''
         mempool.c
         mempool.h
         missing_syscall.h
+        mkdir-label.c
         mkdir.c
         mkdir.h
-        mkdir-label.c
+        module-util.h
         mount-util.c
         mount-util.h
-        MurmurHash2.c
-        MurmurHash2.h
         nss-util.h
         ordered-set.c
         ordered-set.h
+        pager.c
+        pager.h
+        os-util.c
+        os-util.h
         parse-util.c
         parse-util.h
         path-util.c
@@ -126,11 +141,16 @@ basic_sources_plain = files('''
         proc-cmdline.h
         process-util.c
         process-util.h
+        procfs-util.c
+        procfs-util.h
         random-util.c
         random-util.h
         ratelimit.c
         ratelimit.h
         raw-clone.h
+        raw-reboot.h
+        reboot-util.c
+        reboot-util.h
         refcnt.h
         replace-var.c
         replace-var.h
@@ -138,6 +158,8 @@ basic_sources_plain = files('''
         rlimit-util.h
         rm-rf.c
         rm-rf.h
+        securebits-util.c
+        securebits-util.h
         securebits.h
         selinux-util.c
         selinux-util.h
@@ -151,6 +173,8 @@ basic_sources_plain = files('''
         smack-util.c
         smack-util.h
         socket-label.c
+        socket-protocol-list.c
+        socket-protocol-list.h
         socket-util.c
         socket-util.h
         sparse-endian.h
@@ -176,6 +200,8 @@ basic_sources_plain = files('''
         time-util.h
         umask-util.h
         unaligned.h
+        unit-def.c
+        unit-def.h
         unit-name.c
         unit-name.h
         user-util.c
@@ -228,11 +254,19 @@ errno_list_txt = custom_target(
         command : [generate_errno_list, cpp],
         capture : true)
 
+generate_socket_protocol_list = find_program('generate-socket-protocol-list.sh')
+socket_protocol_list_txt = custom_target(
+        'socket-protocol-list.txt',
+        output : 'socket-protocol-list.txt',
+        command : [generate_socket_protocol_list, cpp],
+        capture : true)
+
 generated_gperf_headers = []
 foreach item : [['af',     af_list_txt,     'af',         ''],
                 ['arphrd', arphrd_list_txt, 'arphrd',     'ARPHRD_'],
                 ['cap',    cap_list_txt,    'capability', ''],
-                ['errno',  errno_list_txt,  'errno',      '']]
+                ['errno',  errno_list_txt,  'errno',      ''],
+                ['socket-protocol', socket_protocol_list_txt, 'socket_protocol',     'IPPROTO_']]
 
         fname = '@0@-from-name.gperf'.format(item[0])
         gperf_file = custom_target(
@@ -267,7 +301,10 @@ foreach item : [['af',     af_list_txt,     'af',         ''],
         generated_gperf_headers += [target1, target2]
 endforeach
 
-basic_sources = basic_sources_plain + [missing_h] + generated_gperf_headers
+basic_sources += [missing_h] + generated_gperf_headers
+basic_gcrypt_sources = files(
+        'gcrypt-util.c',
+        'gcrypt-util.h')
 
 libbasic = static_library(
         'basic',
@@ -276,6 +313,16 @@ libbasic = static_library(
         dependencies : [threads,
                         libcap,
                         libblkid,
-                        libselinux,
-                       ],
+                        libmount,
+                        libselinux],
+        c_args : ['-fvisibility=default'],
         install : false)
+
+# A convenience library that is separate from libbasic to avoid
+# unnecessary linking to libgcrypt.
+libbasic_gcrypt = static_library(
+        'basic-gcrypt',
+        basic_gcrypt_sources,
+        include_directories : includes,
+        dependencies : [libgcrypt],
+        c_args : ['-fvisibility=default'])

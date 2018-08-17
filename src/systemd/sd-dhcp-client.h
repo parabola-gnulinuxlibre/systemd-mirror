@@ -1,10 +1,9 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 #ifndef foosddhcpclienthfoo
 #define foosddhcpclienthfoo
 
 /***
-  This file is part of systemd.
-
-  Copyright (C) 2013 Intel Corporation. All rights reserved.
+  Copyright © 2013 Intel Corporation. All rights reserved.
 
   systemd is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -58,9 +57,17 @@ enum {
         SD_DHCP_OPTION_INTERFACE_MTU_AGING_TIMEOUT = 24,
         SD_DHCP_OPTION_INTERFACE_MTU               = 26,
         SD_DHCP_OPTION_BROADCAST                   = 28,
+       /* Windows 10 option to send when Anonymize=true */
+        SD_DHCP_OPTION_ROUTER_DISCOVER             = 31,
         SD_DHCP_OPTION_STATIC_ROUTE                = 33,
         SD_DHCP_OPTION_NTP_SERVER                  = 42,
         SD_DHCP_OPTION_VENDOR_SPECIFIC             = 43,
+       /* Windows 10 option to send when Anonymize=true */
+        SD_DHCP_OPTION_NETBIOS_NAMESERVER          = 44,
+       /* Windows 10 option to send when Anonymize=true */
+        SD_DHCP_OPTION_NETBIOS_NODETYPE            = 46,
+       /* Windows 10 option to send when Anonymize=true */
+        SD_DHCP_OPTION_NETBIOS_SCOPE               = 47,
         SD_DHCP_OPTION_REQUESTED_IP_ADDRESS        = 50,
         SD_DHCP_OPTION_IP_ADDRESS_LEASE_TIME       = 51,
         SD_DHCP_OPTION_OVERLOAD                    = 52,
@@ -73,12 +80,17 @@ enum {
         SD_DHCP_OPTION_REBINDING_T2_TIME           = 59,
         SD_DHCP_OPTION_VENDOR_CLASS_IDENTIFIER     = 60,
         SD_DHCP_OPTION_CLIENT_IDENTIFIER           = 61,
+        SD_DHCP_OPTION_USER_CLASS                  = 77,
         SD_DHCP_OPTION_FQDN                        = 81,
         SD_DHCP_OPTION_NEW_POSIX_TIMEZONE          = 100,
         SD_DHCP_OPTION_NEW_TZDB_TIMEZONE           = 101,
         SD_DHCP_OPTION_DOMAIN_SEARCH_LIST          = 119,
         SD_DHCP_OPTION_CLASSLESS_STATIC_ROUTE      = 121,
         SD_DHCP_OPTION_PRIVATE_BASE                = 224,
+       /* Windows 10 option to send when Anonymize=true */
+        SD_DHCP_OPTION_PRIVATE_CLASSLESS_STATIC_ROUTE = 249,
+       /* Windows 10 option to send when Anonymize=true */
+        SD_DHCP_OPTION_PRIVATE_PROXY_AUTODISCOVERY = 252,
         SD_DHCP_OPTION_PRIVATE_LAST                = 254,
         SD_DHCP_OPTION_END                         = 255,
 };
@@ -119,6 +131,11 @@ int sd_dhcp_client_set_iaid_duid(
                 uint16_t duid_type,
                 const void *duid,
                 size_t duid_len);
+int sd_dhcp_client_set_duid(
+                sd_dhcp_client *client,
+                uint16_t duid_type,
+                const void *duid,
+                size_t duid_len);
 int sd_dhcp_client_get_client_id(
                 sd_dhcp_client *client,
                 uint8_t *type,
@@ -136,6 +153,9 @@ int sd_dhcp_client_set_hostname(
 int sd_dhcp_client_set_vendor_class_identifier(
                 sd_dhcp_client *client,
                 const char *vci);
+int sd_dhcp_client_set_user_class(
+                sd_dhcp_client *client,
+                const char* const *user_class);
 int sd_dhcp_client_get_lease(
                 sd_dhcp_client *client,
                 sd_dhcp_lease **ret);
@@ -146,7 +166,9 @@ int sd_dhcp_client_start(sd_dhcp_client *client);
 sd_dhcp_client *sd_dhcp_client_ref(sd_dhcp_client *client);
 sd_dhcp_client *sd_dhcp_client_unref(sd_dhcp_client *client);
 
-int sd_dhcp_client_new(sd_dhcp_client **ret);
+/* NOTE: anonymize parameter is used to initialize PRL memory with different
+ * options when using RFC7844 Anonymity Profiles */
+int sd_dhcp_client_new(sd_dhcp_client **ret, int anonymize);
 
 int sd_dhcp_client_attach_event(
                 sd_dhcp_client *client,

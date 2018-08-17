@@ -1,39 +1,30 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: LGPL-2.1+
 
 OUTFILE_HEADER = """#!/usr/bin/env python3
+# SPDX-License-Identifier: LGPL-2.1+
 #
 # create-sys-script.py
 #
-# (C) 2017 Canonical Ltd.
+# © 2017 Canonical Ltd.
 # Author: Dan Streetman <dan.streetman@canonical.com>
-#
-# systemd is free software; you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as published by
-# the Free Software Foundation; either version 2.1 of the License, or
-# (at your option) any later version.
-#
-# systemd is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-# Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with systemd; If not, see <http://www.gnu.org/licenses/>.
-#
 """
 
 # Use this only to (re-)create the test/sys-script.py script,
 # after adding or modifying anything in the test/sys/ directory
 
 
-import os, sys, stat, tempfile, filecmp
+import os, sys
+import stat
+import tempfile
+import filecmp
+import subprocess
 
-
-OUTFILE = "sys-script.py"
 OUTFILE_MODE = 0o775
 
 OUTFILE_FUNCS = r"""
 import os, sys
+import shutil
 
 def d(path, mode):
     os.mkdir(path, mode)
@@ -45,7 +36,6 @@ def f(path, mode, contents):
     with open(path, "wb") as f:
         f.write(contents)
     os.chmod(path, mode)
-
 """
 
 OUTFILE_MAIN = """
@@ -57,17 +47,19 @@ if not os.path.isdir(sys.argv[1]):
 
 os.chdir(sys.argv[1])
 
+if os.path.exists('sys'):
+    shutil.rmtree('sys')
 """
 
 
 def handle_dir(outfile, path):
     m = os.lstat(path).st_mode & 0o777
-    outfile.write("d('{}', {:#o})\n".format(path, m))
+    outfile.write(f"d('{path}', {m:#o})\n")
 
 
 def handle_link(outfile, path):
     src = os.readlink(path)
-    outfile.write("l('{}', '{}')\n".format(path, src))
+    outfile.write(f"l('{path}', '{src}')\n")
 
 
 def escape_single_quotes(b):
@@ -85,15 +77,15 @@ def handle_file(outfile, path):
     with open(path, "rb") as f:
         b = f.read()
     if b.count(b"\n") > 1:
-        r = "\n".join([ escape_single_quotes(l) for l in b.split(b"\n") ])
-        r = "b'''{r}'''".format(r=r)
+        r = "\n".join( escape_single_quotes(l) for l in b.split(b"\n") )
+        r = f"b'''{r}'''"
     else:
         r = repr(b)
-    outfile.write("f('{}', {:#o}, {})\n".format(path, m, r))
+    outfile.write(f"f('{path}', {m:#o}, {r})\n")
 
 
 def process_sysdir(outfile):
-    for (dirpath, dirnames, filenames) in os.walk("sys"):
+    for (dirpath, dirnames, filenames) in os.walk('sys'):
         handle_dir(outfile, dirpath)
         for d in dirnames:
             path = os.path.join(dirpath, d)
@@ -139,7 +131,9 @@ def verify_file(tmpd, path_a):
 
 
 def verify_script(tmpd):
+    any = False
     for (dirpath, dirnames, filenames) in os.walk("sys"):
+        any = True
         try:
             path = dirpath
             verify_dir(tmpd, path)
@@ -155,29 +149,31 @@ def verify_script(tmpd):
                     elif stat.S_ISREG(mode):
                         verify_file(tmpd, path)
         except Exception:
-            print("FAIL on '{}'".format(path), file=sys.stderr)
+            print(f'FAIL on "{path}"', file=sys.stderr)
             raise
-
+    if not any:
+        exit('Nothing found!')
 
 if __name__ == "__main__":
-    # Always operate in the dir where this script is
-    os.chdir(os.path.dirname(sys.argv[0]))
+    if len(sys.argv) < 2:
+        exit('Usage: create-sys-script.py /path/to/test/')
 
-    if not os.path.isdir("sys"):
-        exit("No sys/ directory; please create before running this")
+    outfile = os.path.abspath(os.path.dirname(sys.argv[0]) + '/sys-script.py')
+    print(f'Creating {outfile} using contents of {sys.argv[1]}/sys')
 
-    print("Creating {} using contents of sys/".format(OUTFILE))
+    os.chdir(sys.argv[1])
 
-    with open(OUTFILE, "w") as f:
-        os.chmod(OUTFILE, OUTFILE_MODE)
-        f.write(OUTFILE_HEADER.replace(os.path.basename(sys.argv[0]), OUTFILE))
+    with open(outfile, "w") as f:
+        os.chmod(outfile, OUTFILE_MODE)
+        f.write(OUTFILE_HEADER.replace(os.path.basename(sys.argv[0]),
+                                       os.path.basename(outfile)))
         f.write(OUTFILE_FUNCS)
         f.write(OUTFILE_MAIN)
         process_sysdir(f)
 
     with tempfile.TemporaryDirectory() as tmpd:
-        print("Recreating sys/ using {} at {}".format(OUTFILE, tmpd))
-        os.system("./{script} {tmpd}".format(script=OUTFILE, tmpd=tmpd))
+        print(f'Recreating sys/ using {outfile} at {tmpd}')
+        subprocess.check_call([outfile, tmpd])
         verify_script(tmpd)
 
-    print("Verification successful, {} is correct".format(OUTFILE))
+    print(f'Verification successful, {outfile} is correct')

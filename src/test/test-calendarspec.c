@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2012 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <string.h>
 
@@ -170,6 +153,8 @@ int main(int argc, char* argv[]) {
         test_one("annually", "*-01-01 00:00:00");
         test_one("*:2/3", "*-*-* *:02/3:00");
         test_one("2015-10-25 01:00:00 uTc", "2015-10-25 01:00:00 UTC");
+        test_one("2015-10-25 01:00:00 Asia/Vladivostok", "2015-10-25 01:00:00 Asia/Vladivostok");
+        test_one("weekly Pacific/Auckland", "Mon *-*-* 00:00:00 Pacific/Auckland");
         test_one("2016-03-27 03:17:00.4200005", "2016-03-27 03:17:00.420001");
         test_one("2016-03-27 03:17:00/0.42", "2016-03-27 03:17:00/0.420000");
         test_one("9..11,13:00,30", "*-*-* 09..11,13:00,30:00");
@@ -219,6 +204,16 @@ int main(int argc, char* argv[]) {
         test_next("2017-08-06 9,11,13,15,17:00 UTC", "", 1502029800000000, 1502031600000000);
         test_next("2017-08-06 9..17/2:00 UTC", "", 1502029800000000, 1502031600000000);
         test_next("2016-12-* 3..21/6:00 UTC", "", 1482613200000001, 1482634800000000);
+        test_next("2017-09-24 03:30:00 Pacific/Auckland", "", 12345, 1506177000000000);
+        // Due to daylight saving time - 2017-09-24 02:30:00 does not exist
+        test_next("2017-09-24 02:30:00 Pacific/Auckland", "", 12345, -1);
+        test_next("2017-04-02 02:30:00 Pacific/Auckland", "", 12345, 1491053400000000);
+        // Confirm that even though it's a time change here (backward) 02:30 happens only once
+        test_next("2017-04-02 02:30:00 Pacific/Auckland", "", 1491053400000000, -1);
+        test_next("2017-04-02 03:30:00 Pacific/Auckland", "", 12345, 1491060600000000);
+        // Confirm that timezones in the Spec work regardless of current timezone
+        test_next("2017-09-09 20:42:00 Pacific/Auckland", "", 12345, 1504946520000000);
+        test_next("2017-09-09 20:42:00 Pacific/Auckland", "EET", 12345, 1504946520000000);
 
         assert_se(calendar_spec_from_string("test", &c) < 0);
         assert_se(calendar_spec_from_string(" utc", &c) < 0);
@@ -246,6 +241,7 @@ int main(int argc, char* argv[]) {
         assert_se(calendar_spec_from_string("00:00/60", &c) < 0);
         assert_se(calendar_spec_from_string("00:00:2300", &c) < 0);
         assert_se(calendar_spec_from_string("00:00:18446744073709551615", &c) < 0);
+        assert_se(calendar_spec_from_string("@88588582097858858", &c) == -ERANGE);
 
         test_timestamp();
         test_hourly_bug_4031();

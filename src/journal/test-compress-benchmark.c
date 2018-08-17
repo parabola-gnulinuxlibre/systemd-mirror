@@ -1,26 +1,11 @@
-/***
-  This file is part of systemd
-
-  Copyright 2014 Zbigniew Jędrzejewski-Szmek
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include "alloc-util.h"
 #include "compress.h"
+#include "env-util.h"
 #include "macro.h"
 #include "parse-util.h"
+#include "process-util.h"
 #include "random-util.h"
 #include "string-util.h"
 #include "util.h"
@@ -30,9 +15,9 @@ typedef int (compress_t)(const void *src, uint64_t src_size, void *dst,
 typedef int (decompress_t)(const void *src, uint64_t src_size,
                            void **dst, size_t *dst_alloc_size, size_t* dst_size, size_t dst_max);
 
-#if defined(HAVE_XZ) || defined(HAVE_LZ4)
+#if HAVE_XZ || HAVE_LZ4
 
-static usec_t arg_duration = 2 * USEC_PER_SEC;
+static usec_t arg_duration;
 static size_t arg_start;
 
 #define MAX_SIZE (1024*1024LU)
@@ -147,7 +132,7 @@ static void test_compress_decompress(const char* label, const char* type,
         dt = (n2-n) / 1e6;
 
         log_info("%s/%s: compressed & decompressed %zu bytes in %.2fs (%.2fMiB/s), "
-                 "mean compresion %.2f%%, skipped %zu bytes",
+                 "mean compression %.2f%%, skipped %zu bytes",
                  label, type, total, dt,
                  total / 1024. / 1024 / dt,
                  100 - compressed * 100. / total,
@@ -156,8 +141,9 @@ static void test_compress_decompress(const char* label, const char* type,
 #endif
 
 int main(int argc, char *argv[]) {
-#if defined(HAVE_XZ) || defined(HAVE_LZ4)
+#if HAVE_XZ || HAVE_LZ4
         const char *i;
+        int r;
 
         log_set_max_level(LOG_INFO);
 
@@ -166,17 +152,25 @@ int main(int argc, char *argv[]) {
 
                 assert_se(safe_atou(argv[1], &x) >= 0);
                 arg_duration = x * USEC_PER_SEC;
+        } else {
+                bool slow;
+
+                r = getenv_bool("SYSTEMD_SLOW_TESTS");
+                slow = r >= 0 ? r : SYSTEMD_SLOW_TESTS_DEFAULT;
+
+                arg_duration = slow ? 2 * USEC_PER_SEC : USEC_PER_SEC / 50;
         }
+
         if (argc == 3)
                 (void) safe_atozu(argv[2], &arg_start);
         else
                 arg_start = getpid_cached();
 
         NULSTR_FOREACH(i, "zeros\0simple\0random\0") {
-#ifdef HAVE_XZ
+#if HAVE_XZ
                 test_compress_decompress("XZ", i, compress_blob_xz, decompress_blob_xz);
 #endif
-#ifdef HAVE_LZ4
+#if HAVE_LZ4
                 test_compress_decompress("LZ4", i, compress_blob_lz4, decompress_blob_lz4);
 #endif
         }

@@ -1,21 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 #pragma once
 
 /*
- * Copyright (C) 2003 Greg Kroah-Hartman <greg@kroah.com>
- * Copyright (C) 2003-2010 Kay Sievers <kay@vrfy.org>
+ * Copyright © 2003 Greg Kroah-Hartman <greg@kroah.com>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <sys/param.h>
@@ -146,21 +134,21 @@ int udev_ctrl_get_set_children_max(struct udev_ctrl_msg *ctrl_msg);
 
 /* built-in commands */
 enum udev_builtin_cmd {
-#ifdef HAVE_BLKID
+#if HAVE_BLKID
         UDEV_BUILTIN_BLKID,
 #endif
         UDEV_BUILTIN_BTRFS,
         UDEV_BUILTIN_HWDB,
         UDEV_BUILTIN_INPUT_ID,
         UDEV_BUILTIN_KEYBOARD,
-#ifdef HAVE_KMOD
+#if HAVE_KMOD
         UDEV_BUILTIN_KMOD,
 #endif
         UDEV_BUILTIN_NET_ID,
         UDEV_BUILTIN_NET_LINK,
         UDEV_BUILTIN_PATH_ID,
         UDEV_BUILTIN_USB_ID,
-#ifdef HAVE_ACL
+#if HAVE_ACL
         UDEV_BUILTIN_UACCESS,
 #endif
         UDEV_BUILTIN_MAX
@@ -174,14 +162,14 @@ struct udev_builtin {
         bool (*validate)(struct udev *udev);
         bool run_once;
 };
-#ifdef HAVE_BLKID
+#if HAVE_BLKID
 extern const struct udev_builtin udev_builtin_blkid;
 #endif
 extern const struct udev_builtin udev_builtin_btrfs;
 extern const struct udev_builtin udev_builtin_hwdb;
 extern const struct udev_builtin udev_builtin_input_id;
 extern const struct udev_builtin udev_builtin_keyboard;
-#ifdef HAVE_KMOD
+#if HAVE_KMOD
 extern const struct udev_builtin udev_builtin_kmod;
 #endif
 extern const struct udev_builtin udev_builtin_net_id;

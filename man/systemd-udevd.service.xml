@@ -2,20 +2,16 @@
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 
+<!--
+  SPDX-License-Identifier: LGPL-2.1+
+-->
+
 <refentry id="systemd-udevd.service"
           xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <refentryinfo>
     <title>systemd-udevd.service</title>
     <productname>systemd</productname>
-    <authorgroup>
-      <author>
-        <contrib>Developer</contrib>
-        <firstname>Kay</firstname>
-        <surname>Sievers</surname>
-        <email>kay@vrfy.org</email>
-      </author>
-    </authorgroup>
   </refentryinfo>
 
   <refmeta>
@@ -68,6 +64,7 @@
   <refsect1><title>Options</title>
     <variablelist>
       <varlistentry>
+        <term><option>-d</option></term>
         <term><option>--daemon</option></term>
         <listitem>
           <para>Detach and run in the background.</para>
@@ -75,6 +72,7 @@
       </varlistentry>
 
       <varlistentry>
+        <term><option>-D</option></term>
         <term><option>--debug</option></term>
         <listitem>
           <para>Print debug messages to standard error.</para>
@@ -82,6 +80,7 @@
       </varlistentry>
 
       <varlistentry>
+        <term><option>-c=</option></term>
         <term><option>--children-max=</option></term>
         <listitem>
           <para>Limit the number of events executed in parallel.</para>
@@ -89,6 +88,7 @@
       </varlistentry>
 
       <varlistentry>
+        <term><option>-e=</option></term>
         <term><option>--exec-delay=</option></term>
         <listitem>
           <para>Delay the execution of <varname>RUN</varname>
@@ -100,6 +100,7 @@
       </varlistentry>
 
       <varlistentry>
+        <term><option>-t=</option></term>
         <term><option>--event-timeout=</option></term>
         <listitem>
           <para>Set the number of seconds to wait for events to finish. After
@@ -108,6 +109,7 @@
       </varlistentry>
 
       <varlistentry>
+        <term><option>-N=</option></term>
         <term><option>--resolve-names=</option></term>
         <listitem>
           <para>Specify when systemd-udevd should resolve names of users and groups.
@@ -119,11 +121,7 @@
         </listitem>
       </varlistentry>
 
-      <varlistentry>
-        <term><option>--help</option></term>
-
-        <xi:include href="standard-options.xml" xpointer="help-text" />
-      </varlistentry>
+      <xi:include href="standard-options.xml" xpointer="help" />
       <xi:include href="standard-options.xml" xpointer="version" />
     </variablelist>
   </refsect1>

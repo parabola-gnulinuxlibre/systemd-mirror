@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd
-
-  Copyright 2015 Tom Gundersen
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include "bitmap.h"
 
@@ -96,8 +79,19 @@ int main(int argc, const char *argv[]) {
 
         assert_se(i == (unsigned) -1);
 
+        b2 = bitmap_copy(b);
+        assert_se(b2);
+        assert_se(bitmap_equal(b, b2) == true);
+        assert_se(bitmap_equal(b, b) == true);
+        assert_se(bitmap_equal(b, NULL) == false);
+        assert_se(bitmap_equal(NULL, b) == false);
+        assert_se(bitmap_equal(NULL, NULL) == true);
+
         bitmap_clear(b);
         assert_se(bitmap_isclear(b) == true);
+        assert_se(bitmap_equal(b, b2) == false);
+        bitmap_free(b2);
+        b2 = NULL;
 
         assert_se(bitmap_set(b, (unsigned) -1) == -ERANGE);
 

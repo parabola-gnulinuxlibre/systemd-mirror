@@ -1,20 +1,8 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * cdrom_id - optical drive and media information prober
  *
- * Copyright (C) 2008-2010 Kay Sievers <kay@vrfy.org>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <errno.h>
@@ -544,7 +532,7 @@ static int cd_profiles(struct udev *udev, int fd)
         if ((err != 0)) {
                 info_scsi_cmd_err(udev, "GET CONFIGURATION", err);
                 /* handle pre-MMC2 drives which do not support GET CONFIGURATION */
-                if (SK(err) == 0x5 && (ASC(err) == 0x20 || ASC(err) == 0x24)) {
+                if (SK(err) == 0x5 && IN_SET(ASC(err), 0x20, 0x24)) {
                         log_debug("drive is pre-MMC2 and does not support 46h get configuration command");
                         log_debug("trying to work around the problem");
                         ret = cd_profiles_old_mmc(udev, fd);
@@ -565,7 +553,7 @@ static int cd_profiles(struct udev *udev, int fd)
         log_debug("GET CONFIGURATION: size of features buffer 0x%04x", len);
 
         if (len > sizeof(features)) {
-                log_debug("can not get features in a single query, truncating");
+                log_debug("cannot get features in a single query, truncating");
                 len = sizeof(features);
         } else if (len <= 8)
                 len = sizeof(features);
@@ -587,7 +575,7 @@ static int cd_profiles(struct udev *udev, int fd)
         log_debug("GET CONFIGURATION: size of features buffer 0x%04x", len);
 
         if (len > sizeof(features)) {
-                log_debug("can not get features in a single query, truncating");
+                log_debug("cannot get features in a single query, truncating");
                 len = sizeof(features);
         }
 

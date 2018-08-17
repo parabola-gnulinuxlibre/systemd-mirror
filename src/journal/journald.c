@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2011 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <unistd.h>
 
@@ -27,6 +10,7 @@
 #include "journald-kmsg.h"
 #include "journald-server.h"
 #include "journald-syslog.h"
+#include "process-util.h"
 #include "sigbus.h"
 
 int main(int argc, char *argv[]) {
@@ -38,7 +22,8 @@ int main(int argc, char *argv[]) {
                 return EXIT_FAILURE;
         }
 
-        log_set_target(LOG_TARGET_SAFE);
+        log_set_prohibit_ipc(true);
+        log_set_target(LOG_TARGET_AUTO);
         log_set_facility(LOG_SYSLOG);
         log_parse_environment();
         log_open();
@@ -56,7 +41,7 @@ int main(int argc, char *argv[]) {
         server_flush_dev_kmsg(&server);
 
         log_debug("systemd-journald running as pid "PID_FMT, getpid_cached());
-        server_driver_message(&server,
+        server_driver_message(&server, 0,
                               "MESSAGE_ID=" SD_MESSAGE_JOURNAL_START_STR,
                               LOG_MESSAGE("Journal started"),
                               NULL);
@@ -91,7 +76,7 @@ int main(int argc, char *argv[]) {
                         t = server.oldest_file_usec + server.max_retention_usec - n;
                 }
 
-#ifdef HAVE_GCRYPT
+#if HAVE_GCRYPT
                 if (server.system_journal) {
                         usec_t u;
 
@@ -115,7 +100,7 @@ int main(int argc, char *argv[]) {
         }
 
         log_debug("systemd-journald stopped as pid "PID_FMT, getpid_cached());
-        server_driver_message(&server,
+        server_driver_message(&server, 0,
                               "MESSAGE_ID=" SD_MESSAGE_JOURNAL_STOP_STR,
                               LOG_MESSAGE("Journal stopped"),
                               NULL);

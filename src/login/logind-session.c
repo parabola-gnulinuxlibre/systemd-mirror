@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2011 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <fcntl.h>
@@ -45,6 +28,7 @@
 #include "terminal-util.h"
 #include "user-util.h"
 #include "util.h"
+#include "process-util.h"
 
 #define RELEASE_USEC (20*USEC_PER_SEC)
 
@@ -82,6 +66,7 @@ Session* session_new(Manager *m, const char *id) {
         s->manager = m;
         s->fifo_fd = -1;
         s->vtfd = -1;
+        s->audit_id = AUDIT_SESSION_INVALID;
 
         return s;
 }
@@ -177,7 +162,7 @@ int session_save(Session *s) {
         if (!s->started)
                 return 0;
 
-        r = mkdir_safe_label("/run/systemd/sessions", 0755, 0, 0);
+        r = mkdir_safe_label("/run/systemd/sessions", 0755, 0, 0, MKDIR_WARN_MODE);
         if (r < 0)
                 goto fail;
 
@@ -264,7 +249,6 @@ int session_save(Session *s) {
         if (s->desktop) {
                 _cleanup_free_ char *escaped;
 
-
                 escaped = cescape(s->desktop);
                 if (!escaped) {
                         r = -ENOMEM;
@@ -280,10 +264,10 @@ int session_save(Session *s) {
         if (!s->vtnr)
                 fprintf(f, "POSITION=%u\n", s->position);
 
-        if (s->leader > 0)
+        if (pid_is_valid(s->leader))
                 fprintf(f, "LEADER="PID_FMT"\n", s->leader);
 
-        if (s->audit_id > 0)
+        if (audit_session_is_valid(s->audit_id))
                 fprintf(f, "AUDIT=%"PRIu32"\n", s->audit_id);
 
         if (dual_timestamp_is_set(&s->timestamp))
@@ -376,7 +360,7 @@ int session_load(Session *s) {
 
         assert(s);
 
-        r = parse_env_file(s->state_file, NEWLINE,
+        r = parse_env_file(NULL, s->state_file, NEWLINE,
                            "REMOTE",         &remote,
                            "SCOPE",          &s->scope,
                            "SCOPE_JOB",      &s->scope_job,
@@ -459,9 +443,8 @@ int session_load(Session *s) {
         }
 
         if (leader) {
-                k = parse_pid(leader, &s->leader);
-                if (k >= 0)
-                        audit_session_from_pid(s->leader, &s->audit_id);
+                if (parse_pid(leader, &s->leader) >= 0)
+                        (void) audit_session_from_pid(s->leader, &s->audit_id);
         }
 
         if (type) {
@@ -556,7 +539,7 @@ int session_activate(Session *s) {
         return 0;
 }
 
-static int session_start_scope(Session *s) {
+static int session_start_scope(Session *s, sd_bus_message *properties) {
         int r;
 
         assert(s);
@@ -581,7 +564,7 @@ static int session_start_scope(Session *s) {
                                 description,
                                 "systemd-logind.service",
                                 "systemd-user-sessions.service",
-                                (uint64_t) -1, /* disable TasksMax= for the scope, rely on the slice setting for it */
+                                properties,
                                 &error,
                                 &job);
                 if (r < 0) {
@@ -602,7 +585,7 @@ static int session_start_scope(Session *s) {
         return 0;
 }
 
-int session_start(Session *s) {
+int session_start(Session *s, sd_bus_message *properties) {
         int r;
 
         assert(s);
@@ -618,7 +601,7 @@ int session_start(Session *s) {
                 return r;
 
         /* Create cgroup */
-        r = session_start_scope(s);
+        r = session_start_scope(s, properties);
         if (r < 0)
                 return r;
 
@@ -627,8 +610,7 @@ int session_start(Session *s) {
                    "SESSION_ID=%s", s->id,
                    "USER_ID=%s", s->user->name,
                    "LEADER="PID_FMT, s->leader,
-                   LOG_MESSAGE("New session %s of user %s.", s->id, s->user->name),
-                   NULL);
+                   LOG_MESSAGE("New session %s of user %s.", s->id, s->user->name));
 
         if (!dual_timestamp_is_set(&s->timestamp))
                 dual_timestamp_get(&s->timestamp);
@@ -683,8 +665,18 @@ static int session_stop_scope(Session *s, bool force) {
 
                 free(s->scope_job);
                 s->scope_job = job;
-        } else
+        } else {
                 s->scope_job = mfree(s->scope_job);
+
+                /* With no killing, this session is allowed to persist in "closing" state indefinitely.
+                 * Therefore session stop and session removal may be two distinct events.
+                 * Session stop is quite significant on its own, let's log it. */
+                log_struct(s->class == SESSION_BACKGROUND ? LOG_DEBUG : LOG_INFO,
+                           "SESSION_ID=%s", s->id,
+                           "USER_ID=%s", s->user->name,
+                           "LEADER="PID_FMT, s->leader,
+                           LOG_MESSAGE("Session %s logged out. Waiting for processes to exit.", s->id));
+        }
 
         return 0;
 }
@@ -732,8 +724,7 @@ int session_finalize(Session *s) {
                            "SESSION_ID=%s", s->id,
                            "USER_ID=%s", s->user->name,
                            "LEADER="PID_FMT, s->leader,
-                           LOG_MESSAGE("Removed session %s.", s->id),
-                           NULL);
+                           LOG_MESSAGE("Removed session %s.", s->id));
 
         s->timer_event_source = sd_event_source_unref(s->timer_event_source);
 
@@ -947,7 +938,7 @@ int session_create_fifo(Session *s) {
 
         /* Create FIFO */
         if (!s->fifo_path) {
-                r = mkdir_safe_label("/run/systemd/sessions", 0755, 0, 0);
+                r = mkdir_safe_label("/run/systemd/sessions", 0755, 0, 0, MKDIR_WARN_MODE);
                 if (r < 0)
                         return r;
 
@@ -960,7 +951,7 @@ int session_create_fifo(Session *s) {
 
         /* Open reading side */
         if (s->fifo_fd < 0) {
-                s->fifo_fd = open(s->fifo_path, O_RDONLY|O_CLOEXEC|O_NDELAY);
+                s->fifo_fd = open(s->fifo_path, O_RDONLY|O_CLOEXEC|O_NONBLOCK);
                 if (s->fifo_fd < 0)
                         return -errno;
 
@@ -979,7 +970,7 @@ int session_create_fifo(Session *s) {
         }
 
         /* Open writing side */
-        r = open(s->fifo_path, O_WRONLY|O_CLOEXEC|O_NDELAY);
+        r = open(s->fifo_path, O_WRONLY|O_CLOEXEC|O_NONBLOCK);
         if (r < 0)
                 return -errno;
 
@@ -998,27 +989,27 @@ static void session_remove_fifo(Session *s) {
         }
 }
 
-bool session_check_gc(Session *s, bool drop_not_started) {
+bool session_may_gc(Session *s, bool drop_not_started) {
         assert(s);
 
         if (drop_not_started && !s->started)
-                return false;
+                return true;
 
         if (!s->user)
-                return false;
+                return true;
 
         if (s->fifo_fd >= 0) {
                 if (pipe_eof(s->fifo_fd) <= 0)
-                        return true;
+                        return false;
         }
 
         if (s->scope_job && manager_job_is_active(s->manager, s->scope_job))
-                return true;
+                return false;
 
         if (s->scope && manager_unit_is_active(s->manager, s->scope))
-                return true;
+                return false;
 
-        return false;
+        return true;
 }
 
 void session_add_to_gc_queue(Session *s) {
@@ -1135,8 +1126,7 @@ void session_restore_vt(Session *s) {
                 .mode = VT_AUTO,
         };
 
-        _cleanup_free_ char *utf8 = NULL;
-        int vt, kb, old_fd;
+        int vt, old_fd;
 
         /* We need to get a fresh handle to the virtual terminal,
          * since the old file-descriptor is potentially in a hung-up
@@ -1144,8 +1134,7 @@ void session_restore_vt(Session *s) {
          * little dance to avoid having the terminal be available
          * for reuse before we've cleaned it up.
          */
-        old_fd = s->vtfd;
-        s->vtfd = -1;
+        old_fd = TAKE_FD(s->vtfd);
 
         vt = session_open_vt(s);
         safe_close(old_fd);
@@ -1155,12 +1144,7 @@ void session_restore_vt(Session *s) {
 
         (void) ioctl(vt, KDSETMODE, KD_TEXT);
 
-        if (read_one_line_file("/sys/module/vt/parameters/default_utf8", &utf8) >= 0 && *utf8 == '1')
-                kb = K_UNICODE;
-        else
-                kb = K_XLATE;
-
-        (void) ioctl(vt, KDSKBMODE, kb);
+        (void) vt_reset_keyboard(vt);
 
         (void) ioctl(vt, VT_SETMODE, &mode);
         (void) fchown(vt, 0, (gid_t) -1);
@@ -1275,8 +1259,7 @@ int session_set_controller(Session *s, const char *sender, bool force, bool prep
         }
 
         session_release_controller(s, true);
-        s->controller = name;
-        name = NULL;
+        s->controller = TAKE_PTR(name);
         session_save(s);
 
         return 0;

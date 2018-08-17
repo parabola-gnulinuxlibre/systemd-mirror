@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <fcntl.h>
 #include <linux/magic.h>
@@ -60,27 +43,20 @@ static void test_is_symlink(void) {
         assert_se(is_symlink(name_link) == 1);
         assert_se(is_symlink("/a/file/which/does/not/exist/i/guess") < 0);
 
-
         unlink(name);
         unlink(name_link);
 }
 
-static void test_path_is_os_tree(void) {
-        assert_se(path_is_os_tree("/") > 0);
-        assert_se(path_is_os_tree("/etc") == 0);
-        assert_se(path_is_os_tree("/idontexist") == -ENOENT);
-}
-
-static void test_path_check_fstype(void) {
+static void test_path_is_fs_type(void) {
         /* run might not be a mount point in build chroots */
         if (path_is_mount_point("/run", NULL, AT_SYMLINK_FOLLOW) > 0) {
-                assert_se(path_check_fstype("/run", TMPFS_MAGIC) > 0);
-                assert_se(path_check_fstype("/run", BTRFS_SUPER_MAGIC) == 0);
+                assert_se(path_is_fs_type("/run", TMPFS_MAGIC) > 0);
+                assert_se(path_is_fs_type("/run", BTRFS_SUPER_MAGIC) == 0);
         }
-        assert_se(path_check_fstype("/proc", PROC_SUPER_MAGIC) > 0);
-        assert_se(path_check_fstype("/proc", BTRFS_SUPER_MAGIC) == 0);
-        assert_se(path_check_fstype("/proc", BTRFS_SUPER_MAGIC) == 0);
-        assert_se(path_check_fstype("/i-dont-exist", BTRFS_SUPER_MAGIC) == -ENOENT);
+        assert_se(path_is_fs_type("/proc", PROC_SUPER_MAGIC) > 0);
+        assert_se(path_is_fs_type("/proc", BTRFS_SUPER_MAGIC) == 0);
+        assert_se(path_is_fs_type("/proc", BTRFS_SUPER_MAGIC) == 0);
+        assert_se(path_is_fs_type("/i-dont-exist", BTRFS_SUPER_MAGIC) == -ENOENT);
 }
 
 static void test_path_is_temporary_fs(void) {
@@ -94,8 +70,7 @@ static void test_path_is_temporary_fs(void) {
 int main(int argc, char *argv[]) {
         test_files_same();
         test_is_symlink();
-        test_path_is_os_tree();
-        test_path_check_fstype();
+        test_path_is_fs_type();
         test_path_is_temporary_fs();
 
         return 0;

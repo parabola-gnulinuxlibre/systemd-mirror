@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2015 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <sys/xattr.h>
 
@@ -58,8 +41,7 @@ PullJob* pull_job_unref(PullJob *j) {
 static void pull_job_finish(PullJob *j, int ret) {
         assert(j);
 
-        if (j->state == PULL_JOB_DONE ||
-            j->state == PULL_JOB_FAILED)
+        if (IN_SET(j->state, PULL_JOB_DONE, PULL_JOB_FAILED))
                 return;
 
         if (ret == 0) {
@@ -109,7 +91,7 @@ void pull_job_curl_on_finished(CurlGlue *g, CURL *curl, CURLcode result) {
         if (curl_easy_getinfo(curl, CURLINFO_PRIVATE, (char **)&j) != CURLE_OK)
                 return;
 
-        if (!j || j->state == PULL_JOB_DONE || j->state == PULL_JOB_FAILED)
+        if (!j || IN_SET(j->state, PULL_JOB_DONE, PULL_JOB_FAILED))
                 return;
 
         if (result != CURLE_OK) {
@@ -442,7 +424,7 @@ static size_t pull_job_header_callback(void *contents, size_t size, size_t nmemb
         assert(contents);
         assert(j);
 
-        if (j->state == PULL_JOB_DONE || j->state == PULL_JOB_FAILED) {
+        if (IN_SET(j->state, PULL_JOB_DONE, PULL_JOB_FAILED)) {
                 r = -ESTALE;
                 goto fail;
         }
@@ -581,8 +563,7 @@ int pull_job_new(PullJob **ret, const char *url, CurlGlue *glue, void *userdata)
         if (!j->url)
                 return -ENOMEM;
 
-        *ret = j;
-        j = NULL;
+        *ret = TAKE_PTR(j);
 
         return 0;
 }

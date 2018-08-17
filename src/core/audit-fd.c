@@ -1,28 +1,10 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2012 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
-
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 
 #include "audit-fd.h"
 
-#ifdef HAVE_AUDIT
+#if HAVE_AUDIT
 
 #include <libaudit.h>
 #include <stdbool.h>
@@ -48,7 +30,7 @@ int get_audit_fd(void) {
                 audit_fd = audit_open();
 
                 if (audit_fd < 0) {
-                        if (errno != EAFNOSUPPORT && errno != EPROTONOSUPPORT)
+                        if (!IN_SET(errno, EAFNOSUPPORT, EPROTONOSUPPORT))
                                 log_error_errno(errno, "Failed to connect to audit log: %m");
 
                         audit_fd = errno ? -errno : -EINVAL;

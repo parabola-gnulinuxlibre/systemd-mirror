@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <fcntl.h>
@@ -25,6 +8,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/utsname.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -35,7 +19,9 @@
 #include "architecture.h"
 #include "audit-util.h"
 #include "cap-list.h"
+#include "cgroup-util.h"
 #include "condition.h"
+#include "efivars.h"
 #include "extract-word.h"
 #include "fd-util.h"
 #include "fileio.h"
@@ -54,6 +40,7 @@
 #include "stat-util.h"
 #include "string-table.h"
 #include "string-util.h"
+#include "tomoyo-util.h"
 #include "user-util.h"
 #include "util.h"
 #include "virt.h"
@@ -76,8 +63,7 @@ Condition* condition_new(ConditionType type, const char *parameter, bool trigger
 
         r = free_and_strdup(&c->parameter, parameter);
         if (r < 0) {
-                free(c);
-                return NULL;
+                return mfree(c);
         }
 
         return c;
@@ -113,7 +99,7 @@ static int condition_test_kernel_command_line(Condition *c) {
         if (r < 0)
                 return r;
 
-        equal = !!strchr(c->parameter, '=');
+        equal = strchr(c->parameter, '=');
 
         for (p = line;;) {
                 _cleanup_free_ char *word = NULL;
@@ -131,7 +117,7 @@ static int condition_test_kernel_command_line(Condition *c) {
                         const char *f;
 
                         f = startswith(word, c->parameter);
-                        found = f && (*f == '=' || *f == 0);
+                        found = f && IN_SET(*f, 0, '=');
                 }
 
                 if (found)
@@ -139,6 +125,70 @@ static int condition_test_kernel_command_line(Condition *c) {
         }
 
         return false;
+}
+
+static int condition_test_kernel_version(Condition *c) {
+        enum {
+                /* Listed in order of checking. Note that some comparators are prefixes of others, hence the longest
+                 * should be listed first. */
+                LOWER_OR_EQUAL,
+                GREATER_OR_EQUAL,
+                LOWER,
+                GREATER,
+                EQUAL,
+                _ORDER_MAX,
+        };
+
+        static const char *const prefix[_ORDER_MAX] = {
+                [LOWER_OR_EQUAL] = "<=",
+                [GREATER_OR_EQUAL] = ">=",
+                [LOWER] = "<",
+                [GREATER] = ">",
+                [EQUAL] = "=",
+        };
+        const char *p = NULL;
+        struct utsname u;
+        size_t i;
+        int k;
+
+        assert(c);
+        assert(c->parameter);
+        assert(c->type == CONDITION_KERNEL_VERSION);
+
+        assert_se(uname(&u) >= 0);
+
+        for (i = 0; i < _ORDER_MAX; i++) {
+                p = startswith(c->parameter, prefix[i]);
+                if (p)
+                        break;
+        }
+
+        /* No prefix? Then treat as glob string */
+        if (!p)
+                return fnmatch(skip_leading_chars(c->parameter, NULL), u.release, 0) == 0;
+
+        k = str_verscmp(u.release, skip_leading_chars(p, NULL));
+
+        switch (i) {
+
+        case LOWER:
+                return k < 0;
+
+        case LOWER_OR_EQUAL:
+                return k <= 0;
+
+        case EQUAL:
+                return k == 0;
+
+        case GREATER_OR_EQUAL:
+                return k >= 0;
+
+        case GREATER:
+                return k > 0;
+
+        default:
+                assert_not_reached("Can't compare");
+        }
 }
 
 static int condition_test_user(Condition *c) {
@@ -156,7 +206,7 @@ static int condition_test_user(Condition *c) {
                 return id == getuid() || id == geteuid();
 
         if (streq("@system", c->parameter))
-                return getuid() <= SYSTEM_UID_MAX || geteuid() <= SYSTEM_UID_MAX;
+                return uid_is_system(getuid()) || uid_is_system(geteuid());
 
         username = getusername_malloc();
         if (!username)
@@ -174,6 +224,30 @@ static int condition_test_user(Condition *c) {
                 return 0;
 
         return id == getuid() || id == geteuid();
+}
+
+static int condition_test_control_group_controller(Condition *c) {
+        int r;
+        CGroupMask system_mask, wanted_mask = 0;
+
+        assert(c);
+        assert(c->parameter);
+        assert(c->type == CONDITION_CONTROL_GROUP_CONTROLLER);
+
+        r = cg_mask_supported(&system_mask);
+        if (r < 0)
+                return log_debug_errno(r, "Failed to determine supported controllers: %m");
+
+        r = cg_mask_from_string(c->parameter, &wanted_mask);
+        if (r < 0 || wanted_mask <= 0) {
+                /* This won't catch the case that we have an unknown controller
+                 * mixed in with valid ones -- these are only assessed on the
+                 * validity of the valid controllers found. */
+                log_debug("Failed to parse cgroup string: %s", c->parameter);
+                return 1;
+        }
+
+        return FLAGS_SET(system_mask, wanted_mask);
 }
 
 static int condition_test_group(Condition *c) {
@@ -301,6 +375,10 @@ static int condition_test_security(Condition *c) {
                 return use_audit();
         if (streq(c->parameter, "ima"))
                 return use_ima();
+        if (streq(c->parameter, "tomoyo"))
+                return mac_tomoyo_use();
+        if (streq(c->parameter, "uefi-secureboot"))
+                return is_efi_secure_boot();
 
         return false;
 }
@@ -384,7 +462,7 @@ static int condition_test_needs_update(Condition *c) {
                 uint64_t timestamp;
                 int r;
 
-                r = parse_env_file(p, NULL, "TIMESTAMP_NSEC", &timestamp_str, NULL);
+                r = parse_env_file(NULL, p, NULL, "TIMESTAMP_NSEC", &timestamp_str, NULL);
                 if (r < 0) {
                         log_error_errno(r, "Failed to parse timestamp file '%s', using mtime: %m", p);
                         return true;
@@ -524,6 +602,7 @@ int condition_test(Condition *c) {
                 [CONDITION_FILE_NOT_EMPTY] = condition_test_file_not_empty,
                 [CONDITION_FILE_IS_EXECUTABLE] = condition_test_file_is_executable,
                 [CONDITION_KERNEL_COMMAND_LINE] = condition_test_kernel_command_line,
+                [CONDITION_KERNEL_VERSION] = condition_test_kernel_version,
                 [CONDITION_VIRTUALIZATION] = condition_test_virtualization,
                 [CONDITION_SECURITY] = condition_test_security,
                 [CONDITION_CAPABILITY] = condition_test_capability,
@@ -534,6 +613,7 @@ int condition_test(Condition *c) {
                 [CONDITION_FIRST_BOOT] = condition_test_first_boot,
                 [CONDITION_USER] = condition_test_user,
                 [CONDITION_GROUP] = condition_test_group,
+                [CONDITION_CONTROL_GROUP_CONTROLLER] = condition_test_control_group_controller,
                 [CONDITION_NULL] = condition_test_null,
         };
 
@@ -558,8 +638,7 @@ void condition_dump(Condition *c, FILE *f, const char *prefix, const char *(*to_
         assert(c);
         assert(f);
 
-        if (!prefix)
-                prefix = "";
+        prefix = strempty(prefix);
 
         fprintf(f,
                 "%s\t%s: %s%s%s %s\n",
@@ -583,6 +662,7 @@ static const char* const condition_type_table[_CONDITION_TYPE_MAX] = {
         [CONDITION_VIRTUALIZATION] = "ConditionVirtualization",
         [CONDITION_HOST] = "ConditionHost",
         [CONDITION_KERNEL_COMMAND_LINE] = "ConditionKernelCommandLine",
+        [CONDITION_KERNEL_VERSION] = "ConditionKernelVersion",
         [CONDITION_SECURITY] = "ConditionSecurity",
         [CONDITION_CAPABILITY] = "ConditionCapability",
         [CONDITION_AC_POWER] = "ConditionACPower",
@@ -599,6 +679,7 @@ static const char* const condition_type_table[_CONDITION_TYPE_MAX] = {
         [CONDITION_FILE_IS_EXECUTABLE] = "ConditionFileIsExecutable",
         [CONDITION_USER] = "ConditionUser",
         [CONDITION_GROUP] = "ConditionGroup",
+        [CONDITION_CONTROL_GROUP_CONTROLLER] = "ConditionControlGroupController",
         [CONDITION_NULL] = "ConditionNull"
 };
 
@@ -609,6 +690,7 @@ static const char* const assert_type_table[_CONDITION_TYPE_MAX] = {
         [CONDITION_VIRTUALIZATION] = "AssertVirtualization",
         [CONDITION_HOST] = "AssertHost",
         [CONDITION_KERNEL_COMMAND_LINE] = "AssertKernelCommandLine",
+        [CONDITION_KERNEL_VERSION] = "AssertKernelVersion",
         [CONDITION_SECURITY] = "AssertSecurity",
         [CONDITION_CAPABILITY] = "AssertCapability",
         [CONDITION_AC_POWER] = "AssertACPower",
@@ -625,6 +707,7 @@ static const char* const assert_type_table[_CONDITION_TYPE_MAX] = {
         [CONDITION_FILE_IS_EXECUTABLE] = "AssertFileIsExecutable",
         [CONDITION_USER] = "AssertUser",
         [CONDITION_GROUP] = "AssertGroup",
+        [CONDITION_CONTROL_GROUP_CONTROLLER] = "AssertControlGroupController",
         [CONDITION_NULL] = "AssertNull"
 };
 

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 sources = files('''
         sd-dhcp-client.c
         sd-dhcp-server.c

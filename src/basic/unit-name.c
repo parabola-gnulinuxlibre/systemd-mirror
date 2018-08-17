@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <stddef.h>
@@ -24,12 +7,10 @@
 #include <string.h>
 
 #include "alloc-util.h"
-#include "bus-label.h"
 #include "glob-util.h"
 #include "hexdecoct.h"
-#include "macro.h"
 #include "path-util.h"
-#include "string-table.h"
+#include "special.h"
 #include "string-util.h"
 #include "strv.h"
 #include "unit-name.h"
@@ -255,10 +236,29 @@ int unit_name_change_suffix(const char *n, const char *suffix, char **ret) {
 }
 
 int unit_name_build(const char *prefix, const char *instance, const char *suffix, char **ret) {
-        char *s;
+        UnitType type;
 
         assert(prefix);
         assert(suffix);
+        assert(ret);
+
+        if (suffix[0] != '.')
+                return -EINVAL;
+
+        type = unit_type_from_string(suffix + 1);
+        if (type < 0)
+                return -EINVAL;
+
+        return unit_name_build_from_type(prefix, instance, type, ret);
+}
+
+int unit_name_build_from_type(const char *prefix, const char *instance, UnitType type, char **ret) {
+        const char *ut;
+        char *s;
+
+        assert(prefix);
+        assert(type >= 0);
+        assert(type < _UNIT_TYPE_MAX);
         assert(ret);
 
         if (!unit_prefix_is_valid(prefix))
@@ -267,13 +267,12 @@ int unit_name_build(const char *prefix, const char *instance, const char *suffix
         if (instance && !unit_instance_is_valid(instance))
                 return -EINVAL;
 
-        if (!unit_suffix_is_valid(suffix))
-                return -EINVAL;
+        ut = unit_type_to_string(type);
 
         if (!instance)
-                s = strappend(prefix, suffix);
+                s = strjoin(prefix, ".", ut);
         else
-                s = strjoin(prefix, "@", instance, suffix);
+                s = strjoin(prefix, "@", instance, ".", ut);
         if (!s)
                 return -ENOMEM;
 
@@ -305,7 +304,7 @@ static char *do_escape(const char *f, char *t) {
         for (; *f; f++) {
                 if (*f == '/')
                         *(t++) = '-';
-                else if (*f == '-' || *f == '\\' || !strchr(VALID_CHARS, *f))
+                else if (IN_SET(*f, '-', '\\') || !strchr(VALID_CHARS, *f))
                         t = do_escape_char(*f, t);
                 else
                         *(t++) = *f;
@@ -364,8 +363,7 @@ int unit_name_unescape(const char *f, char **ret) {
 
         *t = 0;
 
-        *ret = r;
-        r = NULL;
+        *ret = TAKE_PTR(r);
 
         return 0;
 }
@@ -380,24 +378,19 @@ int unit_name_path_escape(const char *f, char **ret) {
         if (!p)
                 return -ENOMEM;
 
-        path_kill_slashes(p);
+        path_simplify(p, false);
 
-        if (STR_IN_SET(p, "/", ""))
+        if (empty_or_root(p))
                 s = strdup("-");
         else {
-                char *e;
-
-                if (!path_is_safe(p))
+                if (!path_is_normalized(p))
                         return -EINVAL;
 
                 /* Truncate trailing slashes */
-                e = endswith(p, "/");
-                if (e)
-                        *e = 0;
+                delete_trailing_chars(p, "/");
 
                 /* Truncate leading slashes */
-                if (p[0] == '/')
-                        p++;
+                p = skip_leading_chars(p, "/");
 
                 s = unit_name_escape(p);
         }
@@ -440,7 +433,7 @@ int unit_name_path_unescape(const char *f, char **ret) {
                 if (!s)
                         return -ENOMEM;
 
-                if (!path_is_safe(s)) {
+                if (!path_is_normalized(s)) {
                         free(s);
                         return -EINVAL;
                 }
@@ -575,91 +568,32 @@ int unit_name_to_path(const char *name, char **ret) {
         return unit_name_path_unescape(prefix, ret);
 }
 
-char *unit_dbus_path_from_name(const char *name) {
-        _cleanup_free_ char *e = NULL;
-
-        assert(name);
-
-        e = bus_label_escape(name);
-        if (!e)
-                return NULL;
-
-        return strappend("/org/freedesktop/systemd1/unit/", e);
-}
-
-int unit_name_from_dbus_path(const char *path, char **name) {
-        const char *e;
-        char *n;
-
-        e = startswith(path, "/org/freedesktop/systemd1/unit/");
-        if (!e)
-                return -EINVAL;
-
-        n = bus_label_unescape(e);
-        if (!n)
-                return -ENOMEM;
-
-        *name = n;
-        return 0;
-}
-
-const char* unit_dbus_interface_from_type(UnitType t) {
-
-        static const char *const table[_UNIT_TYPE_MAX] = {
-                [UNIT_SERVICE] = "org.freedesktop.systemd1.Service",
-                [UNIT_SOCKET] = "org.freedesktop.systemd1.Socket",
-                [UNIT_BUSNAME] = "org.freedesktop.systemd1.BusName",
-                [UNIT_TARGET] = "org.freedesktop.systemd1.Target",
-                [UNIT_DEVICE] = "org.freedesktop.systemd1.Device",
-                [UNIT_MOUNT] = "org.freedesktop.systemd1.Mount",
-                [UNIT_AUTOMOUNT] = "org.freedesktop.systemd1.Automount",
-                [UNIT_SWAP] = "org.freedesktop.systemd1.Swap",
-                [UNIT_TIMER] = "org.freedesktop.systemd1.Timer",
-                [UNIT_PATH] = "org.freedesktop.systemd1.Path",
-                [UNIT_SLICE] = "org.freedesktop.systemd1.Slice",
-                [UNIT_SCOPE] = "org.freedesktop.systemd1.Scope",
-        };
-
-        if (t < 0)
-                return NULL;
-        if (t >= _UNIT_TYPE_MAX)
-                return NULL;
-
-        return table[t];
-}
-
-const char *unit_dbus_interface_from_name(const char *name) {
-        UnitType t;
-
-        t = unit_name_to_type(name);
-        if (t < 0)
-                return NULL;
-
-        return unit_dbus_interface_from_type(t);
-}
-
-static char *do_escape_mangle(const char *f, UnitNameMangle allow_globs, char *t) {
+static bool do_escape_mangle(const char *f, bool allow_globs, char *t) {
         const char *valid_chars;
+        bool mangled = false;
 
         assert(f);
-        assert(IN_SET(allow_globs, UNIT_NAME_GLOB, UNIT_NAME_NOGLOB));
         assert(t);
 
-        /* We'll only escape the obvious characters here, to play
-         * safe. */
+        /* We'll only escape the obvious characters here, to play safe.
+         *
+         * Returns true if any characters were mangled, false otherwise.
+         */
 
-        valid_chars = allow_globs == UNIT_NAME_GLOB ? VALID_CHARS_GLOB : VALID_CHARS_WITH_AT;
+        valid_chars = allow_globs ? VALID_CHARS_GLOB : VALID_CHARS_WITH_AT;
 
-        for (; *f; f++) {
-                if (*f == '/')
+        for (; *f; f++)
+                if (*f == '/') {
                         *(t++) = '-';
-                else if (!strchr(valid_chars, *f))
+                        mangled = true;
+                } else if (!strchr(valid_chars, *f)) {
                         t = do_escape_char(*f, t);
-                else
+                        mangled = true;
+                } else
                         *(t++) = *f;
-        }
+        *t = 0;
 
-        return t;
+        return mangled;
 }
 
 /**
@@ -669,9 +603,10 @@ static char *do_escape_mangle(const char *f, UnitNameMangle allow_globs, char *t
  *
  *  If @allow_globs, globs characters are preserved. Otherwise, they are escaped.
  */
-int unit_name_mangle_with_suffix(const char *name, UnitNameMangle allow_globs, const char *suffix, char **ret) {
-        char *s, *t;
+int unit_name_mangle_with_suffix(const char *name, UnitNameMangle flags, const char *suffix, char **ret) {
+        char *s;
         int r;
+        bool mangled;
 
         assert(name);
         assert(suffix);
@@ -688,7 +623,7 @@ int unit_name_mangle_with_suffix(const char *name, UnitNameMangle allow_globs, c
                 goto good;
 
         /* Already a fully valid globbing expression? If so, no mangling is necessary either... */
-        if (allow_globs == UNIT_NAME_GLOB &&
+        if ((flags & UNIT_NAME_MANGLE_GLOB) &&
             string_is_glob(name) &&
             in_charset(name, VALID_CHARS_GLOB))
                 goto good;
@@ -713,13 +648,16 @@ int unit_name_mangle_with_suffix(const char *name, UnitNameMangle allow_globs, c
         if (!s)
                 return -ENOMEM;
 
-        t = do_escape_mangle(name, allow_globs, s);
-        *t = 0;
+        mangled = do_escape_mangle(name, flags & UNIT_NAME_MANGLE_GLOB, s);
+        if (mangled)
+                log_full(flags & UNIT_NAME_MANGLE_WARN ? LOG_NOTICE : LOG_DEBUG,
+                         "Invalid unit name \"%s\" was escaped as \"%s\" (maybe you should use systemd-escape?)",
+                         name, s);
 
         /* Append a suffix if it doesn't have any, but only if this is not a glob, so that we can allow "foo.*" as a
          * valid glob. */
-        if ((allow_globs != UNIT_NAME_GLOB || !string_is_glob(s)) && unit_name_to_type(s) < 0)
-                strcpy(t, suffix);
+        if ((!(flags & UNIT_NAME_MANGLE_GLOB) || !string_is_glob(s)) && unit_name_to_type(s) < 0)
+                strcat(s, suffix);
 
         *ret = s;
         return 1;
@@ -743,7 +681,7 @@ int slice_build_parent_slice(const char *slice, char **ret) {
         if (!slice_name_is_valid(slice))
                 return -EINVAL;
 
-        if (streq(slice, "-.slice")) {
+        if (streq(slice, SPECIAL_ROOT_SLICE)) {
                 *ret = NULL;
                 return 0;
         }
@@ -756,7 +694,7 @@ int slice_build_parent_slice(const char *slice, char **ret) {
         if (dash)
                 strcpy(dash, ".slice");
         else {
-                r = free_and_strdup(&s, "-.slice");
+                r = free_and_strdup(&s, SPECIAL_ROOT_SLICE);
                 if (r < 0) {
                         free(s);
                         return r;
@@ -767,7 +705,7 @@ int slice_build_parent_slice(const char *slice, char **ret) {
         return 1;
 }
 
-int slice_build_subslice(const char *slice, const char*name, char **ret) {
+int slice_build_subslice(const char *slice, const char *name, char **ret) {
         char *subslice;
 
         assert(slice);
@@ -780,7 +718,7 @@ int slice_build_subslice(const char *slice, const char*name, char **ret) {
         if (!unit_prefix_is_valid(name))
                 return -EINVAL;
 
-        if (streq(slice, "-.slice"))
+        if (streq(slice, SPECIAL_ROOT_SLICE))
                 subslice = strappend(name, ".slice");
         else {
                 char *e;
@@ -805,7 +743,7 @@ bool slice_name_is_valid(const char *name) {
         if (!unit_name_is_valid(name, UNIT_NAME_PLAIN))
                 return false;
 
-        if (streq(name, "-.slice"))
+        if (streq(name, SPECIAL_ROOT_SLICE))
                 return true;
 
         e = endswith(name, ".slice");
@@ -835,224 +773,3 @@ bool slice_name_is_valid(const char *name) {
 
         return true;
 }
-
-static const char* const unit_type_table[_UNIT_TYPE_MAX] = {
-        [UNIT_SERVICE] = "service",
-        [UNIT_SOCKET] = "socket",
-        [UNIT_BUSNAME] = "busname",
-        [UNIT_TARGET] = "target",
-        [UNIT_DEVICE] = "device",
-        [UNIT_MOUNT] = "mount",
-        [UNIT_AUTOMOUNT] = "automount",
-        [UNIT_SWAP] = "swap",
-        [UNIT_TIMER] = "timer",
-        [UNIT_PATH] = "path",
-        [UNIT_SLICE] = "slice",
-        [UNIT_SCOPE] = "scope",
-};
-
-DEFINE_STRING_TABLE_LOOKUP(unit_type, UnitType);
-
-static const char* const unit_load_state_table[_UNIT_LOAD_STATE_MAX] = {
-        [UNIT_STUB] = "stub",
-        [UNIT_LOADED] = "loaded",
-        [UNIT_NOT_FOUND] = "not-found",
-        [UNIT_ERROR] = "error",
-        [UNIT_MERGED] = "merged",
-        [UNIT_MASKED] = "masked"
-};
-
-DEFINE_STRING_TABLE_LOOKUP(unit_load_state, UnitLoadState);
-
-static const char* const unit_active_state_table[_UNIT_ACTIVE_STATE_MAX] = {
-        [UNIT_ACTIVE] = "active",
-        [UNIT_RELOADING] = "reloading",
-        [UNIT_INACTIVE] = "inactive",
-        [UNIT_FAILED] = "failed",
-        [UNIT_ACTIVATING] = "activating",
-        [UNIT_DEACTIVATING] = "deactivating"
-};
-
-DEFINE_STRING_TABLE_LOOKUP(unit_active_state, UnitActiveState);
-
-static const char* const automount_state_table[_AUTOMOUNT_STATE_MAX] = {
-        [AUTOMOUNT_DEAD] = "dead",
-        [AUTOMOUNT_WAITING] = "waiting",
-        [AUTOMOUNT_RUNNING] = "running",
-        [AUTOMOUNT_FAILED] = "failed"
-};
-
-DEFINE_STRING_TABLE_LOOKUP(automount_state, AutomountState);
-
-static const char* const busname_state_table[_BUSNAME_STATE_MAX] = {
-        [BUSNAME_DEAD] = "dead",
-        [BUSNAME_MAKING] = "making",
-        [BUSNAME_REGISTERED] = "registered",
-        [BUSNAME_LISTENING] = "listening",
-        [BUSNAME_RUNNING] = "running",
-        [BUSNAME_SIGTERM] = "sigterm",
-        [BUSNAME_SIGKILL] = "sigkill",
-        [BUSNAME_FAILED] = "failed",
-};
-
-DEFINE_STRING_TABLE_LOOKUP(busname_state, BusNameState);
-
-static const char* const device_state_table[_DEVICE_STATE_MAX] = {
-        [DEVICE_DEAD] = "dead",
-        [DEVICE_TENTATIVE] = "tentative",
-        [DEVICE_PLUGGED] = "plugged",
-};
-
-DEFINE_STRING_TABLE_LOOKUP(device_state, DeviceState);
-
-static const char* const mount_state_table[_MOUNT_STATE_MAX] = {
-        [MOUNT_DEAD] = "dead",
-        [MOUNT_MOUNTING] = "mounting",
-        [MOUNT_MOUNTING_DONE] = "mounting-done",
-        [MOUNT_MOUNTED] = "mounted",
-        [MOUNT_REMOUNTING] = "remounting",
-        [MOUNT_UNMOUNTING] = "unmounting",
-        [MOUNT_MOUNTING_SIGTERM] = "mounting-sigterm",
-        [MOUNT_MOUNTING_SIGKILL] = "mounting-sigkill",
-        [MOUNT_REMOUNTING_SIGTERM] = "remounting-sigterm",
-        [MOUNT_REMOUNTING_SIGKILL] = "remounting-sigkill",
-        [MOUNT_UNMOUNTING_SIGTERM] = "unmounting-sigterm",
-        [MOUNT_UNMOUNTING_SIGKILL] = "unmounting-sigkill",
-        [MOUNT_FAILED] = "failed"
-};
-
-DEFINE_STRING_TABLE_LOOKUP(mount_state, MountState);
-
-static const char* const path_state_table[_PATH_STATE_MAX] = {
-        [PATH_DEAD] = "dead",
-        [PATH_WAITING] = "waiting",
-        [PATH_RUNNING] = "running",
-        [PATH_FAILED] = "failed"
-};
-
-DEFINE_STRING_TABLE_LOOKUP(path_state, PathState);
-
-static const char* const scope_state_table[_SCOPE_STATE_MAX] = {
-        [SCOPE_DEAD] = "dead",
-        [SCOPE_RUNNING] = "running",
-        [SCOPE_ABANDONED] = "abandoned",
-        [SCOPE_STOP_SIGTERM] = "stop-sigterm",
-        [SCOPE_STOP_SIGKILL] = "stop-sigkill",
-        [SCOPE_FAILED] = "failed",
-};
-
-DEFINE_STRING_TABLE_LOOKUP(scope_state, ScopeState);
-
-static const char* const service_state_table[_SERVICE_STATE_MAX] = {
-        [SERVICE_DEAD] = "dead",
-        [SERVICE_START_PRE] = "start-pre",
-        [SERVICE_START] = "start",
-        [SERVICE_START_POST] = "start-post",
-        [SERVICE_RUNNING] = "running",
-        [SERVICE_EXITED] = "exited",
-        [SERVICE_RELOAD] = "reload",
-        [SERVICE_STOP] = "stop",
-        [SERVICE_STOP_SIGABRT] = "stop-sigabrt",
-        [SERVICE_STOP_SIGTERM] = "stop-sigterm",
-        [SERVICE_STOP_SIGKILL] = "stop-sigkill",
-        [SERVICE_STOP_POST] = "stop-post",
-        [SERVICE_FINAL_SIGTERM] = "final-sigterm",
-        [SERVICE_FINAL_SIGKILL] = "final-sigkill",
-        [SERVICE_FAILED] = "failed",
-        [SERVICE_AUTO_RESTART] = "auto-restart",
-};
-
-DEFINE_STRING_TABLE_LOOKUP(service_state, ServiceState);
-
-static const char* const slice_state_table[_SLICE_STATE_MAX] = {
-        [SLICE_DEAD] = "dead",
-        [SLICE_ACTIVE] = "active"
-};
-
-DEFINE_STRING_TABLE_LOOKUP(slice_state, SliceState);
-
-static const char* const socket_state_table[_SOCKET_STATE_MAX] = {
-        [SOCKET_DEAD] = "dead",
-        [SOCKET_START_PRE] = "start-pre",
-        [SOCKET_START_CHOWN] = "start-chown",
-        [SOCKET_START_POST] = "start-post",
-        [SOCKET_LISTENING] = "listening",
-        [SOCKET_RUNNING] = "running",
-        [SOCKET_STOP_PRE] = "stop-pre",
-        [SOCKET_STOP_PRE_SIGTERM] = "stop-pre-sigterm",
-        [SOCKET_STOP_PRE_SIGKILL] = "stop-pre-sigkill",
-        [SOCKET_STOP_POST] = "stop-post",
-        [SOCKET_FINAL_SIGTERM] = "final-sigterm",
-        [SOCKET_FINAL_SIGKILL] = "final-sigkill",
-        [SOCKET_FAILED] = "failed"
-};
-
-DEFINE_STRING_TABLE_LOOKUP(socket_state, SocketState);
-
-static const char* const swap_state_table[_SWAP_STATE_MAX] = {
-        [SWAP_DEAD] = "dead",
-        [SWAP_ACTIVATING] = "activating",
-        [SWAP_ACTIVATING_DONE] = "activating-done",
-        [SWAP_ACTIVE] = "active",
-        [SWAP_DEACTIVATING] = "deactivating",
-        [SWAP_ACTIVATING_SIGTERM] = "activating-sigterm",
-        [SWAP_ACTIVATING_SIGKILL] = "activating-sigkill",
-        [SWAP_DEACTIVATING_SIGTERM] = "deactivating-sigterm",
-        [SWAP_DEACTIVATING_SIGKILL] = "deactivating-sigkill",
-        [SWAP_FAILED] = "failed"
-};
-
-DEFINE_STRING_TABLE_LOOKUP(swap_state, SwapState);
-
-static const char* const target_state_table[_TARGET_STATE_MAX] = {
-        [TARGET_DEAD] = "dead",
-        [TARGET_ACTIVE] = "active"
-};
-
-DEFINE_STRING_TABLE_LOOKUP(target_state, TargetState);
-
-static const char* const timer_state_table[_TIMER_STATE_MAX] = {
-        [TIMER_DEAD] = "dead",
-        [TIMER_WAITING] = "waiting",
-        [TIMER_RUNNING] = "running",
-        [TIMER_ELAPSED] = "elapsed",
-        [TIMER_FAILED] = "failed"
-};
-
-DEFINE_STRING_TABLE_LOOKUP(timer_state, TimerState);
-
-static const char* const unit_dependency_table[_UNIT_DEPENDENCY_MAX] = {
-        [UNIT_REQUIRES] = "Requires",
-        [UNIT_REQUISITE] = "Requisite",
-        [UNIT_WANTS] = "Wants",
-        [UNIT_BINDS_TO] = "BindsTo",
-        [UNIT_PART_OF] = "PartOf",
-        [UNIT_REQUIRED_BY] = "RequiredBy",
-        [UNIT_REQUISITE_OF] = "RequisiteOf",
-        [UNIT_WANTED_BY] = "WantedBy",
-        [UNIT_BOUND_BY] = "BoundBy",
-        [UNIT_CONSISTS_OF] = "ConsistsOf",
-        [UNIT_CONFLICTS] = "Conflicts",
-        [UNIT_CONFLICTED_BY] = "ConflictedBy",
-        [UNIT_BEFORE] = "Before",
-        [UNIT_AFTER] = "After",
-        [UNIT_ON_FAILURE] = "OnFailure",
-        [UNIT_TRIGGERS] = "Triggers",
-        [UNIT_TRIGGERED_BY] = "TriggeredBy",
-        [UNIT_PROPAGATES_RELOAD_TO] = "PropagatesReloadTo",
-        [UNIT_RELOAD_PROPAGATED_FROM] = "ReloadPropagatedFrom",
-        [UNIT_JOINS_NAMESPACE_OF] = "JoinsNamespaceOf",
-        [UNIT_REFERENCES] = "References",
-        [UNIT_REFERENCED_BY] = "ReferencedBy",
-};
-
-DEFINE_STRING_TABLE_LOOKUP(unit_dependency, UnitDependency);
-
-static const char* const notify_access_table[_NOTIFY_ACCESS_MAX] = {
-        [NOTIFY_NONE] = "none",
-        [NOTIFY_MAIN] = "main",
-        [NOTIFY_EXEC] = "exec",
-        [NOTIFY_ALL] = "all"
-};
-
-DEFINE_STRING_TABLE_LOOKUP(notify_access, NotifyAccess);

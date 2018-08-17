@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2015 Daniel Mack
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <pwd.h>
@@ -31,6 +14,7 @@
 #include "bus-util.h"
 #include "format-util.h"
 #include "logind.h"
+#include "path-util.h"
 #include "special.h"
 #include "strv.h"
 #include "unit-name.h"
@@ -60,15 +44,19 @@ _const_ static usec_t when_wall(usec_t n, usec_t elapse) {
 }
 
 bool logind_wall_tty_filter(const char *tty, void *userdata) {
-
         Manager *m = userdata;
+        const char *p;
 
         assert(m);
 
-        if (!startswith(tty, "/dev/") || !m->scheduled_shutdown_tty)
+        if (!m->scheduled_shutdown_tty)
                 return true;
 
-        return !streq(tty + 5, m->scheduled_shutdown_tty);
+        p = path_startswith(tty, "/dev/");
+        if (!p)
+                return true;
+
+        return !streq(p, m->scheduled_shutdown_tty);
 }
 
 static int warn_wall(Manager *m, usec_t n) {

@@ -1,21 +1,4 @@
-/***
- This file is part of systemd.
-
- Copyright (C) 2013 Tom Gundersen <teg@jklm.no>
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <netinet/ether.h>
 
@@ -58,7 +41,7 @@ static const char* const link_dirs[] = {
         "/etc/systemd/network",
         "/run/systemd/network",
         "/usr/lib/systemd/network",
-#ifdef HAVE_SPLIT_USR
+#if HAVE_SPLIT_USR
         "/lib/systemd/network",
 #endif
         NULL};
@@ -69,14 +52,15 @@ static void link_config_free(link_config *link) {
 
         free(link->filename);
 
-        free(link->match_mac);
+        set_free_free(link->match_mac);
         strv_free(link->match_path);
         strv_free(link->match_driver);
         strv_free(link->match_type);
         free(link->match_name);
         free(link->match_host);
         free(link->match_virt);
-        free(link->match_kernel);
+        free(link->match_kernel_cmdline);
+        free(link->match_kernel_version);
         free(link->match_arch);
 
         free(link->description);
@@ -133,8 +117,7 @@ int link_config_ctx_new(link_config_ctx **ret) {
 
         ctx->enable_name_policy = true;
 
-        *ret = ctx;
-        ctx = NULL;
+        *ret = TAKE_PTR(ctx);
 
         return 0;
 }
@@ -170,21 +153,23 @@ static int load_link(link_config_ctx *ctx, const char *filename) {
         link->port = _NET_DEV_PORT_INVALID;
         link->autonegotiation = -1;
 
-        memset(&link->features, -1, sizeof(link->features));
+        memset(&link->features, 0xFF, sizeof(link->features));
 
         r = config_parse(NULL, filename, file,
                          "Match\0Link\0Ethernet\0",
                          config_item_perf_lookup, link_config_gperf_lookup,
-                         false, false, true, link);
+                         CONFIG_PARSE_WARN, link);
         if (r < 0)
                 return r;
         else
                 log_debug("Parsed configuration file %s", filename);
 
-        if (link->mtu > UINT_MAX || link->speed > UINT_MAX)
+        if (link->speed > UINT_MAX)
                 return -ERANGE;
 
         link->filename = strdup(filename);
+        if (!link->filename)
+                return log_oom();
 
         LIST_PREPEND(links, ctx->links, link);
         link = NULL;
@@ -213,7 +198,7 @@ int link_config_load(link_config_ctx *ctx) {
         /* update timestamp */
         paths_check_timestamp(link_dirs, &ctx->link_dirs_ts_usec, true);
 
-        r = conf_files_list_strv(&files, ".link", NULL, link_dirs);
+        r = conf_files_list_strv(&files, ".link", NULL, 0, link_dirs);
         if (r < 0)
                 return log_error_errno(r, "failed to enumerate link files: %m");
 
@@ -245,7 +230,8 @@ int link_config_get(link_config_ctx *ctx, struct udev_device *device,
 
                 if (net_match_config(link->match_mac, link->match_path, link->match_driver,
                                      link->match_type, link->match_name, link->match_host,
-                                     link->match_virt, link->match_kernel, link->match_arch,
+                                     link->match_virt, link->match_kernel_cmdline,
+                                     link->match_kernel_version, link->match_arch,
                                      attr_value ? ether_aton(attr_value) : NULL,
                                      udev_device_get_property_value(device, "ID_PATH"),
                                      udev_device_get_driver(udev_device_get_parent(device)),
@@ -327,7 +313,7 @@ static bool should_rename(struct udev_device *device, bool respect_predictable) 
                 /* the kernel claims to have given a predictable name */
                 if (respect_predictable)
                         return false;
-                /* fall through */
+                _fallthrough_;
         case NET_NAME_ENUM:
         default:
                 /* the name is known to be bad, or of an unknown type */
@@ -402,6 +388,12 @@ int link_config_apply(link_config_ctx *ctx, link_config *config,
         if (r < 0)
                 log_warning_errno(r, "Could not set offload features of %s: %m", old_name);
 
+        if (config->channels.rx_count_set || config->channels.tx_count_set || config->channels.other_count_set || config->channels.combined_count_set) {
+                r = ethtool_set_channels(&ctx->ethtool_fd, old_name, &config->channels);
+                if (r < 0)
+                        log_warning_errno(r, "Could not set channels of %s: %m", old_name);
+        }
+
         ifindex = udev_device_get_ifindex(device);
         if (ifindex <= 0) {
                 log_warning("Could not find ifindex");
@@ -475,7 +467,7 @@ int link_config_apply(link_config_ctx *ctx, link_config *config,
 
         r = rtnl_set_link_properties(&ctx->rtnl, ifindex, config->alias, mac, config->mtu);
         if (r < 0)
-                return log_warning_errno(r, "Could not set Alias, MACAddress or MTU on %s: %m", old_name);
+                return log_warning_errno(r, "Could not set Alias=, MACAddress= or MTU= on %s: %m", old_name);
 
         *name = new_name;
 

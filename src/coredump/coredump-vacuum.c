@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2014 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <sys/statvfs.h>
 
@@ -23,6 +6,7 @@
 #include "coredump-vacuum.h"
 #include "dirent-util.h"
 #include "fd-util.h"
+#include "fs-util.h"
 #include "hashmap.h"
 #include "macro.h"
 #include "string-util.h"
@@ -51,16 +35,11 @@ static void vacuum_candidate_free(struct vacuum_candidate *c) {
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(struct vacuum_candidate*, vacuum_candidate_free);
 
-static void vacuum_candidate_hasmap_free(Hashmap *h) {
-        struct vacuum_candidate *c;
-
-        while ((c = hashmap_steal_first(h)))
-                vacuum_candidate_free(c);
-
-        hashmap_free(h);
+static void vacuum_candidate_hashmap_free(Hashmap *h) {
+        hashmap_free_with_destructor(h, vacuum_candidate_free);
 }
 
-DEFINE_TRIVIAL_CLEANUP_FUNC(Hashmap*, vacuum_candidate_hasmap_free);
+DEFINE_TRIVIAL_CLEANUP_FUNC(Hashmap*, vacuum_candidate_hashmap_free);
 
 static int uid_from_file_name(const char *filename, uid_t *uid) {
         const char *p, *e, *u;
@@ -159,7 +138,7 @@ int coredump_vacuum(int exclude_fd, uint64_t keep_free, uint64_t max_use) {
         }
 
         for (;;) {
-                _cleanup_(vacuum_candidate_hasmap_freep) Hashmap *h = NULL;
+                _cleanup_(vacuum_candidate_hashmap_freep) Hashmap *h = NULL;
                 struct vacuum_candidate *worst = NULL;
                 struct dirent *de;
                 uint64_t sum = 0;
@@ -230,8 +209,7 @@ int coredump_vacuum(int exclude_fd, uint64_t keep_free, uint64_t max_use) {
                                 if (r < 0)
                                         return log_oom();
 
-                                c = n;
-                                n = NULL;
+                                c = TAKE_PTR(n);
                         }
 
                         c->n_files++;
@@ -251,14 +229,13 @@ int coredump_vacuum(int exclude_fd, uint64_t keep_free, uint64_t max_use) {
                 if (r <= 0)
                         return r;
 
-                if (unlinkat(dirfd(d), worst->oldest_file, 0) < 0) {
+                r = unlinkat_deallocate(dirfd(d), worst->oldest_file, 0);
+                if (r == -ENOENT)
+                        continue;
+                if (r < 0)
+                        return log_error_errno(r, "Failed to remove file %s: %m", worst->oldest_file);
 
-                        if (errno == ENOENT)
-                                continue;
-
-                        return log_error_errno(errno, "Failed to remove file %s: %m", worst->oldest_file);
-                } else
-                        log_info("Removed old coredump %s.", worst->oldest_file);
+                log_info("Removed old coredump %s.", worst->oldest_file);
         }
 
         return 0;

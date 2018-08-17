@@ -1,3 +1,5 @@
+#  SPDX-License-Identifier: LGPL-2.1+
+#
 #  This file is part of systemd.
 #
 #  systemd is free software; you can redistribute it and/or modify it
@@ -13,8 +15,7 @@ Documentation=https://www.freedesktop.org/wiki/Software/systemd/multiseat
 Wants=user.slice
 After=nss-user-lookup.target user.slice
 
-# Ask for the dbus socket. If running over kdbus, the socket will
-# not be actually used.
+# Ask for the dbus socket.
 Wants=dbus.socket
 After=dbus.socket
 
@@ -28,9 +29,12 @@ CapabilityBoundingSet=CAP_SYS_ADMIN CAP_MAC_ADMIN CAP_AUDIT_CONTROL CAP_CHOWN CA
 MemoryDenyWriteExecute=yes
 RestrictRealtime=yes
 RestrictNamespaces=yes
-RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6
-SystemCallFilter=~@clock @cpu-emulation @debug @keyring @module @obsolete @raw-io @reboot @swap
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
 SystemCallArchitectures=native
+LockPersonality=yes
+IPAddressDeny=any
 FileDescriptorStoreMax=512
 
 # Increase the default a bit in order to allow many simultaneous

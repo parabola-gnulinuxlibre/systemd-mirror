@@ -1,23 +1,5 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 #pragma once
-
-/***
-  This file is part of systemd.
-
-  Copyright 2014 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -29,15 +11,25 @@
 #include "string-util.h"
 #include "time-util.h"
 
+typedef enum ImageClass {
+        IMAGE_MACHINE,
+        IMAGE_PORTABLE,
+        _IMAGE_CLASS_MAX,
+        _IMAGE_CLASS_INVALID = -1
+} ImageClass;
+
 typedef enum ImageType {
         IMAGE_DIRECTORY,
         IMAGE_SUBVOLUME,
         IMAGE_RAW,
+        IMAGE_BLOCK,
         _IMAGE_TYPE_MAX,
         _IMAGE_TYPE_INVALID = -1
 } ImageType;
 
 typedef struct Image {
+        unsigned n_ref;
+
         ImageType type;
         char *name;
         char *path;
@@ -51,17 +43,31 @@ typedef struct Image {
         uint64_t limit;
         uint64_t limit_exclusive;
 
+        char *hostname;
+        sd_id128_t machine_id;
+        char **machine_info;
+        char **os_release;
+
+        bool metadata_valid:1;
+        bool discoverable:1;  /* true if we know for sure that image_find() would find the image given just the short name */
+
         void *userdata;
 } Image;
 
 Image *image_unref(Image *i);
-void image_hashmap_free(Hashmap *map);
+Image *image_ref(Image *i);
+
+static inline Hashmap* image_hashmap_free(Hashmap *map) {
+        return hashmap_free_with_destructor(map, image_unref);
+}
 
 DEFINE_TRIVIAL_CLEANUP_FUNC(Image*, image_unref);
 DEFINE_TRIVIAL_CLEANUP_FUNC(Hashmap*, image_hashmap_free);
 
-int image_find(const char *name, Image **ret);
-int image_discover(Hashmap *map);
+int image_find(ImageClass class, const char *name, Image **ret);
+int image_from_path(const char *path, Image **ret);
+int image_find_harder(ImageClass class, const char *name_or_path, Image **ret);
+int image_discover(ImageClass class, Hashmap *map);
 
 int image_remove(Image *i);
 int image_rename(Image *i, const char *new_name);
@@ -77,6 +83,10 @@ int image_path_lock(const char *path, int operation, LockFile *global, LockFile 
 int image_name_lock(const char *name, int operation, LockFile *ret);
 
 int image_set_limit(Image *i, uint64_t referenced_max);
+
+int image_read_metadata(Image *i);
+
+bool image_in_search_path(ImageClass class, const char *image);
 
 static inline bool IMAGE_IS_HIDDEN(const struct Image *i) {
         assert(i);

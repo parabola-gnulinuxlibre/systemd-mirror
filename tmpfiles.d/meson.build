@@ -1,9 +1,12 @@
-enable_tmpfiles = conf.get('ENABLE_TMPFILES', false)
+# SPDX-License-Identifier: LGPL-2.1+
+
+enable_tmpfiles = conf.get('ENABLE_TMPFILES') == 1
 
 tmpfiles = [['home.conf',            ''],
             ['journal-nocow.conf',   ''],
             ['systemd-nologin.conf', ''],
-            ['systemd-nspawn.conf',  ''],
+            ['systemd-nspawn.conf',  'ENABLE_MACHINED'],
+            ['portables.conf',       'ENABLE_PORTABLED'],
             ['tmp.conf',             ''],
             ['x11.conf',             ''],
             ['legacy.conf',          'HAVE_SYSV_COMPAT'],
@@ -12,7 +15,7 @@ tmpfiles = [['home.conf',            ''],
 foreach pair : tmpfiles
         if not enable_tmpfiles
                 # do nothing
-        elif pair[1] == '' or conf.get(pair[1], false)
+        elif pair[1] == '' or conf.get(pair[1]) == 1
                 install_data(pair[0], install_dir : tmpfilesdir)
         else
                 message('Not installing tmpfiles.d/@0@ because @1@ is @2@'
@@ -22,19 +25,18 @@ endforeach
 
 m4_files = [['etc.conf',             ''],
             ['systemd.conf',         ''],
-            ['systemd-remote.conf',  'ENABLE_REMOTE'],
             ['var.conf',             ''],
            ]
 
 foreach pair : m4_files
         if not enable_tmpfiles
                 # do nothing
-        elif pair[1] == '' or conf.get(pair[1], false)
+        elif pair[1] == '' or conf.get(pair[1]) == 1
                 custom_target(
                         'tmpfiles.d_' + pair[0],
                          input : pair[0] + '.m4',
                          output: pair[0],
-                         command : [m4, '-P'] + m4_defines + ['@INPUT@'],
+                         command : [meson_apply_m4, config_h, '@INPUT@'],
                          capture : true,
                          install : true,
                          install_dir : tmpfilesdir)

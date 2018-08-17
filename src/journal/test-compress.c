@@ -1,23 +1,6 @@
-/***
-  This file is part of systemd
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
-  Copyright 2014 Ronny Chevalier
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
-
-#ifdef HAVE_LZ4
+#if HAVE_LZ4
 #include <lz4.h>
 #endif
 
@@ -25,17 +8,19 @@
 #include "compress.h"
 #include "fd-util.h"
 #include "fileio.h"
+#include "fs-util.h"
 #include "macro.h"
+#include "path-util.h"
 #include "random-util.h"
 #include "util.h"
 
-#ifdef HAVE_XZ
+#if HAVE_XZ
 # define XZ_OK 0
 #else
 # define XZ_OK -EPROTONOSUPPORT
 #endif
 
-#ifdef HAVE_LZ4
+#if HAVE_LZ4
 # define LZ4_OK 0
 #else
 # define LZ4_OK -EPROTONOSUPPORT
@@ -54,7 +39,7 @@ typedef int (decompress_sw_t)(const void *src, uint64_t src_size,
 typedef int (compress_stream_t)(int fdf, int fdt, uint64_t max_bytes);
 typedef int (decompress_stream_t)(int fdf, int fdt, uint64_t max_size);
 
-#if defined(HAVE_XZ) || defined(HAVE_LZ4)
+#if HAVE_XZ || HAVE_LZ4
 static void test_compress_decompress(int compression,
                                      compress_blob_t compress,
                                      decompress_blob_t decompress,
@@ -153,11 +138,18 @@ static void test_compress_stream(int compression,
                                  const char *srcfile) {
 
         _cleanup_close_ int src = -1, dst = -1, dst2 = -1;
-        char pattern[] = "/tmp/systemd-test.compressed.XXXXXX",
-             pattern2[] = "/tmp/systemd-test.compressed.XXXXXX";
+        _cleanup_(unlink_tempfilep) char
+                pattern[] = "/tmp/systemd-test.compressed.XXXXXX",
+                pattern2[] = "/tmp/systemd-test.compressed.XXXXXX";
         int r;
-        _cleanup_free_ char *cmd = NULL, *cmd2;
+        _cleanup_free_ char *cmd = NULL, *cmd2 = NULL;
         struct stat st = {};
+
+        r = find_binary(cat, NULL);
+        if (r < 0) {
+                log_error_errno(r, "Skipping %s, could not find %s binary: %m", __func__, cat);
+                return;
+        }
 
         log_debug("/* testing %s compression */",
                   object_compressed_to_string(compression));
@@ -194,19 +186,16 @@ static void test_compress_stream(int compression,
 
         assert_se(lseek(dst, 1, SEEK_SET) == 1);
         r = decompress(dst, dst2, st.st_size);
-        assert_se(r == -EBADMSG || r == 0);
+        assert_se(IN_SET(r, 0, -EBADMSG));
 
         assert_se(lseek(dst, 0, SEEK_SET) == 0);
         assert_se(lseek(dst2, 0, SEEK_SET) == 0);
         r = decompress(dst, dst2, st.st_size - 1);
         assert_se(r == -EFBIG);
-
-        assert_se(unlink(pattern) == 0);
-        assert_se(unlink(pattern2) == 0);
 }
 #endif
 
-#ifdef HAVE_LZ4
+#if HAVE_LZ4
 static void test_lz4_decompress_partial(void) {
         char buf[20000];
         size_t buf_size = sizeof(buf), compressed;
@@ -249,7 +238,7 @@ static void test_lz4_decompress_partial(void) {
 #endif
 
 int main(int argc, char *argv[]) {
-#if defined(HAVE_XZ) || defined(HAVE_LZ4)
+#if HAVE_XZ || HAVE_LZ4
         const char text[] =
                 "text\0foofoofoofoo AAAA aaaaaaaaa ghost busters barbarbar FFF"
                 "foofoofoofoo AAAA aaaaaaaaa ghost busters barbarbar FFF";
@@ -268,7 +257,7 @@ int main(int argc, char *argv[]) {
 
         random_bytes(data + 7, sizeof(data) - 7);
 
-#ifdef HAVE_XZ
+#if HAVE_XZ
         test_compress_decompress(OBJECT_COMPRESSED_XZ, compress_blob_xz, decompress_blob_xz,
                                  text, sizeof(text), false);
         test_compress_decompress(OBJECT_COMPRESSED_XZ, compress_blob_xz, decompress_blob_xz,
@@ -290,7 +279,7 @@ int main(int argc, char *argv[]) {
         log_info("/* XZ test skipped */");
 #endif
 
-#ifdef HAVE_LZ4
+#if HAVE_LZ4
         test_compress_decompress(OBJECT_COMPRESSED_LZ4, compress_blob_lz4, decompress_blob_lz4,
                                  text, sizeof(text), false);
         test_compress_decompress(OBJECT_COMPRESSED_LZ4, compress_blob_lz4, decompress_blob_lz4,

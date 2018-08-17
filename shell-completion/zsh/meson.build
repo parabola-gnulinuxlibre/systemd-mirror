@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-2.1+
+
 zshcompletiondir = get_option('zshcompletiondir')
 if zshcompletiondir == ''
         zshcompletiondir = join_paths(datadir, 'zsh/site-functions')
@@ -33,13 +35,13 @@ if zshcompletiondir != 'no'
                  ['_machinectl',               'ENABLE_MACHINED'],
                  ['_networkctl',               'ENABLE_NETWORKD'],
                  ['_systemd-inhibit',          'ENABLE_LOGIND'],
-                 ['_systemd-resolve',          'ENABLE_RESOLVED'],
+                 ['_systemd-resolve',          'ENABLE_RESOLVE'],
                  ['_systemd-tmpfiles',         'ENABLE_TMPFILES'],
                  ['_timedatectl',              'ENABLE_TIMEDATED'],
                 ]
 
         foreach item : items
-                if item[1] == '' or conf.get(item[1], false)
+                if item[1] == '' or conf.get(item[1]) == 1
                         install_data(item[0],
                                      install_dir : zshcompletiondir)
                 endif

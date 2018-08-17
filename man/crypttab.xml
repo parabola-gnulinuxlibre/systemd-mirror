@@ -2,49 +2,18 @@
 <!--*-nxml-*-->
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
 <!--
-  This file is part of systemd.
-
-  Copyright 2012 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+  SPDX-License-Identifier: LGPL-2.1+
 
   This is based on crypttab(5) from Fedora's initscripts package, which in
   turn is based on Debian's version.
 
   The Red Hat version has been written by Miloslav Trmac <mitr@redhat.com>.
-
 -->
 <refentry id="crypttab" conditional='HAVE_LIBCRYPTSETUP'>
 
   <refentryinfo>
     <title>crypttab</title>
     <productname>systemd</productname>
-
-    <authorgroup>
-      <author>
-        <contrib>Documentation</contrib>
-        <firstname>Miloslav</firstname>
-        <surname>Trmac</surname>
-        <email>mitr@redhat.com</email>
-      </author>
-      <author>
-        <contrib>Documentation</contrib>
-        <firstname>Lennart</firstname>
-        <surname>Poettering</surname>
-        <email>lennart@poettering.net</email>
-      </author>
-    </authorgroup>
   </refentryinfo>
 
   <refmeta>
@@ -69,8 +38,10 @@
 
     <para>Empty lines and lines starting with the <literal>#</literal>
     character are ignored. Each of the remaining lines describes one
-    encrypted block device, fields on the line are delimited by white
-    space. The first two fields are mandatory, the remaining two are
+    encrypted block device. Fields are delimited by white space.</para>
+
+    <para>Each line is in the form<programlisting><replaceable>name</replaceable> <replaceable>encrypted-device</replaceable> <replaceable>password</replaceable> <replaceable>options</replaceable></programlisting>
+    The first two fields are mandatory, the remaining two are
     optional.</para>
 
     <para>Setting up encrypted block devices using this file supports
@@ -106,14 +77,6 @@
     <variablelist class='fstab-options'>
 
       <varlistentry>
-        <term><option>discard</option></term>
-
-        <listitem><para>Allow discard requests to be passed through
-        the encrypted block device. This improves performance on SSD
-        storage but has security implications.</para></listitem>
-      </varlistentry>
-
-      <varlistentry>
         <term><option>cipher=</option></term>
 
         <listitem><para>Specifies the cipher to use. See
@@ -122,6 +85,14 @@
         cipher with unpredictable IV values, such as
         <literal>aes-cbc-essiv:sha256</literal>, is
         recommended.</para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>discard</option></term>
+
+        <listitem><para>Allow discard requests to be passed through the encrypted block
+        device. This improves performance on SSD storage but has security implications.
+        </para></listitem>
       </varlistentry>
 
       <varlistentry>
@@ -143,30 +114,6 @@
         <citerefentry project='die-net'><refentrytitle>cryptsetup</refentrytitle><manvolnum>8</manvolnum></citerefentry>
         for possible values and the default value of this
         option.</para></listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term><option>offset=</option></term>
-
-        <listitem><para>Start offset in the backend device, in 512-byte sectors.
-        This option is only relevant for plain devices.
-        </para></listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term><option>skip=</option></term>
-
-        <listitem><para>How many 512-byte sectors of the encrypted data to skip
-        at the beginning. This is different from the <option>--offset</option>
-        option with respect to the sector numbers used in initialization vector
-        (IV) calculation. Using <option>--offset</option> will shift the IV
-        calculation by the same negative amount.  Hence, if <option>--offset n</option> is given,
-        sector n will  get a sector number of 0 for the IV calculation.
-        Using <option>--skip</option> causes sector n to also be the first
-        sector of the mapped device, but with its number for IV generation being n.</para>
-
-        <para>This option is only relevant for plain devices.</para>
-        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -214,18 +161,54 @@
       </varlistentry>
 
       <varlistentry>
+        <term><option>_netdev</option></term>
+
+        <listitem><para>Marks this cryptsetup device as requiring network. It will be
+        started after the network is available, similarly to
+        <citerefentry><refentrytitle>systemd.mount</refentrytitle><manvolnum>5</manvolnum></citerefentry>
+        units marked with <option>_netdev</option>. The service unit to set up this device
+        will be ordered between <filename>remote-fs-pre.target</filename> and
+        <filename>remote-cryptsetup.target</filename>, instead of
+        <filename>cryptsetup-pre.target</filename> and
+        <filename>cryptsetup.target</filename>.</para>
+
+        <para>Hint: if this device is used for a mount point that is specified in
+        <citerefentry project='man-pages'><refentrytitle>fstab</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+        the <option>_netdev</option> option should also be used for the mount
+        point. Otherwise, a dependency loop might be created where the mount point
+        will be pulled in by <filename>local-fs.target</filename>, while the
+        service to configure the network is usually only started <emphasis>after</emphasis>
+        the local file system has been mounted.</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
         <term><option>noauto</option></term>
 
-        <listitem><para>This device will not be automatically unlocked
-        on boot.</para></listitem>
+        <listitem><para>This device will not be added to <filename>cryptsetup.target</filename>.
+        This means that it will not be automatically unlocked on boot, unless something else pulls
+        it in. In particular, if the device is used for a mount point, it'll be unlocked
+        automatically during boot, unless the mount point itself is also disabled with
+        <option>noauto</option>.</para></listitem>
       </varlistentry>
 
       <varlistentry>
         <term><option>nofail</option></term>
 
-        <listitem><para>The system will not wait for the device to
-        show up and be unlocked at boot, and not fail the boot if it
-        does not show up.</para></listitem>
+        <listitem><para>This device will not be a hard dependency of
+        <filename>cryptsetup.target</filename>. It'll be still pulled in and started, but the system
+        will not wait for the device to show up and be unlocked, and boot will not fail if this is
+        unsuccessful. Note that other units that depend on the unlocked device may still fail. In
+        particular, if the device is used for a mount point, the mount point itself is also needs to
+        have <option>noauto</option> option, or the boot will fail if the device is not unlocked
+        successfully.</para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>offset=</option></term>
+
+        <listitem><para>Start offset in the backend device, in 512-byte sectors. This
+        option is only relevant for plain devices.</para></listitem>
       </varlistentry>
 
       <varlistentry>
@@ -239,6 +222,23 @@
 
         <listitem><para>Set up the encrypted block device in read-only
         mode.</para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>skip=</option></term>
+
+        <listitem><para>How many 512-byte sectors of the encrypted data to skip at the
+        beginning. This is different from the <option>offset=</option> option with respect
+        to the sector numbers used in initialization vector (IV) calculation. Using
+        <option>offset=</option> will shift the IV calculation by the same negative
+        amount. Hence, if <option>offset=<replaceable>n</replaceable></option> is given,
+        sector <replaceable>n</replaceable> will get a sector number of 0 for the IV
+        calculation. Using <option>skip=</option> causes sector
+        <replaceable>n</replaceable> to also be the first sector of the mapped device, but
+        with its number for IV generation being <replaceable>n</replaceable>.</para>
+
+        <para>This option is only relevant for plain devices.</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -347,19 +347,6 @@
       </varlistentry>
 
       <varlistentry>
-        <term><option>x-systemd.device-timeout=</option></term>
-
-        <listitem><para>Specifies how long systemd should wait for a
-        device to show up before giving up on the entry. The argument
-        is a time in seconds or explicitly specified units of
-        <literal>s</literal>,
-        <literal>min</literal>,
-        <literal>h</literal>,
-        <literal>ms</literal>.
-        </para></listitem>
-      </varlistentry>
-
-      <varlistentry>
         <term><option>tmp</option></term>
 
         <listitem><para>The encrypted block device will be prepared
@@ -390,6 +377,19 @@
         typos.</para></listitem>
       </varlistentry>
 
+      <varlistentry>
+        <term><option>x-systemd.device-timeout=</option></term>
+
+        <listitem><para>Specifies how long systemd should wait for a device to show up
+        before giving up on the entry. The argument is a time in seconds or explicitly
+        specified units of
+        <literal>s</literal>,
+        <literal>min</literal>,
+        <literal>h</literal>,
+        <literal>ms</literal>.
+        </para></listitem>
+      </varlistentry>
+
     </variablelist>
 
     <para>At early boot and when the system manager configuration is
@@ -418,6 +418,7 @@ hidden     /mnt/tc_hidden  /dev/null    tcrypt-hidden,tcrypt-keyfile=/etc/keyfil
       <citerefentry><refentrytitle>systemd</refentrytitle><manvolnum>1</manvolnum></citerefentry>,
       <citerefentry><refentrytitle>systemd-cryptsetup@.service</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
       <citerefentry><refentrytitle>systemd-cryptsetup-generator</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+      <citerefentry project='man-pages'><refentrytitle>fstab</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
       <citerefentry project='die-net'><refentrytitle>cryptsetup</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
       <citerefentry project='man-pages'><refentrytitle>mkswap</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
       <citerefentry project='man-pages'><refentrytitle>mke2fs</refentrytitle><manvolnum>8</manvolnum></citerefentry>

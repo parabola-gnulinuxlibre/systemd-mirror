@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2011 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <poll.h>
@@ -33,13 +16,12 @@
 #include "time-util.h"
 #include "util.h"
 
-#ifdef ENABLE_POLKIT
+#if ENABLE_POLKIT
 static pid_t agent_pid = 0;
 
 int polkit_agent_open(void) {
-        int r;
-        int pipe_fd[2];
         char notify_fd[DECIMAL_STR_MAX(int) + 1];
+        int pipe_fd[2], r;
 
         if (agent_pid > 0)
                 return 0;
@@ -48,18 +30,21 @@ int polkit_agent_open(void) {
         if (geteuid() == 0)
                 return 0;
 
-        /* We check STDIN here, not STDOUT, since this is about input,
-         * not output */
+        /* We check STDIN here, not STDOUT, since this is about input, not output */
         if (!isatty(STDIN_FILENO))
                 return 0;
+
+        if (!is_main_thread())
+                return -EPERM;
 
         if (pipe2(pipe_fd, 0) < 0)
                 return -errno;
 
         xsprintf(notify_fd, "%i", pipe_fd[1]);
 
-        r = fork_agent(&agent_pid,
+        r = fork_agent("(polkit-agent)",
                        &pipe_fd[1], 1,
+                       &agent_pid,
                        POLKIT_AGENT_BINARY_PATH,
                        POLKIT_AGENT_BINARY_PATH, "--notify-fd", notify_fd, "--fallback", NULL);
 
@@ -83,9 +68,7 @@ void polkit_agent_close(void) {
                 return;
 
         /* Inform agent that we are done */
-        (void) kill(agent_pid, SIGTERM);
-        (void) kill(agent_pid, SIGCONT);
-
+        (void) kill_and_sigcont(agent_pid, SIGTERM);
         (void) wait_for_terminate(agent_pid, NULL);
         agent_pid = 0;
 }

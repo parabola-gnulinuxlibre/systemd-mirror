@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2013 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -27,6 +10,7 @@
 #include "env-util.h"
 #include "fd-util.h"
 #include "fileio.h"
+#include "fs-util.h"
 #include "io-util.h"
 #include "parse-util.h"
 #include "process-util.h"
@@ -35,7 +19,8 @@
 #include "util.h"
 
 static void test_parse_env_file(void) {
-        char    t[] = "/tmp/test-fileio-in-XXXXXX",
+        _cleanup_(unlink_tempfilep) char
+                t[] = "/tmp/test-fileio-in-XXXXXX",
                 p[] = "/tmp/test-fileio-out-XXXXXX";
         int fd, r;
         FILE *f;
@@ -105,7 +90,7 @@ static void test_parse_env_file(void) {
         }
 
         r = parse_env_file(
-                        t, NULL,
+                        NULL, t, NULL,
                        "one", &one,
                        "two", &two,
                        "three", &three,
@@ -147,13 +132,11 @@ static void test_parse_env_file(void) {
 
         r = load_env_file(NULL, p, NULL, &b);
         assert_se(r >= 0);
-
-        unlink(t);
-        unlink(p);
 }
 
 static void test_parse_multiline_env_file(void) {
-        char    t[] = "/tmp/test-fileio-in-XXXXXX",
+        _cleanup_(unlink_tempfilep) char
+                t[] = "/tmp/test-fileio-in-XXXXXX",
                 p[] = "/tmp/test-fileio-out-XXXXXX";
         int fd, r;
         FILE *f;
@@ -201,15 +184,12 @@ static void test_parse_multiline_env_file(void) {
 
         r = load_env_file(NULL, p, NULL, &b);
         assert_se(r >= 0);
-
-        unlink(t);
-        unlink(p);
 }
 
 static void test_merge_env_file(void) {
-        char t[] = "/tmp/test-fileio-XXXXXX";
+        _cleanup_(unlink_tempfilep) char t[] = "/tmp/test-fileio-XXXXXX";
         int fd, r;
-        FILE *f;
+        _cleanup_fclose_ FILE *f = NULL;
         _cleanup_strv_free_ char **a = NULL;
         char **i;
 
@@ -233,7 +213,7 @@ static void test_merge_env_file(void) {
                                 "zzz=${one:+replacement}\n"
                                 "zzzz=${foobar:-${nothing}}\n"
                                 "zzzzz=${nothing:+${nothing}}\n"
-                                , false);
+                                , WRITE_STRING_FILE_AVOID_NEWLINE);
         assert(r >= 0);
 
         r = merge_env_file(&a, NULL, t);
@@ -276,9 +256,9 @@ static void test_merge_env_file(void) {
 }
 
 static void test_merge_env_file_invalid(void) {
-        char t[] = "/tmp/test-fileio-XXXXXX";
+        _cleanup_(unlink_tempfilep) char t[] = "/tmp/test-fileio-XXXXXX";
         int fd, r;
-        FILE *f;
+        _cleanup_fclose_ FILE *f = NULL;
         _cleanup_strv_free_ char **a = NULL;
         char **i;
 
@@ -302,7 +282,7 @@ static void test_merge_env_file_invalid(void) {
                                 ";comment2=comment2\n"
                                 "#\n"
                                 "\n\n"                  /* empty line */
-                                , false);
+                                , WRITE_STRING_FILE_AVOID_NEWLINE);
         assert(r >= 0);
 
         r = merge_env_file(&a, NULL, t);
@@ -315,9 +295,9 @@ static void test_merge_env_file_invalid(void) {
 }
 
 static void test_executable_is_script(void) {
-        char t[] = "/tmp/test-executable-XXXXXX";
+        _cleanup_(unlink_tempfilep) char t[] = "/tmp/test-fileio-XXXXXX";
         int fd, r;
-        FILE *f;
+        _cleanup_fclose_ FILE *f = NULL;
         char *command;
 
         fd = mkostemp_safe(t);
@@ -343,9 +323,6 @@ static void test_executable_is_script(void) {
                 assert_se(startswith(command, "/"));
                 free(command);
         }
-
-        fclose(f);
-        unlink(t);
 }
 
 static void test_status_field(void) {
@@ -393,7 +370,7 @@ static void test_capeff(void) {
                 r = get_process_capeff(0, &capeff);
                 log_info("capeff: '%s' (r=%d)", capeff, r);
 
-                if (r == -ENOENT || r == -EPERM)
+                if (IN_SET(r, -ENOENT, -EPERM))
                         return;
 
                 assert_se(r == 0);
@@ -404,7 +381,7 @@ static void test_capeff(void) {
 }
 
 static void test_write_string_stream(void) {
-        char fn[] = "/tmp/test-write_string_stream-XXXXXX";
+        _cleanup_(unlink_tempfilep) char fn[] = "/tmp/test-write_string_stream-XXXXXX";
         _cleanup_fclose_ FILE *f = NULL;
         int fd;
         char buf[64];
@@ -414,32 +391,32 @@ static void test_write_string_stream(void) {
 
         f = fdopen(fd, "r");
         assert_se(f);
-        assert_se(write_string_stream(f, "boohoo", true) < 0);
+        assert_se(write_string_stream(f, "boohoo", 0) < 0);
+        f = safe_fclose(f);
 
-        f = freopen(fn, "r+", f);
+        f = fopen(fn, "r+");
         assert_se(f);
 
-        assert_se(write_string_stream(f, "boohoo", true) == 0);
+        assert_se(write_string_stream(f, "boohoo", 0) == 0);
         rewind(f);
 
         assert_se(fgets(buf, sizeof(buf), f));
         assert_se(streq(buf, "boohoo\n"));
+        f = safe_fclose(f);
 
-        f = freopen(fn, "w+", f);
+        f = fopen(fn, "w+");
         assert_se(f);
 
-        assert_se(write_string_stream(f, "boohoo", false) == 0);
+        assert_se(write_string_stream(f, "boohoo", WRITE_STRING_FILE_AVOID_NEWLINE) == 0);
         rewind(f);
 
         assert_se(fgets(buf, sizeof(buf), f));
         printf(">%s<", buf);
         assert_se(streq(buf, "boohoo"));
-
-        unlink(fn);
 }
 
 static void test_write_string_file(void) {
-        char fn[] = "/tmp/test-write_string_file-XXXXXX";
+        _cleanup_(unlink_tempfilep) char fn[] = "/tmp/test-write_string_file-XXXXXX";
         char buf[64] = {};
         _cleanup_close_ int fd;
 
@@ -450,12 +427,10 @@ static void test_write_string_file(void) {
 
         assert_se(read(fd, buf, sizeof(buf)) == 7);
         assert_se(streq(buf, "boohoo\n"));
-
-        unlink(fn);
 }
 
 static void test_write_string_file_no_create(void) {
-        char fn[] = "/tmp/test-write_string_file_no_create-XXXXXX";
+        _cleanup_(unlink_tempfilep) char fn[] = "/tmp/test-write_string_file_no_create-XXXXXX";
         _cleanup_close_ int fd;
         char buf[64] = {0};
 
@@ -465,10 +440,8 @@ static void test_write_string_file_no_create(void) {
         assert_se(write_string_file("/a/file/which/does/not/exists/i/guess", "boohoo", 0) < 0);
         assert_se(write_string_file(fn, "boohoo", 0) == 0);
 
-        assert_se(read(fd, buf, sizeof(buf)) == strlen("boohoo\n"));
+        assert_se(read(fd, buf, sizeof(buf)) == STRLEN("boohoo\n"));
         assert_se(streq(buf, "boohoo\n"));
-
-        unlink(fn);
 }
 
 static void test_write_string_file_verify(void) {
@@ -476,25 +449,24 @@ static void test_write_string_file_verify(void) {
         int r;
 
         assert_se(read_one_line_file("/proc/cmdline", &buf) >= 0);
-        assert_se((buf2 = strjoin(buf, "\n")));
+        assert_se(buf2 = strjoin(buf, "\n"));
 
         r = write_string_file("/proc/cmdline", buf, 0);
-        assert_se(r == -EACCES || r == -EIO);
+        assert_se(IN_SET(r, -EACCES, -EIO));
         r = write_string_file("/proc/cmdline", buf2, 0);
-        assert_se(r == -EACCES || r == -EIO);
+        assert_se(IN_SET(r, -EACCES, -EIO));
 
         assert_se(write_string_file("/proc/cmdline", buf, WRITE_STRING_FILE_VERIFY_ON_FAILURE) == 0);
         assert_se(write_string_file("/proc/cmdline", buf2, WRITE_STRING_FILE_VERIFY_ON_FAILURE) == 0);
 
         r = write_string_file("/proc/cmdline", buf, WRITE_STRING_FILE_VERIFY_ON_FAILURE|WRITE_STRING_FILE_AVOID_NEWLINE);
-        assert_se(r == -EACCES || r == -EIO);
+        assert_se(IN_SET(r, -EACCES, -EIO));
         assert_se(write_string_file("/proc/cmdline", buf2, WRITE_STRING_FILE_VERIFY_ON_FAILURE|WRITE_STRING_FILE_AVOID_NEWLINE) == 0);
 }
 
 static void test_load_env_file_pairs(void) {
-        char fn[] = "/tmp/test-load_env_file_pairs-XXXXXX";
-        int fd;
-        int r;
+        _cleanup_(unlink_tempfilep) char fn[] = "/tmp/test-load_env_file_pairs-XXXXXX";
+        int fd, r;
         _cleanup_fclose_ FILE *f = NULL;
         _cleanup_strv_free_ char **l = NULL;
         char **k, **v;
@@ -531,15 +503,13 @@ static void test_load_env_file_pairs(void) {
                 if (streq(*k, "SUPPORT_URL")) assert_se(streq(*v, "https://bbs.archlinux.org/"));
                 if (streq(*k, "BUG_REPORT_URL")) assert_se(streq(*v, "https://bugs.archlinux.org/"));
         }
-
-        unlink(fn);
 }
 
 static void test_search_and_fopen(void) {
         const char *dirs[] = {"/tmp/foo/bar", "/tmp", NULL};
+
         char name[] = "/tmp/test-search_and_fopen.XXXXXX";
-        int fd = -1;
-        int r;
+        int fd, r;
         FILE *f;
 
         fd = mkostemp_safe(name);
@@ -570,12 +540,11 @@ static void test_search_and_fopen(void) {
         assert_se(r < 0);
 }
 
-
 static void test_search_and_fopen_nulstr(void) {
         const char dirs[] = "/tmp/foo/bar\0/tmp\0";
-        char name[] = "/tmp/test-search_and_fopen.XXXXXX";
-        int fd = -1;
-        int r;
+
+        _cleanup_(unlink_tempfilep) char name[] = "/tmp/test-search_and_fopen.XXXXXX";
+        int fd, r;
         FILE *f;
 
         fd = mkostemp_safe(name);
@@ -603,15 +572,16 @@ static void test_search_and_fopen_nulstr(void) {
 }
 
 static void test_writing_tmpfile(void) {
-        char name[] = "/tmp/test-systemd_writing_tmpfile.XXXXXX";
+        _cleanup_(unlink_tempfilep) char name[] = "/tmp/test-systemd_writing_tmpfile.XXXXXX";
         _cleanup_free_ char *contents = NULL;
         size_t size;
-        int fd, r;
+        _cleanup_close_ int fd = -1;
         struct iovec iov[3];
+        int r;
 
-        IOVEC_SET_STRING(iov[0], "abc\n");
-        IOVEC_SET_STRING(iov[1], ALPHANUMERICAL "\n");
-        IOVEC_SET_STRING(iov[2], "");
+        iov[0] = IOVEC_MAKE_STRING("abc\n");
+        iov[1] = IOVEC_MAKE_STRING(ALPHANUMERICAL "\n");
+        iov[2] = IOVEC_MAKE_STRING("");
 
         fd = mkostemp_safe(name);
         printf("tmpfile: %s", name);
@@ -623,8 +593,6 @@ static void test_writing_tmpfile(void) {
         assert_se(r == 0);
         printf("contents: %s", contents);
         assert_se(streq(contents, "abc\n" ALPHANUMERICAL "\n"));
-
-        unlink(name);
 }
 
 static void test_tempfn(void) {
@@ -663,6 +631,84 @@ static void test_tempfn(void) {
         free(ret);
 }
 
+static const char buffer[] =
+        "Some test data\n"
+        "With newlines, and a NUL byte\0"
+        "\n"
+        "an empty line\n"
+        "an ignored line\n"
+        "and a very long line that is supposed to be truncated, because it is so long\n";
+
+static void test_read_line_one_file(FILE *f) {
+        _cleanup_free_ char *line = NULL;
+
+        assert_se(read_line(f, (size_t) -1, &line) == 15 && streq(line, "Some test data"));
+        line = mfree(line);
+
+        assert_se(read_line(f, 1024, &line) == 30 && streq(line, "With newlines, and a NUL byte"));
+        line = mfree(line);
+
+        assert_se(read_line(f, 1024, &line) == 1 && streq(line, ""));
+        line = mfree(line);
+
+        assert_se(read_line(f, 1024, &line) == 14 && streq(line, "an empty line"));
+        line = mfree(line);
+
+        assert_se(read_line(f, (size_t) -1, NULL) == 16);
+
+        assert_se(read_line(f, 16, &line) == -ENOBUFS);
+        line = mfree(line);
+
+        /* read_line() stopped when it hit the limit, that means when we continue reading we'll read at the first
+         * character after the previous limit. Let's make use of tha to continue our test. */
+        assert_se(read_line(f, 1024, &line) == 61 && streq(line, "line that is supposed to be truncated, because it is so long"));
+        line = mfree(line);
+
+        assert_se(read_line(f, 1024, &line) == 1 && streq(line, ""));
+        line = mfree(line);
+
+        assert_se(read_line(f, 1024, &line) == 0 && streq(line, ""));
+}
+
+static void test_read_line(void) {
+        _cleanup_fclose_ FILE *f = NULL;
+
+        f = fmemopen((void*) buffer, sizeof(buffer), "re");
+        assert_se(f);
+
+        test_read_line_one_file(f);
+}
+
+static void test_read_line2(void) {
+        _cleanup_(unlink_tempfilep) char name[] = "/tmp/test-fileio.XXXXXX";
+        int fd;
+        _cleanup_fclose_ FILE *f = NULL;
+
+        fd = mkostemp_safe(name);
+        assert_se(fd >= 0);
+        assert_se((size_t) write(fd, buffer, sizeof(buffer)) == sizeof(buffer));
+
+        assert_se(lseek(fd, 0, SEEK_SET) == 0);
+        assert_se(f = fdopen(fd, "r"));
+
+        test_read_line_one_file(f);
+}
+
+static void test_read_line3(void) {
+        _cleanup_fclose_ FILE *f = NULL;
+        _cleanup_free_ char *line = NULL;
+        int r;
+
+        f = fopen("/proc/cmdline", "re");
+        if (!f && IN_SET(errno, ENOENT, EPERM))
+                return;
+        assert_se(f);
+
+        r = read_line(f, LINE_MAX, &line);
+        assert_se((size_t) r == strlen(line) + 1);
+        assert_se(read_line(f, LINE_MAX, NULL) == 0);
+}
+
 int main(int argc, char *argv[]) {
         log_set_max_level(LOG_DEBUG);
         log_parse_environment();
@@ -684,6 +730,9 @@ int main(int argc, char *argv[]) {
         test_search_and_fopen_nulstr();
         test_writing_tmpfile();
         test_tempfn();
+        test_read_line();
+        test_read_line2();
+        test_read_line3();
 
         return 0;
 }

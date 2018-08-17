@@ -1,22 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-  Copyright 2013 Thomas H.P. Andersen
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <string.h>
@@ -27,6 +9,7 @@
 #include "fileio.h"
 #include "fs-util.h"
 #include "parse-util.h"
+#include "process-util.h"
 #include "raw-clone.h"
 #include "rm-rf.h"
 #include "string-util.h"
@@ -104,6 +87,11 @@ static void test_max(void) {
         assert_se(CLAMP(CLAMP(0, -10, 10), CLAMP(-5, 10, 20), CLAMP(100, -5, 20)) == 10);
 }
 
+#pragma GCC diagnostic push
+#ifdef __clang__
+#  pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+#endif
+
 static void test_container_of(void) {
         struct mytype {
                 uint8_t pad1[3];
@@ -121,6 +109,8 @@ static void test_container_of(void) {
                                struct mytype,
                                v1) == &myval);
 }
+
+#pragma GCC diagnostic pop
 
 static void test_div_round_up(void) {
         int div;
@@ -218,6 +208,10 @@ static void test_raw_clone(void) {
                 waitpid(pid, &status, __WCLONE);
                 assert_se(WIFEXITED(status) && WEXITSTATUS(status) == EXIT_SUCCESS);
         }
+
+        errno = 0;
+        assert_se(raw_clone(CLONE_FS|CLONE_NEWNS) == -1);
+        assert_se(errno == EINVAL);
 }
 
 static void test_physical_memory(void) {

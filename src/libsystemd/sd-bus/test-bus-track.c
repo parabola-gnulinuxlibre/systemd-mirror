@@ -1,21 +1,9 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 /***
-  This file is part of systemd.
-
-  Copyright 2016 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
 ***/
+
+#include <errno.h>
+#include <sys/socket.h>
 
 #include "sd-bus.h"
 
@@ -64,7 +52,7 @@ int main(int argc, char *argv[]) {
         r = sd_event_default(&event);
         assert_se(r >= 0);
 
-        r = sd_bus_open_system(&a);
+        r = sd_bus_open_user(&a);
         if (IN_SET(r, -ECONNREFUSED, -ENOENT)) {
                 log_info("Failed to connect to bus, skipping tests.");
                 return EXIT_TEST_SKIP;
@@ -74,7 +62,7 @@ int main(int argc, char *argv[]) {
         r = sd_bus_attach_event(a, event, SD_EVENT_PRIORITY_NORMAL);
         assert_se(r >= 0);
 
-        r = sd_bus_open_system(&b);
+        r = sd_bus_open_user(&b);
         assert_se(r >= 0);
 
         r = sd_bus_attach_event(b, event, SD_EVENT_PRIORITY_NORMAL);

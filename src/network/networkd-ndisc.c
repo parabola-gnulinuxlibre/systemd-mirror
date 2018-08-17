@@ -1,20 +1,6 @@
+/* SPDX-License-Identifier: LGPL-2.1+ */
 /***
-  This file is part of systemd.
-
-  Copyright (C) 2014 Intel Corporation. All rights reserved.
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
+  Copyright © 2014 Intel Corporation. All rights reserved.
 ***/
 
 #include <netinet/icmp6.h>
@@ -30,7 +16,7 @@
 #define NDISC_PREFIX_LFT_MIN 7200U
 
 static int ndisc_netlink_handler(sd_netlink *rtnl, sd_netlink_message *m, void *userdata) {
-        _cleanup_link_unref_ Link *link = userdata;
+        _cleanup_(link_unrefp) Link *link = userdata;
         int r;
 
         assert(link);
@@ -39,10 +25,8 @@ static int ndisc_netlink_handler(sd_netlink *rtnl, sd_netlink_message *m, void *
         link->ndisc_messages--;
 
         r = sd_netlink_message_get_errno(m);
-        if (r < 0 && r != -EEXIST) {
+        if (r < 0 && r != -EEXIST)
                 log_link_error_errno(link, r, "Could not set NDisc route or address: %m");
-                link_enter_failed(link);
-        }
 
         if (link->ndisc_messages == 0) {
                 link->ndisc_configured = true;
@@ -53,7 +37,7 @@ static int ndisc_netlink_handler(sd_netlink *rtnl, sd_netlink_message *m, void *
 }
 
 static void ndisc_router_process_default(Link *link, sd_ndisc_router *rt) {
-        _cleanup_route_free_ Route *route = NULL;
+        _cleanup_(route_freep) Route *route = NULL;
         struct in6_addr gateway;
         uint16_t lifetime;
         unsigned preference;
@@ -152,7 +136,7 @@ static void ndisc_router_process_default(Link *link, sd_ndisc_router *rt) {
 }
 
 static void ndisc_router_process_autonomous_prefix(Link *link, sd_ndisc_router *rt) {
-        _cleanup_address_free_ Address *address = NULL;
+        _cleanup_(address_freep) Address *address = NULL;
         Address *existing_address;
         uint32_t lifetime_valid, lifetime_preferred, lifetime_remaining;
         usec_t time_now;
@@ -185,6 +169,10 @@ static void ndisc_router_process_autonomous_prefix(Link *link, sd_ndisc_router *
                 log_link_error_errno(link, r, "Failed to get prefix preferred lifetime: %m");
                 return;
         }
+
+        /* The preferred lifetime is never greater than the valid lifetime */
+        if (lifetime_preferred > lifetime_valid)
+                return;
 
         r = address_new(&address);
         if (r < 0) {
@@ -246,7 +234,7 @@ static void ndisc_router_process_autonomous_prefix(Link *link, sd_ndisc_router *
 }
 
 static void ndisc_router_process_onlink_prefix(Link *link, sd_ndisc_router *rt) {
-        _cleanup_route_free_ Route *route = NULL;
+        _cleanup_(route_freep) Route *route = NULL;
         usec_t time_now;
         uint32_t lifetime;
         unsigned prefixlen;
@@ -304,7 +292,7 @@ static void ndisc_router_process_onlink_prefix(Link *link, sd_ndisc_router *rt) 
 }
 
 static void ndisc_router_process_route(Link *link, sd_ndisc_router *rt) {
-        _cleanup_route_free_ Route *route = NULL;
+        _cleanup_(route_freep) Route *route = NULL;
         struct in6_addr gateway;
         uint32_t lifetime;
         unsigned preference, prefixlen;

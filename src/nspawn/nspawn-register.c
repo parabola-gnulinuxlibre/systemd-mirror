@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2015 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include "sd-bus.h"
 
@@ -23,6 +6,7 @@
 #include "bus-unit-util.h"
 #include "bus-util.h"
 #include "nspawn-register.h"
+#include "special.h"
 #include "stat-util.h"
 #include "strv.h"
 #include "util.h"
@@ -31,8 +15,7 @@ static int append_machine_properties(
                 sd_bus_message *m,
                 CustomMount *mounts,
                 unsigned n_mounts,
-                int kill_signal,
-                char **properties) {
+                int kill_signal) {
 
         unsigned j;
         int r;
@@ -98,7 +81,26 @@ static int append_machine_properties(
         return 0;
 }
 
+static int append_controller_property(sd_bus *bus, sd_bus_message *m) {
+        const char *unique;
+        int r;
+
+        assert(bus);
+        assert(m);
+
+        r = sd_bus_get_unique_name(bus, &unique);
+        if (r < 0)
+                return log_error_errno(r, "Failed to get unique name: %m");
+
+        r = sd_bus_message_append(m, "(sv)", "Controller", "s", unique);
+        if (r < 0)
+                return bus_log_create_error(r);
+
+        return 0;
+}
+
 int register_machine(
+                sd_bus *bus,
                 const char *machine_name,
                 pid_t pid,
                 const char *directory,
@@ -113,12 +115,9 @@ int register_machine(
                 const char *service) {
 
         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
-        _cleanup_(sd_bus_flush_close_unrefp) sd_bus *bus = NULL;
         int r;
 
-        r = sd_bus_default_system(&bus);
-        if (r < 0)
-                return log_error_errno(r, "Failed to open system bus: %m");
+        assert(bus);
 
         if (keep_unit) {
                 r = sd_bus_call_method(
@@ -173,16 +172,19 @@ int register_machine(
                                 return bus_log_create_error(r);
                 }
 
+                r = append_controller_property(bus, m);
+                if (r < 0)
+                        return r;
+
                 r = append_machine_properties(
                                 m,
                                 mounts,
                                 n_mounts,
-                                kill_signal,
-                                properties);
+                                kill_signal);
                 if (r < 0)
                         return r;
 
-                r = bus_append_unit_property_assignment_many(m, properties);
+                r = bus_append_unit_property_assignment_many(m, UNIT_SERVICE, properties);
                 if (r < 0)
                         return r;
 
@@ -201,16 +203,13 @@ int register_machine(
         return 0;
 }
 
-int terminate_machine(pid_t pid) {
+int terminate_machine(sd_bus *bus, pid_t pid) {
         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
         _cleanup_(sd_bus_message_unrefp) sd_bus_message *reply = NULL;
-        _cleanup_(sd_bus_flush_close_unrefp) sd_bus *bus = NULL;
         const char *path;
         int r;
 
-        r = sd_bus_default_system(&bus);
-        if (r < 0)
-                return log_error_errno(r, "Failed to open system bus: %m");
+        assert(bus);
 
         r = sd_bus_call_method(
                         bus,
@@ -252,6 +251,7 @@ int terminate_machine(pid_t pid) {
 }
 
 int allocate_scope(
+                sd_bus *bus,
                 const char *machine_name,
                 pid_t pid,
                 const char *slice,
@@ -262,22 +262,19 @@ int allocate_scope(
 
         _cleanup_(sd_bus_error_free) sd_bus_error error = SD_BUS_ERROR_NULL;
         _cleanup_(sd_bus_message_unrefp) sd_bus_message *m = NULL;
-        _cleanup_(sd_bus_flush_close_unrefp) sd_bus *bus = NULL;
         _cleanup_(sd_bus_message_unrefp) sd_bus_message *reply = NULL;
         _cleanup_(bus_wait_for_jobs_freep) BusWaitForJobs *w = NULL;
         _cleanup_free_ char *scope = NULL;
         const char *description, *object;
         int r;
 
-        r = sd_bus_default_system(&bus);
-        if (r < 0)
-                return log_error_errno(r, "Failed to open system bus: %m");
+        assert(bus);
 
         r = bus_wait_for_jobs_new(bus, &w);
         if (r < 0)
                 return log_error_errno(r, "Could not watch job: %m");
 
-        r = unit_name_mangle_with_suffix(machine_name, UNIT_NAME_NOGLOB, ".scope", &scope);
+        r = unit_name_mangle_with_suffix(machine_name, 0, ".scope", &scope);
         if (r < 0)
                 return log_error_errno(r, "Failed to mangle scope name: %m");
 
@@ -306,20 +303,23 @@ int allocate_scope(
                                   "PIDs", "au", 1, pid,
                                   "Description", "s", description,
                                   "Delegate", "b", 1,
-                                  "Slice", "s", isempty(slice) ? "machine.slice" : slice);
+                                  "Slice", "s", isempty(slice) ? SPECIAL_MACHINE_SLICE : slice);
         if (r < 0)
                 return bus_log_create_error(r);
+
+        r = append_controller_property(bus, m);
+        if (r < 0)
+                return r;
 
         r = append_machine_properties(
                         m,
                         mounts,
                         n_mounts,
-                        kill_signal,
-                        properties);
+                        kill_signal);
         if (r < 0)
                 return r;
 
-        r = bus_append_unit_property_assignment_many(m, properties);
+        r = bus_append_unit_property_assignment_many(m, UNIT_SCOPE, properties);
         if (r < 0)
                 return r;
 

@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2010 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <errno.h>
 #include <stdlib.h>
@@ -27,8 +10,10 @@
 #include "macro.h"
 #include "utf8.h"
 
-size_t cescape_char(char c, char *buf) {
-        char * buf_old = buf;
+int cescape_char(char c, char *buf) {
+        char *buf_old = buf;
+
+        /* Needs space for 4 characters in the buffer */
 
         switch (c) {
 
@@ -200,7 +185,7 @@ int cunescape_one(const char *p, size_t length, char32_t *ret, bool *eight_bit) 
                 /* C++11 style 16bit unicode */
 
                 int a[4];
-                unsigned i;
+                size_t i;
                 uint32_t c;
 
                 if (length != (size_t) -1 && length < 5)
@@ -227,7 +212,7 @@ int cunescape_one(const char *p, size_t length, char32_t *ret, bool *eight_bit) 
                 /* C++11 style 32bit unicode */
 
                 int a[8];
-                unsigned i;
+                size_t i;
                 char32_t c;
 
                 if (length != (size_t) -1 && length < 9)
@@ -314,7 +299,7 @@ int cunescape_length_with_prefix(const char *s, size_t length, const char *prefi
 
         /* Undoes C style string escaping, and optionally prefixes it. */
 
-        pl = prefix ? strlen(prefix) : 0;
+        pl = strlen_ptr(prefix);
 
         r = new(char, pl+length+1);
         if (!r)
@@ -426,7 +411,7 @@ char *octescape(const char *s, size_t len) {
 
         for (f = s, t = r; f < s + len; f++) {
 
-                if (*f < ' ' || *f >= 127 || *f == '\\' || *f == '"') {
+                if (*f < ' ' || *f >= 127 || IN_SET(*f, '\\', '"')) {
                         *(t++) = '\\';
                         *(t++) = '0' + (*f >> 6);
                         *(t++) = '0' + ((*f >> 3) & 8);

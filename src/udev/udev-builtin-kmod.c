@@ -1,21 +1,9 @@
+/* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * load kernel modules
  *
- * Copyright (C) 2011-2012 Kay Sievers <kay@vrfy.org>
- * Copyright (C) 2011 ProFUSION embedded systems
+ * Copyright © 2011 ProFUSION embedded systems
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <errno.h>
@@ -24,13 +12,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "module-util.h"
 #include "string-util.h"
 #include "udev.h"
 
 static struct kmod_ctx *ctx = NULL;
 
 static int load_module(struct udev *udev, const char *alias) {
-        struct kmod_list *list = NULL;
+        _cleanup_(kmod_module_unref_listp) struct kmod_list *list = NULL;
         struct kmod_list *l;
         int err;
 
@@ -42,7 +31,9 @@ static int load_module(struct udev *udev, const char *alias) {
                 log_debug("No module matches '%s'", alias);
 
         kmod_list_foreach(l, list) {
-                struct kmod_module *mod = kmod_module_get_module(l);
+                _cleanup_(kmod_module_unrefp) struct kmod_module *mod = NULL;
+
+                mod = kmod_module_get_module(l);
 
                 err = kmod_module_probe_insert_module(mod, KMOD_PROBE_APPLY_BLACKLIST, NULL, NULL, NULL, NULL);
                 if (err == KMOD_PROBE_APPLY_BLACKLIST)
@@ -51,11 +42,8 @@ static int load_module(struct udev *udev, const char *alias) {
                         log_debug("Inserted '%s'", kmod_module_get_name(mod));
                 else
                         log_debug("Failed to insert '%s'", kmod_module_get_name(mod));
-
-                kmod_module_unref(mod);
         }
 
-        kmod_module_unref_list(list);
         return err;
 }
 

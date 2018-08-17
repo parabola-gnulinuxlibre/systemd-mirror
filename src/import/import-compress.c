@@ -1,21 +1,4 @@
-/***
-  This file is part of systemd.
-
-  Copyright 2015 Lennart Poettering
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include "import-compress.h"
 #include "string-table.h"
@@ -69,7 +52,7 @@ int import_uncompress_detect(ImportCompress *c, const void *data, size_t size) {
         if (memcmp(data, xz_signature, sizeof(xz_signature)) == 0) {
                 lzma_ret xzr;
 
-                xzr = lzma_stream_decoder(&c->xz, UINT64_MAX, LZMA_TELL_UNSUPPORTED_CHECK);
+                xzr = lzma_stream_decoder(&c->xz, UINT64_MAX, LZMA_TELL_UNSUPPORTED_CHECK | LZMA_CONCATENATED);
                 if (xzr != LZMA_OK)
                         return -EIO;
 
@@ -135,7 +118,7 @@ int import_uncompress(ImportCompress *c, const void *data, size_t size, ImportCo
                         c->xz.avail_out = sizeof(buffer);
 
                         lzr = lzma_code(&c->xz, LZMA_RUN);
-                        if (lzr != LZMA_OK && lzr != LZMA_STREAM_END)
+                        if (!IN_SET(lzr, LZMA_OK, LZMA_STREAM_END))
                                 return -EIO;
 
                         r = callback(buffer, sizeof(buffer) - c->xz.avail_out, userdata);
@@ -156,7 +139,7 @@ int import_uncompress(ImportCompress *c, const void *data, size_t size, ImportCo
                         c->gzip.avail_out = sizeof(buffer);
 
                         r = inflate(&c->gzip, Z_NO_FLUSH);
-                        if (r != Z_OK && r != Z_STREAM_END)
+                        if (!IN_SET(r, Z_OK, Z_STREAM_END))
                                 return -EIO;
 
                         r = callback(buffer, sizeof(buffer) - c->gzip.avail_out, userdata);
@@ -177,7 +160,7 @@ int import_uncompress(ImportCompress *c, const void *data, size_t size, ImportCo
                         c->bzip2.avail_out = sizeof(buffer);
 
                         r = BZ2_bzDecompress(&c->bzip2);
-                        if (r != BZ_OK && r != BZ_STREAM_END)
+                        if (!IN_SET(r, BZ_OK, BZ_STREAM_END))
                                 return -EIO;
 
                         r = callback(buffer, sizeof(buffer) - c->bzip2.avail_out, userdata);
@@ -399,7 +382,7 @@ int import_compress_finish(ImportCompress *c, void **buffer, size_t *buffer_size
                         c->xz.avail_out = *buffer_allocated - *buffer_size;
 
                         lzr = lzma_code(&c->xz, LZMA_FINISH);
-                        if (lzr != LZMA_OK && lzr != LZMA_STREAM_END)
+                        if (!IN_SET(lzr, LZMA_OK, LZMA_STREAM_END))
                                 return -EIO;
 
                         *buffer_size += (*buffer_allocated - *buffer_size) - c->xz.avail_out;
@@ -420,7 +403,7 @@ int import_compress_finish(ImportCompress *c, void **buffer, size_t *buffer_size
                         c->gzip.avail_out = *buffer_allocated - *buffer_size;
 
                         r = deflate(&c->gzip, Z_FINISH);
-                        if (r != Z_OK && r != Z_STREAM_END)
+                        if (!IN_SET(r, Z_OK, Z_STREAM_END))
                                 return -EIO;
 
                         *buffer_size += (*buffer_allocated - *buffer_size) - c->gzip.avail_out;
@@ -440,7 +423,7 @@ int import_compress_finish(ImportCompress *c, void **buffer, size_t *buffer_size
                         c->bzip2.avail_out = *buffer_allocated - *buffer_size;
 
                         r = BZ2_bzCompress(&c->bzip2, BZ_FINISH);
-                        if (r != BZ_FINISH_OK && r != BZ_STREAM_END)
+                        if (!IN_SET(r, BZ_FINISH_OK, BZ_STREAM_END))
                                 return -EIO;
 
                         *buffer_size += (*buffer_allocated - *buffer_size) - c->bzip2.avail_out;

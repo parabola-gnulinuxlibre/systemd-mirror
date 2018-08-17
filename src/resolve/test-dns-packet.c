@@ -1,24 +1,9 @@
-/***
-  This file is part of systemd
-
-  Copyright 2016 Zbigniew Jędrzejewski-Szmek
-
-  systemd is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  systemd is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with systemd; If not, see <http://www.gnu.org/licenses/>.
-***/
+/* SPDX-License-Identifier: LGPL-2.1+ */
 
 #include <net/if.h>
 #include <glob.h>
+
+#include "sd-id128.h"
 
 #include "alloc-util.h"
 #include "fileio.h"
@@ -75,7 +60,7 @@ static void test_packet_from_file(const char* filename, bool canonical) {
                 assert_se(packet_size > 0);
                 assert_se(offset + 8 + packet_size <= data_size);
 
-                assert_se(dns_packet_new(&p, DNS_PROTOCOL_DNS, 0) >= 0);
+                assert_se(dns_packet_new(&p, DNS_PROTOCOL_DNS, 0, DNS_PACKET_SIZE_MAX) >= 0);
 
                 assert_se(dns_packet_append_blob(p, data + offset + 8, packet_size, NULL) >= 0);
                 assert_se(dns_packet_read_rr(p, &rr, NULL, NULL) >= 0);
@@ -90,7 +75,7 @@ static void test_packet_from_file(const char* filename, bool canonical) {
 
                 assert_se(dns_resource_record_to_wire_format(rr, canonical) >= 0);
 
-                assert_se(dns_packet_new(&p2, DNS_PROTOCOL_DNS, 0) >= 0);
+                assert_se(dns_packet_new(&p2, DNS_PROTOCOL_DNS, 0, DNS_PACKET_SIZE_MAX) >= 0);
                 assert_se(dns_packet_append_blob(p2, rr->wire_format, rr->wire_format_size, NULL) >= 0);
                 assert_se(dns_packet_read_rr(p2, &rr2, NULL, NULL) >= 0);
 
