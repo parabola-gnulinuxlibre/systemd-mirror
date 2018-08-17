@@ -49,3 +49,32 @@ A script will try to find your QEMU binary. If you want to specify a
 different one you can use `$QEMU_BIN`.
 
     $ sudo make QEMU_BIN=/path/to/qemu/qemu-kvm clean check
+
+Running tests
+-------------
+
+Writing tests
+-------------
+
+Functions you can implement:
+
+ - `check_result_qemu()` (1)
+ - `test_setup()` (22):
+   * Description: This is the main thing you need to do when writing a
+     test.
+   * Default implementation: There is none, you must provide this
+     function.
+ - `test_run()` (1):
+   * Description:
+   * Default implementation: It tries to run the test both in QEMU and
+     in `systemd-nspawn`.  You can inhibit one or both of these by
+     setting `TEST_NO_QEMU` or `TEST_NO_NSPAWN` respectively to
+     non-empty values.
+ - `test_cleanup()` (4)
+
+Variables you can set:
+
+ - `TEST_NO_QEMU` : Affects the default behavior of test_run(), see above.
+ - `TEST_NO_NSPAWN` : Affects the default behavior of test_run(), see above.
+ - `FSTYPE` : 
+ 

@@ -2,9 +2,9 @@
 
 BUILD_DIR="$($(dirname "$0")/../tools/find-build-dir.sh)"
 if [ $# -gt 0 ]; then
-        args="$@"
+        args=("$@")
 else
-        args="clean setup run"
+        args=(clean setup run)
 fi
 
 ninja -C "$BUILD_DIR"
@@ -19,10 +19,8 @@ for TEST in TEST-??-* ; do
         COUNT=$(($COUNT+1))
 
         echo -e "\n--x-- Running $TEST --x--"
-        set +e
-        ( set -x ; make -C "$TEST" "BUILD_DIR=$BUILD_DIR" $args )
-        RESULT=$?
-        set -e
+        RESULT=0
+        make -j1 -C "$TEST" "BUILD_DIR=$BUILD_DIR" "${args[@]}" || RESULT=$?
         echo "--x-- Result of $TEST: $RESULT --x--"
 
         results["$TEST"]="$RESULT"
