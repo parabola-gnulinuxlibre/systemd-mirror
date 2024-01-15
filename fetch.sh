@@ -13,6 +13,8 @@ declare -A urls=(
 	[systemd-stable]=https://github.com/systemd/systemd-stable.git
 	[elogind]=https://github.com/elogind/elogind.git
 	[eudev]=https://github.com/gentoo/eudev.git
+	[notsystemd]=https://github.com/parabola-gnulinuxlibre/notsystemd.git
+	[parabola]=https://github.com/parabola-gnulinuxlibre/systemd-parabola.git
 )
 
 tmpdir=$(mktemp -d)
@@ -27,7 +29,7 @@ for name in "${!urls[@]}"; do
 	git ls-remote --tags --refs "${urls[$name]}" >"$name.0.txt"
 done
 
-# 1: Filter out the ones we don't want to fetch ################################
+# 1: Filter out the tags we don't want to fetch ################################
 
 libremessages msg 'Remapping tags...'
 
@@ -63,7 +65,11 @@ cat eudev.0.txt |
 	# Done.
 	cat >eudev.1.txt
 
-# 2: Rename them ###############################################################
+cp notsystemd.{0,1}.txt
+
+cp parabola.{0,1}.txt
+
+# 2: Rename the tags ###########################################################
 
 # There are two tag formats coming from systemd.git:
 #  - vXXX[.Y]: systemd versions
@@ -91,8 +97,27 @@ cat eudev.0.txt |
 	    -e 's,refs/tags/([01]),refs/tags/eudev/v\1,' \
 	    >eudev.2.txt
 
+<elogind.1.txt awk '{print $2}' |
+	sed -E \
+	    -e 's,refs/tags/,refs/tags/elogind/,' \
+	    >elogind.2.txt
+
+<notsystemd.1.txt awk '{print $2}' |
+	sed -E \
+	    -e 's,refs/tags/,refs/tags/notsystemd/,' \
+	    >notsystemd.2.txt
+
+<parabola.1.txt awk '{print $2}' |
+	sed -E \
+	    -e 's,refs/tags/v,refs/tags/parabola/systemd-v,' \
+	    >parabola.2.txt
+
 # Sanity check; make sure that all tags got renamed.
-if cat *.2.txt|grep -vE 'refs/tags/(udev|systemd|systemd-stable|elogind|eudev)/v'; then
+if cat *.2.txt|grep -vE \
+       -e '^refs/tags/(udev|systemd|systemd-stable|elogind|eudev|notsystemd)/v' \
+       -e '^refs/tags/notsystemd/first-commit$' \
+       -e '^refs/tags/parabola/systemd-v'
+then
 	libremessages error 'Failed to rename some tags appropriately'
 	exit 1
 fi
