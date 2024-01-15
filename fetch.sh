@@ -101,7 +101,7 @@ fi
 
 for name in "${!urls[@]}"; do
 	{
-		echo "+refs/heads/*:refs/remotes/r-${name}/*"
+		echo "+refs/heads/*:refs/heads/${name}/*"
 		paste --delimiter=: <(<"$name.1.txt" awk '{print "+" $2}') "$name.2.txt"
 	} >"$name.3.txt"
 done
