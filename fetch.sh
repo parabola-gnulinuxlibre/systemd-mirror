@@ -15,9 +15,9 @@ declare -A urls=(
 	[eudev]=https://github.com/gentoo/eudev.git
 )
 
-# tmpdir=$(mktemp -d)
-# trap "rm -rf -- ${tmpdir@Q}" EXIT
-# pushd "$tmpdir" >/dev/null
+tmpdir=$(mktemp -d)
+trap "rm -rf -- ${tmpdir@Q}" EXIT
+pushd "$tmpdir" >/dev/null
 
 # 0: List remote tags ##########################################################
 
@@ -106,9 +106,7 @@ for name in "${!urls[@]}"; do
 	} >"$name.3.txt"
 done
 
-# 3: Actually fetch ############################################################
-
-exit 0
+# 4: Actually fetch ############################################################
 
 popd >/dev/null
 libremessages msg 'Actually fetching...'
