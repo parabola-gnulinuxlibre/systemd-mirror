@@ -113,11 +113,11 @@ libremessages msg 'Actually fetching...'
 
 for name in "${!urls[@]}"; do
 	libremessages msg2 '%s -> %s' "${urls[$name]}" "r-${name}"
-	tag_globs=()
+	tag_prefixes=()
 	case "$name" in
-		systemd) tag_globs=('refs/tags/systemd/*' 'refs/tags/udev/*');;
-		*) tag_globs=("refs/tags/$name/*");;
+		systemd) tag_prefixes=('refs/tags/systemd/' 'refs/tags/udev/');;
+		*) tag_prefixes=("refs/tags/$name/");;
 	esac
-	git for-each-ref --format='%(refname)' "${tag_globs[@]}" | grep -vFx -f "$tmpdir/$name.2.txt" | sed 's/^/delete /' | tee /dev/stderr | git update-ref --stdin
+	git for-each-ref --format='%(refname)' "${tag_prefixes[@]}" | grep -vFx -f "$tmpdir/$name.2.txt" | sed 's/^/delete /' | tee /dev/stderr | git update-ref --stdin
 	xargs -d $'\n' -a "$tmpdir/$name.3.txt" git fetch --prune --no-tags -- "${urls[$name]}"
 done
