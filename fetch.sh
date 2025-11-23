@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2023  Luke T. Shumaker <lukeshu@parabola.nu>
+# Copyright 2023, 2025  Luke T. Shumaker <lukeshu@parabola.nu>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # I used to manually maintain a horribly complicated .git/config to
@@ -31,7 +31,16 @@ done
 
 # 1: Filter out the tags we don't want to fetch ################################
 
-libremessages msg 'Remapping tags...'
+libremessages msg 'Filtering tags...'
+
+# Most of the filtering is removal of duplicate tags (the only
+# exception so far is the eudev 3.1.3 thing).  Our strategy for doing
+# this is to use `sed` to rename tags to the tag they are a duplicate
+# of, then use `grep -vFx ORIG.txt` to filter out the duplicates.
+# Because the files contain both the refname and the hash, if there
+# are any false-positives (where the identical remapped-refnames point
+# at different objects) here, the code that comes later will complain
+# and catch it for us.
 
 cp systemd.{0,1}.txt
 
@@ -41,7 +50,10 @@ cat systemd-stable.0.txt |
 	#  - sytemd-v{XXX} -> v{XXX}
 	#  - show -> v1
 	# Filter those out.
-	grep -vFx -f <(<systemd-stable.0.txt sed -nE -e 's,(.*)refs/tags/v1$,\1refs/tags/show\n\1refs/tags/systemd-v1,p' -e 's,refs/tags/v,refs/tags/systemd-v,p' -e 's,refs/tags/([01]),refs/tags/udev-\1,p') |
+	grep -vFx -f <(<systemd-stable.0.txt sed -nE \
+		-e 's,(.*)refs/tags/v1$,\1refs/tags/show\n\1refs/tags/systemd-v1,p' \
+		-e 's,refs/tags/v,refs/tags/systemd-v,p' \
+		-e 's,refs/tags/([01]),refs/tags/udev-\1,p') |
 	# Filter out tags copied from systemd.git
 	grep -vFx -f systemd.0.txt |
 	# Done.
@@ -55,7 +67,9 @@ cat elogind.0.txt |
 
 cat eudev.0.txt |
 	# Filter out the renamed tags from systemd.git
-	grep -vFx -f <(<systemd.0.txt sed -nE -e 's,refs/tags/v,refs/tags/systemd-v,p' -e 's,refs/tags/([01]),refs/tags/udev-\1,p') |
+	grep -vFx -f <(<systemd.0.txt sed -nE \
+		-e 's,refs/tags/v,refs/tags/systemd-v,p' \
+		-e 's,refs/tags/([01]),refs/tags/udev-\1,p') |
 	# Prune out other tags that exist as both 'vXXX' and just 'XXX'.
 	grep -vFx -f <(<eudev.0.txt sed -n 's,^refs/tags/v,refs/tags/,p') |
 	# 'v3.1.4' and '3.1.4' both point at the same commit, but
@@ -70,6 +84,8 @@ cp notsystemd.{0,1}.txt
 cp parabola.{0,1}.txt
 
 # 2: Rename the tags ###########################################################
+
+libremessages msg 'Renaming tags...'
 
 # There are two tag formats coming from systemd.git:
 #  - vXXX[.Y]: systemd versions
@@ -97,11 +113,6 @@ cp parabola.{0,1}.txt
 	    -e 's,refs/tags/([01]),refs/tags/eudev/v\1,' \
 	    >eudev.2.txt
 
-<elogind.1.txt awk '{print $2}' |
-	sed -E \
-	    -e 's,refs/tags/,refs/tags/elogind/,' \
-	    >elogind.2.txt
-
 <notsystemd.1.txt awk '{print $2}' |
 	sed -E \
 	    -e 's,refs/tags/,refs/tags/notsystemd/,' \
@@ -113,6 +124,9 @@ cp parabola.{0,1}.txt
 	    >parabola.2.txt
 
 # Sanity check; make sure that all tags got renamed.
+
+libremessages msg 'Checking tag mapping...'
+
 if cat *.2.txt|grep -vE \
        -e '^refs/tags/(udev|systemd|systemd-stable|elogind|eudev|notsystemd)/v' \
        -e '^refs/tags/notsystemd/first-commit$' \
@@ -137,12 +151,17 @@ popd >/dev/null
 libremessages msg 'Actually fetching...'
 
 for name in "${!urls[@]}"; do
-	libremessages msg2 '%s -> %s' "${urls[$name]}" "r-${name}"
+	libremessages msg2 '%s -> %s/' "${urls[$name]}" "${name}"
 	tag_prefixes=()
 	case "$name" in
 		systemd) tag_prefixes=('refs/tags/systemd/' 'refs/tags/udev/');;
 		*) tag_prefixes=("refs/tags/$name/");;
 	esac
-	git for-each-ref --format='%(refname)' "${tag_prefixes[@]}" | grep -vFx -f "$tmpdir/$name.2.txt" | sed 's/^/delete /' | tee /dev/stderr | git update-ref --stdin
+	# Delete exsiting tags.
+	git for-each-ref --format='%(refname)' "${tag_prefixes[@]}" |
+		grep -vFx -f "$tmpdir/$name.2.txt" |
+		sed 's/^/delete /' |
+		tee /dev/stderr | git update-ref --stdin
+	# Update branches and re-fetch tags.
 	xargs -d $'\n' -a "$tmpdir/$name.3.txt" git fetch --prune --no-tags -- "${urls[$name]}"
 done
