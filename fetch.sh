@@ -105,6 +105,7 @@ libremessages msg 'Renaming tags...'
 <elogind.1.txt awk '{print $2}' |
 	sed -E \
 	    -e 's,refs/tags/,refs/tags/elogind/,' \
+	    -e 's,/V,/v,' \
 	    >elogind.2.txt
 
 <eudev.1.txt awk '{print $2}' |
